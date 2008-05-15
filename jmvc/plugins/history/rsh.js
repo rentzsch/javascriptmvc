@@ -283,7 +283,7 @@ window.MVC.History = {
 	/*Private: Constant for our own internal history event called when the page is loaded*/
 	PAGELOADEDSTRING: "DhtmlHistory_pageLoaded",
 	
-	blank_html_path: MVC.mvc_root+'plugins/history/',
+	blank_html_path: MVC.mvc_root+'/plugins/history/',
 	
 	/*Private: Our history change listener.*/
 	listener: null,
@@ -341,7 +341,11 @@ window.MVC.History = {
 		);
 		var iframeID = "rshHistoryFrame";
 		var iframeHTML = '<iframe frameborder=0" id="' + iframeID + '" style="' + styles + '" src="'+this.blank_html_path+'blank.html?' + initialHash + '"></iframe>';
-		document.write(iframeHTML);
+
+		var iframeDiv = document.createElement('div');
+		iframeDiv.innerHTML = iframeHTML;
+		document.body.appendChild(iframeDiv);
+
 		this.iframe = MVC.$E(iframeID);
 	},
 	
@@ -349,7 +353,9 @@ window.MVC.History = {
 	createOpera: function() {
 		this.waitTime = 400;/*Opera needs longer between history updates*/
 		var imgHTML = '<img src="javascript:location.href=\'javascript:MVC.History.checkLocation();\';" style="' + historyStorage.hideStyles + '" />';
-		document.write(imgHTML);
+		var imgDiv = document.createElement('div');
+		imgDiv.innerHTML = imgHTML;
+		document.body.appendChild(imgDiv);
 	},
 	
 	/*Private: Create Safari-specific DOM nodes and overrides*/
@@ -562,7 +568,10 @@ window.historyStorage = {
 			var textareaHTML = '<form id="' + formID + '" style="' + formStyles + '">'
 				+ '<textarea id="' + textareaID + '" style="' + textareaStyles + '"></textarea>'
 			+ '</form>';
-			document.write(textareaHTML);
+
+			var textareaDiv = document.createElement('div');
+			textareaDiv.innerHTML = textareaHTML;
+			document.body.appendChild(textareaDiv);
 		}
 		this.storageField = MVC.$E(textareaID);
 		if (typeof window.opera !== "undefined") {

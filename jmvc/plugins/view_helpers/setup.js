@@ -130,7 +130,7 @@ MVC.Object.extend(MVC.View.Helpers.prototype, {
 	text_field_tag: function(name, value, html_options) { return this.input_field_tag(name, value, 'text', html_options); },
 	img_tag: function(image_location, options){
 		options = options || {};
-		options.src = "resources/images/"+image_location;
+		options.src = MVC.root.join("resources/images/"+image_location);
 		return this.single_tag_for('img', options);
 	},
 	to_text: function(input, null_text) {
