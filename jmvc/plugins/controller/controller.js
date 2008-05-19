@@ -10,7 +10,11 @@ MVC.Object.is_number = function(value){
 MVC.Controller = function(model, actions){
 	var className= model, newmodel = null, singular = MVC.String.is_singular(model);
 	model = MVC.String.classize(model)+'Controller';
-	newmodel = eval(model + " = function() { this.Class = "+model+";this.initialize.apply(this, arguments);};");
+	newmodel =  function(){
+        this.Class = model;
+        this.initialize.apply(this, arguments);
+    };
+    window[model] = newmodel;
 	newmodel.prototype = new MVC.Controller.functions();
 	newmodel.prototype.klass_name = model;
 	newmodel.className = newmodel.prototype.className =	className;
