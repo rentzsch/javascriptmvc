@@ -1,6 +1,6 @@
 // code contributed by Juriy Zaytsev
 MVC.Object.is_number = function(value){
-	return !isNaN(value)
+	return !isNaN(value);
 };
 /**
  * Creates a new controller object with actions
