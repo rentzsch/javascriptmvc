@@ -23,7 +23,7 @@ MVC.Controller = function(model, actions){
 	newmodel.add_register_action = function(action,observe_on, event_type, capture){
 		if(!registered_actions[event_type]){
 			registered_actions[event_type] = [];
-			MVC.Event.observe(observe_on, event_type, MVC.Controller.dispatch_event, capture);
+            MVC.Event.observe(observe_on, event_type, MVC.Controller.dispatch_event, capture);
 		}
 		registered_actions[event_type].push(action);
 	};
@@ -112,7 +112,7 @@ MVC.Object.extend(MVC.Controller , {
 			if(!actions) continue;
 			for(var i =0; i < actions.length;  i++){
 				var action = actions[i];
-				var match_result = action.match(target, event, parents_path);
+                var match_result = action.match(target, event, parents_path);
 				
 				if(match_result){
 					match_result.controller = MVC.Controller.klasses[c];
@@ -298,14 +298,15 @@ MVC.Controller.Action.prototype = {
 	},
 	change_for_ie : function(){
 		this.controller.add_register_action(this,document.documentElement, 'click');
-		this.filters= {
+		this.end_filters= {
 			click : function(el, event){
-				if(typeof el.selectedIndex == 'undefined') return false; //sometimes it won't exist yet
-				var old = el.getAttribute('_old_value');
-				if(el.nodeName.toUpperCase() == 'SELECT' && old == null){
+				if(typeof el.selectedIndex == 'undefined' || el.nodeName.toUpperCase() != 'SELECT') return false; //sometimes it won't exist yet
+                var old = el.getAttribute('_old_value');
+                
+                if( old == null){
 					el.setAttribute('_old_value', el.selectedIndex);
 					return false;
-				}else if(el.nodeName.toUpperCase() == 'SELECT'){
+				}else{
 					if(old == el.selectedIndex.toString()) return false;
 					el.setAttribute('_old_value', null);
 					return true;
@@ -315,7 +316,7 @@ MVC.Controller.Action.prototype = {
 	},
 	change_for_webkit : function(){
 		this.controller.add_register_action(this,document.documentElement, 'change');
-		this.filters= {
+		this.end_filters= {
 			change : function(el, event){
 				if(typeof el.value == 'undefined') return false; //sometimes it won't exist yet
 				var old = el.getAttribute('_old_value');
@@ -358,21 +359,23 @@ MVC.Controller.Action.prototype = {
 	match : function(el, event, parents){
 		if(this.filters && !this.filters[event.type](el, event)) return null;
 		if(this.controller.className != 'main' &&  (el == document.documentElement || el==document.body) ) return false;
-
 		var matching = 0;
 		for(var n=0; n < parents.length; n++){
 			var node = parents[n], match = this.selector_order()[matching], matched = true;
 			for(var attr in match){
 				if(!match.hasOwnProperty(attr) || attr == 'element') continue;
-				if(match[attr] && attr == 'className'){
+                if(match[attr] && attr == 'className'){
 					if(! MVC.Array.include(node.className.split(' '),match[attr])) matched = false;
 				}else if(match[attr] && node[attr] != match[attr]){
-					matched = false;
+					matched = false;    
 				}
 			}
 			if(matched){
 				matching++;
-				if(matching >= this.selector_order().length) return {node: node.element, order: n, action: this};
+				if(matching >= this.selector_order().length) {
+                    if(this.end_filters && !this.end_filters[event.type](el, event)) return null;
+                    return {node: node.element, order: n, action: this};
+                }
 			}
 		}
 		return null;

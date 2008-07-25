@@ -16,15 +16,22 @@ MVC.Controller('main',{
 		success('mainclick')
 	}
 });
+MVC.Controller('todos',{
+    change: function(){
+        success('change2')
+    }
+})
+
+
 MVC.Controller('tests',{
 	change: function(){
-		success('change')
+        success('change')
 	},
 	click : function(params){
 		success('click')
 	},
 	focus : function(params){
-		success('focus')
+        success('focus')
 	},
 	blur : function(){
 		success('blur')
