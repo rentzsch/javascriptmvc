@@ -16,7 +16,8 @@ MVC.Controller('main',{
 		success('mainclick')
 	}
 });
-MVC.Controller('todos',{
+
+MVC.Controller('todonts',{
     change: function(){
         success('change2')
     }
@@ -69,5 +70,12 @@ MVC.Controller('tests',{
 	after : function(params){
 		this.data = 'HelloWorld'
 		this.render({after: 'render_here'});
-	}
+	},
+    cont : function(){
+        this.testValue = "howdy";
+        this.continue_to('continued')();
+    },
+    continued: function(){
+        MVC.$E('continue_test').innerHTML = this.testValue;
+    }
 });

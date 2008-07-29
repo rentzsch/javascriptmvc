@@ -21,5 +21,10 @@ new MVC.Test.Unit('controller_view',{
 		this.assert_equal("HelloWorld", document.getElementById('after').innerHTML );
 		var part = document.getElementById('render_here');
 		this.assert_equal("after",  part.nextSibling.id);
-	}
+	},
+    test_continue_to : function(){
+        MVC.Controller.dispatch('tests', 'cont',{} );
+        this.assert_equal("howdy",  MVC.$E('continue_test').innerHTML);
+        
+    }
 })

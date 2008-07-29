@@ -171,7 +171,7 @@ MVC.Model.ClassFunctions = {
   update : function(attributes, callback){
   	var base = new this(attributes);
 
-	updateWork = MVC.Function.bind( function(saved) {
+	var updateWork = MVC.Function.bind( function(saved) {
       return callback(base);
     }, this);
     
