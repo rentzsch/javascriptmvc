@@ -1,0 +1,182 @@
+<h3>add page. <input id='page_generator' type='submit' value='Browse'/></h3>
+<p class='indent gray'>Creates a page for your application at the specified location.</p>
+<p class='indent'><span class='gray'>Pages</span>: <%= pages %></p>
+<h3>include.</h3>
+<div class='include_type'>
+    <h4>controllers</h4>
+    <div class='left'>(</div>
+    <div class='includes'>
+    <% var partial = (new MVC.View({absolute_url: 'command/views/_included.ejs'}).render({
+    	iter: included.controllers, 
+    	end_with_comma: true,
+    	type: 'controller'})); %>
+    <%= partial %>
+    </div>
+    <form id='controller_generator'>&nbsp;<input name='controller_name' class='text'/><input type='submit' value='generate'  class='generate'> 
+        <span>)</span>
+    </form>
+    <div class='clear'></div>
+    <div class='indent'>
+	    <% var partial = (new MVC.View({absolute_url: 'command/views/_unincluded.ejs'}).render({
+	    	type: 'controller',
+	    	included: included.controllers,
+	    	files: files.controllers})); %>
+	    <%= partial %>
+        <p class='gray'>Controllers group events for groups of HTML objects. 
+        <a href='http://javascriptmvc.com/learningcenter/controller/index.html'>Learn more</a></p>
+    </div>
+</div>
+
+<div class='include_type'>
+    <h4>models</h4>
+    <div class='left'>(</div>
+    <div class='includes'>
+    <% var partial = (new MVC.View({absolute_url: 'command/views/_included.ejs'}).render({
+    	iter: included.models, 
+    	end_with_comma: true,
+    	type: 'model'})); %>
+    <%= partial %>
+    </div>
+    <form id='model_generator'>&nbsp;<input name='model_name' class='text'/><select name="model_type">
+			<option value="Ajax">Ajax</option>
+            <option value="Cookie">Cookie</option>
+			<option value="Remote">Remote</option>
+			<option value="XMLRest">XML Rest</option>
+		</select><input type='submit' value='generate' class='generate'> 
+        <span>)</span>
+    </form>
+    <div class='clear'></div>
+    <div class='indent'>
+	    <% var partial = (new MVC.View({absolute_url: 'command/views/_unincluded.ejs'}).render({
+	    	type: 'model',
+	    	included: included.models,
+	    	files: files.models})); %>
+	    <%= partial %>
+        <p class='gray'>Models connect to a data source on your domain (Ajax), across domains (Remote), or in 
+    	the browser (Cookie).<a href='http://javascriptmvc.com/learningcenter/model/index.html'>Learn more</a></p>
+    </div>
+</div>
+
+<div class='include_type'>
+    <h4>resources</h4>
+    <div class='left'>(</div>
+    <div class='includes'>
+    <% var partial = (new MVC.View({absolute_url: 'command/views/_included.ejs'}).render({
+    	iter: included.resources, 
+    	end_with_comma: false,
+    	type: 'resource'})); %>
+    <%= partial %>
+    </div>
+    <span>)</span>
+    <div class='clear'></div>
+    <div class='indent'>
+	    <% var partial = (new MVC.View({absolute_url: 'command/views/_unincluded.ejs'}).render({
+	    	type: 'resource',
+	    	included: included.resources,
+	    	files: files.resources})); %>
+	    <%= partial %>
+        <p class='gray'>Resources are non-JavaScriptMVC files or other libraries (like jQuery or Prototype).</p>
+    </div>
+</div>
+
+<div class='include_type'>
+    <h4>unit_tests</h4>
+    <div class='left'>(</div>
+    <div class='includes'>
+    <% var partial = (new MVC.View({absolute_url: 'command/views/_included.ejs'}).render({
+    	iter: included.unit_tests, 
+    	end_with_comma: true,
+    	type: 'unit_test'})); %>
+    <%= partial %>
+    </div>
+    <form id='unit_test_generator'>&nbsp;<input name='unit_test_name' class='text'/><input type='submit' value='generate'  class='generate'> 
+        <span>)</span>
+    </form>
+    <div class='clear'></div>
+    <div class='indent'>
+	    <% var partial = (new MVC.View({absolute_url: 'command/views/_unincluded.ejs'}).render({
+	    	type: 'unit_test',
+	    	included: included.unit_tests,
+	    	files: files.unit_tests})); %>
+	    <%= partial %>
+        <p class='gray'>Unit tests are for testing lower level functionality, like a method or class.  <a href='http://javascriptmvc.com/learningcenter/test/learn.html#types'>Learn more</a></p>
+    </div>
+</div>
+
+<div class='include_type'>
+    <h4>functional_tests</h4>
+    <div class='left'>(</div>
+    <div class='includes'>
+    <% var partial = (new MVC.View({absolute_url: 'command/views/_included.ejs'}).render({
+    	iter: included.functional_tests, 
+    	end_with_comma: true,
+    	type: 'functional_test'})); %>
+    <%= partial %>
+    </div>
+    <form id='functional_test_generator'>&nbsp;<input name='functional_test_name' class='text'/><input type='submit' value='generate'  class='generate'> 
+        <span>)</span>
+    </form>
+    <div class='clear'></div>
+    <div class='indent'>
+	    <% var partial = (new MVC.View({absolute_url: 'command/views/_unincluded.ejs'}).render({
+	    	type: 'functional_test',
+	    	included: included.functional_tests,
+	    	files: files.functional_tests})); %>
+	    <%= partial %>
+        <p class='gray'>Functional tests are for simulating user interactions and testing for correct page response.  
+        <a href='http://javascriptmvc.com/learningcenter/test/learn.html#types'>Learn more</a></p>
+    </div>
+</div>
+
+<div class='include_type'>
+    <h4>views</h4>
+    <div class='left'>(</div>
+    <div class='includes'>
+    <% var partial = (new MVC.View({absolute_url: 'command/views/_included.ejs'}).render({
+    	iter: included.views, 
+    	end_with_comma: false,
+    	type: 'view'})); %>
+    <%= partial %>
+    </div>
+    <span>)</span>
+    <div class='clear'></div>
+    <div class='indent'>
+	    <% var partial = (new MVC.View({absolute_url: 'command/views/_unincluded.ejs'}).render({
+	    	type: 'view',
+	    	included: included.views,
+	    	files: files.views})); %>
+	    <%= partial %>
+        <p class='gray'>Views are HTML template files that help clean HTML from your JavaScript.  
+        <a href='http://javascriptmvc.com/learningcenter/view/index.html'>Learn more</a></p>
+    </div>
+</div>
+
+<div class='include_type'>
+    <h4>plugins</h4>
+    <div class='left'>(</div>
+    <div class='includes'>
+    <% var partial = (new MVC.View({absolute_url: 'command/views/_included.ejs'}).render({
+    	iter: plugins_in_app_file, 
+    	end_with_comma: false,
+    	type: 'plugin'})); %>
+    <%= partial %>
+    </div>
+    <span>)</span>
+    <div class='clear'></div>
+    <ul id='plugins'>
+	<% for(var j=0; j<files.plugins.length; j++) { %>
+		<% var disabled = true;
+		if(included.plugins.indexOf(files.plugins[j]) == -1)
+			disabled = false; %>
+		
+		<li class='plugin'><input type='checkbox' <%= disabled? "disabled='true'": "" %> <%= disabled? "checked='true'": "" %> /> 
+		<% if(MVC.PluginDescriptions[files.plugins[j]]){ %>
+			<a href='<%= MVC.PluginDescriptions[files.plugins[j]].url %>'><%= files.plugins[j] %></a> - 
+			<%= MVC.PluginDescriptions[files.plugins[j]].description %>
+		<% } else { %>
+			<%= files.plugins[j] %>
+		<% } %>
+		</li>
+	<% } %>
+	</ul>
+</div>

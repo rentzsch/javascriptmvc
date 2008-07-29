@@ -1,0 +1,28 @@
+<html>
+	<head>
+		
+	</head>
+	<body>
+		<div id='todos'>
+			<h3 class='demo_header'>Todo Demo</h3>
+			<form class='new' id='todo_form'>
+				<input type='text' value='type new todo here' id='new_todo' style='color: gray'/>
+			</form>
+			<div class='todo' id='thefirsttodo'><img src='../../images/close.png' alt='close'/>
+				<input type='checkbox' class='check'/>
+				<label>Learn JavaScriptMVC</label>
+				<p class='clear'></p>
+			</div>
+		</div>
+		<a onclick='MVC.Console.log("something")'>log</a>
+		
+		<script type='text/javascript'>
+			log = function(message){
+				var p = document.createElement('p')
+				p.innerHTML = message
+				document.body.appendChild(p)
+			}
+		</script>
+		<script src='../../jmvc/include.js?test,test' type='text/javascript'></script>
+	</body>
+</html>

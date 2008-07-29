@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+	<head></head>
+	<body>
+		<script language="javascript" type="text/javascript">
+			window.addEventListener = function(){};
+			document.addEventListener = function(){};
+			var in_command_window = true;
+			var app_name = location.href.split('?')[1];
+			document.write('<script language="javascript" type="text/javascript" src="../include.js?'
+				+app_name+'"><\/script>');
+			document.write('<script language="javascript" type="text/javascript" '
+				+'src="resources/redefine_test_includes.js"><\/script>');
+			document.write('<script language="javascript" type="text/javascript" src="../../apps/'
+				+app_name+'/'+app_name+'_test.js"><\/script>');
+		</script>
+	</body>
+</html>
