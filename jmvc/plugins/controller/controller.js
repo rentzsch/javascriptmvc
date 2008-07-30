@@ -169,8 +169,8 @@ MVC.Controller.Params.prototype = {
 		for(var i=0; i < els.length; i++){
 			var el = els[i];
 			if(el.type.toLowerCase()=='submit') continue;
-			var key = el.name, key_components = key.split(/\[[^\]]*\]/), value;
-         
+			var key = el.name, value, key_components = key.split( /\[|\]\[|\]/ );
+			if(key_components.length > 1) key_components.pop();
 			/* Check for checkbox and radio buttons */
 			switch(el.type.toLowerCase()) {
 				case 'checkbox':
@@ -189,11 +189,11 @@ MVC.Controller.Params.prototype = {
 				if(! data[nested_key] ) data[nested_key] = {};
 				var nested_hash = data[nested_key];
 				for(var k = 1; k < last; k++){
-					nested_key = key_components[k].substring(1, key_components[k].length - 1);
+					nested_key = key_components[k];
 					if( ! nested_hash[nested_key] ) nested_hash[nested_key] ={};
 					nested_hash = nested_hash[nested_key];
 				}
-				nested_hash[ key_components[last].substring(1, key_components[last].length - 1) ] = value;
+				nested_hash[ key_components[last] ] = value;
 			} else {
 		        if (key in data) {
 		        	if (typeof data[key] == 'string' ) data[key] = [data[key]];

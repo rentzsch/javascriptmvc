@@ -545,6 +545,7 @@ MVC.Model.InstanceFunctions =  MVC.Class.extend({
         else {
           var attributes;
           if (this.Class._format == "json") {
+            eval("var jsonData = " + transport.responseText); // Parse JSON into object...
             attributes = this._attributesFromJSON(transport.responseText);
           }
           else {

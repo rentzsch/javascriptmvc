@@ -31,8 +31,10 @@
 		</p>
 		
 		<form id='tests'>
-			<select class='test' id='sel'><option value='one'>one</option><option>two</option></select>
-			<input class='test' value='mouseover, mouseout, click, focus, and blur me' id='input' size='50' />
+			<select class='test' id='sel' name="select_value"><option value='one'>one</option><option>two</option></select>
+			
+            <input type="hidden" name="test[hidden]" value="ignore me" />
+            <input name="test[first]" class='test' value='mouseover, mouseout, click, focus, and blur me' id='input' size='50' />
 			<input type='submit' value='submit me'/>
 		</form>
 		<div id='load' class='failure'>

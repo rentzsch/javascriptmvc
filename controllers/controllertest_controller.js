@@ -38,7 +38,8 @@ MVC.Controller('tests',{
 		success('blur')
 	},
 	'# submit' :function(params){
-		success('submit')
+		SUBMIT_FORM_PARAMS = params.form_params()
+        success('submit')
 		params.event.kill();
 	},
 	mousedown : function(params){

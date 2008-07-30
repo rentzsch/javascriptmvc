@@ -33,7 +33,10 @@ new MVC.Test.Controller('tests',{
 	},
 	test_submit: function(){
 		this.TestsSubmit();
-		this.assert_equal('success', $GET('submit').className )
+        this.assert_equal('success', $GET('submit').className );
+        this.assert_equal('one', SUBMIT_FORM_PARAMS.select_value )
+        this.assert_equal('mouseover, mouseout, click, focus, and blur me', SUBMIT_FORM_PARAMS.test.first )
+        this.assert_equal('ignore me', SUBMIT_FORM_PARAMS.test.hidden )
 	},
 	test_contextmenu : function(){
 		this.TestContextmenu();

@@ -26,5 +26,8 @@ new MVC.Test.Unit('controller_view',{
         MVC.Controller.dispatch('tests', 'cont',{} );
         this.assert_equal("howdy",  MVC.$E('continue_test').innerHTML);
         
+    },
+    test_form_params : function(){
+        
     }
 })
