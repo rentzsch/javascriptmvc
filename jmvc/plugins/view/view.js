@@ -55,7 +55,7 @@ MVC.View = function( options ){
 		MVC.View.update(this.name, this);
 		return;
 	}
-	if(options.url || options.absolute_url){
+	if(options.url){
         options.url = MVC.View.get_absolute_path(options.url);
 		var template = MVC.View.get(options.url, this.cache);
 		if (template) return template;
