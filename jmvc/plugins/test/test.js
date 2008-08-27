@@ -1,9 +1,8 @@
 
-
-
-
-
 MVC.Tests = {};
+
+
+
 MVC.Test = MVC.Class.extend({
 	init: function( name, tests, type  ){
 		this.type = type || 'unit';

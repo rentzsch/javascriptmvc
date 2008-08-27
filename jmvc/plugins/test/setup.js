@@ -1,2 +1,2 @@
-include.plugins('lang','query','debug','class')
+include.plugins('lang','dom/query','debug','lang/class')
 include('test','synthetic_events')
