@@ -1,35 +1,52 @@
-/*--------------------------------------------------------------------------
- *  MVC.View - Embedded JavaScript, version 0.1.0
- *  Copyright (c) 2007 Edward Benson
- *  http://www.edwardbenson.com/projects/MVC.View
- *  ------------------------------------------------------------------------
- *
- *  EJS is freely distributable under the terms of an MIT-style license.
- *
- *  EJS is a client-side preprocessing engine written in and for JavaScript.
- *  If you have used PHP, ASP, JSP, or ERB then you get the idea: code embedded
- *  in <% // Code here %> tags will be executed, and code embedded in <%= .. %> 
- *  tags will be evaluated and appended to the output. 
- * 
- *  This is essentially a direct JavaScript port of Masatoshi Seki's erb.rb 
- *  from the Ruby Core, though it contains a subset of ERB's functionality. 
- * 
- * 
- *  Usage:
- *      // source should be either a string or a DOM node whose innerHTML
- *      // contains EJB source.
- *  	var source = "<% var ejb="EJB"; %><h1>Hello, <%= ejb %>!</h1>"; 
- *      var compiler = new MVC.View.Compiler(source);		
- *	    compiler.compile();	
- *	    var output = eval(compiler.out);
- *      alert(output); // -> "<h1>Hello, EJB!</h1>"
- *       
- *  For a demo:      see demo.html
- *  For the license: see license.txt
- *
- *--------------------------------------------------------------------------*/
+// Copyright (c) 2007 Edward Benson http://www.edwardbenson.com/projects/ejs
 
-
+/**
+ * @constructor
+ * View cleans the HTML out of your JavaScript with client side templates. After View gets its rubber gloves on dirty code, 
+ * you'll feel organized and uncluttered.
+ * @init Creates a new view
+ * @param {Object} options A hash with the following options
+ * <table class="options">
+				<tbody><tr><th>Option</th><th>Default</th><th>Description</th></tr>
+				<tr>
+					<td>url</td>
+					<td>&nbsp;</td>
+					<td>loads the template from a file
+					</td>
+				</tr>
+				<tr>
+					<td>text</td>
+					<td>&nbsp;</td>
+					<td>uses the provided text as the template. Example:<br/><code>new View({text: '&lt;%=user%>'})</code>
+					</td>
+				</tr>
+				<tr>
+					<td>element</td>
+					<td>&nbsp;</td>
+					<td>loads a template from the innerHTML or value of the element.
+					</td>
+				</tr>
+				<tr>
+					<td>type</td>
+					<td>'<'</td>
+					<td>type of magic tags.  Options are '&lt;' or '['
+					</td>
+				</tr>
+				<tr>
+					<td>name</td>
+					<td>the element ID or url </td>
+					<td>an optional name that is used for caching.
+					</td>
+				</tr>
+				<tr>
+					<td>cache</td>
+					<td>true in production mode, false in other modes</td>
+					<td>true to cache template.
+					</td>
+				</tr>
+				
+			</tbody></table>
+ */
 MVC.View = function( options ){
     this.set_options(options);
 	if(options.precompiled){
@@ -38,12 +55,12 @@ MVC.View = function( options ){
 		MVC.View.update(this.name, this);
 		return;
 	}
-	if(options.url){
+	if(options.url || options.absolute_url){
         options.url = MVC.View.get_absolute_path(options.url);
 		var template = MVC.View.get(options.url, this.cache);
 		if (template) return template;
 	    if (template == MVC.View.INVALID_PATH) return null;
-        this.text = include.request(options.url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
+        this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
 		
 		if(this.text == null){
 			throw( {type: 'JMVC', message: 'There is no template at '+url}  );
@@ -72,8 +89,15 @@ MVC.View = function( options ){
 	MVC.View.update(this.name, this);
 	this.template = template;
 };
+/*@Prototype*/
 MVC.View.prototype = {
-	render : function(object, extra_helpers){
+	/**
+	 * Renders an object with extra view helpers attached to the view.
+	 * @param {Object} object data to be rendered
+	 * @param {Object} extra_helpers an object with additonal view helpers
+	 * @return {String} returns the result of the string
+	 */
+    render : function(object, extra_helpers){
 		object = object || {};
 		var v = new MVC.View.Helpers(object);
         MVC.Object.extend(v, extra_helpers || {} );
@@ -82,6 +106,10 @@ MVC.View.prototype = {
 	out : function(){
 		return this.template.out;
 	},
+    /**
+     * Sets options on this view to be rendered with.
+     * @param {Object} options
+     */
 	set_options : function(options){
 		this.type = options.type != null ? options.type : MVC.View.type;
 		this.cache = options.cache != null ? options.cache : MVC.View.cache;
@@ -91,6 +119,20 @@ MVC.View.prototype = {
 	// called without options, returns a function that takes the object
 	// called with options being a string, uses that as a url
 	// called with options as an object
+    /**
+     * Updates an element's innerHTML with the rendered view.
+     * @param {HTMLElement/String} element or id of the element to update
+     * @param {null/String/Object} options is one of the following
+     * <table class="options">
+     *     <tbody>
+     *         <tr><th>Type</th><th>Result</th></tr>
+     *         <tr>null<td><td>returns a function that takes an object and renders with it to the view</td>
+     *         <tr>string<td><td>uses the string as a url to perform a get request for JSON data.</td>
+     *         <tr>object<td><td>uses the object to render</td>
+     *     </tbody></table>
+     *         
+     * @return {null/Function}
+     */
 	update : function(element, options){
         if(typeof element == 'string'){
 			element = MVC.$E(element);
@@ -119,38 +161,10 @@ MVC.View.prototype = {
 };
 
 
-/* Make a split function like Ruby's: "abc".split(/b/) -> ['a', 'b', 'c'] */
-String.prototype.rsplit = function(regex) {
-	var item = this;
-	var result = regex.exec(item);
-	var retArr = new Array();
-	while (result != null)
-	{
-		var first_idx = result.index;
-		var last_idx = regex.lastIndex;
-		if ((first_idx) != 0)
-		{
-			var first_bit = item.substring(0,first_idx);
-			retArr.push(item.substring(0,first_idx));
-			item = item.slice(first_idx);
-		}		
-		retArr.push(result[0]);
-		item = item.slice(result[0].length);
-		result = regex.exec(item);	
-	}
-	if (! item == '')
-	{
-		retArr.push(item);
-	}
-	return retArr;
-};
 
-/* Chop is nice to have too */
-String.prototype.chop = function() {
-	return this.substr(0, this.length - 1);
-};
 
-/* Adaptation from the Scanner of erb.rb  */
+
+/*@Static*/
 MVC.View.Scanner = function(source, left, right) {
 	this.left_delimiter = 	left +'%';	//<%
 	this.right_delimiter = 	'%'+right;	//>
@@ -168,23 +182,6 @@ MVC.View.Scanner = function(source, left, right) {
 	this.lines = 0;
 };
 
-MVC.View.Helpers = function(data){
-	this.data = data;
-};
-MVC.View.Helpers.prototype = {
-	partial: function(options, data){
-		if(!data) data = this.data;
-		return new MVC.View(options).render(data);
-	},
-	to_text: function(input, null_text) {
-	    if(input == null || input === undefined) return null_text || '';
-	    if(input instanceof Date) return input.toDateString();
-		if(input.toString) return input.toString().replace(/\n/g, '<br />').replace(/''/g, "'");
-		return '';
-	}
-};
-
-
 MVC.View.Scanner.to_text = function(input){
 	if(input == null || input === undefined)
         return '';
@@ -196,25 +193,21 @@ MVC.View.Scanner.to_text = function(input){
 };
 
 MVC.View.Scanner.prototype = {
-
-  /* For each line, scan! */
   scan: function(block) {
      scanline = this.scanline;
 	 regex = this.SplitRegexp;
 	 if (! this.source == '')
 	 {
-	 	 var source_split = this.source.rsplit(/\n/);
+	 	 var source_split = MVC.String.rsplit(this.source, /\n/);
 	 	 for(var i=0; i<source_split.length; i++) {
 		 	 var item = source_split[i];
 			 this.scanline(item, regex, block);
 		 }
 	 }
   },
-  
-  /* For each token, block! */
   scanline: function(line, regex, block) {
 	 this.lines++;
-	 var line_split = line.rsplit(regex);
+	 var line_split = MVC.String.rsplit(line, regex);
  	 for(var i=0; i<line_split.length; i++) {
 	   var token = line_split[i];
        if (token != null) {
@@ -228,7 +221,7 @@ MVC.View.Scanner.prototype = {
   }
 };
 
-/* Adaptation from the Buffer of erb.rb  */
+
 MVC.View.Buffer = function(pre_cmd, post_cmd) {
 	this.line = new Array();
 	this.script = "";
@@ -265,7 +258,7 @@ MVC.View.Buffer.prototype = {
  	
 };
 
-/* Adaptation from the Compiler of erb.rb  */
+
 MVC.View.Compiler = function(source, left) {
     this.pre_cmd = ['var ___ViewO = "";'];
 	this.post_cmd = new Array();
@@ -349,7 +342,7 @@ MVC.View.Compiler.prototype = {
 						case scanner.left_delimiter:
 							if (content[content.length - 1] == '\n')
 							{
-								content = content.chop();
+								content = MVC.String.chop(content);
 								buff.push(content);
 								buff.cr();
 							}
@@ -413,7 +406,26 @@ MVC.View.get_absolute_path = function(path){
 }
 
 //type, cache, folder
-
+/**
+ * Sets default options for all views
+ * @param {Object} options Set view with the following options
+ * <table class="options">
+				<tbody><tr><th>Option</th><th>Default</th><th>Description</th></tr>
+				<tr>
+					<td>type</td>
+					<td>'<'</td>
+					<td>type of magic tags.  Options are '&lt;' or '['
+					</td>
+				</tr>
+				<tr>
+					<td>cache</td>
+					<td>true in production mode, false in other modes</td>
+					<td>true to cache template.
+					</td>
+				</tr>
+	</tbody></table>
+ * 
+ */
 MVC.View.config = function(options){
 	MVC.View.cache = options.cache != null ? options.cache : MVC.View.cache;
 	MVC.View.type = options.type != null ? options.type : MVC.View.type;
@@ -439,6 +451,43 @@ MVC.View.config( {cache: include.get_env() == 'production', type: '<' } );
 MVC.View.PreCompiledFunction = function(name, f){
 	new MVC.View({name: name, precompiled: f});
 };
+
+/**
+ * @constructor
+ * By adding functions to MVC.View.Helpers.prototype, those functions will be available in the 
+ * views.
+ * @init Creates a view helper.  This function is called internally.  You should never call it.
+ * @param {Object} data The data passed to the view.  Helpers have access to it through this.data
+ */
+MVC.View.Helpers = function(data){
+	this.data = data;
+};
+/*@prototype*/
+MVC.View.Helpers.prototype = {
+    /**
+     * Renders a new view.  If data is passed in, uses that to render the view.
+     * @param {Object} options standard options passed to a new view.
+     * @param {optional:Object} data
+     * @return {String}
+     */
+	partial: function(options, data){
+		if(!data) data = this.data;
+		return new MVC.View(options).render(data);
+	},
+    /**
+     * For a given value, tries to create a human representation.
+     * @param {Object} input the value being converted.
+     * @param {Object} null_text what text should be present if input == null or undefined, defaults to ''
+     * @return {String} 
+     */
+	to_text: function(input, null_text) {
+	    if(input == null || input === undefined) return null_text || '';
+	    if(input instanceof Date) return input.toDateString();
+		if(input.toString) return input.toString().replace(/\n/g, '<br />').replace(/''/g, "'");
+		return '';
+	}
+};
+
 
 
 MVC.Included.views = [];
@@ -472,3 +521,47 @@ MVC.View.process_include = function(script){
 if(!MVC._no_conflict){
 	View = MVC.View;
 }
+
+
+/**
+ * @add class MVC.String Static
+ */
+MVC.Native.extend('String', {
+    /**
+     * Can split a string nicely cross browser.
+     * @plugin view
+     * @param {Object} item
+     * @param {Object} regex
+     */
+    rsplit : function(string, regex) {
+    	var result = regex.exec(string);
+    	var retArr = new Array();
+    	while (result != null)
+    	{
+    		var first_idx = result.index;
+    		var last_idx = regex.lastIndex;
+    		if ((first_idx) != 0)
+    		{
+    			var first_bit = string.substring(0,first_idx);
+    			retArr.push(string.substring(0,first_idx));
+    			string = string.slice(first_idx);
+    		}		
+    		retArr.push(result[0]);
+    		string = string.slice(result[0].length);
+    		result = regex.exec(string);	
+    	}
+    	if (! string == '')
+    	{
+    		retArr.push(string);
+    	}
+    	return retArr;
+    },
+    /**
+     * Removes the last character from a string.
+     * @plugin view
+     * @param {Object} string
+     */
+    chop: function(string){
+        return this.substr(0, this.length - 1);
+    }
+})
