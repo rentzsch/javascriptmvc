@@ -1,3 +1,10 @@
+include.views(
+	include.get_path()+'/list',
+	include.get_path()+'/edit',
+	include.get_path()+'/display',
+	include.get_path()+'/show'
+);
+
 MVC.Controller.scaffold = function(){
     //go through list of prototype functions, if one doesn't exist copy
     if(!this.className) return;
@@ -31,7 +38,7 @@ MVC.Controller.scaffold.functions = {
         this.singular_name = this.Class.singular_name;
         this[this.controller_name] = objects;
         this.objects = objects;
-        this.render({to: this.controller_name, plugin: 'controller_scaffold/display', action: this.controller_name});
+        this.render({to: this.controller_name, plugin: 'controller/scaffold/display', action: this.controller_name});
     },
     '# form submit' : function(params){
         params.event.kill();
@@ -49,7 +56,7 @@ MVC.Controller.scaffold.functions = {
             this[this.controller_name] = [object];
             this.objects = [object];
             this.singular_name = this.Class.singular_name;
-            this.render({bottom: 'recipe_list', plugin: 'controller_scaffold/list', action: 'list'});//?
+            this.render({bottom: 'recipe_list', plugin: 'controller/scaffold/list', action: 'list'});//?
             
 		}
     },
@@ -61,7 +68,7 @@ MVC.Controller.scaffold.functions = {
     '.edit click' : function(params){
         this[this.Class.singular_name] = params.object_data();
         this.singular_name = this.Class.singular_name;
-        this.render({to: this[this.Class.singular_name].View().element_id(), action: 'edit', plugin: 'controller_scaffold/edit'}); //!
+        this.render({to: this[this.Class.singular_name].View().element_id(), action: 'edit', plugin: 'controller/scaffold/edit'}); //!
     },
     '.cancel click': function(params){
         this.show(params.object_data());
@@ -74,7 +81,7 @@ MVC.Controller.scaffold.functions = {
     show: function(object){
         this[this.Class.singular_name] = object;
         this.singular_name = this.Class.singular_name;
-        this.render({to: this[this.Class.singular_name].View().element_id(), action: 'show', plugin: 'controller_scaffold/show'} );
+        this.render({to: this[this.Class.singular_name].View().element_id(), action: 'show', plugin: 'controller/scaffold/show'} );
     },
     destroyed: function(destroyed){
         if(destroyed)
