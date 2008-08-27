@@ -10,7 +10,7 @@
  * Model is also designed to work with ModelViewHelper.
  */
 MVC.Model = MVC.Class.extend(
-/*Static*/
+/*@Static*/
 {
     /**
      * Finds objects in this class
@@ -106,7 +106,7 @@ MVC.Model = MVC.Class.extend(
         if(!callbacks.onError && callbacks.onComplete) callbacks.onError = callbacks.onComplete;
     }
 },
-/*Prototype*/
+/*@Prototype*/
 {   
     
     init : function(attributes){

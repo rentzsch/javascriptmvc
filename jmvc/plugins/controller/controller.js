@@ -3,7 +3,16 @@ MVC.Object.is_number = function(o){
     return o &&(  typeof o == 'number' || ( typeof o == 'string' && !isNaN(o) ) );
 };
 
-MVC.Controller = MVC.Class.extend({
+/* Controllers respond to events such as mouseovers, clicks, and form submits. 
+ * They do this by naming functions, 
+ * also called actions, with combination css selector and event handlers.
+ */
+MVC.Controller = MVC.Class.extend(
+/*@Static*/
+{
+    /*
+     * Looks for controller actions and hooks them up to delegator
+     */
     init: function(){
         if(!this.className) return;
         this.singularName =  MVC.String.singularize(this.className);
@@ -72,6 +81,12 @@ MVC.Controller = MVC.Class.extend({
             );
 		};
     },
+    /**
+     * Calls the Controller prototype function specified by controller and action_name with the given params.
+     * @param {Controller/String} controller The controller class or its className (i.e. 'todos').
+     * @param {String} action_name The name of the action to be called.
+     * @param {Controller.Params} params The params the action will be called with.
+     */
     dispatch: function(controller, action_name, params){
 		var c_name = controller;
 		if(typeof controller == 'string'){controller = window[ MVC.String.classize(controller)+'Controller'];}
@@ -94,7 +109,28 @@ MVC.Controller = MVC.Class.extend({
 	},
     controllers : [],
     actions: []
-},{
+},
+/*@Prototype*/
+{
+    /*
+     * Returns a function that when called, calls the action with parameters passed to the function. 
+     * This is very useful for creating callbacks for Ajax functionality. 
+     * The callback is called on the same controller instance that created the callback. 
+     * This allows you to easily pass objects between request and response without resorting to closures. 
+     * Example:
+<pre><code>Controller('todos',{
+   "a click" : function(params){ 
+      this.element = params.element;
+	  this.element.innerHTML = 'deleting ...';
+	  new Ajax.Request('delete', {onComplete: <span class="magic">this.continue_to('deleted')</span>}
+   },
+   deleted : function(response){
+      this.element.parentNode.removeChild(this.element);
+   }
+});</code></pre>
+     * @param {String} action Name of prototype function you want called
+     * @return {Function} function that when called, directs to another controller function
+     */
     continue_to :function(action){
 		if(!action) action = this.action.name+'ing';
 		if(typeof this[action] != 'function'){ throw 'There is no action named '+action+'. ';}
@@ -120,6 +156,11 @@ MVC.Controller = MVC.Class.extend({
     }
 });
 
+
+
+/*
+ * Genaric base action.  This must provide a matches base function.
+ */
 MVC.Controller.Action = MVC.Class.extend(
 {
     init: function(){
@@ -133,13 +174,23 @@ MVC.Controller.Action = MVC.Class.extend(
     }
 });
 
+/*
+ * Default EventDelegation based actions
+ */
 MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
+/*@Static*/
     match: new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
+    /*
+     * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
+     * mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, 
+     * focus, blur, load, unload
+     * @return {Boolean} true if a prototype function name matches an action.
+     */
     matches: function(action_name){
         return this.match.exec(action_name);
     }
 },
-//Prototype functions
+/*@Prototype*/
 {    
     init: function(action, f, controller){
         this._super(action, f, controller);
@@ -147,15 +198,21 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
         
         var selector = this.selector();
         if(selector != null){
-            new MVC.DelegationEvent(selector, this.event_type, 
+            new MVC.Delegator(selector, this.event_type, 
                 this.controller.dispatch_closure(controller.className, action ) );
         }
     },
+    /*
+     * Splits the action name into its css and event parts.
+     */
     css_and_event: function(){
         this.parts = this.action.match(this.Class.match);
         this.css = this.parts[1];
         this.event_type = this.parts[2];
     },
+    /*
+     * Deals with main controller specific delegation (blur and focus)
+     */
     main_controller: function(){
 	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
             MVC.Event.observe(window, this.event_type, MVC.Controller.event_closure(this.controller, this.event_type, window) );
@@ -163,6 +220,10 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
         }
         return this.css;
     },
+    /*
+     * Handles a plural controller name
+     * @return {String} the css with the controller name included
+     */
     plural_selector : function(){
 		if(this.css == "#" || this.css.substring(0,2) == "# "){
 			var newer_action_name = this.css.substring(2,this.css.length);
@@ -171,9 +232,17 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
 			return '.'+MVC.String.singularize(this.controller.className)+(this.css? ' '+this.css : '' );
 		}
 	},
+    /*
+     * Handles a singular controller name
+     * @return {String} the css with the controller name included
+     */
     singular_selector : function(){
         return '#'+this.controller.className+(this.css? ' '+this.css : '' );
     },
+    /*
+     * Gets the full css selector for this action
+     * @return {String/null} returns a string css if Delegator should be used, null if otherwise.
+     */
     selector : function(){
         if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
             MVC.Event.observe(window, this.event_type, MVC.Controller.event_closure(this.controller, this.event_type, window) );
@@ -190,14 +259,37 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
     }
 });
 
+/* @Constructor
+ * Instances of Controller.Params are passed to Event based actions.
+ * 
+ * <h3>Example</h3>
+ * <pre><code>MVC.Controller.extend('todos', {
+   mouseover : function(params){ 
+      <span class="magic">params</span>.element.style.backgroundColor = 'Red';
+   },
+   mouseout : function(params){
+      <span class="magic">params</span>.element.style.backgroundColor = '';
+      <span class="magic">params</span>.event.stop();
+   },
+   "img click" : function(params){
+   	  <span class="magic">params</span>.class_element().parentNode.removeSibiling(params.class_element());
+   }
+})</code></pre>
+ * @init Creates a new Controller.Params object.
+ * @param {Object} params An object you want to pass to a controller
+ */
 MVC.Controller.Params = function(params){
 	for(var thing in params){
 		if( params.hasOwnProperty(thing) ) this[thing] = params[thing];
 	}
 };
-
+/*@Prototype*/
 MVC.Controller.Params.prototype = {
-	form_params : function(){
+	/*
+	 * Returns data in a hash for a form.
+	 * @return {Object} Nested form data.
+	 */
+    form_params : function(){
 		var data = {};
 		if(this.element.nodeName.toLowerCase() != 'form') return data;
 		var els = this.element.elements, uri_params = [];
@@ -238,6 +330,10 @@ MVC.Controller.Params.prototype = {
 		}
 		return data;
 	},
+    /*
+     * Returns the class element for the element selected
+     * @return {HTMLElement} the element that shares the controller's id or classname
+     */
 	class_element : function(){
 		var start = this.element, controller = this.controller;
 		var className = MVC.String.is_singular(controller) ? controller : MVC.String.singularize(controller);
@@ -247,6 +343,15 @@ MVC.Controller.Params.prototype = {
 		}
 		return start;
 	},
+    /*
+     * Returns if the event happened directly on the element in the params.
+     * @return {Boolean} true if the event's target is the element, false if otherwise.
+     */
 	is_event_on_element : function(){ return this.event.target == this.element; },
+    /*
+     * If the element has an id like "todo_5" this will return the instance that the 
+     * element represents.
+     * @return {Object} the instance object the form represents.
+     */
 	object_data : function(){ return MVC.View.Helpers.get_data(this.class_element()); }
 };

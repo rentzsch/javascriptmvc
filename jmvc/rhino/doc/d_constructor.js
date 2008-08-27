@@ -12,7 +12,7 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
             res += "<a href='"+name+".html'>"+name+"</a> "
         }
         res +="</body></html>"
-        MVCOptions.save('docs/constructors/index.html', res)
+        MVCOptions.save('docs/constructors/index2.html', res)
     }
 },
 {
@@ -21,20 +21,21 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
         this.Class.listing.push(this);
     },
     add_parent : function(scope){
-        this.parent = scope.Class.className != 'file' ? scope.parent : scope;
+        while(scope.Class.className != 'file') scope = scope.parent;
+        this.parent = scope;
         this.parent.add(this);
     },
     code_setup: MVCObject.DFunction.prototype.code_setup,
     comment_setup: MVCObject.DFunction.prototype.comment_setup,
     return_add: MVCObject.DFunction.prototype.return_add,
     param_add: MVCObject.DFunction.prototype.param_add,
-    constructor_add: function(line){
-            var parts = line.match(/@constructor (.*)/);
+    init_add: function(line){
+            var parts = line.match(/@init (.*)/);
             if(!parts) return;
             this.constructor = parts.pop();
             return this.constructor;
     },
-    constructor_add_more: function(line){
+    init_add_more: function(line){
         this.constructor +="\n"+ line;
     },
     toHTML : function(){
@@ -62,7 +63,7 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
         //return "Class: "+this.name+"\n"+parts.join("\n\n");
     },
     toFile : function(){
-        var res = '<html><head><link rel="stylesheet" href="../style.css" type="text/css"><title>'+this.name+"<title></head><body>"
+        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css"><title>'+this.name+"<title></head><body>"
         res+= this.toHTML();
         res +="</body></html>"
         MVCOptions.save('docs/constructors/'+this.name+".html", res)

@@ -83,43 +83,97 @@ MVC.Object.to_query_string.worker = function(obj,name){
 	return parts2;
 };
 
-//String Helpers
-MVC.Native.extend('String', {
+/* 
+ * @class MVC.String
+ * When not in no-conflict mode, JMVC adds the following helpers to string
+ */
+MVC.Native.extend('String', 
+/*@Static*/
+{
+    /*
+     * Capitalizes a string
+     * @param {String} string the string to be lowercased.
+     * @return {String} a string with the first character capitalized, and everything else lowercased
+     */
 	capitalize : function(string) {
 		return string.charAt(0).toUpperCase()+string.substr(1).toLowerCase();
 	},
+    /**
+     * Returns if a string has another string inside it.
+     * @param {String} string String that is being scanned
+     * @param {String} pattern String that we are looking for
+     * @return {Boolean} true if the string has pattern, false if otherwise
+     */
 	include : function(string, pattern){
 		return string.indexOf(pattern) > -1;
 	},
+    /**
+     * Returns if string ends with another string
+     * @param {String} string String that is being scanned
+     * @param {String} pattern What the string might end with
+     * @return {Boolean} true if the string ends wtih pattern, false if otherwise
+     */
 	ends_with : function(string, pattern) {
 	    var d = string.length - pattern.length;
 	    return d >= 0 && string.lastIndexOf(pattern) === d;
 	},
+    /**
+     * Capitalizes a string from something undercored. Examples:
+     * <pre>
+     *     MVC.String.camelize("one_two") -> "oneTwo"
+     *     "three-four".camelize() -> threeFour</pre>
+     * @param {String} string
+     * @return {String} a the camelized string
+     */
 	camelize: function(string){
 		var parts = string.split(/_|-/);
 		for(var i = 1; i < parts.length; i++)
 			parts[i] = MVC.String.capitalize(parts[i]);
 		return parts.join('');
 	},
+    /**
+     * Like camelize, but the first part is also capitalized
+     * @param {Object} string
+     */
 	classize: function(string){
 		var parts = string.split(/_|-/);
 		for(var i = 0; i < parts.length; i++)
 			parts[i] = MVC.String.capitalize(parts[i]);
 		return parts.join('');
 	},
+    /*
+     * @function strip
+     * @param {String} string returns a string with leading and trailing whitespace removed.
+     */
 	strip : MVC.String.strip
 });
 
 //Date Helpers, probably should be moved into its own class
 
-//Array Helpers
-MVC.Native.extend('Array',{ 
-	include: function(array, thing){
+/* 
+ * @class MVC.Array
+ * When not in no-conflict mode, JMVC adds the following helpers to array
+ */
+MVC.Native.extend('Array',
+/*@static*/
+{ 
+	/**
+	 * Searchs an array for item.  Returns if item is in it.
+	 * @param {Object} array
+	 * @param {Object} item an item that is matched with ==
+	 * @return {Boolean}
+	 */
+    include: function(array, item){
 		for(var i=0; i< array.length; i++){
-			if(array[i] == thing) return true;
+			if(array[i] == item) return true;
 		}
 		return false;
 	},
+    /**
+     * Creates an array from another object.  Typically, this is used to give arguments array like properties.
+     * @param {Object} iterable an array like object with a length property.
+     * @return {Array}
+     */
 	from: function(iterable){
 		 if (!iterable) return [];
 		var results = [];
@@ -128,9 +182,20 @@ MVC.Native.extend('Array',{
 	    return results;
 	}
 });
-//Function Helpers
-MVC.Native.extend('Function', {
-	bind: function(func) {
+/* 
+ * @class MVC.Function
+ * When not in no-conflict mode, JMVC adds the following helpers to function
+ */
+MVC.Native.extend('Function', 
+/*@static*/
+{
+	/**
+	 * Binds a function to another object.  The object the function is binding
+	 * to is the second argument.
+	 * @param {Object} func The function that is being bound.
+	 * @return {Function} 
+	 */
+    bind: function(func) {
 	  var args = MVC.Array.from(arguments);
 	  args.shift();args.shift();
 	  var __method = func, object = arguments[1];
@@ -140,8 +205,20 @@ MVC.Native.extend('Function', {
 	},
 	params: MVC.Function.params
 });
-
-MVC.Native.extend('Number', {
+/* 
+ * @class MVC.Number
+ * When not in no-conflict mode, JMVC adds the following helpers to number
+ */
+MVC.Native.extend('Number', 
+/*@static*/
+{
+    /**
+     * Changes a number to a string, but includes preceeding zeros.
+     * @param {Object} number the number to be converted
+     * @param {Object} length the number of zeros
+     * @param {optional:Object} radix the numeric base (defaults to base 10);
+     * @return {String} 
+     */
     to_padded_string: function(number, length, radix) {
         var string = number.toString(radix || 10);
         var ret = '';

@@ -44,3 +44,4 @@ MVCOptions.collect_and_compress = function(total){
 	collection += "include.end_of_production();";
     return collection;
 }
+

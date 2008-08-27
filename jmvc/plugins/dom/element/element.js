@@ -3,7 +3,7 @@
 // (c) 2005-2007 Sam Stephenson
 
 
-/* Constructor
+/* @constructor
  * The Element API provides useful functions for manipulating and traversing the DOM. 
  * All of these elements are classed under $E. When using the Element or $E function, 
  * all Element functions that have their first argument as element are added to the element.
@@ -16,7 +16,7 @@ $E('element_id').next() -> HTMLElement
 Element.next('element_id') -> HTMLElement
 
 $E('element_id').insert({after: '&lt;p&gt;inserted text&lt;/p&gt;'})</code></pre>
- * @constructor the HTML Element for the given id with functions in Element.
+ * @init the HTML Element for the given id with functions in Element.
  * @param {String/HTMLElement} element Either an HTMLElement or a string describing the element's id.
  * @return {HTMLElement} the HTML Element for the given id with functions in Element.
  */
@@ -26,7 +26,7 @@ MVC.Element = function(element){
     if (!element) return element;
 	return element._mvcextend ? element : MVC.Element.extend(element);
 };
-/*Static*/
+/*@Static*/
 MVC.Object.extend(MVC.Element, {
     /**
      * Inserts HTML into the page relative to the given element.

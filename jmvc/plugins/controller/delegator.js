@@ -1,5 +1,33 @@
-MVC.Delegator={
-	node_path: function(el){
+/**
+ * @constructor
+ * Attaches listeners for delegated events.
+ * @init Creates a new delegator listener
+ * @param {String} selector a css selector
+ * @param {String} event a dom event
+ * @param {Function} f a function to call
+ */
+MVC.Delegator = function(selector, event, f){
+    this._event = event;
+    this._selector = selector;
+    this._func = f;
+    if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
+    if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
+	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
+	if(event == 'change' && MVC.Browser.WebKit) return this.change_for_webkit();
+	
+    this.add_to_delegator();
+};
+
+MVC.Object.extend(MVC.Delegator,
+/*@Static*/
+{
+    /**
+     * Returns an array of objects that represent the path of the node to documentElement.  Each item in the array
+     * has a tag, className, id, and element attribute.
+     * @param {Object} el element in the dom that is nested under the documentElement
+     * @return {Array} representation of the path between the element and the DocumentElement
+     */
+    node_path: function(el){
 		var body = document.documentElement,parents = [],iterator =el;
 		while(iterator != body){
 			parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
@@ -9,6 +37,12 @@ MVC.Delegator={
 		parents.push(body);
 		return parents;
 	},
+    /**
+     * Goes through the delegated events for the given event type (e.g. Click).  Orders the matches
+     * by how nested they are in the dom.  Adds the kill function on the event, then dispatches each
+     * event.  If kill is called, it will stop dispatching other events.
+     * @param {Event} event the DOM event returned by a normal event handler.
+     */
 	dispatch_event: function(event){
 		var target = event.target, matched = false, ret_value = true,matches = [];
 		var delegation_events = MVC.Delegator.events[event.type];
@@ -32,6 +66,12 @@ MVC.Delegator={
 			if(event.is_killed()) return false;
 		}
 	},
+    /**
+     * Used for sorting events on an object
+     * @param {Object} a
+     * @param {Object} b
+     * @return {Number} -1,0,1 depending on how a and b should be sorted.
+     */
     sort_by_order: function(a,b){
     	if(a.order < b.order) return 1;
     	if(b.order < a.order) return -1;
@@ -39,21 +79,20 @@ MVC.Delegator={
     	if(ae == 'click' &&  be == 'change') return 1;
     	if(be == 'click' &&  ae == 'change') return -1;
     	return 0;
-    }
-};
-MVC.Delegator.events = {};
-MVC.DelegationEvent = function(selector, event, f){
-    this._event = event;
-    this._selector = selector;
-    this._func = f;
-    if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
-    if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
-	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
-	if(event == 'change' && MVC.Browser.WebKit) return this.change_for_webkit();
-	
-    this.add_to_delegator();
-};
-MVC.DelegationEvent.prototype = {
+    },
+    /**
+     * Stores all delegated events
+     */
+    events: {}
+})
+
+/*@Prototype*/
+MVC.Delegator.prototype = {
+    /*
+     * returns the event that should actually be used.  In practice, this is just used to switch focus/blur
+     * to activate/deactivate for ie.
+     * @return {String} the adjusted event name.
+     */
     event: function(){
     	if(MVC.Browser.IE){
             if(this._event == 'focus')
@@ -62,10 +101,20 @@ MVC.DelegationEvent.prototype = {
     			return 'deactivate';
     	}
     	return this._event;
-    }, 
+    },
+    /*
+     * Returns if capture should be used (blur and focus)
+     * @return {Boolean} true for focus / blur, false if otherwise
+     */
     capture: function(){
         return MVC.Array.include(['focus','blur'],this._event);
     },
+    /**
+     * If there are no special cases, this is called to add to the delegator.
+     * @param {String} selector - css selector
+     * @param {String} event - event selector
+     * @param {Function} func - a function that will be called
+     */
     add_to_delegator: function(selector, event, func){
         var s = selector || this._selector;
         var e = event || this.event();
@@ -77,7 +126,10 @@ MVC.DelegationEvent.prototype = {
 		}
 		MVC.Delegator.events[e].push(this);
     },
-    
+    /*
+     * Handles the submit case for IE.  It checks if a keypress return happens in an
+     * input area or a submit button is clicked.
+     */
     submit_for_ie : function(){
 		this.add_to_delegator(null, 'click');
         this.add_to_delegator(null, 'keypress');
@@ -93,6 +145,9 @@ MVC.DelegationEvent.prototype = {
 			}
 		};
 	},
+    /*
+     * Handles change events for IE.
+     */
 	change_for_ie : function(){
 		this.add_to_delegator(null, 'click');
         this.end_filters= {
@@ -110,6 +165,9 @@ MVC.DelegationEvent.prototype = {
 			}
 		};
 	},
+    /*
+     * Handles a change event for Safari.
+     */
 	change_for_webkit : function(){
 		this.controller.add_register_action(this,document.documentElement, 'change');
 		this.end_filters= {
@@ -121,6 +179,9 @@ MVC.DelegationEvent.prototype = {
 			}
 		};
 	},
+    /**
+     * Handles a right click for Opera.  It looks for clicks with shiftkey pressed.
+     */
     context_for_opera : function(){
         this.add_to_delegator(null, 'click');
         this.end_filters= {
@@ -132,6 +193,10 @@ MVC.DelegationEvent.prototype = {
     regexp_patterns:  {tag :    		/^\s*(\*|[\w\-]+)(\b|$)?/,
         				id :            /^#([\w\-\*]+)(\b|$)/,
     					className :     /^\.([\w\-\*]+)(\b|$)/},
+    /*
+     * returns and caches the select order for the css patern.
+     * @retun {Array} array of objects that are used to match with the node_path
+     */
     selector_order : function(){
 		if(this.order) return this.order;
 		var selector_parts = this._selector.split(/\s+/);
@@ -155,7 +220,13 @@ MVC.DelegationEvent.prototype = {
 		this.order = order;
 		return this.order;
 	},
-    
+    /**
+     * Tests if an event matches an element.
+     * @param {Object} el the element we are testing
+     * @param {Object} event the event
+     * @param {Object} parents an array of node order objects for the element
+     * @return {Object} returns an object with node, order, and delegation_event attributes.
+     */
     match: function(el, event, parents){
         if(this.filters && !this.filters[event.type](el, event)) return null;
 		//if(this.controller.className != 'main' &&  (el == document.documentElement || el==document.body) ) return false;

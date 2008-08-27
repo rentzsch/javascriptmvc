@@ -10,15 +10,16 @@ MVCObject.DPair = MVCObject.Class.extend(
     create: function(comment, code, scope){
         //first lets get the type!
         //check the comment
-        var check =  comment.match(/\w+/), type
+        var check =  comment.match(/^@(\w+)/), type
 
-        if(!(type = this.has_type(check ? check[0] : null)) ){ //try code
+        if(!(type = this.has_type(check ? check[1] : null)) ){ //try code
             type = this.guess_type(code);
         }
         if(!type) return null;
         return new type(comment, code, scope)
     },
     has_type: function(type){
+        if(!type) return null;
         for(var i=0;i< this.classes.length; i++){
             if(this.classes[i].className.toLowerCase() == type.toLowerCase() ) 
                 return this.classes[i];
@@ -101,5 +102,13 @@ MVCObject.DPair = MVCObject.Class.extend(
             }
         }
         return result;
+    },
+    ordered_params : function(){
+            var arr = [];
+            for(var n in this.params){
+                var param = this.params[n];
+                arr[param.order] = param;
+            }
+            return arr;
     }
 })

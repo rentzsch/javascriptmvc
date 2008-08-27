@@ -37,7 +37,7 @@ MVC.Controller.DragAction = MVC.Controller.DelegateAction.extend({
         
         
         MVC.Draggable.selectors[selector] = 
-            new MVC.DelegationEvent(this.selector(), 'mousedown', function(params){
+            new MVC.Delegator(this.selector(), 'mousedown', function(params){
                //go through list of events, add as parameters for
                for(var event_type in MVC.Draggable.selectors[selector].events){
                    if(MVC.Draggable.selectors[selector].events.hasOwnProperty(event_type) )
