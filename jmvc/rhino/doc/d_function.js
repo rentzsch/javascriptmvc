@@ -63,9 +63,9 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
             return this.params[n];
         },
         return_add: function(line){
-            var parts = line.match(/@return (?:\{([\w\.]+)\})? ?([\w\.]+)/);
+            var parts = line.match(/@return (?:\{([\w\.]+)\})? ?([\w\.]+)?/);
             if(!parts) return;
-            var description = parts.pop();
+            var description = parts.pop() || "";
             var type = parts.pop();
             this.ret = {description: description, type: type};
             return this.ret;
@@ -75,7 +75,7 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
             if(m) this.name = m[1];
         },
         toHTML: function(){
-            return "<div class='method'>"+
+            return "<div class='method'>"+this.pluginHTML()+
                         "<h3 id="+this.full_name()+">"+this.name+"</h4>"+
                         "<pre class='signiture'><code>"+this.signiture()+"<code></pre>"+
                         "<p>"+this.real_comment+"</p>"+
@@ -110,5 +110,9 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
                 res += "<div class='param'><label>"+param.name+"</label> <code>"+param.type+"</code> "+param.description+"</div>"
             }
             return res;
+        },
+        pluginHTML: function(){
+            if(! this.plugin) return "";
+            return "<div class='added_by'>"+this.plugin+"</div>";
         }
     });

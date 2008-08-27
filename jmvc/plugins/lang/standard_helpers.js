@@ -134,6 +134,7 @@ MVC.Native.extend('String',
     /**
      * Like camelize, but the first part is also capitalized
      * @param {Object} string
+     * @return {String}
      */
 	classize: function(string){
 		var parts = string.split(/_|-/);

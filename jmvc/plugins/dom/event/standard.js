@@ -14,8 +14,31 @@ if(document.addEventListener) {
 	    }
 	};
 }else if(document.attachEvent) {
-  MVC.Event={
-	observe: function(element, eventType, handler) {
+/*
+ * @class MVC.Event
+ * JavaScriptMVC's default Event functionality. This functionality should rarely be used. 
+ * In place of registering event handlers directly, you are HIGHLY encouraged to 
+ * create Controllers to handle event registration and callback in a very dry fassion. 
+ * If you use other libraries like prototype or jQuery, their functionailty will be mapped to these functions.
+ * 
+ * 
+ * <h3>Example</h3>
+
+The following calls checkForm on the form element with id 'signinForm' being submitted.
+
+<pre class='top'>Event.observe($('signinForm'), 'submit', checkForm);</pre>
+ * 
+ */
+  MVC.Event=
+ /*@Static*/ 
+  {
+	/**
+	 * Registers an event handler on a DOM element.
+	 * @param {Object} element
+	 * @param {Object} eventType
+	 * @param {optional:Object} handler defaults to false.
+	 */
+    observe: function(element, eventType, handler) {
         if (MVC.Event._find(element, eventType, handler) != -1) return;
         var wrappedHandler = function(e) {
             if (!e) e = window.event;
@@ -64,6 +87,12 @@ if(document.addEventListener) {
             w.attachEvent("onunload", MVC.Event._removeAllHandlers);
         }
     },
+    /**
+     * Unregisters an event handler.
+     * @param {Object} element
+     * @param {Object} eventType
+     * @param {Object} handler
+     */
 	stop_observing: function(element, eventType, handler) {
         var i = MVC.Event._find(element, eventType, handler);
         if (i == -1) return; 

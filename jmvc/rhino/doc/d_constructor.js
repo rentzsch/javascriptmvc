@@ -29,6 +29,7 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
     comment_setup: MVCObject.DFunction.prototype.comment_setup,
     return_add: MVCObject.DFunction.prototype.return_add,
     param_add: MVCObject.DFunction.prototype.param_add,
+    param_add_more: MVCObject.DFunction.prototype.param_add_more,
     init_add: function(line){
             var parts = line.match(/@init (.*)/);
             if(!parts) return;

@@ -110,5 +110,8 @@ MVCObject.DPair = MVCObject.Class.extend(
                 arr[param.order] = param;
             }
             return arr;
+    },
+    plugin_add : function(line){
+        this.plugin = line.match(/@plugin ([^ ]+)/)[1];
     }
 })

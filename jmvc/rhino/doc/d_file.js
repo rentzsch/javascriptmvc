@@ -1,6 +1,6 @@
 MVCObject.DFile = MVCObject.DPair.extend('file',
 {
-    group : new RegExp("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/\[\S\\n\\r]*[^\\n]*)", "g"),
+    group : new RegExp("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/\[^\\w]*[^\\n]*)", "g"),
     splitter : new RegExp("(?:/\\*+((?:[^*]|(?:\\*+[^*/]))*)\\*+/\[^\\w]*([^\\r\\n]*))")
 },{
     init : function(inc){

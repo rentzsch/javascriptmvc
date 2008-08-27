@@ -1,12 +1,12 @@
 body {
 	background:#FFFFFF none repeat scroll 0%;
-
+    font-size: 11pt;
 	min-width:610px;
 	padding:0pt;
 	font-family: Verdana;
 }
 
-.documentation .code_caption pre, .documentation div.code_caption img {margin-bottom:0px;}
+
 .highlight { background-color:#FFFFCC; }
 .html_key { color:#7F3300; }
 .plugins { list-style: none; }
@@ -49,9 +49,7 @@ h5 {
 	margin-bottom: 10px;
 }
 
-pre.code_caption {
-	margin-bottom:0px;
-}
+
 
 div.image img {
 	margin-bottom: 0px;
@@ -117,7 +115,17 @@ table.learn td {
 ul {margin-left: 20px; margin-top: 10px;}
 ul ul {margin-top: 0px; margin-bottom: 10px; font-size: 9pt;}
 
-pre {margin-left: 40px; }
+pre { background-image: url(pattern.png);
+    font-size: 9pt;
+    border: solid 1px #D5E7B3; 
+	margin: 10px 40px 10px 40px; 
+    padding:5px;font-family:Monaco,Consolas,"Lucida Console",monospace;
+    line-height: 13pt;
+    margin-right: 40px;
+}
+pre.top {
+    margin-left: 0px;
+}
 .comment, .console_output {color: green;}
 
 .string_output {color:red;}
@@ -131,11 +139,7 @@ pre {margin-left: 40px; }
 span.error {background-color: Orange}
 
 
-.article pre, .code, .api pre, .documentation pre { 
-	border: solid 1px #D5E7B3; 
-	margin: 10px 40px 10px 40px; 
-	padding: 10px; background-image: url(../images/pattern.png);
-}
+
 
 
 pre.signiture {border: solid 1px #e7b3b3; padding: 0px 0px 0px 5px;}
@@ -180,11 +184,6 @@ h3 {font-size: 12pt;font-weight: bolder;margin: 10px 0px 0px 00px; color: #556F2
 
 h1, h2,h3,h4 {font-family: "Helvetica Neue",Arial}
 h4, .grayed {margin: 0px 0px 10px 40px; font-size: 12pt;color: #808080; line-height: 100%;}
-
-pre {padding:5px;font-family:Monaco,Consolas,"Lucida Console",monospace;
-font-size:92%;line-height: 13pt;
-margin-right: 40px;
-}
 
 
 
@@ -241,4 +240,18 @@ text-decoration:none;
 
 div.group {
     margin-left: 40px;
+}
+
+
+
+.added_by {
+background-image:url(add.png);
+background-repeat:no-repeat;
+float:right;
+font-size:9pt;
+margin-right:40px;
+margin-top:5px;
+padding-bottom:1px;
+padding-left:20px;
+padding-top:1px;
 }

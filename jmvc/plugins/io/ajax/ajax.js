@@ -3,7 +3,70 @@
 //  (c) 2005-2007 Sam Stephenson
 (function(){
 	var factory = MVC.Ajax.factory;
-	MVC.Ajax = function(url,options){
+	
+    /**
+     * @constructor
+     * Ajax is used to perform Ajax requests. It mimics the Prototype library's Ajax functionality.
+     * @init Initiates and processes an AJAX request.
+     * @param {String} url the url where the request is directed
+     * @param {Object} options a hash of optiosn with the following attributes:
+     * <table class="options">
+					<tbody><tr><th>Option</th><th>Default</th><th>Description</th></tr>
+					<tr>
+						<td>asynchronous</td>
+						<td>true</td>
+						<td>Determines whether XMLHttpRequest is used asynchronously or not. 
+						</td>
+					</tr>
+					<tr>
+						<td>contentType</td>
+						<td>'application/x-www-form-urlencoded'</td>
+						<td>The Content-Type header for your request. 
+						You might want to send XML instead of the regular URL-encoded format, 
+						in which case you would have to change this.
+						</td>
+					</tr>
+					<tr>
+						<td>method</td>
+						<td>'post'</td>
+						<td>The HTTP method to use for the request. The other widespread possibility is 'get'.
+						</td>
+					</tr>
+					<tr>
+						<td>parameters</td>
+						<td>''</td>
+						<td>The parameters for the request, which will be encoded into the URL for a 'get' method, or into the request body for the other methods. This can be provided either as a URL-encoded string or as any Hash-compatible object (basically anything), with properties representing parameters.
+						</td>
+					</tr>
+					<tr>
+						<td>requestHeaders</td>
+						<td>See text</td>
+						<td>Request headers are passed as an object, with properties representing headers.
+						</td>
+					</tr>
+					<tr>
+						<td>cache</td>
+						<td>true </td>
+						<td>true to cache template.
+						</td>
+					</tr>
+					
+				</tbody></table>
+		    <h4>Option callbacks</h4>
+		    <p style="margin-bottom: 0px;">Callbacks are called at various points in the life-cycle of a request, and always feature the same list of arguments. 
+		    They are passed to requesters right along with their other options.</p>
+		    <table class="options">
+					<tbody><tr><th>Callback</th><th>Description</th></tr>
+					<tr>
+						<td>onComplete</td>
+						<td>Triggered at the very end of a request's life-cycle, 
+						once the request completed, status-specific callbacks were called, 
+						and possible automatic behaviors were processed.
+						</td>
+					</tr>
+			</tbody></table>
+     */
+    MVC.Ajax = function(url,options){
 		this.options = {
 	      method:       'post',
 	      asynchronous: true,
@@ -72,8 +135,13 @@
 
 
 MVC.Ajax.Events = ['Uninitialized', 'Loading', 'Loaded', 'Interactive', 'Complete'];
-
+/*@Prototype*/
 MVC.Ajax.prototype = {
+  
+  /**
+   * Returns true if the function returned succesfully.
+   * @return {Boolean}
+   */
   success: function() {
     var status = this.getStatus();
     return !status || (status >= 200 && status < 300);
@@ -84,6 +152,11 @@ MVC.Ajax.prototype = {
       return this.transport.status || 0;
     } catch (e) { return 0 }
   },
+  /**
+   * This function is used by Ajax to set the transport's request headers if possible.
+   * @param {Object} user_headers headers supplied by the user in options.headers
+   * 
+   */
   set_request_headers: function(user_headers) {
     var headers = {};//{'Accept': 'text/javascript, text/html, application/xml, text/xml, */*'};
 

@@ -112,9 +112,18 @@ MVC.Inflector = {
     }
   }
 };
-
-
+/**
+ * @add class MVC.String Static
+ */
 MVC.Native.extend('String', {
+  /**
+   * Pluralizes a string
+   * @plugin lang/inflector
+   * @param {String} string string to be pluralized
+   * @param {optional:Number} count
+   * @param {optional:String} plural
+   * @return {String}
+   */
   pluralize: function(string, count, plural) {
     if (typeof count == 'undefined') {
       return MVC.Inflector.pluralize(string);
@@ -122,6 +131,13 @@ MVC.Native.extend('String', {
       return count + ' ' + (1 == parseInt(count) ? string : plural || MVC.Inflector.pluralize(string));
     }
   },
+  /**
+   * Returns the singular version of a string
+   * @plugin lang/inflector
+   * @param {String} string the string to be singularized
+   * @param {optional:Number} count
+   * @return {String}
+   */
   singularize: function(string, count) {
     if (typeof count == 'undefined') {
       return MVC.Inflector.singularize(string);
@@ -129,6 +145,12 @@ MVC.Native.extend('String', {
       return count + " " + MVC.Inflector.singularize(string);
     }
   },
+  /**
+   * Returns if the string is singular
+   * @plugin lang/inflector
+   * @param {String} string
+   * @return {Boolean}
+   */
   is_singular: function(string){
     if(MVC.String.singularize(string) == null && string)
         return true;

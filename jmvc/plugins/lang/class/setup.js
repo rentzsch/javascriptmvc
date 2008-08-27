@@ -5,9 +5,28 @@
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
+  
+  /**
+   * @constructor MVC.Class
+   * Class provides simple simulated inheritance in JavaScript. 
+   * It is based off John Resig's  Simple JavaScript Inheritance  library.
+   * @init Creating a new instance of an object that has extended MVC.Class 
+        calls the init prototype function and returns a new instance of the class.
+   * 
+   */
+  
   MVC.Class = function(){};
-  // Create a new Class that inherits from this class
-  MVC.Class.extend = function(className, klass, proto) {
+  // Create a new Class that inherits from the current class.
+  /*@Static*/
+  MVC.Class.
+    /**
+     * Extends a class with new static and prototype functions.
+     * @param {optional:Object} className - the classes name (used for classes w/ introspection)
+     * @param {optional:Object} klass - the new classes static/class functions
+     * @param {Object} proto - the new classes prototype functions
+     * @return {Class} returns the new class
+     */
+    extend = function(className, klass, proto) {
     if(typeof className != 'string'){
         proto = klass;
         klass = className;
@@ -82,11 +101,22 @@
 	};
     Class.extend = arguments.callee;
     if(className) Class.className = className;
-    
+    /*
+     * @function init
+     * Called when a new Class is created
+     * @param {Class} class the new class
+     */
     if(Class.init) Class.init(Class);
+    /*
+     * @function extended
+     * Called on the base class when extend
+     */
     if(_super_class.extended) _super_class.extended(Class);
-    
+    /*@Prototype*/
     return Class;
+    /*@function init
+     * Called with the same arguments as new Class(arguments ...) when a new class is created.
+     */
   };
 })();
 
