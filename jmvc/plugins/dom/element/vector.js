@@ -1,8 +1,22 @@
+/**
+ * @constructor
+ * A vector class
+ * @init creates a new vector instance from the arguments.  Example:
+ * <pre>new MVC.Vector(1,2)</pre>
+ * 
+ */
+
 MVC.Vector = function(){
     this.update( MVC.Array.from(arguments) );
 };
-MVC.Vector.prototype = {
-    //apply function to every part of this vector
+MVC.Vector.prototype = 
+/*@Prototype*/
+{
+    /**
+     * Applys the function to every item in the vector.  Returns the new vector.
+     * @param {Function} f
+     * @return {MVC.Vector} new vector class.
+     */
     app: function(f){
           var newArr = [];
           
@@ -11,6 +25,12 @@ MVC.Vector.prototype = {
           var vec = new MVC.Vector();
           return vec.update(newArr);
     },
+    /**
+     * Adds two vectors together.  Example:
+     * <pre>new Vector(1,2).plus(2,3) -> &lt;3,5>
+     * new Vector(3,5).plus(new Vector(4,5)) -> &lt;7,10>
+     * @return {MVC.Vector}
+     */
     plus: function(){
         var args = arguments[0] instanceof MVC.Vector ? 
                  arguments[0].array : 
@@ -21,6 +41,10 @@ MVC.Vector.prototype = {
             arr[i] = (arr[i] ? arr[i] : 0) + args[i];
         return vec.update(arr);
     },
+    /**
+     * Like plus but subtracts 2 vectors
+     * @return {MVC.Vector}
+     */
     minus: function(){
          var args = arguments[0] instanceof MVC.Vector ? 
                  arguments[0].array : 
@@ -30,13 +54,37 @@ MVC.Vector.prototype = {
             arr[i] = (arr[i] ? arr[i] : 0) - args[i];
          return vec.update(arr);
     },
+    /*
+     * Returns the 2nd value of the vector
+     * @return {Number}
+     */
     x : function(){ return this.array[1] },
+    /**
+     * Returns the first value of the vector
+     * @return {Number}
+     */
     y : function(){ return this.array[0] },
+    /**
+     * Same as x()
+     * @return {Number}
+     */
     top : function(){ return this.array[1] },
+    /**
+     * same as y()
+     * @return {Number}
+     */
     left : function(){ return this.array[0] },
+    /**
+     * returns (x,y)
+     * @return {String}
+     */
     toString: function(){
         return "("+this.array[0]+","+this.array[1]+")";
     },
+    /**
+     * Replaces the vectors contents
+     * @param {Object} array
+     */
     update: function(array){
         if(this.array){
             for(var i =0; i < this.array.length; i++) delete this.array[i];
@@ -47,8 +95,17 @@ MVC.Vector.prototype = {
     }
 };
 
-
-MVC.Event.pointer = function(event){
+/**
+ * @add class MVC.Event Static
+ */
+MVC.Event.
+/**
+ * Returns the position of the event
+ * @plugin dom/element
+ * @param {Event} event
+ * @return {MVC.Vector}
+ */
+pointer = function(event){
 	return new MVC.Vector( 
         event.pageX || (event.clientX +
           (document.documentElement.scrollLeft || document.body.scrollLeft)),

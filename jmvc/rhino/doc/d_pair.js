@@ -98,7 +98,9 @@ MVCObject.DPair = MVCObject.Class.extend(
         
         if(this.children){
             for(var c=0; c<this.children.length; c++){
-                result = result.concat( this.children[c].linker()  );
+                var adds = this.children[c].linker();
+                if(adds)
+                    result = result.concat( adds );
             }
         }
         return result;

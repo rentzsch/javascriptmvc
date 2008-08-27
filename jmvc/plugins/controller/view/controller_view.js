@@ -1,4 +1,40 @@
-MVC.Controller.prototype.render = function(options) {
+/**
+ * @add class MVC.Controller Prototype
+ */
+
+MVC.Controller.prototype.
+/**
+ * Renders a View template with the controller instance. If action or partial 
+ * are not supplied in the options, 
+ * it looks for a view in app/views/controller_name/action_name.ejs
+ * @plugin controller/view
+ * @param {Object} options A hash with the following properties
+ * <table class="options">
+					<tbody><tr><th>Option</th><th>Default</th><th>Description</th></tr>
+					<tr>
+						<td>action</td>
+						<td>null</td>
+						<td>If present, looks for a template in app/views/<i>controller_name</i>/<i>action</i>.ejs
+						</td>
+					</tr>
+					<tr>
+						<td>partial</td>
+						<td>null</td>
+						<td>A string value that looks like: 'folder/template' or 'template'.  If a folder is present,
+						    it looks for a template in app/views/<i>folder</i>/_<i>template</i>.ejs; otherwise,
+							it looks for a template in app/views/<i>controller_name</i>/_<i>template</i>.ejs.
+						</td>
+					</tr>
+					<tr>
+						<td>to</td>
+						<td>null</td>
+						<td>If present, a HTMLElement or element ID whose text will be replaced by the render.
+						</td>
+					</tr>
+					
+				</tbody></table>
+ */
+render = function(options) {
 		var result, render_to_id = MVC.RENDER_TO, plugin_url;
 		var controller_name = this.Class.className;
 		var action_name = this.action_name;

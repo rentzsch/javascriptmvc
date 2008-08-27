@@ -63,7 +63,7 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
             return this.params[n];
         },
         return_add: function(line){
-            var parts = line.match(/@return (?:\{([\w\.]+)\})? ?([\w\.]+)?/);
+            var parts = line.match(/@return (?:\{([\w\.\/]+)\})? ?([\w\.]+)?/);
             if(!parts) return;
             var description = parts.pop() || "";
             var type = parts.pop();

@@ -787,7 +787,7 @@ MVC.Path.get_data = function(path) {
 		var pair = parts[i].split('=');
 		if(pair.length != 2) continue;
 		var key = decodeURIComponent(pair[0]), value = decodeURIComponent(pair[1]);
-		var key_components = key.rsplit(/\[[^\]]*\]/);
+		var key_components = MVC.String.rsplit(key,/\[[^\]]*\]/);
 		
 		if( key_components.length > 1 ) {
 			var last = key_components.length - 1;

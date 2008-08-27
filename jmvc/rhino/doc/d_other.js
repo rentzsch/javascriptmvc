@@ -80,7 +80,9 @@ MVCObject.DAdd = MVCObject.DPair.extend('add',
         }
         return inst;
         
-    }
+    },
+    toHTML: function(){return ""},
+    linker: function(){}
 });
 
 
