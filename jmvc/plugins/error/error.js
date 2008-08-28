@@ -1,6 +1,6 @@
-MVC.RemoteModel('application_error', {url: 'https://damnit.jupiterit.com', name: 'error'},{});
-
-MVC.Object.extend(ApplicationError,{
+MVC.ApplicationError = MVC.RemoteModel.extend('application_error',
+{
+    url: 'https://damnit.jupiterit.com', name: 'error',
 	textarea_text: "type description here",
 	textarea_title: "Damn It!",
 	close_time: 10,
@@ -15,9 +15,6 @@ MVC.Object.extend(ApplicationError,{
 		if(params['HTML Content'])
 			content.push('HTML Content'+':\n     '+params['HTML Content']);
 		return content.join('\n');
-	},
-	config: function(params) {
-		MVC.Object.extend(ApplicationError, params);
 	},
 	create_containing_div: function(){
 		var div = document.createElement('div');
@@ -163,7 +160,9 @@ MVC.Object.extend(ApplicationError,{
 	    if (event.stopPropagation)  event.stopPropagation(); 
 	    if (event.preventDefault)  event.preventDefault();
 	}
-});
+},
+{}
+)
 
 MVC.error_handler = function(msg, url, l){
 	var e = {
