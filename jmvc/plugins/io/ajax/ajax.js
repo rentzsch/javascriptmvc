@@ -83,7 +83,9 @@
 	      // simulate other verbs over post
 	      if(this.options.parameters == ''){
 		  	this.options.parameters = {_method : this.options.method};
-		  }else
+		  }else if(typeof this.options.parameters == "string")
+            this.options.parameters = this.options.parameters+"&_method="+this.options.method;
+          else
 		  	this.options.parameters['_method'] = this.options.method;
 	      this.options.method = 'post';
 	    }

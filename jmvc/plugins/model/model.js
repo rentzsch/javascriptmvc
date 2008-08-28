@@ -74,6 +74,10 @@ MVC.Model = MVC.Class.extend(
         }
     },
     _associations: [],
+    /**
+     * Creates an instance of the object from an HTML element.
+     * @param {Object} element_or_id
+     */
     from_html: function(element_or_id){
         var el =MVC.$E(element_or_id);
         var el_class = window[ MVC.String.classize(el.getAttribute('type')) ];
@@ -84,10 +88,20 @@ MVC.Model = MVC.Class.extend(
         attributes[el_class.id] = this.element_id_to_id(el.id);
         return el_class.create_as_existing(attributes);
     },
+    /**
+     * Takes an element ID like 'todo_5' and returns '5'
+     * @param {Object} element_id
+     * @return {String} 
+     */
     element_id_to_id: function(element_id){
         var re = new RegExp(this.className+'_', "");
         return element_id.replace(re, '');
     },
+    /**
+     * Adds an attribute to the list of attributes for this class.
+     * @param {String} property
+     * @param {String} type
+     */
     add_attribute : function(property, type){
         if(! this.attributes[property])
             this.attributes[property] = type;
@@ -108,7 +122,10 @@ MVC.Model = MVC.Class.extend(
 },
 /*@Prototype*/
 {   
-    
+    /**
+     * Creates, but does not save a new instance of this class
+     * @param {Object} attributes -> a hash of attributes
+     */
     init : function(attributes){
         //this._properties = [];
         this.errors = [];
@@ -119,6 +136,10 @@ MVC.Model = MVC.Class.extend(
     setup : function(){
         
     },
+    /**
+     * Sets a hash of attributes for this instance
+     * @param {Object} attributes
+     */
     set_attributes : function(attributes)
     {
         for(var key in attributes){ 
@@ -127,6 +148,11 @@ MVC.Model = MVC.Class.extend(
 		}
         return attributes;
     }, 
+    /**
+     * Sets the attributes on this instance and calls save.
+     * @param {Object} attributes
+     * @param {Object} callback
+     */
     update_attributes : function(attributes, callback)
     {
         this.set_attributes(attributes);
@@ -135,6 +161,9 @@ MVC.Model = MVC.Class.extend(
     valid : function() {
       	return  this.errors.length == 0;
     },
+    /**
+     * Validates this instance
+     */
     validate : function(){
         //run validate function and any error functions  
         
@@ -163,6 +192,10 @@ MVC.Model = MVC.Class.extend(
         }
         
     },
+    /**
+     * Returns a list of attribues.
+     * @return {Object}
+     */
     attributes : function() {
         var attributes = {};
         var cas = this.Class.attributes;
@@ -172,6 +205,9 @@ MVC.Model = MVC.Class.extend(
         //for (var i=0; i<this.attributes.length; i++) attributes[this._properties[i]] = this[this._properties[i]];
         return attributes;
     },
+    /**
+     * Returns if the instance is a new object
+     */
     is_new_record : function(){ return true;},
     /**
      * Saves the instance

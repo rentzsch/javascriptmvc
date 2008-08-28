@@ -1,5 +1,59 @@
+/**
+ * AjaxModel makes it easy to write models that handle the request / reponse cycle of most
+ * Ajax driven applications.  It helps you escape transporting callbacks.</br>
+ * It uses convention to tie function names to resouces/ urls.  This is best shown with an example:
+ * First, lets say we wanted an FTP model to be able to requests data from /ftp/dir.  We could create that
+ * model like this:
+ * 
+<pre>Ftp = MVC.AjaxModel.extend('ftp',
+{
+   dir_get_success: function(transport){
+       return transport.responseText;
+   }
+},{})</pre>
+You could make a request to /ftp/dir like this:
+<pre>callback = function(data){alert(data)};
+Ftp.dir({path: "/"}, callback)</pre>
+
+There are a few things to notice here.
+<ul>
+    <li>Ftp.dir function expects params as its first argument.  These will post path="/" to /ftp/dir</li>
+    <li>There are no callbacks in the Ftp model.  You return the data you want passed to the callback in dir_get_success</li>
+    <li>dir_get_success is called with the result of the transport.</li>
+    <li>The get makes the request use the HTTP verb get.  You can use put/post/get/delete.  If no verb is present, it defaults 
+    to post.</li>
+</ul>
+
+AjaxModel allows you to expand on this pattern in several ways:
+<h3>Changing the request path</h3>
+If /ftp/dir was actually ftp_directory, you can change the directory name by adding the following:
+<pre>Ftp = MVC.AjaxModel.extend('ftp',
+{
+   dir_get_url: '/ftp_directory'
+   dir_get_success: function(transport){
+       return transport.responseText;
+   }
+},{})</pre>
+dir_get_url could also be a function that dynamically returns the url.  For example,
+<pre>   ...
+   dir_get_url: function(params){
+       return "/ftp/dir/"+encodeURIComponent(params.path)
+   }
+   ...</pre>
+   would return "/ftp/dir/%2F" for Ftp.dir({path: "/"}, callback)
+
+<h3>Customizing and validating the request</h3>
+You can completely customize the request by making a function like X_request.  Where X matches one of your success functions.
+For example:
+
+
+
+<h3>Respond to errors</h3>
+
+ * 
+ */
 MVC.AjaxModel = MVC.Model.extend(
-//class methods
+/*@Static*/
 {
     transport: MVC.Ajax,
     
@@ -7,6 +61,10 @@ MVC.AjaxModel = MVC.Model.extend(
         
     },
     _matching : /(\w+?)_?(get|post|delete|update|)_success$/, 
+    /**
+     * Goes through the list of static functions.  If they end with _success, creates
+     * a requesting function for them.
+     */
     init: function(){
         if(!this.className) return;
         var val, act, matches;
@@ -44,17 +102,15 @@ MVC.AjaxModel = MVC.Model.extend(
                     }, this);
     },
     _make_public : function(cleaned_name, method){
-        /**
-         * Arguments
-         *  - a list of arguments
-         *  - ending with a single function callback or an object of callbacks
-         */
         var defaultURL = this.base_url+"/"+cleaned_name;
-        if(this[cleaned_name+"_"+method+"_url"]) 
-            defaultURL=typeof this[cleaned_name+"_"+method+"_url"] == 'function' ?
-                        this[cleaned_name+"_"+method+"_url"]() : this[cleaned_name+"_"+method+"_url"];
+        
         
         return function(params){
+            
+            if(this[cleaned_name+"_"+method+"_url"]) 
+            defaultURL=typeof this[cleaned_name+"_"+method+"_url"] == 'function' ?
+                        this[cleaned_name+"_"+method+"_url"](params) : this[cleaned_name+"_"+method+"_url"];
+            
             //get arguments 
             var cleaned_args = MVC.Array.from(arguments);
             var callbacks = this._clean_callbacks(cleaned_args[cleaned_args.length - 1]);
@@ -62,15 +118,16 @@ MVC.AjaxModel = MVC.Model.extend(
             //save old request (if compounded)
             var oldrequest = this.request;
             
-            /**
-             * This is called by default if request isn't called
-             * @param {Object} url
-             * @param {Object} params
-             * @param {Object} options
-             */
+
             
             var defaultOptions = {method: method}
             var request_called = false;
+            /**
+             * Request is only available inside generated request applications.  
+             * @param {optional:Object} url
+             * @param {Object} request_params
+             * @param {Object} options
+             */
             this.request = function(url, request_params, options){
                 //url is optional!
                 request_called = true;
@@ -107,6 +164,12 @@ MVC.AjaxModel = MVC.Model.extend(
 
        this[cleaned_name] = this._make_public(cleaned_name, method)
     },
+    /**
+     * Gets the id of a response from the responseHeader.  This is commonly used in REST
+     * based calls
+     * @param {Object} transport
+     * @param {Number}
+     */
     get_id : function(transport){
         var loc = transport.responseText;
 	  	try{loc = transport.getResponseHeader("location");}catch(e){};

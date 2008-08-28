@@ -177,7 +177,9 @@ h2 {
 	margin: 40px 40px 10px 0px;font-size: 19pt;color: #8FBA3C; border-bottom: solid 1px #e5f0cf;line-height: 20pt;padding-bottom:5px;
 }
 h3 {font-size: 12pt;font-weight: bolder;margin: 10px 0px 0px 00px; color: #556F24; letter-spacing: 1px;}
-
+.group h3 {
+    margin-top: 25px; margin-left:0px;margin-bottom: 5px;
+}
 .attribute h3 {color: #6f2424;}
 
 
@@ -187,7 +189,7 @@ h4, .grayed {margin: 0px 0px 10px 40px; font-size: 12pt;color: #808080; line-hei
 
 
 
-
+.group pre {margin-left: 0px;}
 
 
 .param, .return {margin-left:40px; margin-right:40px;line-height:12pt; font-size: 10pt;margin-bottom:10px;}

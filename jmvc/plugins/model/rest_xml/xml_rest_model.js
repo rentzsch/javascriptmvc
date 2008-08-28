@@ -101,11 +101,9 @@ MVC.XMLRestModel = MVC.AjaxModel.extend(
         }
         return instance;
     },
-    destroy_request: function(id){
-        this.request('/'+this.plural_name+'/'+id+'.xml', {}, {method: 'delete'} );
-    },
-    destroy_error: function(){ return false;},
-    destroy_success: function(transport){ return transport.status == 200},
+    destroy_delete_url : function(id){ return '/'+this.plural_name+'/'+id+'.xml' },
+    destroy_delete_error: function(){ return false;},
+    destroy_delete_success: function(transport){ return transport.status == 200},
     elementHasMany: function(element) {
           if(!element)
           	return false;
