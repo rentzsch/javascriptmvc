@@ -110,8 +110,11 @@ PageGeneratorController = MVC.Controller.extend('page_generator',{
             var pages = MVC.Path.join(MVC.file_base,"apps",this.application_name,"pages.html");
             var old =  Mozilla.readFile(pages)
             
-            Mozilla.saveFile(pages, old+"<a href='"+html_location+"'>"+html_location+"</a>\n" , true );
+			var new_link = "<a href='"+html_location+"'>"+html_location+"</a>\n";
+            Mozilla.saveFile(pages, (old? old: '')+new_link , true );
             
+			// add link to the page
+			document.getElementById('page_links').innerHTML += new_link;
 		}
     }
 });
