@@ -556,6 +556,6 @@ MVC.Native.extend('String', {
      * @param {Object} string
      */
     chop: function(string){
-        return string.substr(0, this.length - 1);
+        return string.substr(0, string.length - 1);
     }
 })
