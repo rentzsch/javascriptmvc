@@ -22,8 +22,7 @@ ModelsController = AddDependencyController.extend('models');
 ResourcesController = AddDependencyController.extend('resources');
 PluginsController = AddDependencyController.extend('plugins',{
 	change: function(params){
-		if(params.element.childNodes.length > 2)
-			params.including_path = params.element.childNodes[2].innerHTML;
+		params.including_path = MVC.View.Helpers.get_data(params.element);
 		this._super(params);
 	}
 });
