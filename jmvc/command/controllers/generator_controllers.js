@@ -4,6 +4,11 @@
 // reloads the application
 AbstractGeneratorController = MVC.Controller.extend({
     submit: function(params){
+		if (!this.class_name) {
+			alert("Please enter a name")
+			params.event.kill();
+			return;
+		}
         params.event.kill();
 		params.including_file_suffix = params.including_file_suffix || '';
 		this.application_name = MVC.current_application;
@@ -28,6 +33,11 @@ AbstractGeneratorController = MVC.Controller.extend({
 
 ControllerGeneratorController = AbstractGeneratorController.extend('controller_generator',{
     submit: function(params){
+		if (!params.element.controller_name.value) {
+			alert("Please enter a name")
+			params.event.kill();
+			return;
+		}
         this.class_name = params.element.controller_name.value;
         this.name = MVC.String.classize(this.class_name)+'Controller';
 		this.application_name = MVC.current_application;
@@ -100,7 +110,7 @@ PageGeneratorController = MVC.Controller.extend('page_generator',{
             var pages = MVC.Path.join(MVC.file_base,"apps",this.application_name,"pages.html");
             var old =  Mozilla.readFile(pages)
             
-            Mozilla.saveFile(pages, old+"<a href='"+html_location+"'>"+html_location.substr(-20)+"</a>\n" , true );
+            Mozilla.saveFile(pages, old+"<a href='"+html_location+"'>"+html_location+"</a>\n" , true );
             
 		}
     }
@@ -108,8 +118,12 @@ PageGeneratorController = MVC.Controller.extend('page_generator',{
 
 ApplicationGeneratorController = PageGeneratorController.extend('application_generator',{
     submit: function(params){
+		if (!params.element.application_name.value) {
+			alert("Please enter an application name")
+			params.event.kill();
+			return;
+		}
 		this.application_name = params.element.application_name.value;
-		
 		
 		// save the application file
 		var res = new MVC.View({absolute_url: 'command/generators/application.ejs'}).render(this);
@@ -131,7 +145,7 @@ ApplicationGeneratorController = PageGeneratorController.extend('application_gen
         var loc = MVC.Path.join(MVC.file_base,"apps",this.application_name,"index.html")
         Mozilla.saveFile(loc, res  );
 		
-        Mozilla.saveFile(MVC.Path.join(MVC.file_base,"apps",this.application_name,"pages.html"), "<a href='"+loc+"'>"+loc.substr(-20)+"</a>\n"  );
+        Mozilla.saveFile(MVC.Path.join(MVC.file_base,"apps",this.application_name,"pages.html"), "<a href='"+loc+"'>"+loc+"</a>\n"  );
         
 		// save the test file
 		var res = new MVC.View({absolute_url: 'command/generators/test.ejs'}).render(this);
@@ -150,7 +164,6 @@ ApplicationGeneratorController = PageGeneratorController.extend('application_gen
 			if(uls[i].innerHTML == this.application_name)
 				uls[i].className = 'selected';
 		}
-		MVC.current_application = 
 		
 		// load the app
 		MVC.Appcreator.Iframe.load_iframe(this.application_name);
