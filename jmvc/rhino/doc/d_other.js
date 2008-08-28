@@ -18,7 +18,7 @@ MVCObject.DPrototype = MVCObject.DStatic.extend('prototype',
 {
     toHTML: function(){
         var ret = "<h2>Prototype Methods</h2>"
-        ret+= this.make(this.children);
+        ret+= this.make(this.children.sort(MVCObject.DPair.sort_by_name));
         return ret;
     },
     name: 'prototype'
