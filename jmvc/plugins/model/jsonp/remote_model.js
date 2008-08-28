@@ -4,7 +4,8 @@ MVC.RemoteModel = MVC.Model.extend(
     init: function(){
         if(!this.className) return;
         if(!this.domain) throw('a domain must be provided for remote model');
-        this.controller_name = this.className;
+        if(!this.controller_name)
+            this.controller_name = this.className;
         this.plural_controller_name = MVC.String.pluralize(this.controller_name);
     },
     find_all: function(params, cbs){
@@ -125,7 +126,7 @@ MVC.RemoteModel = MVC.Model.extend(
     domain: null,
     top_level_length: function(params, url){
     	var p = MVC.Object.extend({}, params);
-        delete p[this.className];
+        delete p[this.controller_name];
         return url.length + MVC.Object.to_query_string(p).length;
 
     },

@@ -1,6 +1,7 @@
 MVC.ApplicationError = MVC.RemoteModel.extend('application_error',
 {
-    url: 'https://damnit.jupiterit.com', name: 'error',
+    controller_name: "error",
+    domain: 'https://damnit.jupiterit.com', name: 'error',
 	textarea_text: "type description here",
 	textarea_title: "Damn It!",
 	close_time: 10,
@@ -34,7 +35,7 @@ MVC.ApplicationError = MVC.RemoteModel.extend('application_error',
 		title.style.font = 'bold 12pt verdana';
 		title.style.color ='white';
 		title.style.padding='0px 5px 0px 10px';
-		title.innerHTML+= "<a style='float:right; width: 50px;text-decoration:underline; color: Red; padding-left: 25px; font-size: 10pt; cursor: pointer' onclick='ApplicationError.send()'>Close</a> "+
+		title.innerHTML+= "<a style='float:right; width: 50px;text-decoration:underline; color: Red; padding-left: 25px; font-size: 10pt; cursor: pointer' onclick='MVC.ApplicationError.send()'>Close</a> "+
 		"<span id='_error_seconds' style='float:right; font-size:10pt;'></span>"+this.textarea_title;
 		return title;
 	},
@@ -46,8 +47,8 @@ MVC.ApplicationError = MVC.RemoteModel.extend('application_error',
 		form.innerHTML ="<div style='float: left; width: 300px;margin-left:"+leftmargin+"px;'>"+this.prompt_text+"</div>"+
 		    "<input type='submit' value='Send' style='font-size: 12pt; float:right; margin: 17px 5px 0px 0px; width:60px;padding:5px;'/>"+
 			"<textarea style='width: 335px; color: gray;' rows='"+(MVC.Browser.Gecko ? 2 : 3)+"' name='description' id='_error_text' "+
-			"onfocus='ApplicationError.text_area_focus();' "+
-			"onblur='ApplicationError.text_area_blur();' >"+this.textarea_text+"</textarea>";
+			"onfocus='MVC.ApplicationError.text_area_focus();' "+
+			"onblur='MVC.ApplicationError.text_area_blur();' >"+this.textarea_text+"</textarea>";
 		form.style.padding = '0px';
 		form.style.font = 'normal 10pt verdana';
 		form.style.margin = '0px';
@@ -55,60 +56,61 @@ MVC.ApplicationError = MVC.RemoteModel.extend('application_error',
 		return form;
 	},
 	create_send_function: function(error){
-		ApplicationError.send = function(event){
+		this.send = MVC.Function.bind(function(event){
 			var params = {error: {}}, description;
 			params.error.subject = error.subject;
 			if((description = MVC.$E('_error_text'))){error['User Description'] = description.value;}
-			if(ApplicationError.prompt_user) {
-				ApplicationError.pause_count_down();
+			if(this.prompt_user) {
+				this.pause_count_down();
 				document.body.removeChild(MVC.$E('_application_error'));
 			}
-			params.error.content = ApplicationError.generate_content(error);
-			ApplicationError.kill_event(event);
-			ApplicationError.create(params);
-		};
+			params.error.content = this.generate_content(error);
+			this.kill_event(event);
+            params.user_crypted_key = APPLICATION_KEY;
+			this.create(params, function(){});
+		}, this);
 	},
 	create_dom: function(error){
 		if(MVC.$E('_application_error')) return; 
-		var div = ApplicationError.create_containing_div();
+		var div = this.create_containing_div();
 		document.body.appendChild(div);
-		div.appendChild(ApplicationError.create_title());
-		div.appendChild(ApplicationError.create_form(ApplicationError.send));
+		div.appendChild(this.create_title());
+		div.appendChild(this.create_form(this.send));
 		this.set_width();
 		
 		var seconds_remaining;
 		var timer;
 		
-		ApplicationError.count_down = function(){
+		this.count_down = function(){
 			seconds_remaining --;
 			document.getElementById('_error_seconds').innerHTML = 'This will close in '+seconds_remaining+' seconds.';
 			if(seconds_remaining == 0){
-				ApplicationError.pause_count_down();
-				ApplicationError.send();
+				MVC.ApplicationError.pause_count_down();
+				MVC.ApplicationError.send();
 			}
 		};
-		ApplicationError.start_count_down = function(){
+		this.start_count_down = MVC.Function.bind(function(){
 			seconds_remaining = this.close_time;
 			MVC.$E('_error_seconds').innerHTML = 'This will close in '+seconds_remaining+' seconds.';
-			timer = setInterval(ApplicationError.count_down, 1000);
-		};
-		ApplicationError.pause_count_down = function(){
+			timer = setInterval(MVC.ApplicationError.count_down, 1000);
+		}, this);
+		this.pause_count_down = function(){
 			clearInterval(timer);
 			timer = null;
 			
 			MVC.$E('_error_seconds').innerHTML = '';
 		};
-		ApplicationError.start_count_down();
+		this.start_count_down();
 	},
 	prompt_and_send: function(error){
 		this.create_send_function(error);
-		if(ApplicationError.prompt_user == true)
+		if(this.prompt_user == true)
 			this.create_dom(error);
 		else
 			this.send();
 	},
 	notify: function(e){
-		e = ApplicationError.transform_error(e);
+		e = this.transform_error(e);
 		MVC.Object.extend(e,{
 			'Browser' : navigator.userAgent,
 			'Page' : location.href,
@@ -116,20 +118,20 @@ MVC.ApplicationError = MVC.RemoteModel.extend('application_error',
 		});
 		if(Error && new Error().stack) e.Stack = new Error().stack;
 		if(!e.subject) e.subject = 'ApplicationError on: '+window.location.href;
-		ApplicationError.prompt_and_send(e);
+		this.prompt_and_send(e);
 		return false;
 	},
 	text_area_focus: function(){
 		var area = document.getElementById('_error_text');
 		if(area.value == this.textarea_text) area.value = '';
 		area.style.color = 'black';
-		ApplicationError.pause_count_down();
+		MVC.ApplicationError.pause_count_down();
 	},
 	text_area_blur: function(){
 		var area = MVC.$E('_error_text');
 		if(area.value == this.textarea_text || area.value == '') area.value = this.textarea_text;
 		area.style.color = 'gray';
-		ApplicationError.start_count_down();
+		MVC.ApplicationError.start_count_down();
 	},
 	set_width: function(){
 		var cont, width;
@@ -170,7 +172,7 @@ MVC.error_handler = function(msg, url, l){
 		fileName: url,
 		lineNumber: l
 	};
-	ApplicationError.notify(e);
+	MVC.ApplicationError.notify(e);
 	return false;
 };
 if(MVC.Controller){
@@ -178,23 +180,23 @@ if(MVC.Controller){
 		try{
 			return instance[action_name](params);
 		}catch(e){
-			ApplicationError.kill_event(params.event);
-			e = ApplicationError.transform_error(e);
+			MVC.ApplicationError.kill_event(params.event);
+			e = MVC.ApplicationError.transform_error(e);
 			
 			MVC.Object.extend(e,{
 				'Controller': instance.klass.className,
 				'Action': action_name,
 				subject: 'Dispatch Error: '+((e.message && typeof(e.message) == 'string') ? e.message : e.toString())
 			});
-			ApplicationError.notify(e);
+			MVC.ApplicationError.notify(e);
 			return false;
 		}
 	};
 }
 
 if(window.attachEvent) {
-	window.attachEvent("onresize", ApplicationError.set_width);
+	window.attachEvent("onresize", MVC.ApplicationError.set_width);
 }else{
-	window.addEventListener('resize', ApplicationError.set_width, false);
+	window.addEventListener('resize', MVC.ApplicationError.set_width, false);
 }
 window.onerror = MVC.error_handler;
