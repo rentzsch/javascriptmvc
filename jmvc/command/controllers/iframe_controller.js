@@ -1,20 +1,23 @@
 MVC.Appcreator = {
 	select: function(app_name) {
+		MVC.Appcreator.select_tab(app_name);
+		MVC.current_application = app_name;
+		MVC.appfile_path = MVC.Path.join(MVC.file_base,'apps',app_name+".js");
+		MVC.testfile_path = MVC.Path.join(MVC.file_base,'apps',app_name,"test.js");
+		MVC.Appcreator.Iframe.load_iframe(app_name);
+		location.hash = '#'+app_name;
+	},
+	select_tab: function(tab_name){
 		// select a project
 		var uls = document.getElementsByTagName('li');
 		for(var i=0; i<uls.length; i++){
-			if (uls[i].innerHTML == app_name) {
+			if (uls[i].innerHTML == tab_name) {
 				uls[i].className += ' selected';
 				continue;
 			}
-			if(uls[i].className.match(/project/) || uls[i].id == 'new_app')
-				uls[i].className = uls[i].className.replace(/selected/, '');
+			else
+				uls[i].className = uls[i].className.replace(/selected/g, '');
 		}
-		MVC.current_application = app_name;
-		MVC.appfile_path = MVC.Path.join(MVC.file_base,'apps',app_name+".js");
-		MVC.testfile_path = MVC.Path.join(MVC.file_base,'apps',app_name,app_name+"_test.js");
-		MVC.Appcreator.Iframe.load_iframe(app_name);
-		location.hash = '#'+app_name;
 	}
 };
 MVC.Appcreator.Iframe = {
