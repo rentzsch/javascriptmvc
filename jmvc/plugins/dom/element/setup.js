@@ -1,4 +1,4 @@
-include('vector','position');
+include('vector');
 
 if(typeof Prototype != 'undefined'){
 	MVC.$E = $;
