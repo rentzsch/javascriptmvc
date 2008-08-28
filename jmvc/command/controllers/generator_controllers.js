@@ -162,7 +162,7 @@ ApplicationGeneratorController = PageGeneratorController.extend('application_gen
 		var uls = document.getElementsByTagName('li');
 		for(var i=0; i<uls.length; i++){
 			if(uls[i].innerHTML == this.application_name)
-				uls[i].className = 'selected';
+				uls[i].className = 'selected project';
 		}
 		
 		// load the app
