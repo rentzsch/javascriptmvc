@@ -1,3 +1,3 @@
 ////include.resources('prototype','effects', 'dragdrop')
-include.plugins('dragdrop');
+include.plugins('controller/dragdrop');
 include.controllers('drags');
