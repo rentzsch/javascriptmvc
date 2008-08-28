@@ -1,12 +1,24 @@
 
 
-
+/**
+ * @constructor
+ * Used for creating and dipatching synthetic events.
+ * @init Sets up a synthetic event.
+ * @param {String} type type of event
+ * @param {optional:Object} options
+ */
 MVC.SyntheticEvent = function(type, options){
 	this.type = type;
 	this.options = options || {};
 }
-MVC.SyntheticEvent.prototype = {
-	send : function(element){
+MVC.SyntheticEvent.prototype = 
+/*@Prototype*/
+{
+	/**
+	 * Dispatches the event on the given element
+	 * @param {Object} element the element that will be the target of the event.
+	 */
+    send : function(element){
 		this.firefox_autocomplete_off(element);
 		
 		if(MVC.Browser.Opera && MVC.Array.include(['focus','blur'],this.type)) return this.createEvents(element);

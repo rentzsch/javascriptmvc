@@ -26,7 +26,7 @@ MVCObject.DFile = MVCObject.DPair.extend('file',
         if(!pairs) return;
         for(var i = 0; i < pairs.length ; i ++){
             var splits = pairs[i].match(this.Class.splitter);
-            var comment = splits[1].replace(/^[^\w@]*/,'').replace(/\r?\n\s*\**\s*/g,'\n');
+            var comment = splits[1].replace(/^[^\w@]*/,'').replace(/\r?\n(\s*\*+)?/g,'\n');
             var code = splits[2];
             var pair = MVCObject.DPair.create( comment , code, scope);
             if(pair)

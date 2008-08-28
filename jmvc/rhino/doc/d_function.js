@@ -9,7 +9,7 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
             var parts = this.Class.code_match(this.code);
             this.name = parts[1];
             this.params = {};
-            this.ret = {type: 'undefined'}
+            this.ret = {type: 'undefined',description: ""}
             var params = parts[2].match(/\w+/);
             if(!params) return;
             
@@ -23,7 +23,7 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
             var lines = this.comment.split("\n");
             this.real_comment = '';
             if(!this.params) this.params = {};
-            if(!this.ret) this.ret = {type: 'undefined'};
+            if(!this.ret) this.ret = {type: 'undefined',description: ""};
             var last, last_data;
 
             for(var l=0; l < lines.length; l++){
@@ -63,7 +63,7 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
             return this.params[n];
         },
         return_add: function(line){
-            var parts = line.match(/@return (?:\{([\w\.\/]+)\})? ?([\w\.]+)?/);
+            var parts = line.match(/@return (?:\{([\w\.\/]+)\})? ?(.*)?/);
             if(!parts) return;
             var description = parts.pop() || "";
             var type = parts.pop();
@@ -80,7 +80,10 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
                         "<pre class='signiture'><code>"+this.signiture()+"<code></pre>"+
                         "<p>"+this.real_comment+"</p>"+
                         //this.long_desc+
-                        this.paramsHTML()+"</div>";
+                        this.paramsHTML()+
+                        this.returnHTML()+
+                        
+                        "</div>";
         },
         signiture : function(){
             var res = [];
@@ -107,12 +110,16 @@ MVCObject.DFunction = MVCObject.DPair.extend('function',
             
             for(var n = 0; n < ordered.length; n++){
                 var param = ordered[n];
-                res += "<div class='param'><label>"+param.name+"</label> <code>"+param.type+"</code> "+param.description+"</div>"
+                res += "<div class='param "+(param.optional ? 'optional' : '') +"'><label>"+param.name+"</label> <code>{"+(param.optional ? '' : '') +""+param.type+"}</code> - "+param.description+"</div>"
             }
             return res;
         },
         pluginHTML: function(){
             if(! this.plugin) return "";
             return "<div class='added_by'>"+this.plugin+"</div>";
+        },
+        returnHTML: function(){
+            if(this.ret.type == "undefined") return ""
+            return "<div class='return'><label>returns</label> "+"<code>{"+this.ret.type+"}</code> - "+this.ret.description;
         }
     });

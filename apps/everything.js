@@ -1,7 +1,7 @@
 include.resources();
 include.plugins('core','controller/comet','controller/dragdrop','dom/query','io/comet','io/jsonp','io/window_name',
     'io/xdoc','lang/date','lang/json','model','model/ajax','model/cookie','model/jsonp','model/rest_json',
-    'model/rest_xml','model/view_helper');
+    'model/rest_xml','model/view_helper', 'test');
 
 //dom/history
 

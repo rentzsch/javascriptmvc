@@ -1,6 +1,6 @@
 include.set_path('../../apps');
 include.resources();
-include.plugins("core","controller/comet","controller/dragdrop","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/rest_xml","model/view_helper");
+include.plugins("core","controller/comet","controller/dragdrop","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/rest_xml","model/view_helper","test");
 include("../jmvc/rhino/doc");
 MVC.Initializer(function(){
 include.models();
@@ -886,7 +886,7 @@ _46.push(_43);
 }
 return _46;
 },chop:function(_4a){
-return this.substr(0,this.length-1);
+return _4a.substr(0,_4a.length-1);
 }});
 ;
 include.set_path('../../jmvc/plugins/controller');
@@ -1764,7 +1764,7 @@ this.Class.scaffold_model.find("all",{},this.continue_to("list"));
 this.singular_name=this.Class.singular_name;
 this[this.controller_name]=_5;
 this.objects=_5;
-this.render({to:this.controller_name,plugin:"controller_scaffold/display",action:this.controller_name});
+this.render({to:this.controller_name,plugin:"controller/scaffold/display",action:this.controller_name});
 },"# form submit":function(_6){
 _6.event.kill();
 this.Class.scaffold_model.create(_6.form_params()[this.Class.singular_name],this.continue_to("created"));
@@ -1777,7 +1777,7 @@ _7.View().clear_errors();
 this[this.controller_name]=[_7];
 this.objects=[_7];
 this.singular_name=this.Class.singular_name;
-this.render({bottom:"recipe_list",plugin:"controller_scaffold/list",action:"list"});
+this.render({bottom:"recipe_list",plugin:"controller/scaffold/list",action:"list"});
 }
 },".delete click":function(_8){
 this[this.Class.singular_name]=_8.object_data();
@@ -1787,7 +1787,7 @@ this[this.Class.singular_name].destroy(this.continue_to("destroyed"));
 },".edit click":function(_9){
 this[this.Class.singular_name]=_9.object_data();
 this.singular_name=this.Class.singular_name;
-this.render({to:this[this.Class.singular_name].View().element_id(),action:"edit",plugin:"controller_scaffold/edit"});
+this.render({to:this[this.Class.singular_name].View().element_id(),action:"edit",plugin:"controller/scaffold/edit"});
 },".cancel click":function(_a){
 this.show(_a.object_data());
 },".save click":function(_b){
@@ -1797,7 +1797,7 @@ this[this.Class.singular_name].update_attributes(_c,this.continue_to("show"));
 },show:function(_d){
 this[this.Class.singular_name]=_d;
 this.singular_name=this.Class.singular_name;
-this.render({to:this[this.Class.singular_name].View().element_id(),action:"show",plugin:"controller_scaffold/show"});
+this.render({to:this[this.Class.singular_name].View().element_id(),action:"show",plugin:"controller/scaffold/show"});
 },destroyed:function(_e){
 if(_e){
 this[this.Class.singular_name].View().destroy();
@@ -4313,6 +4313,786 @@ return this._className+"_"+this._inst.id+"_"+_30+"_edit";
 var el=this.element();
 el.parentNode.removeChild(el);
 }});
+;
+include.set_path('../../jmvc/plugins/test');
+include.plugins("lang","dom/query","debug","lang/class");
+include("test","synthetic_events");
+;
+include.set_path('../../jmvc/plugins/debug');
+MVC.Console={};
+MVC.Console.log=function(_1){
+};
+if(include.get_env()=="development"||include.get_env()=="test"){
+include("console");
+}
+;
+include.set_path('../../jmvc/plugins/test');
+MVC.Tests={};
+MVC.Test=MVC.Class.extend({init:function(_1,_2,_3){
+this.type=_3||"unit";
+this.tests=_2;
+this.test_names=[];
+this.test_array=[];
+for(var t in this.tests){
+if(!this.tests.hasOwnProperty(t)){
+continue;
+}
+if(t.indexOf("test")==0){
+this.test_names.push(t);
+}
+this.test_array.push(t);
+}
+this.name=_1;
+this.Assertions=MVC.Test.Assertions.extend(this.helpers());
+this.passes=0;
+this.failures=0;
+MVC.Tests[this.name]=this;
+this.updateElements(this);
+},fail:function(){
+this.failures++;
+},helpers:function(){
+var _5={};
+for(var t in this.tests){
+if(this.tests.hasOwnProperty(t)&&t.indexOf("test")!=0){
+_5[t]=this.tests[t];
+}
+}
+return _5;
+},pass:function(){
+this.passes++;
+},run:function(_7){
+this.working_test=0;
+this.callback=_7;
+this.passes=0;
+this.failures=0;
+this.run_next();
+},run_helper:function(_8){
+var a=new this.Assertions(this);
+a[_8](0);
+},run_next:function(){
+if(this.working_test!=null&&this.working_test<this.test_names.length){
+this.working_test++;
+this.run_test(this.test_names[this.working_test-1]);
+}else{
+if(this.working_test!=null){
+MVC.Console.window.update_test(this);
+this.working_test=null;
+if(this.callback){
+this.callback();
+this.callback=null;
+}
+}
+}
+},run_test:function(_a){
+var _b=this;
+setTimeout(function(){
+this.assertions=new _b.Assertions(_b,_a);
+},0);
+},prepare_page:function(_c){
+MVC.Console.window.document.getElementById(_c+"_explanation").style.display="none";
+MVC.Console.window.document.getElementById(_c+"_test_runner").style.display="block";
+},updateElements:function(_d){
+if(_d.type=="unit"){
+this.prepare_page("unit");
+}else{
+this.prepare_page("functional");
+}
+var _e=MVC.Console.window.document.getElementById(_d.type+"_tests");
+var _f="<h3><img alt='run' src='playwhite.png' onclick='find_and_run(\""+_d.name+"\")'/>"+_d.name+" <span id='"+_d.name+"_results'></span></h3>";
+_f+="<div class='table_container'><table cellspacing='0px'><thead><tr><th>tests</th><th>result</th></tr></thead><tbody>";
+for(var t in _d.tests){
+if(!_d.tests.hasOwnProperty(t)){
+continue;
+}
+if(t.indexOf("test")!=0){
+continue;
+}
+var _11=t.substring(5);
+_f+="<tr class=\"step\" id=\"step_"+_d.name+"_"+t+"\">"+"<td class='name'>"+"<a href='javascript: void(0);' onclick='find_and_run(\""+_d.name+"\",\""+t+"\")'>"+_11+"</a></td>"+"<td class=\"result\">&nbsp;</td></tr>";
+}
+_f+="</tbody></table></div>";
+if(this.added_helpers){
+_f+="<div class='helpers'>Helpers: ";
+var _12=[];
+for(var h in _d.added_helpers){
+if(_d.added_helpers.hasOwnProperty(h)){
+_12.push("<a href='javascript: void(0)' onclick='run_helper(\""+_d.name+"\",\""+h+"\")'>"+h+"</a>");
+}
+}
+_f+=_12.join(", ")+"</div>";
+}
+var t=MVC.Console.window.document.createElement("div");
+t.className="test";
+t.innerHTML=_f;
+_e.appendChild(t);
+}});
+MVC.Test.Runner=function(_14,_15,_16){
+var _17;
+_14.run=function(_18){
+_14._callback=_18;
+_17=0;
+_16.start.call(_14);
+_14.run_next();
+};
+_14.run_next=function(){
+if(_17!=null&&_17<_14[_15].length){
+if(_17>0){
+_16.after.call(_14,_17-1);
+}
+_17++;
+_14[_15][_17-1].run(_14.run_next);
+}else{
+if(_17!=null){
+if(_17>0){
+_16.after.call(_14,_17-1);
+}
+_16.done.call(_14);
+if(_14._callback){
+_14._callback();
+_14._callback=null;
+}else{
+}
+}
+}
+};
+};
+MVC.Test.Assertions=MVC.Class.extend({init:function(_19,_1a){
+this.assertions=0;
+this.failures=0;
+this.errors=0;
+this.messages=[];
+this._test=_19;
+if(!_1a){
+return;
+}
+this._delays=0;
+this._test_name=_1a;
+this._last_called=_1a;
+MVC.Console.window.running(this._test,this._test_name);
+if(this.setup){
+this._setup();
+}else{
+this._start();
+}
+},_start:function(){
+try{
+this._test.tests[this._test_name].call(this);
+}
+catch(e){
+this.error(e);
+this._delays=0;
+}
+this._update();
+},_setup:function(){
+var _1b=this.next;
+var _1c;
+this.next=function(t){
+_1c=t?t*1000:500;
+};
+this.setup();
+this.next=_1b;
+if(_1c){
+var t=this;
+var _1f=this._start;
+setTimeout(function(){
+_1f.call(t);
+},_1c);
+}else{
+this._start();
+}
+},assert:function(_20,_21){
+var _21=_21||"assert: got \""+MVC.Test.inspect(_20)+"\"";
+try{
+_20?this.pass():this.fail(_21);
+}
+catch(e){
+this.error(e);
+}
+},assert_equal:function(_22,_23,_24){
+var _24=_24||"assertEqual";
+try{
+(_22==_23)?this.pass():this.fail(_24+": expected \""+MVC.Test.inspect(_22)+"\", actual \""+MVC.Test.inspect(_23)+"\"");
+}
+catch(e){
+this.error(e);
+}
+},assert_null:function(obj,_26){
+var _26=_26||"assertNull";
+try{
+(obj==null)?this.pass():this.fail(_26+": got \""+MVC.Test.inspect(obj)+"\"");
+}
+catch(e){
+this.error(e);
+}
+},assert_not:function(_27,_28){
+var _28=arguments[1]||"assert: got \""+MVC.Test.inspect(_27)+"\"";
+try{
+!_27?this.pass():this.fail(_28);
+}
+catch(e){
+this.error(e);
+}
+},assert_not_null:function(_29,_2a){
+var _2a=_2a||"assertNotNull";
+this.assert(_29!=null,_2a);
+},assert_each:function(_2b,_2c,_2d){
+var _2d=_2d||"assert_each";
+try{
+var e=MVC.Array.from(_2b);
+var a=MVC.Array.from(_2c);
+if(e.length!=a.length){
+return this.fail(_2d+": expected "+MVC.Test.inspect(_2b)+", actual "+MVC.Test.inspect(_2c));
+}else{
+for(var i=0;i<e.length;i++){
+if(e[i]!=a[i]){
+return this.fail(_2d+": expected "+MVC.Test.inspect(_2b)+", actual "+MVC.Test.inspect(_2c));
+}
+}
+}
+this.pass();
+}
+catch(e){
+this.error(e);
+}
+},pass:function(){
+this.assertions++;
+},fail:function(_31){
+this.failures++;
+this.messages.push("Failure: "+_31);
+},error:function(_32){
+this.errors++;
+this.messages.push(_32.name+": "+_32.message+"("+MVC.Test.inspect(_32)+")");
+},_get_next_name:function(){
+for(var i=0;i<this._test.test_array.length;i++){
+if(this._test.test_array[i]==this._last_called){
+if(i+1>=this._test.test_array.length){
+alert("There is no function following '"+this._last_called+"'.  Please make sure you have no duplicate function names in your tests.");
+}
+return this._test.test_array[i+1];
+}
+}
+},_call_next_callback:function(_34,_35){
+if(!_34){
+_34=this._get_next_name();
+}
+var _36=this;
+var _37=this._test.tests[_34];
+return function(){
+_36._last_called=_34;
+var _38=MVC.Array.from(arguments);
+if(_35){
+_38.unshift(_35);
+}
+try{
+_37.apply(_36,_38);
+}
+catch(e){
+_36.error(e);
+}
+_36._delays--;
+_36._update();
+};
+},next:function(_39,_3a,_3b){
+this._delays++;
+_3a=_3a?_3a*1000:500;
+setTimeout(this._call_next_callback(_3b,_39),_3a);
+},next_callback:function(_3c,_3d){
+this._delays++;
+var f=this._call_next_callback(_3c);
+if(!_3d){
+return f;
+}
+return function(){
+setTimeout(f,_3d*1000);
+};
+},_update:function(){
+if(this._delays==0){
+if(this.teardown){
+this.teardown();
+}
+if(this._do_blur_back){
+this._blur_back();
+}
+MVC.Console.window.update(this._test,this._test_name,this);
+this.failures==0&&this.errors==0?this._test.pass():this._test.fail();
+this._test.run_next();
+}
+},_blur_back:function(){
+MVC.Browser.Gecko?window.blur():MVC.Console.window.focus();
+}});
+Function.prototype.curry=function(){
+var fn=this,_40=Array.prototype.slice.call(arguments);
+return function(){
+return fn.apply(this,_40.concat(Array.prototype.slice.call(arguments)));
+};
+};
+MVC.Test.Unit=MVC.Test.extend({init:function(_41,_42){
+this._super(_41,_42,"unit");
+MVC.Test.Unit.tests.push(this);
+}});
+MVC.Test.Unit.tests=[];
+MVC.Test.Runner(MVC.Test.Unit,"tests",{start:function(){
+this.passes=0;
+},after:function(_43){
+if(this.tests[_43].failures==0){
+this.passes++;
+}
+},done:function(){
+MVC.Console.window.document.getElementById("unit_result").innerHTML="("+this.passes+"/"+this.tests.length+")"+(this.passes==this.tests.length?" Wow!":"");
+}});
+MVC.Test.Functional=MVC.Test.extend({init:function(_44,_45){
+this._super(_44,_45,"functional");
+MVC.Test.Functional.tests.push(this);
+},helpers:function(){
+var _46=this._super();
+_46.Action=function(_47,_48,_49){
+_49=_49||{};
+_49.type=_47;
+var _4a=0;
+if(typeof _49=="number"){
+_4a=_49||0;
+}else{
+if(typeof _49=="object"){
+_4a=_49.number||0;
+}
+}
+var _4b=typeof _48=="string"?MVC.Query(_48)[_4a]:_48;
+if((_47=="focus"||_47=="write"||_47=="click")&&!this._do_blur_back){
+MVC.Browser.Gecko?MVC.Console.window.blur():window.focus();
+this._do_blur_back=true;
+}
+var _4c=new MVC.SyntheticEvent(_47,_49).send(_4b);
+return {event:_4c,element:_4b,options:_49};
+};
+for(var e=0;e<MVC.Test.Functional.events.length;e++){
+var _4e=MVC.Test.Functional.events[e];
+_46[MVC.String.capitalize(_4e)]=_46.Action.curry(_4e);
+}
+return _46;
+}});
+MVC.Test.Functional.events=["blur","change","click","contextmenu","dblclick","keyup","keydown","keypress","mousedown","mousemove","mouseout","mouseover","mouseup","reset","resize","scroll","select","submit","dblclick","focus","load","unload","drag","write"];
+MVC.Test.Functional.tests=[];
+MVC.Test.Runner(MVC.Test.Functional,"tests",{start:function(){
+this.passes=0;
+},after:function(_4f){
+if(this.tests[_4f].failures==0){
+this.passes++;
+}
+},done:function(){
+MVC.Console.window.document.getElementById("functional_result").innerHTML="("+this.passes+"/"+this.tests.length+")"+(this.passes==this.tests.length?" Wow!":"");
+}});
+MVC.Test.Controller=MVC.Test.Functional.extend({init:function(_50,_51){
+var _52=MVC.String.classize(_50);
+var _53=_52+"Controller";
+this.controller=window[_53];
+if(!this.controller){
+alert("There is no controller named "+_53);
+}
+this.unit=_50;
+this._super(_52+"TestController",_51);
+},helpers:function(){
+var _54=this._super();
+var _55=MVC.Object.extend({},this.controller.actions);
+this.added_helpers={};
+for(var _56 in _55){
+if(!_55.hasOwnProperty(_56)||!_55[_56].event_type||!_55[_56].css_selector){
+continue;
+}
+var _57=_55[_56].event_type;
+var _58=_55[_56].css_selector.replace(/\.|#/g,"")+" "+_57;
+var _59=_58.replace(/(\w*)/g,function(m,_5b){
+return MVC.String.capitalize(_5b);
+}).replace(/ /g,"");
+_54[_59]=_54[MVC.String.capitalize(_57)].curry(_55[_56].css_selector);
+this.added_helpers[_59]=_54[_59];
+}
+return _54;
+}});
+if(MVC.Console&&MVC.Console.window){
+MVC.Console.window.get_tests=function(){
+return MVC.Tests;
+};
+}
+MVC.Test.inspect=function(_5c){
+try{
+if(_5c===undefined){
+return "undefined";
+}
+if(_5c===null){
+return "null";
+}
+if(_5c.length!=null&&typeof _5c!="string"){
+return "[ ... ]";
+}
+return _5c.inspect?_5c.inspect():_5c.toString();
+}
+catch(e){
+if(e instanceof RangeError){
+return "...";
+}
+throw e;
+}
+};
+MVC.Test.loaded_files={};
+MVC.Included.unit_tests=[];
+MVC.Included.functional_tests=[];
+include.unit_tests=function(){
+for(var i=0;i<arguments.length;i++){
+MVC.Console.log("Trying to load: test/unit/"+arguments[i]+"_test.js");
+}
+include.app(function(i){
+return "../../test/unit/"+i+"_test";
+},MVC.Included.unit_tests).apply(null,arguments);
+};
+include.functional_tests=function(){
+for(var i=0;i<arguments.length;i++){
+MVC.Console.log("Trying to load: test/functional/"+arguments[i]+"_test.js");
+}
+include.app(function(i){
+return "../../test/functional/"+i+"_test";
+},MVC.Included.functional_tests).apply(null,arguments);
+};
+if(!MVC._no_conflict){
+Test=MVC.Test;
+}
+;
+include.set_path('../../jmvc/plugins/test');
+MVC.SyntheticEvent=function(_1,_2){
+this.type=_1;
+this.options=_2||{};
+};
+MVC.SyntheticEvent.prototype={send:function(_3){
+this.firefox_autocomplete_off(_3);
+if(MVC.Browser.Opera&&MVC.Array.include(["focus","blur"],this.type)){
+return this.createEvents(_3);
+}
+if(this.type=="focus"){
+return _3.focus();
+}
+if(this.type=="blur"){
+return _3.blur();
+}
+if(this.type=="write"){
+return this.write(_3);
+}
+if(this.type=="drag"){
+return this.drag(_3);
+}
+return this.create_event(_3);
+},firefox_autocomplete_off:function(_4){
+if(MVC.Browser.Gecko&&_4.nodeName.toLowerCase()=="input"&&_4.getAttribute("autocomplete")!="off"){
+_4.setAttribute("autocomplete","off");
+}
+},create_event:function(_5){
+if(document.createEvent){
+this.createEvent(_5);
+}else{
+if(document.createEventObject){
+this.createEventObject(_5);
+}else{
+throw "Your browser doesn't support dispatching events";
+}
+}
+return this.event;
+},createEvent:function(_6){
+if(MVC.Array.include(["keypress","keyup","keydown"],this.type)){
+this.createKeypress(_6,this.options.character);
+}else{
+if(this.type=="submit"){
+this.createEvents(_6);
+}else{
+if(MVC.Array.include(["click","dblclick","mouseover","mouseout","mousemove","mousedown","mouseup","contextmenu"],this.type)){
+this.createMouse(_6);
+}
+}
+}
+},createEventObject:function(_7){
+if(MVC.Array.include(["keypress","keyup","keydown"],this.type)){
+this.createKeypressObject(_7,this.options.character);
+}else{
+if(this.type=="submit"){
+this.createSubmitObject(_7);
+}else{
+if(MVC.Array.include(["click","dblclick","mouseover","mouseout","mousemove","mousedown","mouseup","contextmenu"],this.type)){
+this.createMouseObject(_7);
+}
+}
+}
+},simulateEvent:function(_8){
+if(_8.dispatchEvent){
+return _8.dispatchEvent(this.event);
+}else{
+if(_8.fireEvent){
+return _8.fireEvent("on"+this.type,this.event);
+}else{
+throw "Your browser doesn't support dispatching events";
+}
+}
+},createEvents:function(_9){
+this.event=document.createEvent("Events");
+this.event.initEvent(this.type,true,true);
+this.simulateEvent(_9);
+},createSubmitObject:function(_a){
+if(MVC.Controller){
+for(var i=0;i<_a.elements.length;i++){
+var el=_a.elements[i];
+if(el.nodeName.toLowerCase()=="input"&&el.type.toLowerCase()=="submit"){
+return (new MVC.SyntheticEvent("click").send(el));
+}
+}
+for(var i=0;i<_a.elements.length;i++){
+var el=_a.elements[i];
+if((el.nodeName.toLowerCase()=="input"&&el.type.toLowerCase()=="text")||el.nodeName.toLowerCase()=="textarea"){
+return (new MVC.SyntheticEvent("keypress",{keyCode:13}).send(el));
+}
+}
+}else{
+this.event=document.createEventObject();
+this.simulateEvent(_a);
+}
+},createKeypress:function(_d,_e){
+if(_e&&_e.match(/\n/)){
+this.options.keyCode=13;
+_e=0;
+}
+if(_e&&_e.match(/[\b]/)){
+this.options.keyCode=8;
+_e=0;
+}
+var _f=MVC.Object.extend({ctrlKey:false,altKey:false,shiftKey:false,metaKey:false,keyCode:this.options.keyCode||0,charCode:(_e?_e.charCodeAt(0):0)},arguments[2]||{});
+try{
+this.event=document.createEvent("KeyEvents");
+this.event.initKeyEvent(this.type,true,true,window,_f.ctrlKey,_f.altKey,_f.shiftKey,_f.metaKey,_f.keyCode,_f.charCode);
+}
+catch(e){
+try{
+this.event=document.createEvent("Events");
+}
+catch(e2){
+this.event=document.createEvent("UIEvents");
+}
+finally{
+this.event.initEvent(this.type,true,true);
+MVC.Object.extend(this.event,_f);
+}
+}
+var _10=this.simulateEvent(_d);
+if(_10&&this.type=="keypress"&&!MVC.Browser.Gecko&&(_d.nodeName.toLowerCase()=="input"||_d.nodeName.toLowerCase()=="textarea")){
+if(_e){
+_d.value+=_e;
+}else{
+if(this.options.keyCode&&this.options.keyCode==8){
+_d.value=_d.value.substring(0,_d.value.length-1);
+}
+}
+}
+},createKeypressObject:function(_11,_12){
+if(_12&&_12.match(/\n/)){
+this.options.keyCode=13;
+_12=0;
+}
+if(_12&&_12.match(/[\b]/)){
+this.options.keyCode=8;
+_12=0;
+}
+this.event=document.createEventObject();
+this.event.charCode=(_12?_12.charCodeAt(0):0);
+this.event.keyCode=this.options.keyCode||(_12?_12.charCodeAt(0):0);
+var _13=this.simulateEvent(_11);
+if(_13&&this.type=="keypress"&&!MVC.Browser.Gecko&&(_11.nodeName.toLowerCase()=="input"||_11.nodeName.toLowerCase()=="textarea")){
+if(_12){
+_11.value+=_12;
+}else{
+if(this.options.keyCode&&this.options.keyCode==8){
+_11.value=_11.value.substring(0,_11.value.length-1);
+}
+}
+}
+},createMouse:function(_14){
+this.event=document.createEvent("MouseEvents");
+var _15=MVC.Test.center(_14);
+var _16=MVC.Object.extend({bubbles:true,cancelable:true,view:window,detail:1,screenX:366,screenY:195,clientX:_15[0],clientY:_15[1],ctrlKey:false,altKey:false,shiftKey:false,metaKey:false,button:(this.type=="contextmenu"?2:0),relatedTarget:null},this.options);
+this.event.initMouseEvent(this.type,_16.bubbles,_16.cancelable,_16.view,_16.detail,_16.screenX,_16.screenY,_16.clientX,_16.clientY,_16.ctrlKey,_16.altKey,_16.shiftKey,_16.metaKey,_16.button,_16.relatedTarget);
+this.simulateEvent(_14);
+},createMouseObject:function(_17){
+this.event=document.createEventObject();
+var _18=MVC.Test.center(_17);
+var _19=MVC.Object.extend({bubbles:true,cancelable:true,view:window,detail:1,screenX:1,screenY:1,clientX:_18[0],clientY:_18[1],ctrlKey:false,altKey:false,shiftKey:false,metaKey:false,button:(this.type=="contextmenu"?2:1),relatedTarget:null},this.options);
+MVC.Object.extend(this.event,_19);
+if(!MVC.Browser.Gecko&&(_17.nodeName.toLowerCase()=="input"||(_17.type&&_17.type.toLowerCase()=="checkbox"))){
+_17.checked=(_17.checked?false:true);
+}
+this.simulateEvent(_17);
+},drag:function(_1a){
+var _1b=function(_1c,_1d){
+if(!_1d[_1c].x||!_1d[_1c].y){
+if(typeof _1d[_1c]=="string"){
+_1d[_1c]=document.getElementById(_1d[_1c]);
+}
+var _1e=MVC.Test.center(_1d[_1c]);
+_1d[_1c].x=_1e.left;
+_1d[_1c].y=_1e.top;
+}
+};
+_1b("from",this.options);
+_1b("to",this.options);
+if(this.options.duration){
+return new MVC.Test.Drag(_1a,this.options);
+}
+var x=this.options.from.x;
+var y=this.options.from.y;
+var _21=this.options.steps||100;
+this.type="mousedown";
+this.options.clientX=x;
+this.options.clientY=y;
+this.create_event(_1a);
+this.type="mousemove";
+for(var i=0;i<_21;i++){
+x=this.options.from.x+(i*(this.options.to.x-this.options.from.x))/_21;
+y=this.options.from.y+(i*(this.options.to.y-this.options.from.y))/_21;
+this.options.clientX=x;
+this.options.clientY=y;
+this.create_event(_1a);
+}
+},write:function(_23){
+_23.focus();
+return new MVC.Test.Write(_23,this.options);
+}};
+MVC.Test.Write=function(_24,_25){
+this.delay=100;
+if(typeof _25=="string"){
+this.text=_25;
+this.synchronous=true;
+}else{
+if(_25.callback){
+this.callback=_25.callback;
+}
+if(_25.text){
+this.text=_25.text;
+}
+if(_25.synchronous==true){
+this.synchronous=true;
+}
+}
+this.element=_24;
+this.text_index=1;
+if(this.synchronous==true){
+for(var i=0;i<this.text.length;i++){
+this.write_character(this.text.substr(i,1));
+}
+}else{
+this.write_character(this.text.substr(0,1));
+setTimeout(this.next_callback(),this.delay);
+}
+};
+MVC.Test.Write.prototype={next:function(){
+if(this.text_index>=this.text.length){
+if(this.callback){
+this.callback({element:this.target});
+}else{
+return;
+}
+}else{
+this.write_character(this.text.substr(this.text_index,1));
+this.text_index++;
+setTimeout(this.next_callback(),this.delay);
+}
+},write_character:function(_27){
+new MVC.SyntheticEvent("keypress",{character:_27}).send(this.element);
+},next_callback:function(){
+var t=this;
+return function(){
+t.next();
+};
+}};
+MVC.Test.Drag=function(_29,_2a){
+this.callback=_2a.callback;
+this.start_x=_2a.from.x;
+this.end_x=_2a.to.x;
+this.delta_x=this.end_x-this.start_x;
+this.start_y=_2a.from.y;
+this.end_y=_2a.to.y;
+this.delta_y=this.end_y-this.start_y;
+this.target=_29;
+this.duration=_2a.duration?_2a.duration*1000:1000;
+this.start=new Date();
+new MVC.SyntheticEvent("mousedown",{clientX:this.start_x,clientY:this.start_y}).send(_29);
+this.pointer=document.createElement("div");
+this.pointer.style.width="10px";
+this.pointer.style.height="10px";
+this.pointer.style.backgroundColor="RED";
+this.pointer.style.position="absolute";
+this.pointer.style.left=""+this.start_x+"px";
+var _2b=window.pageYOffset||document.documentElement.scrollTop||0;
+var _2c=this.start_y+_2b;
+this.pointer.style.top=""+_2c+"px";
+this.pointer.style.lineHeight="1px";
+document.body.appendChild(this.pointer);
+setTimeout(this.next_callback(),20);
+};
+MVC.Test.Drag.prototype={next:function(){
+var now=new Date();
+var _2e=now-this.start;
+if(_2e>this.duration){
+new MVC.SyntheticEvent("mousemove",{clientX:this.end_x,clientY:this.end_y}).send(this.target);
+var _2f=new MVC.SyntheticEvent("mouseup",{clientX:this.end_x,clientY:this.end_y}).send(this.target);
+this.pointer.parentNode.removeChild(this.pointer);
+if(this.callback){
+this.callback({event:_2f,element:this.target});
+}
+}else{
+var _30=_2e/this.duration;
+var x=this.start_x+_30*this.delta_x;
+var y=this.start_y+_30*this.delta_y;
+this.pointer.style.left=""+x+"px";
+var _33=window.pageYOffset||document.documentElement.scrollTop||0;
+var _34=y+_33;
+this.pointer.style.top=""+_34+"px";
+new MVC.SyntheticEvent("mousemove",{clientX:x,clientY:y}).send(this.target);
+setTimeout(this.next_callback(),20);
+}
+},next_callback:function(){
+var t=this;
+return function(){
+t.next();
+};
+}};
+MVC.Test.get_dimensions=function(_36){
+var _37=_36.style.display;
+if(_37!="none"&&_37!=null){
+return {width:_36.offsetWidth,height:_36.offsetHeight};
+}
+var els=_36.style;
+var _39=els.visibility;
+var _3a=els.position;
+var _3b=els.display;
+els.visibility="hidden";
+els.position="absolute";
+els.display="block";
+var _3c=_36.clientWidth;
+var _3d=_36.clientHeight;
+els.display=_3b;
+els.position=_3a;
+els.visibility=_39;
+return {width:_3c,height:_3d};
+};
+MVC.Test.center=function(_3e){
+var d=MVC.Test.get_dimensions(_3e);
+var _40=d.height/2,_41=d.width/2;
+do{
+_40+=_3e.offsetTop||0;
+_41+=_3e.offsetLeft||0;
+_3e=_3e.offsetParent;
+}while(_3e);
+var _42=window.pageYOffset||document.documentElement.scrollTop||0;
+var _43=window.pageXOffset||document.documentElement.scrollLeft||0;
+_40=_40-_42;
+_41=_41-_43;
+var _44=[_41,_40];
+_44.left=_41;
+_44.top=_40;
+return _44;
+};
 ;
 include.set_path('../../jmvc/rhino');
 if(typeof load!="undefined"){
