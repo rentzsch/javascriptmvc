@@ -1,4 +1,14 @@
-MVC.Position = {
+/**
+ * @class MVC.Position
+ * Provides helper functions that let you know if a coordinate is within an X,Y value
+ */
+MVC.Position = 
+/*@Static*/
+{
+  /**
+   * Needs to be called once before any calculations are made, but after
+   * all CSS has been applied.  Sets deltaX and deltaY
+   */
   prepare: function() {
     this.deltaX =  window.pageXOffset
                 || document.documentElement.scrollLeft
@@ -10,7 +20,14 @@ MVC.Position = {
                 || 0;
   },
 
-  // caches x/y coordinate pair to use with overlap
+  /**
+   * Returns if a coordinate is within another element.
+   * caches x/y coordinate pair to use with overlap
+   * @param {HTMLElement} element
+   * @param {Number} x
+   * @param {Number} y
+   * @return {Boolean} true if x, y is inside the element, false if otherwise.
+   */
   within: function(element, x, y) {
     if (this.includeScrollOffsets)
       return this.withinIncludingScrolloffsets(element, x, y);
@@ -23,7 +40,13 @@ MVC.Position = {
             x >= this.offset[0] &&
             x <  this.offset[0] + element.offsetWidth);
   },
-
+  /**
+   * Returns if a coordinate is within an element taking scrolling into account.
+   * @param {HTMLElement} element
+   * @param {Number} x
+   * @param {Number} y
+   * @return {Boolean} true if x, y is inside the element, false if otherwise.
+   */
   withinIncludingScrolloffsets: function(element, x, y) {
     var offsetcache = MVC.Element.cumulativeScrollOffset(element);
 
