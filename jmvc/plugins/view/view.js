@@ -55,12 +55,13 @@ MVC.View = function( options ){
 		MVC.View.update(this.name, this);
 		return;
 	}
-	if(options.url){
-        options.url = MVC.View.get_absolute_path(options.url);
+	if(options.url || options.absolute_url){
+        var url = options.absolute_url || MVC.root.join(options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' )) ;
+        options.url = options.absolute_url || options.url;
 		var template = MVC.View.get(options.url, this.cache);
 		if (template) return template;
 	    if (template == MVC.View.INVALID_PATH) return null;
-        this.text = include.request(options.url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
+        this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
 		
 		if(this.text == null){
 			throw( {type: 'JMVC', message: 'There is no template at '+url}  );
@@ -399,11 +400,6 @@ MVC.View.Compiler.prototype = {
   }
 };
 
-MVC.View.get_absolute_path = function(path){
-	if(path.match(/^\//))
-		var is_absolute = true;
-	return (is_absolute? path: MVC.root.join(path+ (path.match(/\.ejs/) ? '' : '.ejs' )) );
-}
 
 //type, cache, folder
 /**
@@ -432,14 +428,12 @@ MVC.View.config = function(options){
 	var templates_directory = {}; //nice and private container
 	
 	MVC.View.get = function(path, cache){
-		path = MVC.View.get_absolute_path(path);
 		if(cache == false) return null;
 		if(templates_directory[path]) return templates_directory[path];
   		return null;
 	};
 	
 	MVC.View.update = function(path, template) { 
-		path = MVC.View.get_absolute_path(path);
 		if(path == null) return;
 		templates_directory[path] = template ;
 	};
@@ -562,6 +556,6 @@ MVC.Native.extend('String', {
      * @param {Object} string
      */
     chop: function(string){
-        return string.substr(0, string.length - 1);
+        return string.substr(0, this.length - 1);
     }
 })

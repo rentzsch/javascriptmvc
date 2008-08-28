@@ -1,9 +1,9 @@
-include.views(
+/*include.views(
 	include.get_path()+'/list',
 	include.get_path()+'/edit',
 	include.get_path()+'/display',
 	include.get_path()+'/show'
-);
+);*/
 
 MVC.Controller.scaffold = function(){
     //go through list of prototype functions, if one doesn't exist copy

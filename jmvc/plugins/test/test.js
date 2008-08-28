@@ -2,8 +2,30 @@
 MVC.Tests = {};
 
 
-
-MVC.Test = MVC.Class.extend({
+/**
+ * The Test class is the super class of other test classes including: 
+ * Test.Unit, Test.Functional, and Test.Controller. 
+ * Typically Test is not used directly but its functions are available in inheriting classes.
+ */
+MVC.Test = MVC.Class.extend(
+/*@Prototype*/
+{
+    /**
+     * Creates a new test case. A test case is a collection of test functions and helpers.
+     * 
+     * <pre><code>new MVC.Test('TestCaseName',{
+  test_some_asserts : function(){
+    var value = this.my_helper('hello world')
+    this.assert(value)      //passes
+  },
+  my_helper : function(value){
+    return value == 'hello world'
+  }
+}, 'unit')</code></pre>
+     * @param {Object} name the unique name of the test. Make sure no two tests have the same name.
+     * @param {Object} tests An object with test functions. Functions that begin with test_ will be run as tests. Functions that don't begin with test are converted to helper functions. Do not name helper functions the same name as the test provided helpers and assertions such as assert or assertEqual as your functions will override these functions.
+     * @param {Object} type The type of test ('unit', 'functional').
+     */
 	init: function( name, tests, type  ){
 		this.type = type || 'unit';
 		this.tests = tests;
@@ -22,17 +44,32 @@ MVC.Test = MVC.Class.extend({
 		MVC.Tests[this.name] = this;
 		this.updateElements(this);
 	},
+    /**
+     * Adds to the test case's failure count.
+     */
 	fail : function(){
 		this.failures++;
 	},
+    /**
+     * Returns an object of helper functions that will be used to generate a 
+     * new Assertion class for the TestCase. The base implementation returns all functions provided to tests in the constructor that do not start with test. 
+     * Functional and Controller tests overwrite this function.
+     */
 	helpers : function(){
 		var helpers = {}; 
 		for(var t in this.tests) if(this.tests.hasOwnProperty(t) && t.indexOf('test') != 0) helpers[t] = this.tests[t];
 		return helpers;
 	},
+    /**
+     * Adds to the test case's pass count.
+     */
 	pass : function(){
 		this.passes++;
 	},
+    /**
+     * Runs all the testcase's tests and when complete calls an optional callback if provided.
+     * @param {optional:Function} callback optional callback for when the test is complete
+     */
 	run: function(callback){
 		this.working_test = 0;
 		this.callback = callback;
@@ -40,10 +77,17 @@ MVC.Test = MVC.Class.extend({
 		this.failures = 0;
 		this.run_next();
 	},
+    /**
+     * Runs a helper function.
+     * @param {String} helper_name
+     */
 	run_helper: function(helper_name){
 		var a = new this.Assertions(this);
 		a[helper_name](0);
 	},
+    /**
+     * Runs the next function
+     */
 	run_next: function(){
 		if(this.working_test != null && this.working_test < this.test_names.length){
 			this.working_test++;
@@ -102,6 +146,14 @@ MVC.Test = MVC.Class.extend({
 	}
 });
 
+/**
+ * @constructor
+ * Adds run and run next functions to a Test Class
+ * @init Adds
+ * @param {Object} object
+ * @param {Function} iterator_name - "Tests"
+ * @param {Object} params
+ */
 MVC.Test.Runner = function(object, iterator_name,params){
 	var iterator_num;
 	object.run = function(callback){
@@ -130,9 +182,23 @@ MVC.Test.Runner = function(object, iterator_name,params){
 };
 
 
-//almsot everything in here should be private
-MVC.Test.Assertions =  MVC.Class.extend({
-	init: function( test, test_name){
+/**
+ * Assertions run test functions, provide helpers, and record the results of the tests.
+ * <h3>Example</h3>
+ * <pre><code>this.assert_equal("Tiger", this.name, "Tiger was expected");
+this.assert_not_null(this.title, "Title was null");
+this.assert_null(this.obj, "Expected to be null");
+this.assert(x_value > 200);</code></pre>
+ */
+MVC.Test.Assertions =  MVC.Class.extend(
+/*@Prototype*/
+{
+	/**
+	 * Creates a new Assertion with the given test for the test that matches test_name.
+	 * @param {MVC.Test} test An instance of a MVC.Test class.
+	 * @param {Function} test_name A function name.
+	 */
+    init: function( test, test_name){
 		this.assertions = 0;
 		this.failures = 0;
 		this.errors= 0;
@@ -394,8 +460,8 @@ MVC.Test.Controller = MVC.Test.Functional.extend({
 
 
 
-
-MVC.Console.window.get_tests = function(){return MVC.Tests; } 
+if(MVC.Console && MVC.Console.window)
+    MVC.Console.window.get_tests = function(){return MVC.Tests; } 
 
 //This function returns what something looks like
 MVC.Test.inspect =  function(object) {
