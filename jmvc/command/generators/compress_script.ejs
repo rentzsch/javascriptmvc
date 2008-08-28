@@ -1,10 +1,14 @@
+// java -jar jmvc\rhino\js.jar -e load('apps/<%= application_name %>/compress.js')
+
 MVCOptions = {
     onload: false,
     compress_callback: function(total){
         var compressed = MVCOptions.collect_and_compress(total);
         MVCOptions.save('apps/<%= application_name %>/production.js', compressed);
         print("Compressed to 'apps/<%= application_name %>/production.js'.");
-        new MVCObject.DApplication(total, "<%= application_name %>");
+        var app = new MVCObject.DApplication(total, "<%= application_name %>");
+        app.generate();
+        print("Generated docs.");
     }
 }
 load('jmvc/rhino/htmlparser.js');
