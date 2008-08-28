@@ -190,18 +190,31 @@ h4, .grayed {margin: 0px 0px 10px 40px; font-size: 12pt;color: #808080; line-hei
 
 
 
-.param {margin-left:40px; margin-right:40px;line-height:12pt; font-size: 10pt;margin-bottom:10px;}
-.param label {
+.param, .return {margin-left:40px; margin-right:40px;line-height:12pt; font-size: 10pt;margin-bottom:10px;}
+
+
+.param label, .return label {
 color:#808080;
 font-size:10pt;
 margin:0px 0px 0px 0px;
 font-weight: bold;
-
 }
+
+.return label {color: #d67c7c}
+
 .param .option{margin-left:40px;}
 .param .option label {font-size: 9pt;font-style: italic;font-weight: normal;}
 
 .param .default label {color: #BB7711;}
+
+.param code {
+    font-size: 10pt;
+    border-bottom: solid 1px #D5E7B3;
+}
+.optional code {
+    border-bottom: none;
+    font-size: 10pt;
+}
 span.default {color: #BB7711;}
 
 .options {text-align: left;margin-left:40px;margin-right: 40px;line-height: 150%;
