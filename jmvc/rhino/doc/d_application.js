@@ -60,7 +60,7 @@ MVCObject.DApplication.prototype = {
         var res = '<html><head><link rel="stylesheet" href="../jmvc/rhino/doc/style.css" type="text/css">'+
             '<title>'+this.name+'<title></head><body>'
         
-        res += "<div id='left_side'>"+summary+"</div>"
+        res += "<div id='left_side'>"+"</div>"
         res += "<div id='right_side'>"
         res += '<h1>Application Summary <label>'+this.name+'</label></h1>'
         
