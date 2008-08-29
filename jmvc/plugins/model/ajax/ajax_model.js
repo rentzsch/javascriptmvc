@@ -35,20 +35,43 @@ If /ftp/dir was actually ftp_directory, you can change the directory name by add
    }
 },{})</pre>
 dir_get_url could also be a function that dynamically returns the url.  For example,
-<pre>   ...
+<pre>...
    dir_get_url: function(params){
        return "/ftp/dir/"+encodeURIComponent(params.path)
    }
-   ...</pre>
+...</pre>
    would return "/ftp/dir/%2F" for Ftp.dir({path: "/"}, callback)
 
 <h3>Customizing and validating the request</h3>
 You can completely customize the request by making a function like X_request.  Where X matches one of your success functions.
-For example:
+The following example validates that params must include a path.
+<pre>...
+   dir_get_request: function(params){
+       if(!params.path) throw "Path does not exist!"
+   }
+...</pre>
+In a request function, you can also completely customize the request with the temporary this.request function.
+Example:
+<pre>...
+   dir_get_request: function(params){
+       if(!params.path) throw "Path does not exist!"
+       this.request("/ftp/dir/"+encodeURIComponent(params.path)+".json")
+   }
+...</pre>
 
 
 
 <h3>Respond to errors</h3>
+Finally, you can respond to Transport errors in the same way you respond to success:
+<pre>Ftp = MVC.AjaxModel.extend('ftp',
+{
+   dir_get_success: function(transport){
+       return transport.responseText;
+   },
+   dir_get_error: function(transport){
+       return "error data"
+   }
+},{})</pre>
 
  * 
  */
@@ -123,10 +146,15 @@ MVC.AjaxModel = MVC.Model.extend(
             var defaultOptions = {method: method}
             var request_called = false;
             /**
-             * Request is only available inside generated request applications.  
+             * @function request
+             * Request is only available inside generated request functions.  
+             * If the first argument is not a string, it assumes the first 2 arguments are
+             * the request params and the options.  If there are more than 3 arguments, those
+             * arguments
+             * will be used when calling back the success or error functions.
              * @param {optional:Object} url
-             * @param {Object} request_params
-             * @param {Object} options
+             * @param {Object} request_params parameters passed to the request
+             * @param {Object} options options sent to the transport
              */
             this.request = function(url, request_params, options){
                 //url is optional!

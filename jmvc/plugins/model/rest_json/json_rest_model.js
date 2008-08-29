@@ -1,17 +1,35 @@
 /**
- * Model for accessing JSON rest resources.
+ * Model for accessing JSON rest resources.<br/>
  * 
- * Examples: recipes.json
+ * To create a new JSONModel:
+ * <pre>Todo = JSONRestModel.extend('todos')</pre>
+ * 
+ * To change the find url:
+ * <pre>Todo = JSONRestModel.extend('todos',{
+ *   find_all_get_url: "application/todos.json"
+ *},{})</pre>
+ * Examples of how data should be returned to use JSONModel
+ * <pre>/recipes.json should return 
  *    [ 
  *       {attributes: 
  *           {title: "Chicken Soup", id: "48", 
- *            instructions: "Call Mom!\nBring chicken"}  }, 
+ *            instructions: "Call Mom!\nBring chicken",
+ *            id: 1}  }, 
  *       {attributes: 
  *           {title: "Toast", id: "49", 
- *            instructions: "Heat Bread"}  } ]
+ *            instructions: "Heat Bread",
+ *            id: 1}  } 
+ *     ]
+ *     
+/recipes/1.json should return
+ *     {attributes: 
+ *           {title: "Chicken Soup", id: "48", 
+ *            instructions: "Call Mom!\nBring chicken",
+ *            id: 1}  } </pre>
  * 
  */
 MVC.JSONRestModel = MVC.AjaxModel.extend(
+/*@Static*/
 {
     init: function(){
         if(!this.className) return;
@@ -19,10 +37,24 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
         this.singular_name =  this.className;
         this._super();
     },
+    /**
+     * overwrite this function if you don't want to eval js
+     * @param {Object} json_string json string
+     * @return {Object} json converted to data
+     */
     json_from_string : function(json_string){
-        return eval(json_string); //overwrite this function if you don't want to eval js
+        return eval(json_string); //
     },
+    /**
+     * Returns the URL for find all requests
+     * @retunn {String}
+     */
     find_all_get_url : function(){ return '/'+this.plural_name+'.json'},
+    /**
+     * When a find comes back successful, callsback with the data converted into instances of this class
+     * @param {Object} transport
+     * @return {Array} Array of json model instances that get passed to the callback 
+     */
     find_all_get_success : function(transport){  //error is either success, complete or error
         var data = this.json_from_string(transport.responseText);
         var collection = [];
@@ -34,6 +66,10 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
     	}
         return collection;
     },
+    /**
+     * Posts attributes to /plural_name.json.
+     * @param {Object} attributes
+     */
     create_request: function(attributes){
         var instance = new this(attributes);
         instance.validate()
@@ -43,6 +79,14 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
         this.request('/'+this.plural_name+'.json', params, {method: 'post'}, instance );
         return instance;
     },
+    /**
+     * After a successful create request, this gets the id from the header 
+     * and returns the new instance.
+     * @param {Object} transport
+     * @param {Object} callback success callback passed into create
+     * @param {Object} instance the instance this call is creating
+     * @return {jsonmodel} a new instance
+     */
     create_success: function(transport, callback, instance){
           if (/\w+/.test(transport.responseText)) {
             var errors = this.json_from_string(transport.responseText);
@@ -56,6 +100,11 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
           }
     	  return instance;
     },
+    /**
+     * Posts data to /plural_name/id.json
+     * @param {Number} id the id of the instance we are updating
+     * @param {Object} attributes updated attributes
+     */
     update_request: function(id, attributes){
         delete attributes.id
         var params = {};
@@ -75,6 +124,11 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
         }
         return instance;
     },
+    /**
+     * Returns the delete url
+     * @param {Object} id
+     * @return {String} /plural_name/id.xml
+     */
     destroy_delete_url : function(id){return  '/'+this.plural_name+'/'+id+'.xml' },
     destroy_delete_error: function(){ return false;},
     destroy_delete_success: function(transport){ return transport.status == 200}
