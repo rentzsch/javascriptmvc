@@ -197,7 +197,7 @@ object_data = function(){
 	var element = this.element;
 	// loop through parents, this element, or one of its parents should have "todo_4" as its' id
 	// this allows more complex html structures, such as <div id='todo_4'><div class='todo'></div></div>
-	while(element && element.id && !element.id.match(new RegExp(className))){
+	while(element && !element.id.match(new RegExp(className))){
 		element = element.parentNode;
 		if(element == document) element = null;
 	}
