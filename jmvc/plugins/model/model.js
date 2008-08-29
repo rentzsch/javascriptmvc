@@ -12,6 +12,7 @@
 MVC.Model = MVC.Class.extend(
 /*@Static*/
 {
+	store_type: MVC.SimpleStore,
     /**
      * Finds objects in this class
      * @param {Object} id the id of a object
@@ -19,6 +20,21 @@ MVC.Model = MVC.Class.extend(
      * @param {Object} callbacks a single onComplete callback or a hash of callbacks
      * @return {Model} will return instances of the model if syncronous
      */
+	init: function(){
+		this.store = new this.store_type();
+	},
+	find_one: function(id, callbacks){
+		return this.store.find_one(id, callbacks);
+	},
+	create: function(obj, callbacks){
+		return this.store.create(obj, callbacks);
+	},
+	update: function(id, attributes, callbacks){
+		return this.store.update(id, attributes, callbacks);
+	},
+	destroy: function(id, callbacks){
+		return this.store.destroy(id, callbacks);
+	},
     find : function(id, params, callbacks){
         if(!params)  params = {};
         if(typeof params == 'function') {
