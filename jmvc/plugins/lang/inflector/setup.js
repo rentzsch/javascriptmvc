@@ -1,1 +1,2 @@
-include('inflector')
+include.plugins('lang');
+include('inflector');
