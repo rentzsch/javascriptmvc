@@ -75,7 +75,10 @@ Mozilla = {
         netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
         var file = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
         file.initWithPath(filePath);
-        var entries = file.directoryEntries;
+        try{
+             var entries = file.directoryEntries;
+        }catch(e){return [];}
+       
         while (entries.hasMoreElements()) {
             var entry = entries.getNext();
             entry.QueryInterface(Components.interfaces.nsIFile);
@@ -118,7 +121,7 @@ Mozilla = {
 	    	var base = window.location.pathname.match(/(\/.*)\/jmvc\/command.html/)[1];
 	    
 	    if (convert) {
-	        base = base.replace(/\//g, MVC.Path.slash)
+	        base = base.replace(/\//g, MVC.Path.slash).replace(/%20/g," ")
 	    }
 		
 		return base;

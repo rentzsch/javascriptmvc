@@ -355,3 +355,7 @@ MVC.Controller.Params.prototype = {
      */
 	object_data : function(){ return MVC.View.Helpers.get_data(this.class_element()); }
 };
+
+if(!MVC._no_conflict && typeof Controller == 'undefined'){
+	Controller = MVC.Controller
+}
