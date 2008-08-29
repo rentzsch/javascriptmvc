@@ -5,8 +5,9 @@ MVC.SimpleStore = MVC.Class.extend({
 	init: function(){
 		this._data = {};
 	},
-	find_one: function(id){
-		return this._data[id]
+	find_one: function(params){
+		var id = params.id;
+		return this._data[id];
 	},
 	create: function(obj){
 		var id = obj.id;

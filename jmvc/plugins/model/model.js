@@ -23,8 +23,8 @@ MVC.Model = MVC.Class.extend(
 	init: function(){
 		this.store = new this.store_type();
 	},
-	find_one: function(id, callbacks){
-		return this.store.find_one(id, callbacks);
+	find_one: function(params, callbacks){
+		return this.store.find_one(params, callbacks);
 	},
 	create: function(obj, callbacks){
 		return this.store.create(obj, callbacks);
