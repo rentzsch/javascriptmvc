@@ -6,7 +6,7 @@ MVCOptions = {
         print("Compressed to 'apps/everything/production.js'.");
         
         print("Parsing files for docs ...");
-        var app = new MVCObject.DApplication(total, "everything");
+        var app = new MVCObject.DApplication(total, "jmvc");
         
         app.generate();
         print("Generated docs.");
