@@ -335,8 +335,8 @@ MVC.Controller.Params.prototype = {
      * @return {HTMLElement} the element that shares the controller's id or classname
      */
 	class_element : function(){
-		var start = this.element, controller = this.controller;
-		var className = MVC.String.is_singular(controller) ? controller : MVC.String.singularize(controller);
+		var start = this.element;
+		var className = this._className();
 		while(start && start.className.indexOf(className) == -1 ){
 			start = start.parentNode;
 			if(start == document) return null;
@@ -348,12 +348,11 @@ MVC.Controller.Params.prototype = {
      * @return {Boolean} true if the event's target is the element, false if otherwise.
      */
 	is_event_on_element : function(){ return this.event.target == this.element; },
-    /*
-     * If the element has an id like "todo_5" this will return the instance that the 
-     * element represents.
-     * @return {Object} the instance object the form represents.
-     */
-	object_data : function(){ return MVC.View.Helpers.get_data(this.class_element()); }
+	_className : function(){
+		controller = this.controller;
+		var className = MVC.String.is_singular(controller) ? controller : MVC.String.singularize(controller);
+		return className;
+	}
 };
 
 if(!MVC._no_conflict && typeof Controller == 'undefined'){
