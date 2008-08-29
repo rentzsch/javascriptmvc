@@ -156,11 +156,13 @@ var is_included = function(path){
 	return false;
 };
 
-var add_with_defaults = function(inc){
+var add_with_defaults = function(inc, force){
 	if(typeof inc == 'string') inc = {path: inc.indexOf('.js') == -1  ? inc+'.js' : inc};
 	if(typeof inc != 'function'){
         inc.original_path = inc.path;
         inc = MVC.Object.extend( MVC.Object.extend({},options), inc);
+        if(force)
+            inc.compress = false
     }
 	include.add(inc);
 };
@@ -170,7 +172,9 @@ include = function(){
 		for(var i=0; i < arguments.length; i++) add_with_defaults(arguments[i]);
 	}else{
 		if(!first_wave_done) return; 
-		for(var i=0; i < arguments.length; i++) add_with_defaults(arguments[i]);
+		for(var i=0; i < arguments.length; i++){
+            add_with_defaults(arguments[i]);
+        }
 		return;
 	}
 	if(first && !MVC.Browser.Opera){
@@ -221,6 +225,12 @@ MVC.Object.extend(include,{
 		newInclude.start = ar.join('/');
 		current_includes.unshift(  newInclude );
 	},
+    force : function(){
+        for(var i=0; i < arguments.length; i++){
+            //basically convert from jmvc
+            insert_head(MVC.root.join(arguments[i]));
+        }
+    },
 	normalize: function(path){
 		var current_path = include.get_path();
 		//if you are cross domain from the page, and providing a path that doesn't have an domain

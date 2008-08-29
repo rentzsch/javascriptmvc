@@ -1,0 +1,3 @@
+MVC.Translation({
+    "hi" : "Hello"
+})
