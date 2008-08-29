@@ -114,7 +114,8 @@ PageGeneratorController = MVC.Controller.extend('page_generator',{
             Mozilla.saveFile(pages, (old? old: '')+new_link , true );
             
 			// add link to the page
-			document.getElementById('page_links').innerHTML += new_link;
+			var el = document.getElementById('page_links');
+			if(el) el.innerHTML += new_link;
 		}
     }
 });
