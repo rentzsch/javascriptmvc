@@ -185,7 +185,7 @@ MVC.Model = MVC.Class.extend(
         
     },
     _setAttribute : function(attribute, value) {
-        if (value && typeof(value) == "object" && value.constructor != Date)
+        if (MVC.Array.include(this.Class._associations, attribute))
           this._setAssociation(attribute, value);
         else
           this._setProperty(attribute, value);
@@ -200,10 +200,8 @@ MVC.Model = MVC.Class.extend(
     _setAssociation : function(association, values) {
         this[association] = function(){
             if(! MVC.String.is_singular(association ) ) association = MVC.String.singularize(association);
-            
-            var associated_class = window[MVC.String.capitalize(association)];
+            var associated_class = window[MVC.String.classize(association)];
             if(!associated_class) return values;
-            //alert(values.length)
             return associated_class.create_many_as_existing(values);
         }
         
