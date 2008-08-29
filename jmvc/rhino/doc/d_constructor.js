@@ -63,11 +63,12 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
         return ret+"</div>"
         //return "Class: "+this.name+"\n"+parts.join("\n\n");
     },
-    toFile : function(){
+    toFile : function(summary){
         var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css"><title>'+this.name+"<title></head><body>"
-        res+= this.toHTML();
+        res += "<div id='left_side'>"+summary+"</div>"
+        res+= "<div id='right_side'>"+this.toHTML()+"</div>";
         res +="</body></html>"
-        MVCOptions.save('docs/constructors/'+this.name+".html", res)
+        MVCOptions.save('docs/classes/'+this.name+".html", res)
     },
     get_quicklinks : function(){
         var inside = this.linker().sort(MVCObject.DPair.sort_by_full_name);

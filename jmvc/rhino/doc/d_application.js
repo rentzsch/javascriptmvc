@@ -22,57 +22,61 @@ MVCObject.DApplication = function(total, app_name){
 
 MVCObject.DApplication.prototype = {
     generate : function(){
+        var summary = this.summary();
+        
         //make classes
         for(var i = 0; i < MVCObject.DClass.listing.length; i++){
-            MVCObject.DClass.listing[i].toFile();
+            MVCObject.DClass.listing[i].toFile(summary);
         }
         //MVCObject.DClass.create_index();
         
         //make constructors
         for(var i = 0; i < MVCObject.DConstructor.listing.length; i++){
-            MVCObject.DConstructor.listing[i].toFile();
+            MVCObject.DConstructor.listing[i].toFile(summary);
         }
         //MVCObject.DConstructor.create_index();
         
         //what makes most sense is to group MVC, and Core
         
-        this.summary()
+        //this.summary()
     },
     summary: function(){
-        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css">'+
-            '<title>'+this.name+'<title></head><body>'
+        //var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css">'+
+        //    '<title>'+this.name+'<title></head><body>'
+        var res = "<h3>Documentation</h3><ul>"
+        //res += '<h1>Application Summary <label>'+this.name+'</label></h1>'
         
-        res += '<h1>Application Summary <label>'+this.name+'</label></h1>'
         
+        //res += '<h2>Classes</h2>'
+        var things = MVCObject.DClass.listing.concat( MVCObject.DConstructor.listing ).sort( MVCObject.DPair.sort_by_name );
         
-        res += '<h2>Classes</h2>'
-        
-        for(var i = 0; i < MVCObject.DClass.listing.length; i++){
-            var name = MVCObject.DClass.listing[i].name;
-            res += "<div><a href='../classes/"+name+".html'>"+name+"</a></div>"
+
+        for(var i = 0; i < things.length; i++){
+            var name = things[i].name;
+            res += "<li><a href='../classes/"+name+".html'>"+name+"</a></li>"
         }
         
         
         
-        res += '<h2>Constructors </h2>'
-        
-        for(var i = 0; i < MVCObject.DConstructor.listing.length; i++){
-            var name = MVCObject.DConstructor.listing[i].name;
+        /*res += '<h2>Constructors </h2>'
+        var sorted_constructors = MVCObject.DConstructor.listing.sort( MVCObject.DPair.sort_by_name )
+        for(var i = 0; i < sorted_constructors.length; i++){
+            var name = sorted_constructors[i].name;
             res += "<div><a href='../constructors/"+name+".html'>"+name+"</a></div>"
-        }
+        }*/
         
         
-        res += '<h2>Files </h2>'
+        //res += '<h2>Files </h2>'
         
-        for(var i = 0; i < this.files.length; i++)
-            res += '<div><a href="'+this.files[i].name  +'">'+this.clean_path( this.files[i].name)+'</a></div>'
-        
-        
-        
+        //for(var i = 0; i < this.files.length; i++)
+        //    res += '<div><a href="'+this.files[i].name  +'">'+this.clean_path( this.files[i].name)+'</a></div>'
         
         
         
-        MVCOptions.save('docs/apps/'+this.name+".html", res)
+        
+        
+        return res + "</ul>"
+        //MVCOptions.save('docs/apps/'+this.name+".html", res)
     },
     clean_path : function(path){
         return path;

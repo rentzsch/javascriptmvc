@@ -53,9 +53,10 @@ MVCObject.DClass = MVCObject.DPair.extend('class',
         return ret+"</div>"
         //return "Class: "+this.name+"\n"+parts.join("\n\n");
     },
-    toFile : function(){
+    toFile : function(summary){
         var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css"><title>'+this.name+"<title></head><body>"
-        res+= this.toHTML();
+        res += "<div id='left_side'>"+summary+"</div>"
+        res += "<div id='right_side'>"+this.toHTML()+"</div>";
         res +="</body></html>"
         MVCOptions.save('docs/classes/'+this.name+".html", res)
     },

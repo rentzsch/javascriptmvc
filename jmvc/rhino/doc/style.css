@@ -1,9 +1,13 @@
 body {
-	background:#FFFFFF none repeat scroll 0%;
+
     font-size: 11pt;
 	min-width:610px;
 	padding:0pt;
 	font-family: Verdana;
+    background-image:url(side_background.png);
+    background-repeat:repeat-y;
+    margin:0pt;
+padding:0pt;
 }
 
 
@@ -49,7 +53,36 @@ h5 {
 	margin-bottom: 10px;
 }
 
+#left_side ul {
+border-top:1px solid #6E8F2E;
+list-style-image:none;
+list-style-position:outside;
+list-style-type:none;
+margin:20px;
+padding:0px;
+}
 
+#left_side li {
+background-color:#D5E7B3;
+border-bottom:1px solid #6E8F2E;
+margin:0px;
+padding-bottom:4px;
+padding-left:10px;
+padding-top:4px;
+}
+
+
+#left_side a:hover {
+    border-bottom:1px solid #556F24;
+}
+#left_side a, #left_side a:visited {
+    color:blue;
+    font-family:Verdana;
+    font-size:9pt;
+    font-weight:bold;
+    text-decoration:none;
+}
+Inhe
 
 div.image img {
 	margin-bottom: 0px;
@@ -159,8 +192,11 @@ pre.signiture {border: solid 1px #e7b3b3; padding: 0px 0px 0px 5px;}
 
 
 .api {background-image: url(../images/side_background.png); background-repeat: repeat-y;}
-.left_side {float:left;width: 260px; margin-top: 20px;}
 
+#left_side {float:left;width: 260px; margin-top: 10px;}
+#right_side {
+margin-top:20px;margin-left:300px;
+}
 
 #content {text-align:left;}
 
@@ -182,7 +218,14 @@ h3 {font-size: 12pt;font-weight: bolder;margin: 10px 0px 0px 00px; color: #556F2
 }
 .attribute h3 {color: #6f2424;}
 
-
+#left_side h3{
+    color:#8FBA3C;
+font-family:Verdana;
+font-size:15pt;
+font-weight:normal;
+margin:0px 0px 0px 20px;
+padding:0px;
+}
 
 h1, h2,h3,h4 {font-family: "Helvetica Neue",Arial}
 h4, .grayed {margin: 0px 0px 10px 40px; font-size: 12pt;color: #808080; line-height: 100%;}

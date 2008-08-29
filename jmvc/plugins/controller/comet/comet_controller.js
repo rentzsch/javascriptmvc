@@ -1,18 +1,43 @@
 /**
  * This class is used to 
  *    handle starting a comet response
- *    handling when there are errors
- *    dispatching the callback to other controllers for handling
- */
+ *    and
+ *    dispatching the response to other controllers for handling.
+ *    </br>
+By default, comet controller queries the url of its className.  For example:
+<pre>JabbifyController = CometController.extend('jabbify',{},{})</pre>
+connects to /jabbify
+<br/>
+Comet controller expects data of the format:
+<pre>{ClassName1: 
+    {action1: [data1, data2 ...], 
+     action2: [ ....], 
+     ...
+    }
+ ClassName2: { .... }
+}</pre>
+  If possible, CometController tries to create new instances of data, and dispatch to a matching 
+  controller action.  For example:
+<pre>{Todo: {create: [{name: 'wash dishes'}]}}</pre>
+Will create a new Todo instance and call TodosController::create with that instance.
+</pre>
+*/
 MVC.CometController = MVC.Controller.extend(
+/*@Static*/
 {
     init : function(){
          //cancels matching controller actions  
     },
+    /**
+     * Starts the coment connection.
+     */
     run: function(){
         var instance = new this();
         instance.run();
     },
+    /**
+     * Kills the comet connection.
+     */
     kill: function(){
         var instance = new this();
         instance.kill();
@@ -29,6 +54,10 @@ MVC.CometController = MVC.Controller.extend(
     wait_time : function(){
         return this._wait_time;
     },
+    /**
+     * Dispatches to a controller and tries to send it instances if possible.
+     * @param {Object} response
+     */
     dispatch : function(response){
         var responseJSON = this.convert(response);
         for(var className in response){
@@ -54,6 +83,7 @@ MVC.CometController = MVC.Controller.extend(
     controller_map :{},
     error_mode: false
 },
+/*@Prototype*/
 {
     run : function(){
         this.start_polling();
@@ -75,6 +105,10 @@ MVC.CometController = MVC.Controller.extend(
         this.error_mode = true;
         this.run(); //start over
     },
+    /**
+     * Called when the comet request successfully returns.
+     * @param {Object} response
+     */
     success : function(response){
         this.Class.dispatch(response);
     },

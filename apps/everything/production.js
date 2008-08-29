@@ -339,7 +339,11 @@ if(!MVC.Array.include(["get","post"],this.options.method)){
 if(this.options.parameters==""){
 this.options.parameters={_method:this.options.method};
 }else{
+if(typeof this.options.parameters=="string"){
+this.options.parameters=this.options.parameters+"&_method="+this.options.method;
+}else{
 this.options.parameters["_method"]=this.options.method;
+}
 }
 this.options.method="post";
 }
@@ -1429,7 +1433,7 @@ return _2;
 };
 ;
 include.set_path('../../jmvc/plugins/dom/element');
-include("vector","position");
+include("vector");
 if(typeof Prototype!="undefined"){
 MVC.$E=$;
 MVC.$E.insert=Element.insert;
@@ -1489,26 +1493,6 @@ return this;
 MVC.Event.pointer=function(_f){
 return new MVC.Vector(_f.pageX||(_f.clientX+(document.documentElement.scrollLeft||document.body.scrollLeft)),_f.pageY||(_f.clientY+(document.documentElement.scrollTop||document.body.scrollTop)));
 };
-;
-include.set_path('../../jmvc/plugins/dom/element');
-MVC.Position={prepare:function(){
-this.deltaX=window.pageXOffset||document.documentElement.scrollLeft||document.body.scrollLeft||0;
-this.deltaY=window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop||0;
-},within:function(_1,x,y){
-if(this.includeScrollOffsets){
-return this.withinIncludingScrolloffsets(_1,x,y);
-}
-this.xcomp=x;
-this.ycomp=y;
-this.offset=MVC.Element.cumulativeOffset(_1);
-return (y>=this.offset[1]&&y<this.offset[1]+_1.offsetHeight&&x>=this.offset[0]&&x<this.offset[0]+_1.offsetWidth);
-},withinIncludingScrolloffsets:function(_4,x,y){
-var _7=MVC.Element.cumulativeScrollOffset(_4);
-this.xcomp=x+_7[0]-this.deltaX;
-this.ycomp=y+_7[1]-this.deltaY;
-this.offset=MVC.Element.cumulativeOffset(_4);
-return (this.ycomp>=this.offset[1]&&this.ycomp<this.offset[1]+_4.offsetHeight&&this.xcomp>=this.offset[0]&&this.xcomp<this.offset[0]+_4.offsetWidth);
-}};
 ;
 include.set_path('../../jmvc/plugins/dom/element');
 MVC.Element=function(_1){
@@ -2098,8 +2082,28 @@ this.Class._comet.kill();
 }});
 ;
 include.set_path('../../jmvc/plugins/controller/dragdrop');
-include.plugins("controller","dom/element","dom/query");
+include.plugins("controller","dom/element","dom/query","dom/position");
 include("drag","drop");
+;
+include.set_path('../../jmvc/plugins/dom/position');
+MVC.Position={prepare:function(){
+this.deltaX=window.pageXOffset||document.documentElement.scrollLeft||document.body.scrollLeft||0;
+this.deltaY=window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop||0;
+},within:function(_1,x,y){
+if(this.includeScrollOffsets){
+return this.withinIncludingScrolloffsets(_1,x,y);
+}
+this.xcomp=x;
+this.ycomp=y;
+this.offset=MVC.Element.cumulativeOffset(_1);
+return (y>=this.offset[1]&&y<this.offset[1]+_1.offsetHeight&&x>=this.offset[0]&&x<this.offset[0]+_1.offsetWidth);
+},withinIncludingScrolloffsets:function(_4,x,y){
+var _7=MVC.Element.cumulativeScrollOffset(_4);
+this.xcomp=x+_7[0]-this.deltaX;
+this.ycomp=y+_7[1]-this.deltaY;
+this.offset=MVC.Element.cumulativeOffset(_4);
+return (this.ycomp>=this.offset[1]&&this.ycomp<this.offset[1]+_4.offsetHeight&&this.xcomp>=this.offset[0]&&this.xcomp<this.offset[0]+_4.offsetWidth);
+}};
 ;
 include.set_path('../../jmvc/plugins/controller/dragdrop');
 MVC.Controller.DragAction=MVC.Controller.DelegateAction.extend({match:new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")},{init:function(_1,f,_3){
@@ -3268,10 +3272,10 @@ _f[_10](_17);
 }
 },_make_public:function(_18,_19){
 var _1a=this.base_url+"/"+_18;
-if(this[_18+"_"+_19+"_url"]){
-_1a=typeof this[_18+"_"+_19+"_url"]=="function"?this[_18+"_"+_19+"_url"]():this[_18+"_"+_19+"_url"];
-}
 return function(_1b){
+if(this[_18+"_"+_19+"_url"]){
+_1a=typeof this[_18+"_"+_19+"_url"]=="function"?this[_18+"_"+_19+"_url"](_1b):this[_18+"_"+_19+"_url"];
+}
 var _1c=MVC.Array.from(arguments);
 var _1d=this._clean_callbacks(_1c[_1c.length-1]);
 _1b=_1c.length>1?_1b:{};
@@ -3441,7 +3445,9 @@ return;
 if(!this.domain){
 throw ("a domain must be provided for remote model");
 }
+if(!this.controller_name){
 this.controller_name=this.className;
+}
 this.plural_controller_name=MVC.String.pluralize(this.controller_name);
 },find_all:function(_1,_2){
 var _3=this._clean_callbacks(_2);
@@ -3503,7 +3509,7 @@ _1c.referer=window.location.href;
 }
 },callback_name:"callback",domain:null,top_level_length:function(_1e,url){
 var p=MVC.Object.extend({},_1e);
-delete p[this.className];
+delete p[this.controller_name];
 return url.length+MVC.Object.to_query_string(p).length;
 },seperate:function(_21,_22,_23){
 var _24=2000-9-_22;
@@ -3619,11 +3625,11 @@ _16.add_errors(_17);
 }
 }
 return _16;
-},destroy_request:function(id){
-this.request("/"+this.plural_name+"/"+id+".json",{},{method:"delete"});
-},destroy_error:function(){
+},destroy_delete_url:function(id){
+return "/"+this.plural_name+"/"+id+".xml";
+},destroy_delete_error:function(){
 return false;
-},destroy_success:function(_19){
+},destroy_delete_success:function(_19){
 return _19.status==200;
 }},{});
 ;
@@ -4018,11 +4024,11 @@ _17._resetAttributes(_19);
 }
 }
 return _17;
-},destroy_request:function(id){
-this.request("/"+this.plural_name+"/"+id+".xml",{},{method:"delete"});
-},destroy_error:function(){
+},destroy_delete_url:function(id){
+return "/"+this.plural_name+"/"+id+".xml";
+},destroy_delete_error:function(){
 return false;
-},destroy_success:function(_1c){
+},destroy_delete_success:function(_1c){
 return _1c.status==200;
 },elementHasMany:function(_1d){
 if(!_1d){
