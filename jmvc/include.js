@@ -352,12 +352,14 @@ var head = function(){
 	de.insertBefore(head, de.firstChild);
 	return head;
 };
-var insert_head = function(src){
-	var script= script_tag();
+var insert_head = function(src, encode){
+	encode = encode || "UTF-8";
+    var script= script_tag();
 	script.src= src;
-	script.charset= "UTF-8";
+	script.charset= encode;
 	head().appendChild(script);
 };
+include.insert_head = insert_head;
 var script_tag = function(){
 	var start = document.createElement('script');
 	start.type = 'text/javascript';

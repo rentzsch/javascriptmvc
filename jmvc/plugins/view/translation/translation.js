@@ -1,21 +1,31 @@
 
-include.translation = function(name){
-    include.force("views/translations/"+name+".js");
-    if(MVC.Translation._lang) throw "More than one translation loaded"
-    MVC.Translation._lang = name
+include.translation = function(name, encoding){
+    if(!name) return;
+    encoding = encoding || "iso-8859-1";
+    include.insert_head(MVC.root.join("views/translations/"+name+".js") , encoding  );
 }
 
+MVC.translate = function(phrase){
+    return phrase;
+}
 
-MVC.Object.extend(MVC.View.Helpers.prototype, {
-    translate : function(phrase){
-        var t = MVC.Translation[MVC.Translation._lang][phrase]
-        return t ? t : phrase;
-    }
-
-})
 
 
 
 MVC.Translation = function(translations){
-    MVC.Translation[MVC.Translation._lang] = translations;
+
+    MVC.translate = function(phrase){
+        var t = translations[phrase]
+        return t ? t : phrase;
+    }
+    if(!MVC._no_conflict){
+    	$T = MVC.translate;
+    }
 };
+
+
+if(!MVC._no_conflict){
+	$T = MVC.translate;
+    Translation = MVC.Translation;
+}
+
