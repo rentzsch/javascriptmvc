@@ -17,7 +17,7 @@ MVC.SimpleStore = MVC.Class.extend({
 		for(var attr in attributes){
 			this._data[id][attr] = attributes[attr];
 		}
-		return this._data[id][attr];
+		return this._data[id];
 	},
 	destroy: function(id){
 		delete this._data[id];

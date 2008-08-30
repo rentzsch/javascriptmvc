@@ -56,7 +56,7 @@ MVC.Model = MVC.Class.extend(
      */
     create_as_existing : function(attributes){
         if(!attributes) return null;
-        if(attributes.attributes) attributes = attributes.attributes;
+        if(attributes.attributes) attributes = attributes.attributes();
         var inst = new this(attributes);
         inst.is_new_record = this.new_record_func;
         return inst;
