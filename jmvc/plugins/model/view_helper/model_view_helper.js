@@ -104,12 +104,14 @@ MVC.ModelViewHelper = MVC.Class.extend(
         if(this._element) return this._element;
         this._element = MVC.$E(this.element_id());
         if(this._element) return this._element;
+    },
+	create_element: function(){
         this._element = document.createElement('div');
         this._element.id = this.element_id();
         this._element.className = this._className;
         this._element.setAttribute('type', this._className);
         return this._element;
-    },
+	},
     element_id : function(){
         return this._className+'_'+this._inst[this._inst.Class.id];
     },
