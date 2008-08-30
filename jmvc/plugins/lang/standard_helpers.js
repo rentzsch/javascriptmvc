@@ -220,10 +220,12 @@ MVC.Native.extend('Number',
      * @param {optional:Object} radix the numeric base (defaults to base 10);
      * @return {String} 
      */
-    to_padded_string: function(number, length, radix) {
+    to_padded_string: function(number, len, radix) {
         var string = number.toString(radix || 10);
-        var ret = '';
-        for(var i = 0 ; i < length - string.length; i++) ret =+ '0';
+        var ret = '', needed = len - string.length;
+        
+        for(var i = 0 ; i < needed; i++) 
+            ret += '0';
         return ret + string;
     }
 })
