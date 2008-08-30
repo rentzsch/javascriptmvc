@@ -21,8 +21,14 @@ MVC.Translation = function(translations){
     if(!MVC._no_conflict){
     	$T = MVC.translate;
     }
+    for(var i =0; i < MVC.Translation._cbs.length; i++){
+        MVC.Translation._cbs[i](translations);
+    }
 };
-
+MVC.Translation._cbs = [];
+MVC.Translation.onload = function(f){
+    MVC.Translation._cbs.push(f)
+}
 
 if(!MVC._no_conflict){
 	$T = MVC.translate;
