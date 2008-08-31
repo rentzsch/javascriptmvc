@@ -13,9 +13,9 @@ if(typeof Prototype == 'undefined') {
 			"../io/ajax/prototype_ajax");
 	MVC.Included.plugins.push('lang','lang/inflector','io/ajax');
 }
-//include('../ajax/debug');
 
-if(include.get_env() == 'test') include('test')
+if(MVC.Console)
+	include("../io/ajax/debug")
 
 MVC.Included.plugins.push('view','controller','controller/view');
 

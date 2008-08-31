@@ -2,6 +2,10 @@
 	var request = MVC.Ajax;
 
 	MVC.Ajax = function(url,options){
+		var options = MVC.Ajax.setup_request(url,options);
+		return MVC.Ajax.make_request(options.url,options);
+	};
+	MVC.Ajax.setup_request= function(url,options){
 		if( options.use_fixture == null || options.use_fixture == true  ){
 		    var testurl = url;
             if(options.parameters) 
@@ -26,10 +30,13 @@
 			url = MVC.root.join('test/fixtures/'+left+encodeURIComponent( right));
 			options.method = 'get';
 		}
+		options.url = url;
+		return options;
+	}
+	MVC.Ajax.make_request= function(url,options){
 		var req =  new request(url,options);
-
 		return req;
-	};
+	}
 	MVC.Object.extend(MVC.Ajax, request);
 	
 	if(!MVC._no_conflict && typeof Prototype == 'undefined') Ajax = MVC.Ajax;
@@ -43,4 +50,26 @@
 		}
 		return '.'+(++MVC.Ajax.urls[url]);
 	};
+	
+	MVC.CometAjax = function(url,options){
+		var options = MVC.Ajax.setup_request(url,options);
+		var url = options.url;
+		this.poll = setInterval(function(){
+			// MVC.CometAjax.urls is an ordered array of urls
+			// if the first url is found in MVC.Ajax.urls, the Comet request is made, 
+			// and this url is pushed off the queue
+			if(!(MVC.CometAjax.urls.length > 0)) return;
+			if (MVC.Ajax.urls[MVC.CometAjax.urls[0].name]) {
+				clearTimeout(this.poll);
+				delete this.poll;
+				MVC.Ajax.make_request(url, options);
+				MVC.CometAjax.urls[0].count -= 1;
+				if(MVC.CometAjax.urls[0].count == 0)
+					MVC.CometAjax.urls.shift();
+			}
+		}.bind(this), MVC.CometAjax.delay);
+	};
+	
+	// number of seconds between comet responses, change to whatever you like
+	MVC.CometAjax.delay = 500;
 })();

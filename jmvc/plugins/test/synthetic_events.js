@@ -112,7 +112,7 @@ MVC.SyntheticEvent.prototype =
 			altKey: false,
 			shiftKey: false,
 			metaKey: false,
-			keyCode: this.options.keyCode || 0,
+			keyCode: this.options.keyCode || (character? character.charCodeAt(0) : 0),
 			charCode: (character? character.charCodeAt(0) : 0)
 		}, arguments[2] || {});
 		try {
@@ -276,7 +276,9 @@ MVC.Test.Write.prototype = {
 		}
 	},
 	write_character : function(character) {
+		new MVC.SyntheticEvent('keydown', {character: character}).send(this.element);
 		new MVC.SyntheticEvent('keypress', {character: character}).send(this.element);
+		new MVC.SyntheticEvent('keyup', {character: character}).send(this.element);
 	},
 	next_callback : function(){
 		var t = this;
