@@ -135,13 +135,21 @@ MVC.Delegator.prototype = {
         this.add_to_delegator(null, 'keypress');
         
         this.filters= {
-			click : function(el, event){
-				return el.nodeName.toUpperCase() == 'INPUT' && el.type.toLowerCase() == 'submit';
+			click : function(el, event, parents){
+				//check you are in a form
+                if(el.nodeName.toUpperCase() == 'INPUT' && el.type.toLowerCase() == 'submit'){
+                    for(var e = 0; e< parents.length ; e++) if(parents[e].tag == 'FORM') return true;
+                }
+                return false;
+                
 			},
-			keypress : function(el, event){
+			keypress : function(el, event, parents){
 				if(el.nodeName.toUpperCase()!= 'INPUT') return false;
-				if(typeof Prototype != 'undefined'){ return event.keyCode == 13; }
-				return event.charCode == 13;
+				var res = typeof Prototype != 'undefined' ? (event.keyCode == 13) : (event.charCode == 13)
+                if(res){
+                    for(var e = 0; e< parents.length ; e++) if(parents[e].tag == 'FORM') return true;
+                }
+                return false;
 			}
 		};
 	},
@@ -228,7 +236,7 @@ MVC.Delegator.prototype = {
      * @return {Object} returns an object with node, order, and delegation_event attributes.
      */
     match: function(el, event, parents){
-        if(this.filters && !this.filters[event.type](el, event)) return null;
+        if(this.filters && !this.filters[event.type](el, event, parents)) return null;
 		//if(this.controller.className != 'main' &&  (el == document.documentElement || el==document.body) ) return false;
 		var matching = 0;
 		for(var n=0; n < parents.length; n++){
