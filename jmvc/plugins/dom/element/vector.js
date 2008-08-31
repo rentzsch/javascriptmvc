@@ -58,12 +58,12 @@ MVC.Vector.prototype =
      * Returns the 2nd value of the vector
      * @return {Number}
      */
-    x : function(){ return this.array[1] },
+    x : function(){ return this.array[0] },
     /**
      * Returns the first value of the vector
      * @return {Number}
      */
-    y : function(){ return this.array[0] },
+    y : function(){ return this.array[1] },
     /**
      * Same as x()
      * @return {Number}
