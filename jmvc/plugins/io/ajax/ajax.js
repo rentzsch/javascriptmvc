@@ -3,7 +3,6 @@
 //  (c) 2005-2007 Sam Stephenson
 (function(){
 	var factory = MVC.Ajax.factory;
-	
     /**
      * @constructor
      * Ajax is used to perform Ajax requests. It mimics the Prototype library's Ajax functionality.
@@ -67,6 +66,7 @@
 			</tbody></table>
      */
     MVC.Ajax = function(url,options){
+		MVC.Ajax.Events = ['Uninitialized', 'Loading', 'Loaded', 'Interactive', 'Complete'];
 		this.options = {
 	      method:       'post',
 	      asynchronous: true,
@@ -126,7 +126,7 @@
 				}
 			},this);
 			
-			this.transport.open(this.options.method, this.url, true);
+			this.transport.open(this.options.method, location.protocol+"//"+document.domain+this.url, true);
 		    this.set_request_headers(options.headers);
 			
 			this.transport.send(parameters);
@@ -136,7 +136,6 @@
 })();
 
 
-MVC.Ajax.Events = ['Uninitialized', 'Loading', 'Loaded', 'Interactive', 'Complete'];
 /*@Prototype*/
 MVC.Ajax.prototype = {
   
