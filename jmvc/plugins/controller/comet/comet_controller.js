@@ -90,7 +90,7 @@ MVC.CometController = MVC.Controller.extend(
     },
     start_polling : function(){
         
-        this.Class._comet = new MVC.Comet(this.Class.domain+"/"+this.Class.className, 
+        this.Class._comet = new MVC.Comet("/"+this.Class.className, 
                 {method: 'get', 
                 onComplete: this.continue_to('complete'),
                 onSuccess: this.continue_to('success'),
