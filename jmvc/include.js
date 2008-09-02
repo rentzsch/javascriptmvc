@@ -394,7 +394,7 @@ MVC.random = MVC.get_random(6);
 MVC.Ajax.factory = function(){ return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();};
 include.request = function(path){
    var request = MVC.Ajax.factory();
-   request.open("GET", location.protocol+"//"+document.domain+path, false);
+   request.open("GET", path, false);
    try{request.send(null);}
    catch(e){return null;}
    if ( request.status == 404 || request.status == 2 ||(request.status == 0 && request.responseText == '') ) return null;

@@ -61,9 +61,7 @@ MVC.View = function( options ){
 		var template = MVC.View.get(options.url, this.cache);
 		if (template) return template;
 	    if (template == MVC.View.INVALID_PATH) return null;
-		var req_url = url+(this.cache || window._rhino ? '' : '?'+Math.random() );
-		req_url = (req_url[0] != '/'? '/': '')+req_url;
-        this.text = include.request(req_url);
+        this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
 		
 		if(this.text == null){
 			throw( {type: 'JMVC', message: 'There is no template at '+url}  );
