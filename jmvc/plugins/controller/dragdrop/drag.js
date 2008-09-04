@@ -56,6 +56,7 @@ MVC.Controller.DragAction = MVC.Controller.DelegateAction.extend({
 MVC.Draggable = function(params){
     this.element = params.element;
     this.moved = false;
+	this.keep_dragging = true;
     //this.originalz = MVC.Element.getStyle(this.element,'z-Index');
     //this.originallyAbsolute = MVC.Element.getStyle(this.element,'position')  == 'absolute';
 
@@ -73,7 +74,8 @@ MVC.Draggable.prototype = {
         MVC.Element.makePositioned(this.element);
         this.element.style.zIndex = 1000;  //make the z-Index high
         this.moved = true;
-        this.dragstart({element: this.element, event: event});
+		// only drag if dragstart doesn't return false
+        this.keep_dragging = this.dragstart({element: this.element, event: event});
         MVC.Droppables.compile(); //Get the list of Droppables.
     },
     //returns the current relative offset
@@ -83,7 +85,10 @@ MVC.Draggable.prototype = {
     },
     //draws the position of the dragging object
     draw: function(pointer, event){
-        if(!this.moved) this.start(event);  //on first move, call start
+        if (!this.moved || !this.keep_dragging)
+			this.start(event) //on first move, call start
+		// only drag if dragstart doesn't return false
+		if(!this.keep_dragging) return;
         MVC.Position.prepare();
         var pos = MVC.Element.cumulativeOffset(this.element).minus(this.currentDelta());//current position, minus offset = where element should be
         var p = pointer.minus(pos).minus( this.mouse_position_on_element );  //from mouse position
