@@ -140,6 +140,7 @@ MVC.Model = MVC.Class.extend(
     init : function(attributes){
         //this._properties = [];
         this.errors = [];
+		this.validations = [];
         
         this.set_attributes(this.Class._attributes || {});
         this.set_attributes(attributes);
@@ -176,9 +177,23 @@ MVC.Model = MVC.Class.extend(
      * Validates this instance
      */
     validate : function(){
-        //run validate function and any error functions  
-        
+        //run validate function and any error functions
+		this.errors.splice(0, this.errors.length);
+		for(var i = 0; i < this.validations.length; i++){
+			var validation = this.validations[i];
+			if (!validation.is_valid(this)) {
+				this.errors.push(validation.error_message);
+			}
+		}
     },
+	/**
+	 * Validation assignments
+	 * 
+	 */
+	validate_format_of: function(attribute, format, error_message){
+		this.validations.push(new MVC.ValidateFormatOf(attribute, format, error_message));
+	},
+	
     _setAttribute : function(attribute, value) {
         if (MVC.Array.include(this.Class._associations, attribute))
           this._setAssociation(attribute, value);
