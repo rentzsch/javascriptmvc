@@ -29,7 +29,7 @@ MVC.Native.extend = function(class_name, source){
 				var names = MVC.Function.params(source[property]);
     			if( names.length == 0) continue;
 				var first_arg = names[0];
-				if( first_arg.match(class_name.toLowerCase()) || (first_arg == 'func' && class_name == 'Function' )  ){
+				if( first_arg.match(class_name.substr(0,1).toLowerCase()  ) || (first_arg == 'func' && class_name == 'Function' )  ){
 					MVC.Native.set_prototype(class_name, property, source[property]);
 				}
 			}
@@ -95,8 +95,8 @@ MVC.Native.extend('String',
      * @param {String} string the string to be lowercased.
      * @return {String} a string with the first character capitalized, and everything else lowercased
      */
-	capitalize : function(string) {
-		return string.charAt(0).toUpperCase()+string.substr(1).toLowerCase();
+	capitalize : function(s) {
+		return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();
 	},
     /**
      * Returns if a string has another string inside it.
@@ -104,8 +104,8 @@ MVC.Native.extend('String',
      * @param {String} pattern String that we are looking for
      * @return {Boolean} true if the string has pattern, false if otherwise
      */
-	include : function(string, pattern){
-		return string.indexOf(pattern) > -1;
+	include : function(s, pattern){
+		return s.indexOf(pattern) > -1;
 	},
     /**
      * Returns if string ends with another string
@@ -113,9 +113,9 @@ MVC.Native.extend('String',
      * @param {String} pattern What the string might end with
      * @return {Boolean} true if the string ends wtih pattern, false if otherwise
      */
-	ends_with : function(string, pattern) {
-	    var d = string.length - pattern.length;
-	    return d >= 0 && string.lastIndexOf(pattern) === d;
+	ends_with : function(s, pattern) {
+	    var d = s.length - pattern.length;
+	    return d >= 0 && s.lastIndexOf(pattern) === d;
 	},
     /**
      * Capitalizes a string from something undercored. Examples:
@@ -125,19 +125,19 @@ MVC.Native.extend('String',
      * @param {String} string
      * @return {String} a the camelized string
      */
-	camelize: function(string){
-		var parts = string.split(/_|-/);
+	camelize: function(s){
+		var parts = s.split(/_|-/);
 		for(var i = 1; i < parts.length; i++)
 			parts[i] = MVC.String.capitalize(parts[i]);
 		return parts.join('');
 	},
     /**
      * Like camelize, but the first part is also capitalized
-     * @param {Object} string
+     * @param {Object} s
      * @return {String}
      */
-	classize: function(string){
-		var parts = string.split(/_|-/);
+	classize: function(s){
+		var parts = s.split(/_|-/);
 		for(var i = 0; i < parts.length; i++)
 			parts[i] = MVC.String.capitalize(parts[i]);
 		return parts.join('');
@@ -164,9 +164,9 @@ MVC.Native.extend('Array',
 	 * @param {Object} item an item that is matched with ==
 	 * @return {Boolean}
 	 */
-    include: function(array, item){
-		for(var i=0; i< array.length; i++){
-			if(array[i] == item) return true;
+    include: function(a, item){
+		for(var i=0; i< a.length; i++){
+			if(a[i] == item) return true;
 		}
 		return false;
 	},
@@ -196,10 +196,10 @@ MVC.Native.extend('Function',
 	 * @param {Object} func The function that is being bound.
 	 * @return {Function} 
 	 */
-    bind: function(func) {
+    bind: function(f) {
 	  var args = MVC.Array.from(arguments);
 	  args.shift();args.shift();
-	  var __method = func, object = arguments[1];
+	  var __method = f, object = arguments[1];
 	  return function() {
 	    return __method.apply(object, args.concat(MVC.Array.from(arguments) )  );
 	  }
@@ -220,8 +220,8 @@ MVC.Native.extend('Number',
      * @param {optional:Object} radix the numeric base (defaults to base 10);
      * @return {String} 
      */
-    to_padded_string: function(number, len, radix) {
-        var string = number.toString(radix || 10);
+    to_padded_string: function(n, len, radix) {
+        var string = n.toString(radix || 10);
         var ret = '', needed = len - string.length;
         
         for(var i = 0 ; i < needed; i++) 

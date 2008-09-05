@@ -85,6 +85,9 @@ var self = window;
 			},
             get pathname(){
                 return window.location.href.substr(window.location.protocol.length);
+            },
+            get search(){
+                return curLocation.getQuery() ? "?"+curLocation.getQuery() : "";
             }
 		};
 	});
