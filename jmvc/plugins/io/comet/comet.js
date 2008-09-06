@@ -98,10 +98,10 @@ MVC.Comet = function(url, options)
        // var transport = this.transport;
         //this.timeout = setTimeout(function(){ 
         this.options.polling();
-        new this.transport(this.url, this.options);
+        MVC.Comet.connection = new this.transport(this.url, this.options);
         
         //},0);
-    }
+    }.bind(this)
    
     this.options.is_killed = function(){return killed};
     this.options.waiting_to_poll = function(){  polling = false; };
@@ -116,7 +116,7 @@ MVC.Comet = function(url, options)
     this.transport = this.options.transport || MVC.Comet.transport;
     
 
-    new this.transport(url, this.options)
+    MVC.Comet.connection = new this.transport(url, this.options)
 }
 //Change this to other transports (MVC.WindowName)
 MVC.Comet.transport = MVC.Ajax;
@@ -148,9 +148,9 @@ MVC.Comet.prototype = {
         
         this.timeout = setTimeout(function(){ 
             options.polling();
-            new transport(url, options);
+            MVC.Comet.connection = new transport(url, options);
         
-        },wait_time);
+        }.bind(this),wait_time);
         
 	}
 }
@@ -159,6 +159,9 @@ MVC.Comet.prototype = {
 //Setup onunload to kill future requests
 MVC.Event.observe(window, 'unload', function(){
     MVC.Comet.send = false;
+	if(MVC.Comet.connection && MVC.Comet.connection.transport 
+		&& MVC.Comet.transport.className && MVC.Comet.transport.className == 'Ajax') 
+		MVC.Comet.connection.transport.abort();
 });
 
 

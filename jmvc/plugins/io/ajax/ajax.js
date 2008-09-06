@@ -135,7 +135,7 @@
 	MVC.Ajax.factory = factory;
 })();
 
-
+MVC.Ajax.className = 'Ajax'
 MVC.Ajax.Events = ['Uninitialized', 'Loading', 'Loaded', 'Interactive', 'Complete'];
 /*@Prototype*/
 MVC.Ajax.prototype = {
