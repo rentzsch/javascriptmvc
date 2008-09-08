@@ -54,7 +54,7 @@
 	MVC.CometAjax = function(url,options){
 		var options = MVC.Ajax.setup_request(url,options);
 		var url = options.url;
-		this.poll = setInterval(function(){
+		this.poll = setInterval(MVC.Function.bind(function(){
 			// MVC.CometAjax.urls is an ordered array of urls
 			// if the first url is found in MVC.Ajax.urls, the Comet request is made, 
 			// and this url is pushed off the queue
@@ -67,7 +67,7 @@
 				if(MVC.CometAjax.urls[0].count == 0)
 					MVC.CometAjax.urls.shift();
 			}
-		}.bind(this), MVC.CometAjax.delay);
+		},this), MVC.CometAjax.delay);
 	};
 	
 	// number of seconds between comet responses, change to whatever you like

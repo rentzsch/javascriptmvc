@@ -85,7 +85,7 @@ MVC.Comet = function(url, options)
      * If you are using a timeout to space reconnections, poll_now can
      * be used to reconnect immediately.
      */
-    this.poll_now = function(){
+    this.poll_now = MVC.Function.bind(function(){
         // if we aren't waiting, kill the timer that says wait and go right now
         //console.log('no wait called')
         if(this.is_polling()) return;
@@ -101,7 +101,7 @@ MVC.Comet = function(url, options)
         MVC.Comet.connection = new this.transport(this.url, this.options);
         
         //},0);
-    }.bind(this)
+    },this)
    
     this.options.is_killed = function(){return killed};
     this.options.waiting_to_poll = function(){  polling = false; };
@@ -146,11 +146,11 @@ MVC.Comet.prototype = {
         
         var wait_time = typeof options.wait_time == 'function' ? options.wait_time() : options.wait_time
         
-        this.timeout = setTimeout(function(){ 
+        this.timeout = setTimeout( MVC.Function.bind( function(){ 
             options.polling();
             MVC.Comet.connection = new transport(url, options);
         
-        }.bind(this),wait_time);
+        },this),wait_time);
         
 	}
 }
