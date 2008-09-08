@@ -82,7 +82,7 @@ MVC.JsonP.prototype = {
         var search = new RegExp(this.url);
         for(var s = 0; s < scripts.length; s++){
             var script = scripts[s];
-            if(script.src.match(search)) script.parentNode.removeChild(script);
+            if(MVC.String.include( script.src ,this.url)) script.parentNode.removeChild(script);
         }
     }
 }
