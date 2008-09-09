@@ -21,7 +21,9 @@ MVC.Model = MVC.Class.extend(
      * @return {Model} will return instances of the model if syncronous
      */
 	init: function(){
-		this.store = new this.store_type();
+		if(!this.className) return;
+        MVC.Model.models[this.className] = this;
+        this.store = new this.store_type();
 	},
 	find_one: function(params, callbacks){
 		return this.store.find_one(params, callbacks);
@@ -134,7 +136,8 @@ MVC.Model = MVC.Class.extend(
         if(!callbacks.onSuccess && !callbacks.onComplete) throw "You must supply a positive callback!";
         if(!callbacks.onSuccess) callbacks.onSuccess = callbacks.onComplete;
         if(!callbacks.onError && callbacks.onComplete) callbacks.onError = callbacks.onComplete;
-    }
+    },
+    models : {}
 },
 /*@Prototype*/
 {   

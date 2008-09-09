@@ -16,7 +16,8 @@ MVC.Controller = MVC.Class.extend(
     init: function(){
         if(!this.className) return;
         this.singularName =  MVC.String.singularize(this.className);
-        MVC.Controller.controllers.push(this);
+        if(!MVC.Controller.controllers[this.className]) MVC.Controller.controllers[this.className] = [];
+        MVC.Controller.controllers[this.className].push(this);
         var val, act;
         this.actions = {};
         for(var action_name in this.prototype){
@@ -89,7 +90,9 @@ MVC.Controller = MVC.Class.extend(
      */
     dispatch: function(controller, action_name, params){
 		var c_name = controller;
-		if(typeof controller == 'string'){controller = window[ MVC.String.classize(controller)+'Controller'];}
+		if(typeof controller == 'string'){
+            controller = MVC.Controller.controllers[c_name][0];
+        }
 		if(!controller) throw 'No controller named '+c_name+' was found for MVC.Controller.dispatch.';
 		if(!action_name) action_name = 'index';
 		

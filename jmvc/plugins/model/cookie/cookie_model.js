@@ -3,6 +3,7 @@ MVC.CookieModel = MVC.Model.extend(
 {
     init : function(){
           this._working = null;  
+          this._super();
     },
     days: null,
     find_one : function(params){

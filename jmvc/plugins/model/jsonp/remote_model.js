@@ -1,4 +1,4 @@
-MVC.RemoteModel = MVC.Model.extend(
+MVC.JsonPModel = MVC.Model.extend(
 {
     error_timeout: 4000,
     init: function(){
@@ -7,6 +7,7 @@ MVC.RemoteModel = MVC.Model.extend(
         if(!this.controller_name)
             this.controller_name = this.className;
         this.plural_controller_name = MVC.String.pluralize(this.controller_name);
+        this._super();
     },
     find_all: function(params, cbs){
         var callbacks = this._clean_callbacks(cbs);

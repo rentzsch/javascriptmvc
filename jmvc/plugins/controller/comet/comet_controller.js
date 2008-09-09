@@ -70,12 +70,12 @@ MVC.CometController = MVC.Controller.extend(
                 if(this.models_map[className] != null){
                     if(this.models_map[className] != false)
                         objects = this.models_map[className].create_many_as_existing(objects);
-                }else if(window[className]){
-                    objects = window[className].create_many_as_existing(objects);
+                }else if(MVC.Model.models[className.toLowerCase()]){
+                    objects = MVC.Model.models[className.toLowerCase()].create_many_as_existing(objects);
                 }
                 //now pass to controller
                 //var controller = window[MVC.String.pluralize(className)+'controller']
-                var controller_name = this.controller_map[className] ? this.controller_map[className] : MVC.String.pluralize(className);
+                var controller_name = this.controller_map[className] ? this.controller_map[className] : MVC.String.pluralize(className).toLowerCase();
                 MVC.Controller.dispatch(controller_name, action, objects);
             }
         } 
