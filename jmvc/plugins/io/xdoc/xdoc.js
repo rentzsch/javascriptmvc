@@ -33,11 +33,14 @@ if(MVC.Browser.Opera){
               
                     
              var frame = MVC.XDoc._frame;
-             var receiver = frame.contentDocument;
-             
              
              MVC.XDoc.requesting = this;
-             receiver.postMessage(this.url);
+             try{
+                 frame.contentWindow.postMessage(this.url);
+             }catch(e){
+                 frame.contentDocument.postMessage(this.url)
+             }
+
              
         },
         handle: function(event){
