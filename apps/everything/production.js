@@ -21,8 +21,8 @@ MVC.Event=Event;
 include({path:"../lang/prototype_helpers.js",shrink_variables:false},"../lang/inflector/inflector","../io/ajax/prototype_ajax");
 MVC.Included.plugins.push("lang","lang/inflector","io/ajax");
 }
-if(include.get_env()=="test"){
-include("test");
+if(MVC.Console){
+include("../io/ajax/debug");
 }
 MVC.Included.plugins.push("view","controller","controller/view");
 include("../view/view","../controller/controller","../controller/delegator","../controller/view/controller_view");
@@ -64,7 +64,7 @@ if(_9.length==0){
 continue;
 }
 var _a=_9[0];
-if(_a.match(_5.toLowerCase())||(_a=="func"&&_5=="Function")){
+if(_a.match(_5.substr(0,1).toLowerCase())||(_a=="func"&&_5=="Function")){
 MVC.Native.set_prototype(_5,_8,_6[_8]);
 }
 }
@@ -115,29 +115,29 @@ _18=_18.concat(MVC.Object.to_query_string.worker(_1a,_17?_17+"["+_19+"]":_19));
 }
 return _18;
 };
-MVC.Native.extend("String",{capitalize:function(_1d){
-return _1d.charAt(0).toUpperCase()+_1d.substr(1).toLowerCase();
-},include:function(_1e,_1f){
-return _1e.indexOf(_1f)>-1;
-},ends_with:function(_20,_21){
-var d=_20.length-_21.length;
-return d>=0&&_20.lastIndexOf(_21)===d;
-},camelize:function(_23){
-var _24=_23.split(/_|-/);
+MVC.Native.extend("String",{capitalize:function(s){
+return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();
+},include:function(s,_1f){
+return s.indexOf(_1f)>-1;
+},ends_with:function(s,_21){
+var d=s.length-_21.length;
+return d>=0&&s.lastIndexOf(_21)===d;
+},camelize:function(s){
+var _24=s.split(/_|-/);
 for(var i=1;i<_24.length;i++){
 _24[i]=MVC.String.capitalize(_24[i]);
 }
 return _24.join("");
-},classize:function(_26){
-var _27=_26.split(/_|-/);
+},classize:function(s){
+var _27=s.split(/_|-/);
 for(var i=0;i<_27.length;i++){
 _27[i]=MVC.String.capitalize(_27[i]);
 }
 return _27.join("");
 },strip:MVC.String.strip});
-MVC.Native.extend("Array",{include:function(_29,_2a){
-for(var i=0;i<_29.length;i++){
-if(_29[i]==_2a){
+MVC.Native.extend("Array",{include:function(a,_2a){
+for(var i=0;i<a.length;i++){
+if(a[i]==_2a){
 return true;
 }
 }
@@ -152,20 +152,20 @@ _2d.push(_2c[i]);
 }
 return _2d;
 }});
-MVC.Native.extend("Function",{bind:function(_30){
+MVC.Native.extend("Function",{bind:function(f){
 var _31=MVC.Array.from(arguments);
 _31.shift();
 _31.shift();
-var _32=_30,_33=arguments[1];
+var _32=f,_33=arguments[1];
 return function(){
 return _32.apply(_33,_31.concat(MVC.Array.from(arguments)));
 };
 },params:MVC.Function.params});
-MVC.Native.extend("Number",{to_padded_string:function(_34,_35,_36){
-var _37=_34.toString(_36||10);
-var ret="";
-for(var i=0;i<_35-_37.length;i++){
-ret=+"0";
+MVC.Native.extend("Number",{to_padded_string:function(n,len,_36){
+var _37=n.toString(_36||10);
+var ret="",_39=len-_37.length;
+for(var i=0;i<_39;i++){
+ret+="0";
 }
 return ret+_37;
 }});
@@ -397,6 +397,7 @@ this.transport.send(_4);
 };
 MVC.Ajax.factory=_1;
 })();
+MVC.Ajax.className="Ajax";
 MVC.Ajax.Events=["Uninitialized","Loading","Loaded","Interactive","Complete"];
 MVC.Ajax.prototype={success:function(){
 var _6=this.getStatus();
@@ -902,7 +903,10 @@ if(!this.className){
 return;
 }
 this.singularName=MVC.String.singularize(this.className);
-MVC.Controller.controllers.push(this);
+if(!MVC.Controller.controllers[this.className]){
+MVC.Controller.controllers[this.className]=[];
+}
+MVC.Controller.controllers[this.className].push(this);
 var _2,_3;
 this.actions={};
 for(var _4 in this.prototype){
@@ -971,7 +975,7 @@ return MVC.Controller.dispatch(_10,_11,new MVC.Controller.Params(_12));
 },dispatch:function(_13,_14,_15){
 var _16=_13;
 if(typeof _13=="string"){
-_13=window[MVC.String.classize(_13)+"Controller"];
+_13=MVC.Controller.controllers[_16][0];
 }
 if(!_13){
 throw "No controller named "+_16+" was found for MVC.Controller.dispatch.";
@@ -1127,9 +1131,9 @@ _2d[key]=_34;
 }
 return _2d;
 },class_element:function(){
-var _39=this.element,_3a=this.controller;
-var _3b=MVC.String.is_singular(_3a)?_3a:MVC.String.singularize(_3a);
-while(_39&&_39.className.indexOf(_3b)==-1){
+var _39=this.element;
+var _3a=this._className();
+while(_39&&_39.className.indexOf(_3a)==-1){
 _39=_39.parentNode;
 if(_39==document){
 return null;
@@ -1138,9 +1142,14 @@ return null;
 return _39;
 },is_event_on_element:function(){
 return this.event.target==this.element;
-},object_data:function(){
-return MVC.View.Helpers.get_data(this.class_element());
+},_className:function(){
+controller=this.controller;
+var _3b=MVC.String.is_singular(controller)?controller:MVC.String.singularize(controller);
+return _3b;
 }};
+if(!MVC._no_conflict&&typeof Controller=="undefined"){
+Controller=MVC.Controller;
+}
 ;
 include.set_path('../../jmvc/plugins/controller');
 MVC.Delegator=function(_1,_2,f){
@@ -1237,20 +1246,32 @@ MVC.Delegator.events[e].push(this);
 },submit_for_ie:function(){
 this.add_to_delegator(null,"click");
 this.add_to_delegator(null,"keypress");
-this.filters={click:function(el,_1f){
-return el.nodeName.toUpperCase()=="INPUT"&&el.type.toLowerCase()=="submit";
-},keypress:function(el,_21){
+this.filters={click:function(el,_1f,_20){
+if(el.nodeName.toUpperCase()=="INPUT"&&el.type.toLowerCase()=="submit"){
+for(var e=0;e<_20.length;e++){
+if(_20[e].tag=="FORM"){
+return true;
+}
+}
+}
+return false;
+},keypress:function(el,_23,_24){
 if(el.nodeName.toUpperCase()!="INPUT"){
 return false;
 }
-if(typeof Prototype!="undefined"){
-return _21.keyCode==13;
+var res=typeof Prototype!="undefined"?(_23.keyCode==13):(_23.charCode==13);
+if(res){
+for(var e=0;e<_24.length;e++){
+if(_24[e].tag=="FORM"){
+return true;
 }
-return _21.charCode==13;
+}
+}
+return false;
 }};
 },change_for_ie:function(){
 this.add_to_delegator(null,"click");
-this.end_filters={click:function(el,_23){
+this.end_filters={click:function(el,_28){
 if(typeof el.selectedIndex=="undefined"||el.nodeName.toUpperCase()!="SELECT"){
 return false;
 }
@@ -1268,7 +1289,7 @@ return true;
 }};
 },change_for_webkit:function(){
 this.controller.add_register_action(this,document.documentElement,"change");
-this.end_filters={change:function(el,_26){
+this.end_filters={change:function(el,_2b){
 if(typeof el.value=="undefined"){
 return false;
 }
@@ -1278,62 +1299,62 @@ return el.value!=old;
 }};
 },context_for_opera:function(){
 this.add_to_delegator(null,"click");
-this.end_filters={click:function(el,_29){
-return _29.shiftKey;
+this.end_filters={click:function(el,_2e){
+return _2e.shiftKey;
 }};
 },regexp_patterns:{tag:/^\s*(\*|[\w\-]+)(\b|$)?/,id:/^#([\w\-\*]+)(\b|$)/,className:/^\.([\w\-\*]+)(\b|$)/},selector_order:function(){
 if(this.order){
 return this.order;
 }
-var _2a=this._selector.split(/\s+/);
-var _2b=this.regexp_patterns;
-var _2c=[];
-for(var i=0;i<_2a.length;i++){
-var v={},r,p=_2a[i];
-for(var _31 in _2b){
-if(_2b.hasOwnProperty(_31)){
-if((r=p.match(_2b[_31]))){
-if(_31=="tag"){
-v[_31]=r[1].toUpperCase();
+var _2f=this._selector.split(/\s+/);
+var _30=this.regexp_patterns;
+var _31=[];
+for(var i=0;i<_2f.length;i++){
+var v={},r,p=_2f[i];
+for(var _36 in _30){
+if(_30.hasOwnProperty(_36)){
+if((r=p.match(_30[_36]))){
+if(_36=="tag"){
+v[_36]=r[1].toUpperCase();
 }else{
-v[_31]=r[1];
+v[_36]=r[1];
 }
 p=p.replace(r[0],"");
 }
 }
 }
-_2c.push(v);
+_31.push(v);
 }
-this.order=_2c;
+this.order=_31;
 return this.order;
-},match:function(el,_33,_34){
-if(this.filters&&!this.filters[_33.type](el,_33)){
+},match:function(el,_38,_39){
+if(this.filters&&!this.filters[_38.type](el,_38,_39)){
 return null;
 }
-var _35=0;
-for(var n=0;n<_34.length;n++){
-var _37=_34[n],_38=this.selector_order()[_35],_39=true;
-for(var _3a in _38){
-if(!_38.hasOwnProperty(_3a)||_3a=="element"){
+var _3a=0;
+for(var n=0;n<_39.length;n++){
+var _3c=_39[n],_3d=this.selector_order()[_3a],_3e=true;
+for(var _3f in _3d){
+if(!_3d.hasOwnProperty(_3f)||_3f=="element"){
 continue;
 }
-if(_38[_3a]&&_3a=="className"){
-if(!MVC.Array.include(_37.className.split(" "),_38[_3a])){
-_39=false;
+if(_3d[_3f]&&_3f=="className"){
+if(!MVC.Array.include(_3c.className.split(" "),_3d[_3f])){
+_3e=false;
 }
 }else{
-if(_38[_3a]&&_37[_3a]!=_38[_3a]){
-_39=false;
+if(_3d[_3f]&&_3c[_3f]!=_3d[_3f]){
+_3e=false;
 }
 }
 }
-if(_39){
-_35++;
-if(_35>=this.selector_order().length){
-if(this.end_filters&&!this.end_filters[_33.type](el,_33)){
+if(_3e){
+_3a++;
+if(_3a>=this.selector_order().length){
+if(this.end_filters&&!this.end_filters[_38.type](el,_38)){
 return null;
 }
-return {node:_37.element,order:n,delegation_event:this};
+return {node:_3c.element,order:n,delegation_event:this};
 }
 }
 }
@@ -1434,16 +1455,7 @@ return _2;
 ;
 include.set_path('../../jmvc/plugins/dom/element');
 include("vector");
-if(typeof Prototype!="undefined"){
-MVC.$E=$;
-MVC.$E.insert=Element.insert;
-}else{
-if(typeof jQuery!="undefined"){
-include("jquery_element");
-}else{
 include("element");
-}
-}
 ;
 include.set_path('../../jmvc/plugins/dom/element');
 MVC.Vector=function(){
@@ -1469,9 +1481,9 @@ _a[i]=(_a[i]?_a[i]:0)-_9[i];
 }
 return _b.update(_a);
 },x:function(){
-return this.array[1];
-},y:function(){
 return this.array[0];
+},y:function(){
+return this.array[1];
 },top:function(){
 return this.array[1];
 },left:function(){
@@ -1825,6 +1837,7 @@ include.plugins("controller/view");
 }
 ;
 include.set_path('../../jmvc/plugins/lang/inflector');
+include.plugins("lang");
 include("inflector");
 ;
 include.set_path('../../jmvc/plugins/dom/event');
@@ -2053,18 +2066,18 @@ if(this.models_map[_7]!=false){
 _a=this.models_map[_7].create_many_as_existing(_a);
 }
 }else{
-if(window[_7]){
-_a=window[_7].create_many_as_existing(_a);
+if(MVC.Model.models[_7.toLowerCase()]){
+_a=MVC.Model.models[_7.toLowerCase()].create_many_as_existing(_a);
 }
 }
-var _b=this.controller_map[_7]?this.controller_map[_7]:MVC.String.pluralize(_7);
+var _b=this.controller_map[_7]?this.controller_map[_7]:MVC.String.pluralize(_7).toLowerCase();
 MVC.Controller.dispatch(_b,_9,_a);
 }
 }
 },controller_map:{},error_mode:false},{run:function(){
 this.start_polling();
 },start_polling:function(){
-this.Class._comet=new MVC.Comet(this.Class.domain+"/"+this.Class.className,{method:"get",onComplete:this.continue_to("complete"),onSuccess:this.continue_to("success"),onFailure:this.continue_to("failure"),parameters:this.Class.parameters||null,session:this.Class.session||null,transport:this.Class.transport,wait_time:MVC.Function.bind(this.Class.wait_time,this.Class)});
+this.Class._comet=new MVC.Comet((this.Class.domain?this.Class.domain:"")+"/"+this.Class.className,{method:"get",onComplete:this.continue_to("complete"),onSuccess:this.continue_to("success"),onFailure:this.continue_to("failure"),parameters:this.Class.parameters||null,session:this.Class.session||null,transport:this.Class.transport,wait_time:MVC.Function.bind(this.Class.wait_time,this.Class)});
 },failure:function(){
 this.error_mode=true;
 this.run();
@@ -2130,6 +2143,7 @@ MVC.Draggable.selectors[_4].events[this.event_type]=_1;
 MVC.Draggable=function(_7){
 this.element=_7.element;
 this.moved=false;
+this.keep_dragging=true;
 this.mouse_position_on_element=MVC.Event.pointer(_7.event).minus(MVC.Element.cumulativeOffset(_7.element));
 this.dragstart=_7.dragstart||function(){
 };
@@ -2142,13 +2156,16 @@ MVC.Draggable.prototype={start:function(_8){
 MVC.Element.makePositioned(this.element);
 this.element.style.zIndex=1000;
 this.moved=true;
-this.dragstart({element:this.element,event:_8});
+this.keep_dragging=this.dragstart({element:this.element,event:_8});
 MVC.Droppables.compile();
 },currentDelta:function(){
 return new MVC.Vector(parseInt(MVC.Element.getStyle(this.element,"left")||"0"),parseInt(MVC.Element.getStyle(this.element,"top")||"0"));
 },draw:function(_9,_a){
-if(!this.moved){
+if(!this.moved||!this.keep_dragging){
 this.start(_a);
+}
+if(!this.keep_dragging){
+return;
 }
 MVC.Position.prepare();
 var _b=MVC.Element.cumulativeOffset(this.element).minus(this.currentDelta());
@@ -2569,6 +2586,9 @@ Query=MVC.Query;
 include.set_path('../../jmvc/plugins/io/comet');
 include.plugins("dom/event");
 include("comet");
+if(MVC.Console){
+include("debug");
+}
 ;
 include.set_path('../../jmvc/plugins/io/comet');
 MVC.Comet=function(_1,_2){
@@ -2586,14 +2606,14 @@ var _4=true;
 this.kill=function(){
 _3=true;
 };
-this.poll_now=function(){
+this.poll_now=MVC.Function.bind(function(){
 if(this.is_polling()){
 return;
 }
 clearTimeout(this.timeout);
 this.options.polling();
-new this.transport(this.url,this.options);
-};
+MVC.Comet.connection=new this.transport(this.url,this.options);
+},this);
 this.options.is_killed=function(){
 return _3;
 };
@@ -2607,7 +2627,7 @@ this.is_polling=function(){
 return _4;
 };
 this.transport=this.options.transport||MVC.Comet.transport;
-new this.transport(_1,this.options);
+MVC.Comet.connection=new this.transport(_1,this.options);
 };
 MVC.Comet.transport=MVC.Ajax;
 MVC.Comet.prototype={callback:function(_5){
@@ -2627,13 +2647,16 @@ var _6=this.url;
 var _7=this.options;
 var _5=this.transport;
 var _8=typeof _7.wait_time=="function"?_7.wait_time():_7.wait_time;
-this.timeout=setTimeout(function(){
+this.timeout=setTimeout(MVC.Function.bind(function(){
 _7.polling();
-new _5(_6,_7);
-},_8);
+MVC.Comet.connection=new _5(_6,_7);
+},this),_8);
 }};
 MVC.Event.observe(window,"unload",function(){
 MVC.Comet.send=false;
+if(MVC.Comet.connection&&MVC.Comet.connection.transport&&MVC.Comet.transport.className&&MVC.Comet.transport.className=="Ajax"){
+MVC.Comet.connection.transport.abort();
+}
 });
 if(!MVC._no_conflict&&typeof Comet=="undefined"){
 Comet=MVC.Comet;
@@ -2712,7 +2735,7 @@ var _e=document.getElementsByTagName("script");
 var _f=new RegExp(this.url);
 for(var s=0;s<_e.length;s++){
 var _11=_e[s];
-if(_11.src.match(_f)){
+if(MVC.String.include(_11.src,this.url)){
 _11.parentNode.removeChild(_11);
 }
 }
@@ -2880,30 +2903,34 @@ this.url+=(MVC.String.include(this.url,";")?"&":";")+MVC.Object.to_query_string(
 var _4=typeof this.options.parameters=="function"?this.options.parameters():this.options.parameters;
 this.url+=(MVC.String.include(this.url,"?")?"&":"?")+MVC.Object.to_query_string(_4);
 var _5=MVC.XDoc._frame;
-var _6=_5.contentDocument;
 MVC.XDoc.requesting=this;
-_6.postMessage(this.url);
-},handle:function(_7){
-if(_7.data!="null"){
-eval("var data = "+_7.data);
-data.responseText=_7.data;
+try{
+_5.contentWindow.postMessage(this.url);
+}
+catch(e){
+_5.contentDocument.postMessage(this.url);
+}
+},handle:function(_6){
+if(_6.data!="null"){
+eval("var data = "+_6.data);
+data.responseText=_6.data;
 }else{
 data={responseText:""};
 }
 this.options.onComplete(data);
 }};
 MVC.XDoc.next=function(){
-var _8=MVC.XDoc.waiting_requests.shift();
-if(_8){
-_8.send();
+var _7=MVC.XDoc.waiting_requests.shift();
+if(_7){
+_7.send();
 }
 };
 MVC.XDoc.observing=false;
-MVC.XDoc.styleFrame=function(_9){
-_9.style.width="100%";
-_9.style.height="100%";
-_9.style.border="0px";
-_9.style.display="none";
+MVC.XDoc.styleFrame=function(_8){
+_8.style.width="100%";
+_8.style.height="100%";
+_8.style.border="0px";
+_8.style.display="none";
 };
 MVC.XDoc._can_request=false;
 MVC.XDoc.frame_loaded=function(){
@@ -2911,15 +2938,15 @@ MVC.XDoc._can_request=true;
 MVC.XDoc.next();
 };
 (function(){
-var _a=document.createElement(MVC.Browser.IE?"<iframe name=\"Jabbify\" onload=\"MVC.XDoc.frame_loaded()\">":"iframe");
-MVC.XDoc.styleFrame(_a);
-document.body.appendChild(_a);
-_a.onload=MVC.Function.bind(MVC.XDoc.frame_loaded,MVC.XDoc);
-_a.contentWindow.location=Jabbify.comet_domain+"/crossdomain.html";
-MVC.XDoc._frame=_a;
+var _9=document.createElement(MVC.Browser.IE?"<iframe name=\"Jabbify\" onload=\"MVC.XDoc.frame_loaded()\">":"iframe");
+MVC.XDoc.styleFrame(_9);
+document.body.appendChild(_9);
+_9.onload=MVC.Function.bind(MVC.XDoc.frame_loaded,MVC.XDoc);
+_9.contentWindow.location=Jabbify.comet_domain+"/crossdomain.html";
+MVC.XDoc._frame=_9;
 })();
-MVC.Event.observe(document,"message",function(_b){
-MVC.XDoc.requesting.handle(_b);
+MVC.Event.observe(document,"message",function(_a){
+MVC.XDoc.requesting.handle(_a);
 MVC.XDoc.next();
 });
 }else{
@@ -2962,6 +2989,10 @@ return new Date(Date.UTC(parseInt(_c[0],10),(parseInt(_c[1],10)-1),parseInt(_c[2
 return _1(_7);
 }});
 })();
+;
+include.set_path('../../jmvc/plugins/lang/json');
+include.plugins("lang");
+include("json");
 ;
 include.set_path('../../jmvc/plugins/lang/json');
 MVC.Object.extend(MVC.Number,{to_json:function(_1){
@@ -3032,44 +3063,77 @@ return "{"+_10.join(", ")+"}";
 ;
 include.set_path('../../jmvc/plugins/model');
 include.plugins("lang/class");
+include("simple_store");
 include("model");
 ;
 include.set_path('../../jmvc/plugins/model');
-MVC.Model=MVC.Class.extend({find:function(id,_2,_3){
-if(!_2){
-_2={};
+MVC.SimpleStore=MVC.Class.extend({init:function(){
+this._data={};
+},find_one:function(_1){
+var id=_1.id;
+return this._data[id];
+},create:function(_3){
+var id=_3.id;
+this._data[id]=_3;
+},update:function(id,_6){
+for(var _7 in _6){
+this._data[id][_7]=_6[_7];
 }
-if(typeof _2=="function"){
-callback=_2;
-_2={};
+return this._data[id];
+},destroy:function(id){
+delete this._data[id];
+}});
+;
+include.set_path('../../jmvc/plugins/model');
+MVC.Model=MVC.Class.extend({store_type:MVC.SimpleStore,init:function(){
+if(!this.className){
+return;
+}
+MVC.Model.models[this.className]=this;
+this.store=new this.store_type();
+},find_one:function(_1,_2){
+return this.store.find_one(_1,_2);
+},create:function(_3,_4){
+return this.store.create(_3,_4);
+},update:function(id,_6,_7){
+return this.store.update(id,_6,_7);
+},destroy:function(id,_9){
+return this.store.destroy(id,_9);
+},find:function(id,_b,_c){
+if(!_b){
+_b={};
+}
+if(typeof _b=="function"){
+callback=_b;
+_b={};
 }
 if(id=="all"){
-return this.create_many_as_existing(this.find_all(_2,_3));
+return this.create_many_as_existing(this.find_all(_b,_c));
 }else{
-if(!_2[this.id]&&id!="first"){
-_2[this.id]=id;
+if(!_b[this.id]&&id!="first"){
+_b[this.id]=id;
 }
-return this.create_as_existing(this.find_one(id=="first"?null:_2,_3));
+return this.create_as_existing(this.find_one(id=="first"?null:_b,_c));
 }
-},create_as_existing:function(_4){
-if(!_4){
+},create_as_existing:function(_d){
+if(!_d){
 return null;
 }
-if(_4.attributes){
-_4=_4.attributes;
+if(_d.attributes){
+_d=_d.attributes();
 }
-var _5=new this(_4);
-_5.is_new_record=this.new_record_func;
-return _5;
-},create_many_as_existing:function(_6){
-if(!_6){
+var _e=new this(_d);
+_e.is_new_record=this.new_record_func;
+return _e;
+},create_many_as_existing:function(_f){
+if(!_f){
 return null;
 }
-var _7=[];
-for(var i=0;i<_6.length;i++){
-_7.push(this.create_as_existing(_6[i]));
+var res=[];
+for(var i=0;i<_f.length;i++){
+res.push(this.create_as_existing(_f[i]));
 }
-return _7;
+return res;
 },id:"id",new_record_func:function(){
 return false;
 },validations:[],has_many:function(){
@@ -3080,137 +3144,137 @@ this._associations.push(arguments[i]);
 for(var i=0;i<arguments.length;i++){
 this._associations.push(arguments[i]);
 }
-},_associations:[],from_html:function(_b){
-var el=MVC.$E(_b);
-var _d=window[MVC.String.classize(el.getAttribute("type"))];
-if(!_d){
+},_associations:[],from_html:function(_14){
+var el=MVC.$E(_14);
+var _16=window[MVC.String.classize(el.getAttribute("type"))];
+if(!_16){
 return null;
 }
-var _e={};
-_e[_d.id]=this.element_id_to_id(el.id);
-return _d.create_as_existing(_e);
-},element_id_to_id:function(_f){
+var _17={};
+_17[_16.id]=this.element_id_to_id(el.id);
+return _16.create_as_existing(_17);
+},element_id_to_id:function(_18){
 var re=new RegExp(this.className+"_","");
-return _f.replace(re,"");
-},add_attribute:function(_11,_12){
-if(!this.attributes[_11]){
-this.attributes[_11]=_12;
+return _18.replace(re,"");
+},add_attribute:function(_1a,_1b){
+if(!this.attributes[_1a]){
+this.attributes[_1a]=_1b;
 }
-},attributes:{},_clean_callbacks:function(_13){
-if(!_13){
+},attributes:{},_clean_callbacks:function(_1c){
+if(!_1c){
 throw "You must supply a callback!";
 }
-if(typeof _13=="function"){
-return {onSuccess:_13,onError:_13};
+if(typeof _1c=="function"){
+return {onSuccess:_1c,onError:_1c};
 }
-if(!_13.onSuccess&&!_13.onComplete){
+if(!_1c.onSuccess&&!_1c.onComplete){
 throw "You must supply a positive callback!";
 }
-if(!_13.onSuccess){
-_13.onSuccess=_13.onComplete;
+if(!_1c.onSuccess){
+_1c.onSuccess=_1c.onComplete;
 }
-if(!_13.onError&&_13.onComplete){
-_13.onError=_13.onComplete;
+if(!_1c.onError&&_1c.onComplete){
+_1c.onError=_1c.onComplete;
 }
-}},{init:function(_14){
+},models:{}},{init:function(_1d){
 this.errors=[];
 this.set_attributes(this.Class._attributes||{});
-this.set_attributes(_14);
+this.set_attributes(_1d);
 },setup:function(){
-},set_attributes:function(_15){
-for(var key in _15){
-if(_15.hasOwnProperty(key)){
-this._setAttribute(key,_15[key]);
+},set_attributes:function(_1e){
+for(var key in _1e){
+if(_1e.hasOwnProperty(key)){
+this._setAttribute(key,_1e[key]);
 }
 }
-return _15;
-},update_attributes:function(_17,_18){
-this.set_attributes(_17);
-return this.save(_18);
+return _1e;
+},update_attributes:function(_20,_21){
+this.set_attributes(_20);
+return this.save(_21);
 },valid:function(){
 return this.errors.length==0;
 },validate:function(){
-},_setAttribute:function(_19,_1a){
-if(_1a&&typeof (_1a)=="object"&&_1a.constructor!=Date){
-this._setAssociation(_19,_1a);
+},_setAttribute:function(_22,_23){
+if(MVC.Array.include(this.Class._associations,_22)){
+this._setAssociation(_22,_23);
 }else{
-this._setProperty(_19,_1a);
+this._setProperty(_22,_23);
 }
-},_setProperty:function(_1b,_1c){
-this[_1b]=MVC.Array.include(["created_at","updated_at"],_1b)?MVC.Date.parse(_1c):_1c;
-this.Class.add_attribute(_1b,MVC.Object.guess_type(_1c));
-},_setAssociation:function(_1d,_1e){
-this[_1d]=function(){
-if(!MVC.String.is_singular(_1d)){
-_1d=MVC.String.singularize(_1d);
+},_setProperty:function(_24,_25){
+this[_24]=MVC.Array.include(["created_at","updated_at"],_24)?MVC.Date.parse(_25):_25;
+this.Class.add_attribute(_24,MVC.Object.guess_type(_25));
+},_setAssociation:function(_26,_27){
+this[_26]=function(){
+if(!MVC.String.is_singular(_26)){
+_26=MVC.String.singularize(_26);
 }
-var _1f=window[MVC.String.capitalize(_1d)];
-if(!_1f){
-return _1e;
+var _28=window[MVC.String.classize(_26)];
+if(!_28){
+return _27;
 }
-return _1f.create_many_as_existing(_1e);
+return _28.create_many_as_existing(_27);
 };
 },attributes:function(){
-var _20={};
+var _29={};
 var cas=this.Class.attributes;
-for(var _22 in cas){
-if(cas.hasOwnProperty(_22)){
-_20[_22]=this[_22];
+for(var _2b in cas){
+if(cas.hasOwnProperty(_2b)){
+_29[_2b]=this[_2b];
 }
 }
-return _20;
+return _29;
 },is_new_record:function(){
 return true;
-},save:function(_23){
-var _24;
+},save:function(_2c){
+var _2d;
 this.errors=[];
 this.validate();
 if(!this.valid()){
 return false;
 }
 if(this.is_new_record()){
-_24=this.Class.create(this.attributes(),_23);
+_2d=this.Class.create(this.attributes(),_2c);
 }else{
-_24=this.Class.update(this[this.Class.id],this.attributes(),_23);
+_2d=this.Class.update(this[this.Class.id],this.attributes(),_2c);
 }
 this.is_new_record=this.Class.new_record_func;
 return true;
-},destroy:function(_25){
-this.Class.destroy(this[this.Class.id],_25);
-},add_errors:function(_26){
-if(_26){
-this.errors=this.errors.concat(_26);
+},destroy:function(_2e){
+this.Class.destroy(this[this.Class.id],_2e);
+},add_errors:function(_2f){
+if(_2f){
+this.errors=this.errors.concat(_2f);
 }
-},_resetAttributes:function(_27){
+},_resetAttributes:function(_30){
 this._clear();
 },_clear:function(){
 var cas=this.Class.attributes;
-for(var _29 in cas){
-if(cas.hasOwnProperty(_29)){
-this[_29]=null;
+for(var _32 in cas){
+if(cas.hasOwnProperty(_32)){
+this[_32]=null;
 }
 }
 }});
-MVC.Object.guess_type=function(_2a){
-if(typeof _2a!="string"){
-if(_2a==null){
-return typeof _2a;
+MVC.Object.guess_type=function(_33){
+if(typeof _33!="string"){
+if(_33==null){
+return typeof _33;
 }
-if(_2a.constructor==Date){
+if(_33.constructor==Date){
 return "date";
 }
-if(_2a.constructor==Array){
+if(_33.constructor==Array){
 return "array";
 }
-return typeof _2a;
+return typeof _33;
 }
-if(_2a=="true"||_2a=="false"){
+if(_33=="true"||_33=="false"){
 return "boolean";
 }
-if(!isNaN(_2a)){
+if(!isNaN(_33)){
 return "number";
 }
-return typeof _2a;
+return typeof _33;
 };
 ;
 include.set_path('../../jmvc/plugins/model/ajax');
@@ -3343,6 +3407,7 @@ include("cookie_model");
 include.set_path('../../jmvc/plugins/model/cookie');
 MVC.CookieModel=MVC.Model.extend({init:function(){
 this._working=null;
+this._super();
 },days:null,find_one:function(_1){
 var _2=this.find_class_data().instances;
 if(!_1){
@@ -3438,7 +3503,7 @@ include.plugins("model","lang/date","io/jsonp");
 include("remote_model");
 ;
 include.set_path('../../jmvc/plugins/model/jsonp');
-MVC.RemoteModel=MVC.Model.extend({error_timeout:4000,init:function(){
+MVC.JsonPModel=MVC.Model.extend({error_timeout:4000,init:function(){
 if(!this.className){
 return;
 }
@@ -3449,6 +3514,7 @@ if(!this.controller_name){
 this.controller_name=this.className;
 }
 this.plural_controller_name=MVC.String.pluralize(this.controller_name);
+this._super();
 },find_all:function(_1,_2){
 var _3=this._clean_callbacks(_2);
 var _4=_3.onSuccess;
@@ -4242,6 +4308,7 @@ this._element=MVC.$E(this.element_id());
 if(this._element){
 return this._element;
 }
+},create_element:function(){
 this._element=document.createElement("div");
 this._element.id=this.element_id();
 this._element.className=this._className;
@@ -4319,6 +4386,23 @@ return this._className+"_"+this._inst.id+"_"+_30+"_edit";
 var el=this.element();
 el.parentNode.removeChild(el);
 }});
+MVC.Controller.Params.prototype.object_data=function(){
+var _32=this._className();
+var _33=window[MVC.String.classize(_32)];
+var _34=this.element;
+while(_34&&!_34.id.match(new RegExp(_32))){
+_34=_34.parentNode;
+if(_34==document){
+_34=null;
+}
+}
+if(!_33||!_34){
+return null;
+}
+var _35=_34.id;
+var id=_35.match(new RegExp(_32+"_(.*)$"))[1];
+return _33.find(id);
+};
 ;
 include.set_path('../../jmvc/plugins/test');
 include.plugins("lang","dom/query","debug","lang/class");
@@ -4865,7 +4949,7 @@ if(_e&&_e.match(/[\b]/)){
 this.options.keyCode=8;
 _e=0;
 }
-var _f=MVC.Object.extend({ctrlKey:false,altKey:false,shiftKey:false,metaKey:false,keyCode:this.options.keyCode||0,charCode:(_e?_e.charCodeAt(0):0)},arguments[2]||{});
+var _f=MVC.Object.extend({ctrlKey:false,altKey:false,shiftKey:false,metaKey:false,keyCode:this.options.keyCode||(_e?_e.charCodeAt(0):0),charCode:(_e?_e.charCodeAt(0):0)},arguments[2]||{});
 try{
 this.event=document.createEvent("KeyEvents");
 this.event.initKeyEvent(this.type,true,true,window,_f.ctrlKey,_f.altKey,_f.shiftKey,_f.metaKey,_f.keyCode,_f.charCode);
@@ -5004,7 +5088,9 @@ this.text_index++;
 setTimeout(this.next_callback(),this.delay);
 }
 },write_character:function(_27){
+new MVC.SyntheticEvent("keydown",{character:_27}).send(this.element);
 new MVC.SyntheticEvent("keypress",{character:_27}).send(this.element);
+new MVC.SyntheticEvent("keyup",{character:_27}).send(this.element);
 },next_callback:function(){
 var t=this;
 return function(){
