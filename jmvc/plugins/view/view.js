@@ -261,7 +261,7 @@ MVC.View.Buffer.prototype = {
 
 
 MVC.View.Compiler = function(source, left) {
-    this.pre_cmd = ['var ___ViewO = "";'];
+    this.pre_cmd = ['var ___ViewO = [];'];
 	this.post_cmd = new Array();
 	this.source = ' ';	
 	if (source != null)
@@ -297,7 +297,7 @@ MVC.View.Compiler.prototype = {
   compile: function(options) {
   	options = options || {};
 	this.out = '';
-	var put_cmd = "___ViewO += ";
+	var put_cmd = "___ViewO.push(";
 	var insert_cmd = put_cmd;
 	var buff = new MVC.View.Buffer(this.pre_cmd, this.post_cmd);		
 	var content = '';
@@ -314,7 +314,7 @@ MVC.View.Compiler.prototype = {
 			switch(token) {
 				case '\n':
 					content = content + "\n";
-					buff.push(put_cmd + '"' + clean(content) + '";');
+					buff.push(put_cmd + '"' + clean(content) + '");');
 					buff.cr();
 					content = '';
 					break;
@@ -324,7 +324,7 @@ MVC.View.Compiler.prototype = {
 					scanner.stag = token;
 					if (content.length > 0)
 					{
-						buff.push(put_cmd + '"' + clean(content) + '"');
+						buff.push(put_cmd + '"' + clean(content) + '")');
 					}
 					content = '';
 					break;
@@ -352,7 +352,7 @@ MVC.View.Compiler.prototype = {
 							}
 							break;
 						case scanner.left_equal:
-							buff.push(insert_cmd + "(MVC.View.Scanner.to_text(" + content + "))");
+							buff.push(insert_cmd + "(MVC.View.Scanner.to_text(" + content + ")))");
 							break;
 					}
 					scanner.stag = null;
@@ -370,11 +370,11 @@ MVC.View.Compiler.prototype = {
 	if (content.length > 0)
 	{
 		// Chould be content.dump in Ruby
-		buff.push(put_cmd + '"' + clean(content) + '"');
+		buff.push(put_cmd + '"' + clean(content) + '")');
 	}
 	buff.close();
 	this.out = buff.script + ";";
-	var to_be_evaled = 'this.process = function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+this.out+" return ___ViewO;}}}catch(e){e.lineNumber=null;throw e;}};";
+	var to_be_evaled = 'this.process = function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+this.out+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}};";
 	
 	try{
 		eval(to_be_evaled);
