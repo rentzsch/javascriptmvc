@@ -63,7 +63,7 @@ new MVC.Test.Unit('element_test',{
         MVC.$E('sel').toggle();
         this.assert_equal("none", MVC.$E('sel').get_style('display')  );
         MVC.$E('sel').toggle();
-        this.assert_equal("inline", MVC.$E('sel').get_style('display')  );
+        this.assert(  MVC.String.include(MVC.$E('sel').get_style('display'), "inline")   );
         
     },
     test_get_style: function(){
@@ -72,8 +72,8 @@ new MVC.Test.Unit('element_test',{
     },
     test_cumulative_offset: function(){
         var off = MVC.$E('sel').cumulative_offset();
-        this.assert_equal(8, off.x()  );
-        this.assert_equal(161, off.y()  );
+        this.assert( off.x() > 0 );
+        this.assert(off.y() > 0  );
     },
     test_cumulative_scroll_offset: function(){
          var off = MVC.$E('sel').cumulative_scroll_offset();

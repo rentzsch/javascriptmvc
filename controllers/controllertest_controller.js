@@ -16,13 +16,7 @@ MainController = MVC.Controller.extend('main',{
 	}
 });
 
-if(MVC.Browser.Opera){
-	alert('o')
-	window.unlock = false; 
-	opera.setOverrideHistoryNavigationMode('compatible');
-	history.navigationMode = 'compatible';	
-	
-}
+
 
 
 TestsController = MVC.Controller.extend('tests',{
