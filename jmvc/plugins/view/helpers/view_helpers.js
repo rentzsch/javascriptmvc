@@ -90,6 +90,15 @@ MVC.Object.extend(MVC.View.Helpers.prototype, {
 	    return this.single_tag_for('input', html_options);
 	},
     /**
+	 * @plugin view/helpers
+	 * @param {Object} text
+	 * @param {Object} html_options
+	 */
+	label_tag: function(text, html_options) {
+		html_options = html_options || {};
+		return this.start_tag_for('label', html_options) + text + this.tag_end('label');
+	},
+	/**
      * @plugin view/helpers
      * @param {Object} name
      * @param {Object} url
