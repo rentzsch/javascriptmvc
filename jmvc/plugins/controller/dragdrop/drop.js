@@ -56,7 +56,7 @@ MVC.Droppables = {
     
     if(options.accept) options.accept = [options.accept].flatten();*/
 
-    MVC.Element.makePositioned(element); // fix IE
+    MVC.Element.make_positioned(element); // fix IE
     options.element = element;
 
     this.drops.push(options);
@@ -66,7 +66,7 @@ MVC.Droppables = {
     var deepest = drops[0];
       
     for (i = 1; i < drops.length; ++i)
-      if (MVC.Element.isParent(drops[i].element, deepest.element))
+      if (MVC.Element.is_parent(drops[i].element, deepest.element))
         deepest = drops[i];
     
     return deepest;

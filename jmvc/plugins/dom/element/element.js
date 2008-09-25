@@ -106,7 +106,7 @@ MVC.Object.extend(MVC.Element, {
     get_children : function(element){
         var els = [];
         var el = element.first();
-        while(el){ el = els.push(el).next(); }
+        while(el){ els.push(el);el = el.next(); }
         return els;
     },
     /*
@@ -162,9 +162,9 @@ MVC.Object.extend(MVC.Element, {
     /*
      * Makes an element position ('relative', 'absolute', or 'static')
      */
-    makePositioned: function(element) {
+    make_positioned: function(element) {
         element = MVC.$E(element);
-        var pos = MVC.Element.getStyle(element, 'position');
+        var pos = MVC.Element.get_style(element, 'position');
         if (pos == 'static' || !pos) {
           element._madePositioned = true;
           element.style.position = 'relative';
@@ -180,7 +180,7 @@ MVC.Object.extend(MVC.Element, {
     /*
      * Returns the style for a given element.
      */
-    getStyle:  function(element, style) {
+    get_style:  function(element, style) {
         element = MVC.$E(element);
         style = style == 'float' ? 'cssFloat' : MVC.String.camelize(style);
         var value;
@@ -197,7 +197,7 @@ MVC.Object.extend(MVC.Element, {
      * Returns the vector
      * @return {Vector} a vector
      */
-    cumulativeOffset: function(element) {
+    cumulative_offset: function(element) {
         var valueT = 0, valueL = 0;
         do {
           valueT += element.offsetTop  || 0;
@@ -206,7 +206,7 @@ MVC.Object.extend(MVC.Element, {
         } while (element);
         return new MVC.Vector( valueL, valueT );
     },
-    cumulativeScrollOffset: function(element) {
+    cumulative_scroll_offset: function(element) {
         var valueT = 0, valueL = 0;
         do {
           valueT += element.scrollTop  || 0;
@@ -215,15 +215,17 @@ MVC.Object.extend(MVC.Element, {
         } while (element);
         return new MVC.Vector( valueL, valueT );
     },
-    isParent: function(element,child ) {
+    is_parent: function(element,child ) {
+      if(typeof child == 'string') child = MVC.$E(child);
       if (!child.parentNode || child == element) return false;
       if (child.parentNode == element) return true;
-      return MVC.Element.isParent(child.parentNode, element);
+      return MVC.Element.is_parent(child.parentNode, element);
     },
     /*
      * Returns true or false if one element is inside another element.
      */
     has: function(element, b){
+      if(typeof b == 'string') b = MVC.$E(b);
       return element.contains ?
         element != b && element.contains(b) :
         !!(element.compareDocumentPosition(b) & 16);

@@ -57,11 +57,11 @@ MVC.Draggable = function(params){
     this.element = params.element;
     this.moved = false;
 	this.keep_dragging = true;
-    //this.originalz = MVC.Element.getStyle(this.element,'z-Index');
-    //this.originallyAbsolute = MVC.Element.getStyle(this.element,'position')  == 'absolute';
+    //this.originalz = MVC.Element.get_style(this.element,'z-Index');
+    //this.originallyAbsolute = MVC.Element.get_style(this.element,'position')  == 'absolute';
 
     this.mouse_position_on_element = 
-            MVC.Event.pointer(params.event).minus( MVC.Element.cumulativeOffset(params.element) )
+            MVC.Event.pointer(params.event).minus( MVC.Element.cumulative_offset(params.element) )
     
     this.dragstart = params.dragstart || function(){};
     this.dragend = params.dragend || function(){};
@@ -71,7 +71,7 @@ MVC.Draggable = function(params){
 
 MVC.Draggable.prototype = {
     start: function(event){
-        MVC.Element.makePositioned(this.element);
+        MVC.Element.make_positioned(this.element);
         this.element.style.zIndex = 1000;  //make the z-Index high
         this.moved = true;
 		// only drag if dragstart doesn't return false
@@ -80,8 +80,8 @@ MVC.Draggable.prototype = {
     },
     //returns the current relative offset
     currentDelta: function() {
-        return new MVC.Vector( parseInt(MVC.Element.getStyle(this.element,'left') || '0'), 
-                            parseInt(MVC.Element.getStyle(this.element,'top') || '0'))   ;
+        return new MVC.Vector( parseInt(MVC.Element.get_style(this.element,'left') || '0'), 
+                            parseInt(MVC.Element.get_style(this.element,'top') || '0'))   ;
     },
     //draws the position of the dragging object
     draw: function(pointer, event){
@@ -90,7 +90,7 @@ MVC.Draggable.prototype = {
 		// only drag if dragstart doesn't return false
 		if(!this.keep_dragging) return;
         MVC.Position.prepare();
-        var pos = MVC.Element.cumulativeOffset(this.element).minus(this.currentDelta());//current position, minus offset = where element should be
+        var pos = MVC.Element.cumulative_offset(this.element).minus(this.currentDelta());//current position, minus offset = where element should be
         var p = pointer.minus(pos).minus( this.mouse_position_on_element );  //from mouse position
         var s = this.element.style;
         s.top =  p.top()+"px";

@@ -33,7 +33,7 @@ MVC.Position =
       return this.withinIncludingScrolloffsets(element, x, y);
     this.xcomp = x;
     this.ycomp = y;
-    this.offset = MVC.Element.cumulativeOffset(element);
+    this.offset = MVC.Element.cumulative_offset(element);
 
     return (y >= this.offset[1] &&
             y <  this.offset[1] + element.offsetHeight &&
@@ -48,11 +48,11 @@ MVC.Position =
    * @return {Boolean} true if x, y is inside the element, false if otherwise.
    */
   withinIncludingScrolloffsets: function(element, x, y) {
-    var offsetcache = MVC.Element.cumulativeScrollOffset(element);
+    var offsetcache = MVC.Element.cumulative_scroll_offset(element);
 
     this.xcomp = x + offsetcache[0] - this.deltaX;
     this.ycomp = y + offsetcache[1] - this.deltaY;
-    this.offset = MVC.Element.cumulativeOffset(element);
+    this.offset = MVC.Element.cumulative_offset(element);
 
     return (this.ycomp >= this.offset[1] &&
             this.ycomp <  this.offset[1] + element.offsetHeight &&

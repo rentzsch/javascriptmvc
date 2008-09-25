@@ -90,7 +90,12 @@
 		</div>
 		
 		<div id='insertion_test'></div>
-		
+		<table id="update_test">
+		    
+		</table>
+        <div id="remove_test">
+		    
+		</div>
 		<script src='../../jmvc/include.js' type='text/javascript'></script>
 		<script type='text/javascript'>
 			
@@ -121,7 +126,7 @@
 			
 			
 			if(location.href.indexOf('element') != -1){
-				include.plugin('element');
+				include.plugin('dom/element');
 				document.getElementById('element_el').style.backgroundColor = '#ddffdd';
 			}else{
 				document.getElementById('noelement_el').style.backgroundColor = '#ddffdd';
