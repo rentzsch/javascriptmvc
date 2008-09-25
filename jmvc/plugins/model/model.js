@@ -136,6 +136,7 @@ MVC.Model = MVC.Class.extend(
         if(!callbacks.onSuccess && !callbacks.onComplete) throw "You must supply a positive callback!";
         if(!callbacks.onSuccess) callbacks.onSuccess = callbacks.onComplete;
         if(!callbacks.onError && callbacks.onComplete) callbacks.onError = callbacks.onComplete;
+		return callbacks;
     },
     models : {}
 },
