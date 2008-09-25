@@ -35,7 +35,7 @@ new MVC.Test.Unit('conflict_ajax',{
 			this.messages.push("Skipping because Prototype's Ajax overwrites.");
 			return;
 		}
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}

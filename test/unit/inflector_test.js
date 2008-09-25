@@ -8,7 +8,7 @@ new MVC.Test.Unit('inflector',{
 		this.assert_equal('dogs', MVC.String.pluralize('dog'));
 	},
 	test_conflict_singular : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
@@ -16,7 +16,7 @@ new MVC.Test.Unit('inflector',{
 		this.assert_equal('dog', 'dogs'.singularize());
 	},
 	test_conflict_pluralize : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}

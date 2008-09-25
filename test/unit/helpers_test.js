@@ -64,7 +64,7 @@ new MVC.Test.Unit('helpers',{
 
 new MVC.Test.Unit('conflict_helpers',{
 	test_string_capitalize : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
@@ -73,7 +73,7 @@ new MVC.Test.Unit('conflict_helpers',{
 		this.assert_equal('Yes', 'YES'.capitalize())
 	},
 	test_string_include : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
@@ -84,7 +84,7 @@ new MVC.Test.Unit('conflict_helpers',{
 		this.assert_not( 'Justin'.include('nJ') )
 	},
 	test_string_ends_with : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
@@ -92,28 +92,28 @@ new MVC.Test.Unit('conflict_helpers',{
 		this.assert_not( 'Justin'.ends_with('is awesome')   );
 	},
 	test_string_camelize : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
 		this.assert_equal('oneTwo', 'one_two'.camelize(), "OK if Prototype"  )
 	},
 	test_string_classize : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
 		this.assert_equal('OneTwo', 'one_two'.classize() )
 	},
 	test_string_strip : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
 		this.assert_equal('word', ' word  '.strip())
 	},
 	test_array_include : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
@@ -121,7 +121,7 @@ new MVC.Test.Unit('conflict_helpers',{
 		this.assert_not([1,2,3].include( 4) )
 	},
 	test_array_from : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
@@ -134,7 +134,7 @@ new MVC.Test.Unit('conflict_helpers',{
 		f.call(this, 1, 2)
 	},
 	test_function_bind : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
@@ -144,7 +144,7 @@ new MVC.Test.Unit('conflict_helpers',{
 		b();
 	},
 	test_function_params : function(){
-		if(MVC.no_conflict) {
+		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
 			return;
 		}
