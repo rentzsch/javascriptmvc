@@ -815,7 +815,7 @@ MVC.Path.get_data = function(path) {
 
 //this should convert options to params
 MVC.Controller.prototype.redirect_to = function(options){
-	var controller_name = this.Class.className;
+	var controller_name = options.controller || this.Class.className;
 	var action_name = options.action || 'index';
 	var lhs = window.location.href.split('#')[0];
    
