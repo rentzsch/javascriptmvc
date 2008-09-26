@@ -13,7 +13,7 @@ if [ $1 == "-h" -o $1 == "-?" -o $1 == "--help" ]
 then
 echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
 echo Available commands:
-echo js				Opens a command line JavaScript environment
+echo -e "js\t\tOpens a command line JavaScript environment"
 echo js [FILE]			Runs FILE in the Rhino environment
 
 echo JavaScriptMVC script usage:
