@@ -1,3 +1,25 @@
-var controllerName = _args[0]+'Controller';
-print("Generating "+controllerName+"...");
-if(_args[1]) print("Another argument "+_args[1]+"...");
+if(!_args[0]){
+	print("Usage: js jmvc/generate/controller class_name")
+	quit();
+}
+
+load('jmvc/generate/loader.js');
+
+var data = {class_name: _args[0]}
+data.name = MVC.String.classize(_args[0])+'Controller';
+
+
+c = new View({absolute_url: "jmvc/command/generators/controller.ejs"});
+MVCOptions.save("controllers/"+_args[0]+"_controller.js",  c.render(data)  )
+
+print("Generating ... controllers/"+_args[0]+"_controller.js");
+
+
+t = new View({absolute_url: "jmvc/command/generators/controller_test.ejs"});
+MVCOptions.save("test/functional/"+_args[0]+"_controller_test.js",  t.render(data)  );
+
+
+print("               test/functional/"+_args[0]+"_controller_test.js");
+
+
+print("\n               Make sure to add to your application files!\n");
