@@ -23,19 +23,7 @@ MVC.Model = MVC.Class.extend(
 	init: function(){
 		if(!this.className) return;
         MVC.Model.models[this.className] = this;
-        this.store = new this.store_type();
-	},
-	find_one: function(params, callbacks){
-		return this.store.find_one(params, callbacks);
-	},
-	create: function(obj, callbacks){
-		return this.store.create(obj, callbacks);
-	},
-	update: function(id, attributes, callbacks){
-		return this.store.update(id, attributes, callbacks);
-	},
-	destroy: function(id, callbacks){
-		return this.store.destroy(id, callbacks);
+        this.store = new this.store_type(this);
 	},
     find : function(id, params, callbacks){
         if(!params)  params = {};
@@ -51,6 +39,7 @@ MVC.Model = MVC.Class.extend(
             return this.create_as_existing( this.find_one(id == 'first'? null : params, callbacks) );
         }
     },
+    asynchronous : true,
     /**
      * Used to create an existing object from attributes
      * @param {Object} attributes
@@ -130,7 +119,9 @@ MVC.Model = MVC.Class.extend(
      * @param {Object} callbacks
      */
     _clean_callbacks : function(callbacks){
-        if(!callbacks) throw "You must supply a callback!";
+        if(!callbacks) {
+            if(this.asynchronous) throw "You must supply a callback!"; else return null;
+        }
         if(typeof callbacks == 'function')
             return {onSuccess: callbacks, onError: callbacks};
         if(!callbacks.onSuccess && !callbacks.onComplete) throw "You must supply a positive callback!";
@@ -195,8 +186,20 @@ MVC.Model = MVC.Class.extend(
           this._setProperty(attribute, value);
     },
     _setProperty : function(property, value) {  
-        this[property] = MVC.Array.include(['created_at','updated_at'], property) ? MVC.Date.parse(value) :  value;
+        //add to cache, this should probably check that the id isn't changing.  If it does, should update the cache
+        var old = this[property]
+        
+            
 
+        this[property] = MVC.Array.include(['created_at','updated_at'], property) ? MVC.Date.parse(value) :  value;
+        if(property == this.Class.id && this.Class.store){
+            if(!old){
+                this.Class.store.create(this);
+            }else if(old != this[property]){
+                this.Class.store.destroy(old);
+                this.Class.store.create(this);
+            }
+        }
         //if (!(MVC.Array.include(this._properties,property))) this._properties.push(property);  
         
         this.Class.add_attribute(property, MVC.Object.guess_type(value)  );
@@ -231,16 +234,15 @@ MVC.Model = MVC.Class.extend(
      * Saves the instance
      * @param {optional:Function} callback or object of callbacks
      */
-    save: function(callback){
+    save: function(callbacks){
         var result;
         this.errors = [];
         this.validate();
         if(!this.valid()) return false;
-        
-        if(this.is_new_record())
-            result = this.Class.create(this.attributes(), callback);
-        else
-            result = this.Class.update(this[this.Class.id], this.attributes(), callback);
+        result = this.is_new_record() ? 
+            this.Class.create(this.attributes(), callbacks) : 
+            this.Class.update(this[this.Class.id], this.attributes(), callbacks);
+
         this.is_new_record = this.Class.new_record_func;
         return true;
     },
@@ -250,6 +252,7 @@ MVC.Model = MVC.Class.extend(
      */
     destroy : function(callback){
         this.Class.destroy(this[this.Class.id], callback);
+        this.Class.store.destroy(this);
     },
     add_errors : function(errors){
         if(errors) this.errors = this.errors.concat(errors);

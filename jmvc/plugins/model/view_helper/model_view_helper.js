@@ -194,17 +194,20 @@ MVC.Controller.Params.prototype.
  */
 object_data = function(){
 	// use the class name of the controller
-	var className = this._className();
-	var model = window[MVC.String.classize(className)];
-	var element = this.element;
+	var className = this._className(), 
+        model, 
+        element = this.element, 
+        matcher = new RegExp("^"+className+"_(.*)$");
+    if(! (model=MVC.Model.models[className])  ) return;
+
 	// loop through parents, this element, or one of its parents should have "todo_4" as its' id
 	// this allows more complex html structures, such as <div id='todo_4'><div class='todo'></div></div>
-	while(element && !element.id.match(new RegExp(className))){
-		element = element.parentNode;
-		if(element == document) element = null;
-	}
-	if(!model || !element) return null;
-	var element_id = element.id;
-	var id = element_id.match(new RegExp(className+"_(.*)$"))[1];
-	return model.find(id);
+
+    while(element && element.parentNode && !element.id.match(matcher) ) { 
+        element = element.parentNode;
+    }
+    
+	if(!element) return null;
+	var id = element.id.match(matcher)[1];
+	return model.store.find_one(id);
 }

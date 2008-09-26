@@ -98,6 +98,7 @@ MVC.AjaxModel = MVC.Model.extend(
                 this.add_req(matches, val)
             }
 	    }
+        this._super();
     },
     _default_options: function(cleaned_name, method, remaining_args, callbacks){
         var defaultOptions = {};
