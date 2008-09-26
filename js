@@ -14,7 +14,7 @@ then
 echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
 echo Available commands:
 echo -e "js\t\t\t\tOpens a command line JavaScript environment"
-echo -e "js -d\t\t\t\Opens the Rhino debugger"
+echo -e "js -d\t\t\t\tOpens the Rhino debugger"
 echo -e "js [FILE]\t\t\tRuns FILE in the Rhino environment"
 echo -e ""
 echo  -e "JavaScriptMVC script usage:"
