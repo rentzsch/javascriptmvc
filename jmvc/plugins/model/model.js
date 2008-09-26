@@ -252,7 +252,7 @@ MVC.Model = MVC.Class.extend(
      */
     destroy : function(callback){
         this.Class.destroy(this[this.Class.id], callback);
-        this.Class.store.destroy(this);
+        this.Class.store.destroy(this[this.Class.id]);
     },
     add_errors : function(errors){
         if(errors) this.errors = this.errors.concat(errors);
