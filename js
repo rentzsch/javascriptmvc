@@ -9,6 +9,12 @@ then
   exit 127
 fi
 
+if [ $1 -eq "-h" ]
+then
+  echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
+  exit 127
+fi
+
 ARGS=[
 for arg
 do
