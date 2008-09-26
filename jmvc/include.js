@@ -412,8 +412,6 @@ include.check_exists = function(path){
     return true;
 }
 
-
-
 include.controllers = include.app(function(i){return '../controllers/'+i+'_controller'}, MVC.Included.controllers);
 include.models = include.app(function(i){return '../models/'+i}, MVC.Included.models);
 include.resources = include.app(function(i){return '../resources/'+i}, MVC.Included.resources);
@@ -427,20 +425,25 @@ if(MVC.script_options){
 	include(MVC.apps_root+'/'+MVC.script_options[0]);
 	
     if(MVC.script_options[1] == 'test'){
-         if(include.check_exists(MVC.apps_root+'/'+MVC.app_name+'/test.js')){
-    		var path = include.get_path();
-    		include.set_path(MVC.apps_root)
-    		include(MVC.app_name+'/test')
-    		include.set_path(path)
-    	}else{
-    		setTimeout(function(){
-                MVC.Console.log("There is no application test file at:\n    \"apps/"+MVC.app_name+"/test.js\"\nUse it to include your test files.\n\nTest includes:\n    include.unit_tests('product')\n    include.functional_tests('widget')")
-            },1000)
-            
-    	}
+		var load_test = function(){
+			var path = include.get_path();
+			include.set_path(MVC.apps_root)
+			include(MVC.app_name+'/test')
+			include.set_path(path)
+		}
+		// check exists doesn't block other scripts from loading in FF3, so this causes problems
+		if (navigator.userAgent.match(/Firefox\/3/)) { // FF 3
+			load_test();
+		} else {
+			if(include.check_exists(MVC.apps_root+'/'+MVC.app_name+'/test.js')){
+				load_test();
+	    	}else{
+	    		setTimeout(function(){
+	                MVC.Console.log("There is no application test file at:\n    \"apps/"+MVC.app_name+"/test.js\"\nUse it to include your test files.\n\nTest includes:\n    include.unit_tests('product')\n    include.functional_tests('widget')")
+	            },1000)
+	    	}
+		}
     }
-   
-    
     
     include.opera();
 }
