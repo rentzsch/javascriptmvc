@@ -1,1 +1,0 @@
-java -jar jmvc\rhino\js.jar -e _args=['%2'];load('%1')
