@@ -265,6 +265,8 @@ MVC.Object.extend(include,{
 		if(!latest) {
 			first_wave_done = true;
 			if(include.get_env()=='compress') setTimeout( include.compress, 10 );
+            if(typeof MVCOptions != 'undefined' && MVCOptions.done_loading) MVCOptions.done_loading();
+            
             if(include._close){ 
                 this.close_time();
             }

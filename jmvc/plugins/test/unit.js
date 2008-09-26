@@ -32,7 +32,11 @@ MVC.Test.Runner(MVC.Test.Unit, "tests", {
 		if(this.tests[number].failures == 0 ) this.passes++;
 	},
 	done: function(){
-		MVC.Console.window.document.getElementById('unit_result').innerHTML = 
-			'('+this.passes+'/'+this.tests.length+')' + (this.passes == this.tests.length ? ' Wow!' : '')
+		
+        if(!window._rhino)
+            MVC.Console.window.document.getElementById('unit_result').innerHTML = 
+    			'('+this.passes+'/'+this.tests.length+')' + (this.passes == this.tests.length ? ' Wow!' : '');
+        else
+            MVCOptions.unit_results(this);
 	}
 })

@@ -25,7 +25,8 @@ MVC.Test.Assertions =  MVC.Class.extend(
 		this._delays = 0;
 		this._test_name = test_name;
 		this._last_called = test_name;
-		MVC.Console.window.running(this._test, this._test_name);
+		if(!window._rhino)
+            MVC.Console.window.running(this._test, this._test_name);
 		if(this.setup) 
 			this._setup();
 		else{
@@ -252,7 +253,11 @@ MVC.Test.Assertions =  MVC.Class.extend(
 			if(this.teardown) this.teardown()
 			if(this._do_blur_back)
 				this._blur_back();
-			MVC.Console.window.update(this._test, this._test_name, this);
+			
+            if(!window._rhino)
+                MVC.Console.window.update(this._test, this._test_name, this);
+            else
+                MVCOptions.report(this);
 			this.failures == 0 && this.errors == 0?  this._test.pass(): this._test.fail();
 			this._test.run_next();
 		}

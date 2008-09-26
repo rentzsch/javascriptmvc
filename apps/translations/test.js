@@ -1,2 +1,2 @@
-include.unit_tests();
+include.unit_tests('translate');
 include.functional_tests();

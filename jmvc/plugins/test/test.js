@@ -42,7 +42,8 @@ MVC.Test = MVC.Class.extend(
 		this.failures = 0;
 		
 		MVC.Tests[this.name] = this;
-		this.updateElements(this);
+		if(!window._rhino)
+            this.updateElements(this);
 	},
     /**
      * Adds to the test case's failure count.
@@ -93,7 +94,10 @@ MVC.Test = MVC.Class.extend(
 			this.working_test++;
 			this.run_test(this.test_names[this.working_test-1]);
 		}else if(this.working_test != null){
-			MVC.Console.window.update_test(this)
+			if(!window._rhino)
+                MVC.Console.window.update_test(this)
+            else
+                MVCOptions.update_test(this);
 			this.working_test = null;
 			if(this.callback){
 				this.callback();
@@ -189,20 +193,14 @@ MVC.Included.functional_tests = [];
 
 include.unit_tests = function(){
 	for(var i=0; i< arguments.length; i++){
-        if(MVC.Console)
-            MVC.Console.log('Trying to load: test/unit/'+arguments[i]+'_test.js');
-        else
-            print('Trying to load: test/unit/'+arguments[i]+'_test.js')
+        MVC.Console.log('Trying to load: test/unit/'+arguments[i]+'_test.js');
     }
 		
 	include.app(function(i){ return '../test/unit/'+i+'_test'}, MVC.Included.unit_tests).apply(null, arguments);
 }
 include.functional_tests = function(){
 	for(var i=0; i< arguments.length; i++){
-        if(MVC.Console)
-            MVC.Console.log('Trying to load: test/functional/'+arguments[i]+'_test.js');
-        else
-            print('Trying to load: test/unit/'+arguments[i]+'_test.js');
+        MVC.Console.log('Trying to load: test/functional/'+arguments[i]+'_test.js');
     }
 	include.app(function(i){ return '../test/functional/'+i+'_test'}, MVC.Included.functional_tests).apply(null, arguments);
 }
