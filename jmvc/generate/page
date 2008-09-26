@@ -1,0 +1,34 @@
+if(_args.length < 2){
+	print("Creates an html page that loads one of your applications.\n")
+	print("USAGE: js jmvc/generate/test app_name page_location\n")
+	print();
+	quit();
+}
+load('jmvc/generate/loader.js');
+
+
+File = java.io.File
+
+var jmvc = new String(new File('').getAbsoluteFile().toString());
+var jmvc_folders = jmvc.split(/\/|\\/);
+
+var loc = _args[1]
+var loc_folders = loc.split(/\/|\\/);
+
+//for each .. in loc folders, replace with jmvc folder
+
+var i = 0;
+
+while( loc_folders[i] == ".." ){
+	loc_folders[i] = jmvc_folders.pop();
+}
+
+var data = {
+	path_to_jmvc: loc_folders.join("/"),
+	application_name: _args[0]
+}
+try{
+	render_to(loc, "jmvc/command/generators/page.ejs", data);
+}catch(e){
+	print("  ERROR! Unable to render to "+loc+". Make sure folder exists!");
+}
