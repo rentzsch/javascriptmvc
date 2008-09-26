@@ -3,8 +3,19 @@
 # if arguments do exist, it loads the script in the first argument and passes the other arguments to the script
 # ie: js jmvc/script/controller Todo
 
-echo ${#}
+if [ $# -eq 0 ]
+then
+  java -jar jmvc/rhino/js.jar
+  exit 127
+fi
 
-#for %%a in (%2 %3 %4 %5 %6 %7) do (
-#	if not "%%a"=="" SET ARGS=!ARGS!'%%a',
-#)
+ARGS=[
+for arg
+do
+  if [ $arg != $1 ]
+  then
+    ARGS=$ARGS"'$arg'",
+  fi
+done
+ARGS=$ARGS]
+java -jar jmvc/rhino/js.jar -e _args=$ARGS -e 'load("jmvc/scripts/controller")'
