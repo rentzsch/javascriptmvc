@@ -420,7 +420,7 @@ if(MVC.script_options){
 	MVC.apps_root =  MVC.root.join('apps')
 	MVC.app_name = MVC.script_options[0];
     if(window._rhino)
-        MVC.script_options[1] = 'compress'
+        MVC.script_options[1] = MVCOptions.env
 	if(MVC.script_options.length > 1)	include.setup({env: MVC.script_options[1], production: MVC.apps_root+'/'+MVC.script_options[0]+'/production'});
 	include(MVC.apps_root+'/'+MVC.script_options[0]);
 	
