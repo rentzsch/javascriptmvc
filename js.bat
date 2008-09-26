@@ -13,6 +13,6 @@ for %%a in (%2 %3 %4 %5 %6 %7) do (
 	if not "%%a"=="" SET ARGS=!ARGS!'%%a',
 )
 SET ARGS=%ARGS%]
-java -jar jmvc\rhino\js.jar -e _args=%ARGS%;load('%1')
+java -jar jmvc\rhino\js.jar -e _args=%ARGS% -e load('%1')
 
 :END
