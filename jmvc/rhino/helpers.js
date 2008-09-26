@@ -5,6 +5,11 @@ MVCOptions.save = function(path, src){
 		out.flush();
 		out.close();
 };
+MVCOptions.create_folder = function(path){
+    var out = new java.io.File( path )
+    out.mkdir();
+};
+
 MVCOptions.compress = function(src, path){
     return Packages.org.mozilla.javascript.tools.shell.Main.compress(src, path || include.get_production_name() ); 
 };
