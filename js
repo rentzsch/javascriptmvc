@@ -13,15 +13,15 @@ if [ $1 == "-h" -o $1 == "-?" -o $1 == "--help" ]
 then
 echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
 echo Available commands:
-echo -e "js\t\tOpens a command line JavaScript environment"
-echo js [FILE]			Runs FILE in the Rhino environment
-
-echo JavaScriptMVC script usage:
-echo js jmvc/generate/app [NAME]	Creates a new JavaScriptMVC application
-echo js jmvc/generate/page [APP] [PAGE]	Generates a page for the application
-echo js jmvc/generate/controller [NAME]	Generates a Controller file
-echo js jmvc/generate/model [TYPE] [NAME]	Generates a Model file
-echo js apps/[NAME]/compress.js	Compress your application and generate documentation
+echo -e "js\t\t\t\tOpens a command line JavaScript environment"
+echo -e "js [FILE]\t\t\t\tRuns FILE in the Rhino environment"
+echo -e ""
+echo  -e "JavaScriptMVC script usage:"
+echo  -e "js jmvc/generate/app [NAME]\t\t\tCreates a new JavaScriptMVC application"
+echo  -e "js jmvc/generate/page [APP] [PAGE]\t\t\tGenerates a page for the application"
+echo  -e "js jmvc/generate/controller [NAME]\t\t\tGenerates a Controller file"
+echo  -e "js jmvc/generate/model [TYPE] [NAME]\t\t\tGenerates a Model file"
+echo  -e "js apps/[NAME]/compress.js\t\t\tCompress your application and generate documentation"
   exit 127
 fi
 
