@@ -1,0 +1,25 @@
+if(!_args[0]){
+	print("Usage: js jmvc/generate/controller class_name")
+	quit();
+}
+load('jmvc/generate/loader.js');
+
+var data = {class_name: _args[0], application_name: _args[0]}
+
+render_to("apps/"+_args[0]+".js", "jmvc/command/generators/application.ejs", data);
+
+
+MVCOptions.create_folder("apps/"+_args[0]);
+
+print("               apps/"+_args[0]);
+
+
+render_to("apps/"+_args[0]+"/compress.js", "jmvc/command/generators/compress_script.ejs", data);
+
+
+render_to("apps/"+_args[0]+"/index.html", "jmvc/command/generators/compress_page.ejs", data);
+
+
+render_to("apps/"+_args[0]+"/test.js", "jmvc/command/generators/test.ejs", data);
+
+print("\nMake sure to add new files to your application and test file!\n");

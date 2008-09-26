@@ -24,3 +24,14 @@ include.request = function(path){
 
 MVCOptions = {};
 load('jmvc/rhino/helpers.js');
+
+var first = true;
+render_to = function(file, ejs, data){
+    var v = new View({absolute_url: ejs });
+    
+    MVCOptions.save(file,  v.render(data)  );
+    
+    print( (first ? "Generating ...":"              ") + " "+file);
+    
+    first = false;
+}
