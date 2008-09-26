@@ -29,7 +29,7 @@
  * 
  */
 MVC.JSONRestModel = MVC.AjaxModel.extend(
-/*@Static*/
+/* @Static*/
 {
     init: function(){
         if(!this.className) return;
@@ -57,6 +57,10 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
      */
     find_all_get_success : function(transport){  //error is either success, complete or error
         var data = this.json_from_string(transport.responseText);
+        return this.convert_response_into_instances(data);
+    },
+
+    convert_response_into_instances: function(data) {
         var collection = [];
     	for(var i = 0; i < data.length; i++){
     		var unit = data[i];
@@ -66,6 +70,7 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
     	}
         return collection;
     },
+
     /**
      * Posts attributes to /plural_name.json.
      * @param {Object} attributes
