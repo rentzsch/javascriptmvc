@@ -11,6 +11,11 @@ if "%1"=="-h" GOTO PRINT_HELP
 if "%1"=="-?" GOTO PRINT_HELP
 if "%1"=="--help" GOTO PRINT_HELP
 
+if "%1"=="-d" (
+	java -classpath jmvc/rhino/js.jar org.mozilla.javascript.tools.debugger.Main
+	GOTO END
+)
+
 SET ARGS=[
 SET FILENAME=%1
 SET FILENAME=%FILENAME:\=/%
@@ -26,6 +31,7 @@ GOTO END
 echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
 echo Available commands:
 echo js				Opens a command line JavaScript environment
+echo js	-d			Opens the Rhino debugger
 echo js [FILE]			Runs FILE in the Rhino environment
 
 echo JavaScriptMVC script usage:

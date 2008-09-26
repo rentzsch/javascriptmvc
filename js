@@ -14,6 +14,7 @@ then
 echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
 echo Available commands:
 echo -e "js\t\t\t\tOpens a command line JavaScript environment"
+echo -e "js -d\t\t\t\Opens the Rhino debugger"
 echo -e "js [FILE]\t\t\tRuns FILE in the Rhino environment"
 echo -e ""
 echo  -e "JavaScriptMVC script usage:"
@@ -23,6 +24,13 @@ echo  -e "js jmvc/generate/controller [NAME]\tGenerates a Controller file"
 echo  -e "js jmvc/generate/model [TYPE] [NAME]\tGenerates a Model file"
 echo  -e "js apps/[NAME]/compress.js\t\tCompress your application and generate documentation"
   exit 127
+fi
+
+
+if [ $1 == "-d" ]
+then
+	java -classpath jmvc/rhino/js.jar org.mozilla.javascript.tools.debugger.Main
+	exit 127
 fi
 
 ARGS=[
