@@ -10,7 +10,6 @@ if "%1"=="" (
 SET ARGS=[
 SET FILENAME=%1
 SET FILENAME=%FILENAME:\=/%
-echo %FILENAME%
 ::haven't seen any way to loop through all args yet, so for now this goes through arg 2-7
 for %%a in (%2 %3 %4 %5 %6 %7) do (
 	if not "%%a"=="" SET ARGS=!ARGS!'%%a',
