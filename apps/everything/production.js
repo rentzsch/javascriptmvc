@@ -339,8 +339,8 @@ if(!MVC.Array.include(["get","post"],this.options.method)){
 if(this.options.parameters==""){
 this.options.parameters={_method:this.options.method};
 }else{
-if(typeof this.options.parameters=="string"){
-this.options.parameters=this.options.parameters+"&_method="+this.options.method;
+if(typeof this.options.parameters=="string"||typeof this.options.parameters=="number"){
+this.options.parameters=""+this.options.parameters+"&_method="+this.options.method;
 }else{
 this.options.parameters["_method"]=this.options.method;
 }
@@ -669,7 +669,7 @@ line=null;
 }
 }};
 MVC.View.Compiler=function(_21,_22){
-this.pre_cmd=["var ___ViewO = \"\";"];
+this.pre_cmd=["var ___ViewO = [];"];
 this.post_cmd=new Array();
 this.source=" ";
 if(_21!=null){
@@ -704,7 +704,7 @@ this.out="";
 MVC.View.Compiler.prototype={compile:function(_24){
 _24=_24||{};
 this.out="";
-var _25="___ViewO += ";
+var _25="___ViewO.push(";
 var _26=_25;
 var _27=new MVC.View.Buffer(this.pre_cmd,this.post_cmd);
 var _28="";
@@ -719,7 +719,7 @@ if(_2c.stag==null){
 switch(_2b){
 case "\n":
 _28=_28+"\n";
-_27.push(_25+"\""+_29(_28)+"\";");
+_27.push(_25+"\""+_29(_28)+"\");");
 _27.cr();
 _28="";
 break;
@@ -728,7 +728,7 @@ case _2c.left_equal:
 case _2c.left_comment:
 _2c.stag=_2b;
 if(_28.length>0){
-_27.push(_25+"\""+_29(_28)+"\"");
+_27.push(_25+"\""+_29(_28)+"\")");
 }
 _28="";
 break;
@@ -753,7 +753,7 @@ _27.push(_28);
 }
 break;
 case _2c.left_equal:
-_27.push(_26+"(MVC.View.Scanner.to_text("+_28+"))");
+_27.push(_26+"(MVC.View.Scanner.to_text("+_28+")))");
 break;
 }
 _2c.stag=null;
@@ -769,11 +769,11 @@ break;
 }
 });
 if(_28.length>0){
-_27.push(_25+"\""+_29(_28)+"\"");
+_27.push(_25+"\""+_29(_28)+"\")");
 }
 _27.close();
 this.out=_27.script+";";
-var _2d="this.process = function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {"+this.out+" return ___ViewO;}}}catch(e){e.lineNumber=null;throw e;}};";
+var _2d="this.process = function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {"+this.out+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}};";
 try{
 eval(_2d);
 }
@@ -1566,7 +1566,8 @@ return MVC.Array.from(div.childNodes);
 var els=[];
 var el=_16.first();
 while(el){
-el=els.push(el).next();
+els.push(el);
+el=el.next();
 }
 return els;
 },first:function(_19,_1a){
@@ -1613,9 +1614,9 @@ return MVC.$E(_23.parentNode).last(_25);
 return MVC.$E(_26);
 },toggle:function(_27){
 return _27.style.display=="none"?_27.style.display="":_27.style.display="none";
-},makePositioned:function(_28){
+},make_positioned:function(_28){
 _28=MVC.$E(_28);
-var pos=MVC.Element.getStyle(_28,"position");
+var pos=MVC.Element.get_style(_28,"position");
 if(pos=="static"||!pos){
 _28._madePositioned=true;
 _28.style.position="relative";
@@ -1625,7 +1626,7 @@ _28.style.left=0;
 }
 }
 return _28;
-},getStyle:function(_2a,_2b){
+},get_style:function(_2a,_2b){
 _2a=MVC.$E(_2a);
 _2b=_2b=="float"?"cssFloat":MVC.String.camelize(_2b);
 var _2c;
@@ -1639,7 +1640,7 @@ if(_2b=="opacity"){
 return _2c?parseFloat(_2c):1;
 }
 return _2c=="auto"?null:_2c;
-},cumulativeOffset:function(_2e){
+},cumulative_offset:function(_2e){
 var _2f=0,_30=0;
 do{
 _2f+=_2e.offsetTop||0;
@@ -1647,7 +1648,7 @@ _30+=_2e.offsetLeft||0;
 _2e=_2e.offsetParent;
 }while(_2e);
 return new MVC.Vector(_30,_2f);
-},cumulativeScrollOffset:function(_31){
+},cumulative_scroll_offset:function(_31){
 var _32=0,_33=0;
 do{
 _32+=_31.scrollTop||0;
@@ -1655,15 +1656,21 @@ _33+=_31.scrollLeft||0;
 _31=_31.parentNode;
 }while(_31);
 return new MVC.Vector(_33,_32);
-},isParent:function(_34,_35){
+},is_parent:function(_34,_35){
+if(typeof _35=="string"){
+_35=MVC.$E(_35);
+}
 if(!_35.parentNode||_35==_34){
 return false;
 }
 if(_35.parentNode==_34){
 return true;
 }
-return MVC.Element.isParent(_35.parentNode,_34);
+return MVC.Element.is_parent(_35.parentNode,_34);
 },has:function(_36,b){
+if(typeof b=="string"){
+b=MVC.$E(b);
+}
 return _36.contains?_36!=b&&_36.contains(b):!!(_36.compareDocumentPosition(b)&16);
 },update:function(_38,_39){
 _38=MVC.$E(_38);
@@ -1894,137 +1901,140 @@ _1f.value=_1d||"";
 _1f.type=_1e||"text";
 _1f.name=_1c;
 return this.single_tag_for("input",_1f);
-},link_to:function(_20,url,_22){
-if(!_20){
-var _20="null";
-}
+},label_tag:function(_20,_21){
+_21=_21||{};
+return this.start_tag_for("label",_21)+_20+this.tag_end("label");
+},link_to:function(_22,url,_24){
 if(!_22){
-var _22={};
+var _22="null";
 }
-this.set_confirm(_22);
-_22.href=url;
-return this.start_tag_for("a",_22)+_20+this.tag_end("a");
-},link_to_if:function(_23,_24,url,_26){
-return this.link_to_unless((!_23),_24,url,_26);
-},link_to_unless:function(_27,_28,url,_2a){
-if(_27){
-return _28;
+if(!_24){
+var _24={};
 }
-return this.link_to(_28,url,_2a);
-},set_confirm:function(_2b){
-if(_2b.confirm){
-_2b.onclick=_2b.onclick||"";
-_2b.onclick=_2b.onclick+"; var ret_confirm = confirm(\""+_2b.confirm+"\"); if(!ret_confirm){ return false;} ";
-_2b.confirm=null;
+this.set_confirm(_24);
+_24.href=url;
+return this.start_tag_for("a",_24)+_22+this.tag_end("a");
+},link_to_if:function(_25,_26,url,_28){
+return this.link_to_unless((!_25),_26,url,_28);
+},link_to_unless:function(_29,_2a,url,_2c){
+if(_29){
+return _2a;
 }
-},submit_link_to:function(_2c,_2d,_2e,_2f){
-if(!_2c){
-var _2c="null";
+return this.link_to(_2a,url,_2c);
+},set_confirm:function(_2d){
+if(_2d.confirm){
+_2d.onclick=_2d.onclick||"";
+_2d.onclick=_2d.onclick+"; var ret_confirm = confirm(\""+_2d.confirm+"\"); if(!ret_confirm){ return false;} ";
+_2d.confirm=null;
 }
+},submit_link_to:function(_2e,_2f,_30,_31){
 if(!_2e){
-_2e={};
+var _2e="null";
 }
-_2e.type="submit";
-_2e.value=_2c;
-this.set_confirm(_2e);
-_2e.onclick=_2e.onclick+";window.location=\""+_2d+"\"; return false;";
-return this.single_tag_for("input",_2e);
-},password_field_tag:function(_30,_31,_32){
-return this.input_field_tag(_30,_31,"password",_32);
-},select_tag:function(_33,_34,_35,_36){
-_36=_36||{};
-_36.id=_36.id||_33;
-_36.name=_33;
+if(!_30){
+_30={};
+}
+_30.type="submit";
+_30.value=_2e;
+this.set_confirm(_30);
+_30.onclick=_30.onclick+";window.location=\""+_2f+"\"; return false;";
+return this.single_tag_for("input",_30);
+},password_field_tag:function(_32,_33,_34){
+return this.input_field_tag(_32,_33,"password",_34);
+},select_tag:function(_35,_36,_37,_38){
+_38=_38||{};
+_38.id=_38.id||_35;
+_38.name=_35;
 var txt="";
-txt+=this.start_tag_for("select",_36);
-for(var i=0;i<_35.length;i++){
-var _39=_35[i];
-if(typeof _39=="string"){
-_39={value:_39};
+txt+=this.start_tag_for("select",_38);
+for(var i=0;i<_37.length;i++){
+var _3b=_37[i];
+if(typeof _3b=="string"){
+_3b={value:_3b};
 }
-if(!_39.text){
-_39.text=_39.value;
+if(!_3b.text){
+_3b.text=_3b.value;
 }
-if(!_39.value){
-_39.text=_39.text;
+if(!_3b.value){
+_3b.text=_3b.text;
 }
-var _3a={value:_39.value};
-if(_39.value==_34){
-_3a.selected="selected";
+var _3c={value:_3b.value};
+if(_3b.value==_36){
+_3c.selected="selected";
 }
-txt+=this.start_tag_for("option",_3a)+_39.text+this.tag_end("option");
+txt+=this.start_tag_for("option",_3c)+_3b.text+this.tag_end("option");
 }
 txt+=this.tag_end("select");
 return txt;
-},single_tag_for:function(tag,_3c){
-return this.tag(tag,_3c,"/>");
-},start_tag_for:function(tag,_3e){
-return this.tag(tag,_3e);
-},submit_tag:function(_3f,_40){
-_40=_40||{};
-_40.type=_40.type||"submit";
-_40.value=_3f||"Submit";
-return this.single_tag_for("input",_40);
-},tag:function(tag,_42,end){
+},single_tag_for:function(tag,_3e){
+return this.tag(tag,_3e,"/>");
+},start_tag_for:function(tag,_40){
+return this.tag(tag,_40);
+},submit_tag:function(_41,_42){
+_42=_42||{};
+_42.type=_42.type||"submit";
+_42.value=_41||"Submit";
+return this.single_tag_for("input",_42);
+},tag:function(tag,_44,end){
 end=end||">";
 var txt=" ";
-for(var _45 in _42){
-if(_42.hasOwnProperty(_45)){
-value=_42[_45]!=null?_42[_45].toString():"";
-if(_45=="Class"||_45=="klass"){
-_45="class";
+for(var _47 in _44){
+if(_44.hasOwnProperty(_47)){
+value=_44[_47]!=null?_44[_47].toString():"";
+if(_47=="Class"||_47=="klass"){
+_47="class";
 }
 if(value.indexOf("'")!=-1){
-txt+=_45+"=\""+value+"\" ";
+txt+=_47+"=\""+value+"\" ";
 }else{
-txt+=_45+"='"+value+"' ";
+txt+=_47+"='"+value+"' ";
 }
 }
 }
 return "<"+tag+txt+end;
 },tag_end:function(tag){
 return "</"+tag+">";
-},text_area_tag:function(_47,_48,_49){
-_49=_49||{};
-_49.id=_49.id||_47;
-_49.name=_49.name||_47;
-_48=_48||"";
-if(_49.size){
-_49.cols=_49.size.split("x")[0];
-_49.rows=_49.size.split("x")[1];
-delete _49.size;
+},text_area_tag:function(_49,_4a,_4b){
+_4b=_4b||{};
+_4b.id=_4b.id||_49;
+_4b.name=_4b.name||_49;
+_4a=_4a||"";
+if(_4b.size){
+_4b.cols=_4b.size.split("x")[0];
+_4b.rows=_4b.size.split("x")[1];
+delete _4b.size;
 }
-_49.cols=_49.cols||50;
-_49.rows=_49.rows||4;
-return this.start_tag_for("textarea",_49)+_48+this.tag_end("textarea");
-},text_field_tag:function(_4a,_4b,_4c){
-return this.input_field_tag(_4a,_4b,"text",_4c);
-},img_tag:function(_4d,_4e){
-_4e=_4e||{};
-_4e.src="resources/images/"+_4d;
-return this.single_tag_for("img",_4e);
+_4b.cols=_4b.cols||50;
+_4b.rows=_4b.rows||4;
+return this.start_tag_for("textarea",_4b)+_4a+this.tag_end("textarea");
+},text_field_tag:function(_4c,_4d,_4e){
+return this.input_field_tag(_4c,_4d,"text",_4e);
+},img_tag:function(_4f,_50){
+_50=_50||{};
+_50.src="resources/images/"+_4f;
+return this.single_tag_for("img",_50);
 }});
 MVC.View.Helpers.prototype.text_tag=MVC.View.Helpers.prototype.text_area_tag;
 (function(){
-var _4f={};
-var _50=0;
-MVC.View.Helpers.link_data=function(_51){
-var _52=_50++;
-_4f[_52]=_51;
-return "_data='"+_52+"'";
+var _51={};
+var _52=0;
+MVC.View.Helpers.link_data=function(_53){
+var _54=_52++;
+_51[_54]=_53;
+return "_data='"+_54+"'";
 };
 MVC.View.Helpers.get_data=function(el){
 if(!el){
 return null;
 }
-var _54=el.getAttribute("_data");
-if(!_54){
+var _56=el.getAttribute("_data");
+if(!_56){
 return null;
 }
-return _4f[parseInt(_54)];
+return _51[parseInt(_56)];
 };
-MVC.View.Helpers.prototype.link_data=function(_55){
-return MVC.View.Helpers.link_data(_55);
+MVC.View.Helpers.prototype.link_data=function(_57){
+return MVC.View.Helpers.link_data(_57);
 };
 MVC.View.Helpers.prototype.get_data=function(el){
 return MVC.View.Helpers.get_data(el);
@@ -2108,13 +2118,13 @@ return this.withinIncludingScrolloffsets(_1,x,y);
 }
 this.xcomp=x;
 this.ycomp=y;
-this.offset=MVC.Element.cumulativeOffset(_1);
+this.offset=MVC.Element.cumulative_offset(_1);
 return (y>=this.offset[1]&&y<this.offset[1]+_1.offsetHeight&&x>=this.offset[0]&&x<this.offset[0]+_1.offsetWidth);
 },withinIncludingScrolloffsets:function(_4,x,y){
-var _7=MVC.Element.cumulativeScrollOffset(_4);
+var _7=MVC.Element.cumulative_scroll_offset(_4);
 this.xcomp=x+_7[0]-this.deltaX;
 this.ycomp=y+_7[1]-this.deltaY;
-this.offset=MVC.Element.cumulativeOffset(_4);
+this.offset=MVC.Element.cumulative_offset(_4);
 return (this.ycomp>=this.offset[1]&&this.ycomp<this.offset[1]+_4.offsetHeight&&this.xcomp>=this.offset[0]&&this.xcomp<this.offset[0]+_4.offsetWidth);
 }};
 ;
@@ -2144,7 +2154,7 @@ MVC.Draggable=function(_7){
 this.element=_7.element;
 this.moved=false;
 this.keep_dragging=true;
-this.mouse_position_on_element=MVC.Event.pointer(_7.event).minus(MVC.Element.cumulativeOffset(_7.element));
+this.mouse_position_on_element=MVC.Event.pointer(_7.event).minus(MVC.Element.cumulative_offset(_7.element));
 this.dragstart=_7.dragstart||function(){
 };
 this.dragend=_7.dragend||function(){
@@ -2153,13 +2163,13 @@ this.dragging=_7.dragging||function(){
 };
 };
 MVC.Draggable.prototype={start:function(_8){
-MVC.Element.makePositioned(this.element);
+MVC.Element.make_positioned(this.element);
 this.element.style.zIndex=1000;
 this.moved=true;
 this.keep_dragging=this.dragstart({element:this.element,event:_8});
 MVC.Droppables.compile();
 },currentDelta:function(){
-return new MVC.Vector(parseInt(MVC.Element.getStyle(this.element,"left")||"0"),parseInt(MVC.Element.getStyle(this.element,"top")||"0"));
+return new MVC.Vector(parseInt(MVC.Element.get_style(this.element,"left")||"0"),parseInt(MVC.Element.get_style(this.element,"top")||"0"));
 },draw:function(_9,_a){
 if(!this.moved||!this.keep_dragging){
 this.start(_a);
@@ -2168,7 +2178,7 @@ if(!this.keep_dragging){
 return;
 }
 MVC.Position.prepare();
-var _b=MVC.Element.cumulativeOffset(this.element).minus(this.currentDelta());
+var _b=MVC.Element.cumulative_offset(this.element).minus(this.currentDelta());
 var p=_9.minus(_b).minus(this.mouse_position_on_element);
 var s=this.element.style;
 s.top=p.top()+"px";
@@ -2213,13 +2223,13 @@ return d.element==$(_5);
 },add:function(_7){
 _7=MVC.$E(_7);
 var _8=MVC.Object.extend({},arguments[1]||{});
-MVC.Element.makePositioned(_7);
+MVC.Element.make_positioned(_7);
 _8.element=_7;
 this.drops.push(_8);
 },findDeepestChild:function(_9){
 var _a=_9[0];
 for(i=1;i<_9.length;++i){
-if(MVC.Element.isParent(_9[i].element,_a.element)){
+if(MVC.Element.is_parent(_9[i].element,_a.element)){
 _a=_9[i];
 }
 }
@@ -2958,35 +2968,46 @@ alert("XDoc should not be called");
 include.set_path('../../jmvc/plugins/lang/date');
 (function(){
 var _1=Date.parse;
-MVC.Native.extend("Date",{month_name:function(_2){
-return MVC.Date.month_names[_2.getMonth()-1];
-},number_of_days_in_month:function(_3){
-var _4=_3.getFullYear(),_5=_3.getMonth(),m=[31,28,31,30,31,30,31,31,30,31,30,31];
-if(_5!=1){
-return m[_5];
+MVC.Native.extend("Date",{add_days:function(_2,_3){
+_2.setDate(_2.getDate()+_3);
+return _2;
+},add_weeks:function(_4,_5){
+return MVC.Date.add_days(_4,_5*7);
+},day_name:function(_6){
+return MVC.Date.day_names[_6.getDay()];
+},first_day_of_week:function(_7){
+var _8=new Date(_7);
+_8.setDate(_7.getDate()-_7.getDay());
+return _8;
+},month_name:function(_9){
+return MVC.Date.month_names[_9.getMonth()];
+},number_of_days_in_month:function(_a){
+var _b=_a.getFullYear(),_c=_a.getMonth(),m=[31,28,31,30,31,30,31,31,30,31,30,31];
+if(_c!=1){
+return m[_c];
 }
-if(_4%4!=0||(_4%100==0&&_4%400!=0)){
+if(_b%4!=0||(_b%100==0&&_b%400!=0)){
 return m[1];
 }
 return m[1]+1;
-},month_names:["January","February","March","April","May","June","July","August","September","October","November","December"],parse:function(_7){
-if(typeof _7!="string"){
+},day_names:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],month_names:["January","February","March","April","May","June","July","August","September","October","November","December"],parse:function(_e){
+if(typeof _e!="string"){
 return null;
 }
 var f1=/\d{4}-\d{1,2}-\d{1,2}/,f2=/\d{4}\/\d{1,2}\/\d{1,2}/,f3=/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})\s(\d{1,2}):(\d{1,2}):(\d{1,2})/;
-var _b;
-if((_b=_7.match(f3))){
-return new Date(Date.UTC(parseInt(_b[1],10),(parseInt(_b[2],10)-1),parseInt(_b[3],10),parseInt(_b[4],10),parseInt(_b[5],10),parseInt(_b[6],10)));
+var _12;
+if((_12=_e.match(f3))){
+return new Date(Date.UTC(parseInt(_12[1],10),(parseInt(_12[2],10)-1),parseInt(_12[3],10),parseInt(_12[4],10),parseInt(_12[5],10),parseInt(_12[6],10)));
 }
-if(_7.match(f1)){
-var _c=_7.match(f1)[0].split("-");
-return new Date(Date.UTC(parseInt(_c[0],10),(parseInt(_c[1],10)-1),parseInt(_c[2],10)));
+if(_e.match(f1)){
+var _13=_e.match(f1)[0].split("-");
+return new Date(Date.UTC(parseInt(_13[0],10),(parseInt(_13[1],10)-1),parseInt(_13[2],10)));
 }
-if(_7.match(f2)){
-var _c=_7.match(f2)[0].split("/");
-return new Date(Date.UTC(parseInt(_c[0],10),(parseInt(_c[1],10)-1),parseInt(_c[2],10)));
+if(_e.match(f2)){
+var _13=_e.match(f2)[0].split("/");
+return new Date(Date.UTC(parseInt(_13[0],10),(parseInt(_13[1],10)-1),parseInt(_13[2],10)));
 }
-return _1(_7);
+return _1(_e);
 }});
 })();
 ;
@@ -3067,19 +3088,14 @@ include("simple_store");
 include("model");
 ;
 include.set_path('../../jmvc/plugins/model');
-MVC.SimpleStore=MVC.Class.extend({init:function(){
+MVC.SimpleStore=MVC.Class.extend({init:function(_1){
 this._data={};
-},find_one:function(_1){
-var id=_1.id;
+this.storing_class=_1;
+},find_one:function(id,_3){
 return this._data[id];
-},create:function(_3){
-var id=_3.id;
-this._data[id]=_3;
-},update:function(id,_6){
-for(var _7 in _6){
-this._data[id][_7]=_6[_7];
-}
-return this._data[id];
+},create:function(_4){
+var id=_4.id;
+this._data[id]=_4;
 },destroy:function(id){
 delete this._data[id];
 }});
@@ -3090,50 +3106,42 @@ if(!this.className){
 return;
 }
 MVC.Model.models[this.className]=this;
-this.store=new this.store_type();
-},find_one:function(_1,_2){
-return this.store.find_one(_1,_2);
-},create:function(_3,_4){
-return this.store.create(_3,_4);
-},update:function(id,_6,_7){
-return this.store.update(id,_6,_7);
-},destroy:function(id,_9){
-return this.store.destroy(id,_9);
-},find:function(id,_b,_c){
-if(!_b){
-_b={};
+this.store=new this.store_type(this);
+},find:function(id,_2,_3){
+if(!_2){
+_2={};
 }
-if(typeof _b=="function"){
-callback=_b;
-_b={};
+if(typeof _2=="function"){
+callback=_2;
+_2={};
 }
 if(id=="all"){
-return this.create_many_as_existing(this.find_all(_b,_c));
+return this.create_many_as_existing(this.find_all(_2,_3));
 }else{
-if(!_b[this.id]&&id!="first"){
-_b[this.id]=id;
+if(!_2[this.id]&&id!="first"){
+_2[this.id]=id;
 }
-return this.create_as_existing(this.find_one(id=="first"?null:_b,_c));
+return this.create_as_existing(this.find_one(id=="first"?null:_2,_3));
 }
-},create_as_existing:function(_d){
-if(!_d){
+},asynchronous:true,create_as_existing:function(_4){
+if(!_4){
 return null;
 }
-if(_d.attributes){
-_d=_d.attributes();
+if(_4.attributes){
+_4=_4.attributes();
 }
-var _e=new this(_d);
-_e.is_new_record=this.new_record_func;
-return _e;
-},create_many_as_existing:function(_f){
-if(!_f){
+var _5=new this(_4);
+_5.is_new_record=this.new_record_func;
+return _5;
+},create_many_as_existing:function(_6){
+if(!_6){
 return null;
 }
-var res=[];
-for(var i=0;i<_f.length;i++){
-res.push(this.create_as_existing(_f[i]));
+var _7=[];
+for(var i=0;i<_6.length;i++){
+_7.push(this.create_as_existing(_6[i]));
 }
-return res;
+return _7;
 },id:"id",new_record_func:function(){
 return false;
 },validations:[],has_many:function(){
@@ -3144,137 +3152,150 @@ this._associations.push(arguments[i]);
 for(var i=0;i<arguments.length;i++){
 this._associations.push(arguments[i]);
 }
-},_associations:[],from_html:function(_14){
-var el=MVC.$E(_14);
-var _16=window[MVC.String.classize(el.getAttribute("type"))];
-if(!_16){
+},_associations:[],from_html:function(_b){
+var el=MVC.$E(_b);
+var _d=window[MVC.String.classize(el.getAttribute("type"))];
+if(!_d){
 return null;
 }
-var _17={};
-_17[_16.id]=this.element_id_to_id(el.id);
-return _16.create_as_existing(_17);
-},element_id_to_id:function(_18){
+var _e={};
+_e[_d.id]=this.element_id_to_id(el.id);
+return _d.create_as_existing(_e);
+},element_id_to_id:function(_f){
 var re=new RegExp(this.className+"_","");
-return _18.replace(re,"");
-},add_attribute:function(_1a,_1b){
-if(!this.attributes[_1a]){
-this.attributes[_1a]=_1b;
+return _f.replace(re,"");
+},add_attribute:function(_11,_12){
+if(!this.attributes[_11]){
+this.attributes[_11]=_12;
 }
-},attributes:{},_clean_callbacks:function(_1c){
-if(!_1c){
+},attributes:{},_clean_callbacks:function(_13){
+if(!_13){
+if(this.asynchronous){
 throw "You must supply a callback!";
+}else{
+return null;
 }
-if(typeof _1c=="function"){
-return {onSuccess:_1c,onError:_1c};
 }
-if(!_1c.onSuccess&&!_1c.onComplete){
+if(typeof _13=="function"){
+return {onSuccess:_13,onError:_13};
+}
+if(!_13.onSuccess&&!_13.onComplete){
 throw "You must supply a positive callback!";
 }
-if(!_1c.onSuccess){
-_1c.onSuccess=_1c.onComplete;
+if(!_13.onSuccess){
+_13.onSuccess=_13.onComplete;
 }
-if(!_1c.onError&&_1c.onComplete){
-_1c.onError=_1c.onComplete;
+if(!_13.onError&&_13.onComplete){
+_13.onError=_13.onComplete;
 }
-},models:{}},{init:function(_1d){
+return _13;
+},models:{}},{init:function(_14){
 this.errors=[];
 this.set_attributes(this.Class._attributes||{});
-this.set_attributes(_1d);
+this.set_attributes(_14);
 },setup:function(){
-},set_attributes:function(_1e){
-for(var key in _1e){
-if(_1e.hasOwnProperty(key)){
-this._setAttribute(key,_1e[key]);
+},set_attributes:function(_15){
+for(var key in _15){
+if(_15.hasOwnProperty(key)){
+this._setAttribute(key,_15[key]);
 }
 }
-return _1e;
-},update_attributes:function(_20,_21){
-this.set_attributes(_20);
-return this.save(_21);
+return _15;
+},update_attributes:function(_17,_18){
+this.set_attributes(_17);
+return this.save(_18);
 },valid:function(){
 return this.errors.length==0;
 },validate:function(){
-},_setAttribute:function(_22,_23){
-if(MVC.Array.include(this.Class._associations,_22)){
-this._setAssociation(_22,_23);
+},_setAttribute:function(_19,_1a){
+if(MVC.Array.include(this.Class._associations,_19)){
+this._setAssociation(_19,_1a);
 }else{
-this._setProperty(_22,_23);
+this._setProperty(_19,_1a);
 }
-},_setProperty:function(_24,_25){
-this[_24]=MVC.Array.include(["created_at","updated_at"],_24)?MVC.Date.parse(_25):_25;
-this.Class.add_attribute(_24,MVC.Object.guess_type(_25));
-},_setAssociation:function(_26,_27){
-this[_26]=function(){
-if(!MVC.String.is_singular(_26)){
-_26=MVC.String.singularize(_26);
+},_setProperty:function(_1b,_1c){
+var old=this[_1b];
+this[_1b]=MVC.Array.include(["created_at","updated_at"],_1b)?MVC.Date.parse(_1c):_1c;
+if(_1b==this.Class.id&&this.Class.store){
+if(!old){
+this.Class.store.create(this);
+}else{
+if(old!=this[_1b]){
+this.Class.store.destroy(old);
+this.Class.store.create(this);
 }
-var _28=window[MVC.String.classize(_26)];
-if(!_28){
-return _27;
 }
-return _28.create_many_as_existing(_27);
+}
+this.Class.add_attribute(_1b,MVC.Object.guess_type(_1c));
+},_setAssociation:function(_1e,_1f){
+this[_1e]=function(){
+if(!MVC.String.is_singular(_1e)){
+_1e=MVC.String.singularize(_1e);
+}
+var _20=window[MVC.String.classize(_1e)];
+if(!_20){
+return _1f;
+}
+return _20.create_many_as_existing(_1f);
 };
 },attributes:function(){
-var _29={};
+var _21={};
 var cas=this.Class.attributes;
-for(var _2b in cas){
-if(cas.hasOwnProperty(_2b)){
-_29[_2b]=this[_2b];
+for(var _23 in cas){
+if(cas.hasOwnProperty(_23)){
+_21[_23]=this[_23];
 }
 }
-return _29;
+return _21;
 },is_new_record:function(){
 return true;
-},save:function(_2c){
-var _2d;
+},save:function(_24){
+var _25;
 this.errors=[];
 this.validate();
 if(!this.valid()){
 return false;
 }
-if(this.is_new_record()){
-_2d=this.Class.create(this.attributes(),_2c);
-}else{
-_2d=this.Class.update(this[this.Class.id],this.attributes(),_2c);
-}
+_25=this.is_new_record()?this.Class.create(this.attributes(),_24):this.Class.update(this[this.Class.id],this.attributes(),_24);
 this.is_new_record=this.Class.new_record_func;
 return true;
-},destroy:function(_2e){
-this.Class.destroy(this[this.Class.id],_2e);
-},add_errors:function(_2f){
-if(_2f){
-this.errors=this.errors.concat(_2f);
+},destroy:function(_26){
+this.Class.destroy(this[this.Class.id],_26);
+this.Class.store.destroy(this[this.Class.id]);
+},add_errors:function(_27){
+if(_27){
+this.errors=this.errors.concat(_27);
 }
-},_resetAttributes:function(_30){
+},_resetAttributes:function(_28){
 this._clear();
 },_clear:function(){
 var cas=this.Class.attributes;
-for(var _32 in cas){
-if(cas.hasOwnProperty(_32)){
-this[_32]=null;
+for(var _2a in cas){
+if(cas.hasOwnProperty(_2a)){
+this[_2a]=null;
 }
 }
 }});
-MVC.Object.guess_type=function(_33){
-if(typeof _33!="string"){
-if(_33==null){
-return typeof _33;
+MVC.Object.guess_type=function(_2b){
+if(typeof _2b!="string"){
+if(_2b==null){
+return typeof _2b;
 }
-if(_33.constructor==Date){
+if(_2b.constructor==Date){
 return "date";
 }
-if(_33.constructor==Array){
+if(_2b.constructor==Array){
 return "array";
 }
-return typeof _33;
+return typeof _2b;
 }
-if(_33=="true"||_33=="false"){
+if(_2b=="true"||_2b=="false"){
 return "boolean";
 }
-if(!isNaN(_33)){
+if(!isNaN(_2b)){
 return "number";
 }
-return typeof _33;
+return typeof _2b;
 };
 ;
 include.set_path('../../jmvc/plugins/model/ajax');
@@ -3310,6 +3331,7 @@ if(typeof _1=="function"&&_4!="Class"&&(_3=_4.match(this._matching))){
 this.add_req(_3,_1);
 }
 }
+this._super();
 },_default_options:function(_5,_6,_7,_8){
 var _9={};
 this._add_default_callback(_9,"success",_6,_5,_7,_8);
@@ -3638,65 +3660,67 @@ return eval(_1);
 return "/"+this.plural_name+".json";
 },find_all_get_success:function(_2){
 var _3=this.json_from_string(_2.responseText);
-var _4=[];
-for(var i=0;i<_3.length;i++){
-var _6=_3[i];
-var _7=this.create_as_existing(_6.attributes);
-if(_6.errors){
-_7.add_errors(_6.errors);
+return this.convert_response_into_instances(_3);
+},convert_response_into_instances:function(_4){
+var _5=[];
+for(var i=0;i<_4.length;i++){
+var _7=_4[i];
+var _8=this.create_as_existing(_7.attributes);
+if(_7.errors){
+_8.add_errors(_7.errors);
 }
-_4.push(_7);
+_5.push(_8);
 }
-return _4;
-},create_request:function(_8){
-var _9=new this(_8);
-_9.validate();
-if(!_9.valid()){
-return _9;
+return _5;
+},create_request:function(_9){
+var _a=new this(_9);
+_a.validate();
+if(!_a.valid()){
+return _a;
 }
-var _a={};
-_a[this.singular_name]=_8;
-this.request("/"+this.plural_name+".json",_a,{method:"post"},_9);
-return _9;
-},create_success:function(_b,_c,_d){
-if(/\w+/.test(_b.responseText)){
-var _e=this.json_from_string(_b.responseText);
-if(_e){
-_d.add_errors(_e);
+var _b={};
+_b[this.singular_name]=_9;
+this.request("/"+this.plural_name+".json",_b,{method:"post"},_a);
+return _a;
+},create_success:function(_c,_d,_e){
+if(/\w+/.test(_c.responseText)){
+var _f=this.json_from_string(_c.responseText);
+if(_f){
+_e.add_errors(_f);
 }
 }
-if(_d.is_new_record()&&_b.status==201){
-var id=this.get_id(_b);
+if(_e.is_new_record()&&_c.status==201){
+var id=this.get_id(_c);
 if(!isNaN(id)){
-_d._setProperty("id",id);
+_e._setProperty("id",id);
 }
 }
-return _d;
-},update_request:function(id,_11){
-delete _11.id;
-var _12={};
-_12[this.singular_name]=_11;
-var _13=this.create_as_existing(_11);
-_13.id=id;
-_13.validate();
-if(!_13.valid()){
-return _13;
+return _e;
+},update_request:function(id,_12){
+delete _12.id;
+var _13={};
+_13[this.singular_name]=_12;
+var _14=this.create_as_existing(_12);
+_14.id=id;
+_14.validate();
+if(!_14.valid()){
+return _14;
 }
-this.request("/"+this.plural_name+"/"+id+".json",_12,{method:"put"},_13);
-},update_success:function(_14,_15,_16){
-if(/\w+/.test(_14.responseText)){
-var _17=this.json_from_string(_14.responseText);
-if(_17){
-_16.add_errors(_17);
+this.request("/"+this.plural_name+"/"+id+".json",_13,{method:"put"},_14);
+},update_success:function(_15,_16,_17){
+if(/\w+/.test(_15.responseText)){
+var _18=this.json_from_string(_15.responseText);
+if(_18){
+_17.add_errors(_18);
 }
 }
-return _16;
+return _17;
 },destroy_delete_url:function(id){
 return "/"+this.plural_name+"/"+id+".xml";
 },destroy_delete_error:function(){
 return false;
-},destroy_delete_success:function(_19){
-return _19.status==200;
+},destroy_delete_success:function(_1a){
+return _1a.status==200;
 }},{});
 ;
 include.set_path('../../jmvc/plugins/model/rest_xml');
@@ -4387,34 +4411,31 @@ var el=this.element();
 el.parentNode.removeChild(el);
 }});
 MVC.Controller.Params.prototype.object_data=function(){
-var _32=this._className();
-var _33=window[MVC.String.classize(_32)];
-var _34=this.element;
-while(_34&&!_34.id.match(new RegExp(_32))){
+var _32=this._className(),_33,_34=this.element,_35=new RegExp("^"+_32+"_(.*)$");
+if(!(_33=MVC.Model.models[_32])){
+return;
+}
+while(_34&&_34.parentNode&&!_34.id.match(_35)){
 _34=_34.parentNode;
-if(_34==document){
-_34=null;
 }
-}
-if(!_33||!_34){
+if(!_34){
 return null;
 }
-var _35=_34.id;
-var id=_35.match(new RegExp(_32+"_(.*)$"))[1];
-return _33.find(id);
+var id=_34.id.match(_35)[1];
+return _33.store.find_one(id);
 };
 ;
 include.set_path('../../jmvc/plugins/test');
-include.plugins("lang","dom/query","debug","lang/class");
-include("test","synthetic_events");
-;
-include.set_path('../../jmvc/plugins/debug');
-MVC.Console={};
-MVC.Console.log=function(_1){
-};
-if(include.get_env()=="development"||include.get_env()=="test"){
-include("console");
+include.plugins("lang","dom/query");
+if(!window._rhino){
+include.plugins("debug");
+}else{
+MVC.Console={log:function(_1){
+print(_1);
+}};
 }
+include.plugins("lang/class");
+include("test","runner","assertions","unit","functional","controller","synthetic_events");
 ;
 include.set_path('../../jmvc/plugins/test');
 MVC.Tests={};
@@ -4437,7 +4458,9 @@ this.Assertions=MVC.Test.Assertions.extend(this.helpers());
 this.passes=0;
 this.failures=0;
 MVC.Tests[this.name]=this;
+if(!window._rhino){
 this.updateElements(this);
+}
 },fail:function(){
 this.failures++;
 },helpers:function(){
@@ -4465,7 +4488,11 @@ this.working_test++;
 this.run_test(this.test_names[this.working_test-1]);
 }else{
 if(this.working_test!=null){
+if(!window._rhino){
 MVC.Console.window.update_test(this);
+}else{
+MVCOptions.update_test(this);
+}
 this.working_test=null;
 if(this.callback){
 this.callback();
@@ -4516,305 +4543,29 @@ t.className="test";
 t.innerHTML=_f;
 _e.appendChild(t);
 }});
-MVC.Test.Runner=function(_14,_15,_16){
-var _17;
-_14.run=function(_18){
-_14._callback=_18;
-_17=0;
-_16.start.call(_14);
-_14.run_next();
-};
-_14.run_next=function(){
-if(_17!=null&&_17<_14[_15].length){
-if(_17>0){
-_16.after.call(_14,_17-1);
-}
-_17++;
-_14[_15][_17-1].run(_14.run_next);
-}else{
-if(_17!=null){
-if(_17>0){
-_16.after.call(_14,_17-1);
-}
-_16.done.call(_14);
-if(_14._callback){
-_14._callback();
-_14._callback=null;
-}else{
-}
-}
-}
-};
-};
-MVC.Test.Assertions=MVC.Class.extend({init:function(_19,_1a){
-this.assertions=0;
-this.failures=0;
-this.errors=0;
-this.messages=[];
-this._test=_19;
-if(!_1a){
-return;
-}
-this._delays=0;
-this._test_name=_1a;
-this._last_called=_1a;
-MVC.Console.window.running(this._test,this._test_name);
-if(this.setup){
-this._setup();
-}else{
-this._start();
-}
-},_start:function(){
-try{
-this._test.tests[this._test_name].call(this);
-}
-catch(e){
-this.error(e);
-this._delays=0;
-}
-this._update();
-},_setup:function(){
-var _1b=this.next;
-var _1c;
-this.next=function(t){
-_1c=t?t*1000:500;
-};
-this.setup();
-this.next=_1b;
-if(_1c){
-var t=this;
-var _1f=this._start;
-setTimeout(function(){
-_1f.call(t);
-},_1c);
-}else{
-this._start();
-}
-},assert:function(_20,_21){
-var _21=_21||"assert: got \""+MVC.Test.inspect(_20)+"\"";
-try{
-_20?this.pass():this.fail(_21);
-}
-catch(e){
-this.error(e);
-}
-},assert_equal:function(_22,_23,_24){
-var _24=_24||"assertEqual";
-try{
-(_22==_23)?this.pass():this.fail(_24+": expected \""+MVC.Test.inspect(_22)+"\", actual \""+MVC.Test.inspect(_23)+"\"");
-}
-catch(e){
-this.error(e);
-}
-},assert_null:function(obj,_26){
-var _26=_26||"assertNull";
-try{
-(obj==null)?this.pass():this.fail(_26+": got \""+MVC.Test.inspect(obj)+"\"");
-}
-catch(e){
-this.error(e);
-}
-},assert_not:function(_27,_28){
-var _28=arguments[1]||"assert: got \""+MVC.Test.inspect(_27)+"\"";
-try{
-!_27?this.pass():this.fail(_28);
-}
-catch(e){
-this.error(e);
-}
-},assert_not_null:function(_29,_2a){
-var _2a=_2a||"assertNotNull";
-this.assert(_29!=null,_2a);
-},assert_each:function(_2b,_2c,_2d){
-var _2d=_2d||"assert_each";
-try{
-var e=MVC.Array.from(_2b);
-var a=MVC.Array.from(_2c);
-if(e.length!=a.length){
-return this.fail(_2d+": expected "+MVC.Test.inspect(_2b)+", actual "+MVC.Test.inspect(_2c));
-}else{
-for(var i=0;i<e.length;i++){
-if(e[i]!=a[i]){
-return this.fail(_2d+": expected "+MVC.Test.inspect(_2b)+", actual "+MVC.Test.inspect(_2c));
-}
-}
-}
-this.pass();
-}
-catch(e){
-this.error(e);
-}
-},pass:function(){
-this.assertions++;
-},fail:function(_31){
-this.failures++;
-this.messages.push("Failure: "+_31);
-},error:function(_32){
-this.errors++;
-this.messages.push(_32.name+": "+_32.message+"("+MVC.Test.inspect(_32)+")");
-},_get_next_name:function(){
-for(var i=0;i<this._test.test_array.length;i++){
-if(this._test.test_array[i]==this._last_called){
-if(i+1>=this._test.test_array.length){
-alert("There is no function following '"+this._last_called+"'.  Please make sure you have no duplicate function names in your tests.");
-}
-return this._test.test_array[i+1];
-}
-}
-},_call_next_callback:function(_34,_35){
-if(!_34){
-_34=this._get_next_name();
-}
-var _36=this;
-var _37=this._test.tests[_34];
-return function(){
-_36._last_called=_34;
-var _38=MVC.Array.from(arguments);
-if(_35){
-_38.unshift(_35);
-}
-try{
-_37.apply(_36,_38);
-}
-catch(e){
-_36.error(e);
-}
-_36._delays--;
-_36._update();
-};
-},next:function(_39,_3a,_3b){
-this._delays++;
-_3a=_3a?_3a*1000:500;
-setTimeout(this._call_next_callback(_3b,_39),_3a);
-},next_callback:function(_3c,_3d){
-this._delays++;
-var f=this._call_next_callback(_3c);
-if(!_3d){
-return f;
-}
-return function(){
-setTimeout(f,_3d*1000);
-};
-},_update:function(){
-if(this._delays==0){
-if(this.teardown){
-this.teardown();
-}
-if(this._do_blur_back){
-this._blur_back();
-}
-MVC.Console.window.update(this._test,this._test_name,this);
-this.failures==0&&this.errors==0?this._test.pass():this._test.fail();
-this._test.run_next();
-}
-},_blur_back:function(){
-MVC.Browser.Gecko?window.blur():MVC.Console.window.focus();
-}});
 Function.prototype.curry=function(){
-var fn=this,_40=Array.prototype.slice.call(arguments);
+var fn=this,_15=Array.prototype.slice.call(arguments);
 return function(){
-return fn.apply(this,_40.concat(Array.prototype.slice.call(arguments)));
+return fn.apply(this,_15.concat(Array.prototype.slice.call(arguments)));
 };
 };
-MVC.Test.Unit=MVC.Test.extend({init:function(_41,_42){
-this._super(_41,_42,"unit");
-MVC.Test.Unit.tests.push(this);
-}});
-MVC.Test.Unit.tests=[];
-MVC.Test.Runner(MVC.Test.Unit,"tests",{start:function(){
-this.passes=0;
-},after:function(_43){
-if(this.tests[_43].failures==0){
-this.passes++;
-}
-},done:function(){
-MVC.Console.window.document.getElementById("unit_result").innerHTML="("+this.passes+"/"+this.tests.length+")"+(this.passes==this.tests.length?" Wow!":"");
-}});
-MVC.Test.Functional=MVC.Test.extend({init:function(_44,_45){
-this._super(_44,_45,"functional");
-MVC.Test.Functional.tests.push(this);
-},helpers:function(){
-var _46=this._super();
-_46.Action=function(_47,_48,_49){
-_49=_49||{};
-_49.type=_47;
-var _4a=0;
-if(typeof _49=="number"){
-_4a=_49||0;
-}else{
-if(typeof _49=="object"){
-_4a=_49.number||0;
-}
-}
-var _4b=typeof _48=="string"?MVC.Query(_48)[_4a]:_48;
-if((_47=="focus"||_47=="write"||_47=="click")&&!this._do_blur_back){
-MVC.Browser.Gecko?MVC.Console.window.blur():window.focus();
-this._do_blur_back=true;
-}
-var _4c=new MVC.SyntheticEvent(_47,_49).send(_4b);
-return {event:_4c,element:_4b,options:_49};
-};
-for(var e=0;e<MVC.Test.Functional.events.length;e++){
-var _4e=MVC.Test.Functional.events[e];
-_46[MVC.String.capitalize(_4e)]=_46.Action.curry(_4e);
-}
-return _46;
-}});
-MVC.Test.Functional.events=["blur","change","click","contextmenu","dblclick","keyup","keydown","keypress","mousedown","mousemove","mouseout","mouseover","mouseup","reset","resize","scroll","select","submit","dblclick","focus","load","unload","drag","write"];
-MVC.Test.Functional.tests=[];
-MVC.Test.Runner(MVC.Test.Functional,"tests",{start:function(){
-this.passes=0;
-},after:function(_4f){
-if(this.tests[_4f].failures==0){
-this.passes++;
-}
-},done:function(){
-MVC.Console.window.document.getElementById("functional_result").innerHTML="("+this.passes+"/"+this.tests.length+")"+(this.passes==this.tests.length?" Wow!":"");
-}});
-MVC.Test.Controller=MVC.Test.Functional.extend({init:function(_50,_51){
-var _52=MVC.String.classize(_50);
-var _53=_52+"Controller";
-this.controller=window[_53];
-if(!this.controller){
-alert("There is no controller named "+_53);
-}
-this.unit=_50;
-this._super(_52+"TestController",_51);
-},helpers:function(){
-var _54=this._super();
-var _55=MVC.Object.extend({},this.controller.actions);
-this.added_helpers={};
-for(var _56 in _55){
-if(!_55.hasOwnProperty(_56)||!_55[_56].event_type||!_55[_56].css_selector){
-continue;
-}
-var _57=_55[_56].event_type;
-var _58=_55[_56].css_selector.replace(/\.|#/g,"")+" "+_57;
-var _59=_58.replace(/(\w*)/g,function(m,_5b){
-return MVC.String.capitalize(_5b);
-}).replace(/ /g,"");
-_54[_59]=_54[MVC.String.capitalize(_57)].curry(_55[_56].css_selector);
-this.added_helpers[_59]=_54[_59];
-}
-return _54;
-}});
 if(MVC.Console&&MVC.Console.window){
 MVC.Console.window.get_tests=function(){
 return MVC.Tests;
 };
 }
-MVC.Test.inspect=function(_5c){
+MVC.Test.inspect=function(_16){
 try{
-if(_5c===undefined){
+if(_16===undefined){
 return "undefined";
 }
-if(_5c===null){
+if(_16===null){
 return "null";
 }
-if(_5c.length!=null&&typeof _5c!="string"){
+if(_16.length!=null&&typeof _16!="string"){
 return "[ ... ]";
 }
-return _5c.inspect?_5c.inspect():_5c.toString();
+return _16.inspect?_16.inspect():_16.toString();
 }
 catch(e){
 if(e instanceof RangeError){
@@ -4831,7 +4582,7 @@ for(var i=0;i<arguments.length;i++){
 MVC.Console.log("Trying to load: test/unit/"+arguments[i]+"_test.js");
 }
 include.app(function(i){
-return "../../test/unit/"+i+"_test";
+return "../test/unit/"+i+"_test";
 },MVC.Included.unit_tests).apply(null,arguments);
 };
 include.functional_tests=function(){
@@ -4839,12 +4590,308 @@ for(var i=0;i<arguments.length;i++){
 MVC.Console.log("Trying to load: test/functional/"+arguments[i]+"_test.js");
 }
 include.app(function(i){
-return "../../test/functional/"+i+"_test";
+return "../test/functional/"+i+"_test";
 },MVC.Included.functional_tests).apply(null,arguments);
 };
 if(!MVC._no_conflict){
 Test=MVC.Test;
 }
+;
+include.set_path('../../jmvc/plugins/test');
+MVC.Test.Runner=function(_1,_2,_3){
+var _4;
+_1.run=function(_5){
+_1._callback=_5;
+_4=0;
+_3.start.call(_1);
+_1.run_next();
+};
+_1.run_next=function(){
+if(_4!=null&&_4<_1[_2].length){
+if(_4>0){
+_3.after.call(_1,_4-1);
+}
+_4++;
+_1[_2][_4-1].run(_1.run_next);
+}else{
+if(_4!=null){
+if(_4>0){
+_3.after.call(_1,_4-1);
+}
+_3.done.call(_1);
+if(_1._callback){
+_1._callback();
+_1._callback=null;
+}else{
+}
+}
+}
+};
+};
+;
+include.set_path('../../jmvc/plugins/test');
+MVC.Test.Assertions=MVC.Class.extend({init:function(_1,_2){
+this.assertions=0;
+this.failures=0;
+this.errors=0;
+this.messages=[];
+this._test=_1;
+if(!_2){
+return;
+}
+this._delays=0;
+this._test_name=_2;
+this._last_called=_2;
+if(!window._rhino){
+MVC.Console.window.running(this._test,this._test_name);
+}
+if(this.setup){
+this._setup();
+}else{
+this._start();
+}
+},_start:function(){
+try{
+this._test.tests[this._test_name].call(this);
+}
+catch(e){
+this.error(e);
+this._delays=0;
+}
+this._update();
+},_setup:function(){
+var _3=this.next;
+var _4;
+this.next=function(t){
+_4=t?t*1000:500;
+};
+this.setup();
+this.next=_3;
+if(_4){
+var t=this;
+var _7=this._start;
+setTimeout(function(){
+_7.call(t);
+},_4);
+}else{
+this._start();
+}
+},assert:function(_8,_9){
+var _9=_9||"assert: got \""+MVC.Test.inspect(_8)+"\"";
+try{
+_8?this.pass():this.fail(_9);
+}
+catch(e){
+this.error(e);
+}
+},assert_equal:function(_a,_b,_c){
+var _c=_c||"assertEqual";
+try{
+(_a==_b)?this.pass():this.fail(_c+": expected \""+MVC.Test.inspect(_a)+"\", actual \""+MVC.Test.inspect(_b)+"\"");
+}
+catch(e){
+this.error(e);
+}
+},assert_null:function(_d,_e){
+var _e=_e||"assertNull";
+try{
+(_d==null)?this.pass():this.fail(_e+": got \""+MVC.Test.inspect(_d)+"\"");
+}
+catch(e){
+this.error(e);
+}
+},assert_not:function(_f,_10){
+var _10=arguments[1]||"assert: got \""+MVC.Test.inspect(_f)+"\"";
+try{
+!_f?this.pass():this.fail(_10);
+}
+catch(e){
+this.error(e);
+}
+},assert_not_null:function(_11,_12){
+var _12=_12||"assertNotNull";
+this.assert(_11!=null,_12);
+},assert_each:function(_13,_14,_15){
+var _15=_15||"assert_each";
+try{
+var e=MVC.Array.from(_13);
+var a=MVC.Array.from(_14);
+if(e.length!=a.length){
+return this.fail(_15+": expected "+MVC.Test.inspect(_13)+", actual "+MVC.Test.inspect(_14));
+}else{
+for(var i=0;i<e.length;i++){
+if(e[i]!=a[i]){
+return this.fail(_15+": expected "+MVC.Test.inspect(_13)+", actual "+MVC.Test.inspect(_14));
+}
+}
+}
+this.pass();
+}
+catch(e){
+this.error(e);
+}
+},pass:function(){
+this.assertions++;
+},fail:function(_19){
+this.failures++;
+this.messages.push("Failure: "+_19);
+},error:function(_1a){
+this.errors++;
+this.messages.push(_1a.name+": "+_1a.message+"("+MVC.Test.inspect(_1a)+")");
+},_get_next_name:function(){
+for(var i=0;i<this._test.test_array.length;i++){
+if(this._test.test_array[i]==this._last_called){
+if(i+1>=this._test.test_array.length){
+alert("There is no function following '"+this._last_called+"'.  Please make sure you have no duplicate function names in your tests.");
+}
+return this._test.test_array[i+1];
+}
+}
+},_call_next_callback:function(_1c,_1d){
+if(!_1c){
+_1c=this._get_next_name();
+}
+var _1e=this;
+var _1f=this._test.tests[_1c];
+return function(){
+_1e._last_called=_1c;
+var _20=MVC.Array.from(arguments);
+if(_1d){
+_20.unshift(_1d);
+}
+try{
+_1f.apply(_1e,_20);
+}
+catch(e){
+_1e.error(e);
+}
+_1e._delays--;
+_1e._update();
+};
+},next:function(_21,_22,_23){
+this._delays++;
+_22=_22?_22*1000:500;
+setTimeout(this._call_next_callback(_23,_21),_22);
+},next_callback:function(_24,_25){
+this._delays++;
+var f=this._call_next_callback(_24);
+if(!_25){
+return f;
+}
+return function(){
+setTimeout(f,_25*1000);
+};
+},_update:function(){
+if(this._delays==0){
+if(this.teardown){
+this.teardown();
+}
+if(this._do_blur_back){
+this._blur_back();
+}
+if(!window._rhino){
+MVC.Console.window.update(this._test,this._test_name,this);
+}else{
+MVCOptions.report(this);
+}
+this.failures==0&&this.errors==0?this._test.pass():this._test.fail();
+this._test.run_next();
+}
+},_blur_back:function(){
+MVC.Browser.Gecko?window.blur():MVC.Console.window.focus();
+}});
+;
+include.set_path('../../jmvc/plugins/test');
+MVC.Test.Unit=MVC.Test.extend({init:function(_1,_2){
+this._super(_1,_2,"unit");
+MVC.Test.Unit.tests.push(this);
+}});
+MVC.Test.Unit.tests=[];
+MVC.Test.Runner(MVC.Test.Unit,"tests",{start:function(){
+this.passes=0;
+},after:function(_3){
+if(this.tests[_3].failures==0){
+this.passes++;
+}
+},done:function(){
+if(!window._rhino){
+MVC.Console.window.document.getElementById("unit_result").innerHTML="("+this.passes+"/"+this.tests.length+")"+(this.passes==this.tests.length?" Wow!":"");
+}else{
+MVCOptions.unit_results(this);
+}
+}});
+;
+include.set_path('../../jmvc/plugins/test');
+MVC.Test.Functional=MVC.Test.extend({init:function(_1,_2){
+this._super(_1,_2,"functional");
+MVC.Test.Functional.tests.push(this);
+},helpers:function(){
+var _3=this._super();
+_3.Action=function(_4,_5,_6){
+_6=_6||{};
+_6.type=_4;
+var _7=0;
+if(typeof _6=="number"){
+_7=_6||0;
+}else{
+if(typeof _6=="object"){
+_7=_6.number||0;
+}
+}
+var _8=typeof _5=="string"?MVC.Query(_5)[_7]:_5;
+if((_4=="focus"||_4=="write"||_4=="click")&&!this._do_blur_back){
+MVC.Browser.Gecko?MVC.Console.window.blur():window.focus();
+this._do_blur_back=true;
+}
+var _9=new MVC.SyntheticEvent(_4,_6).send(_8);
+return {event:_9,element:_8,options:_6};
+};
+for(var e=0;e<MVC.Test.Functional.events.length;e++){
+var _b=MVC.Test.Functional.events[e];
+_3[MVC.String.capitalize(_b)]=_3.Action.curry(_b);
+}
+return _3;
+}});
+MVC.Test.Functional.events=["blur","change","click","contextmenu","dblclick","keyup","keydown","keypress","mousedown","mousemove","mouseout","mouseover","mouseup","reset","resize","scroll","select","submit","dblclick","focus","load","unload","drag","write"];
+MVC.Test.Functional.tests=[];
+MVC.Test.Runner(MVC.Test.Functional,"tests",{start:function(){
+this.passes=0;
+},after:function(_c){
+if(this.tests[_c].failures==0){
+this.passes++;
+}
+},done:function(){
+MVC.Console.window.document.getElementById("functional_result").innerHTML="("+this.passes+"/"+this.tests.length+")"+(this.passes==this.tests.length?" Wow!":"");
+}});
+;
+include.set_path('../../jmvc/plugins/test');
+MVC.Test.Controller=MVC.Test.Functional.extend({init:function(_1,_2){
+var _3=MVC.String.classize(_1);
+var _4=_3+"Controller";
+this.controller=window[_4];
+if(!this.controller){
+alert("There is no controller named "+_4);
+}
+this.unit=_1;
+this._super(_3+"TestController",_2);
+},helpers:function(){
+var _5=this._super();
+var _6=MVC.Object.extend({},this.controller.actions);
+this.added_helpers={};
+for(var _7 in _6){
+if(!_6.hasOwnProperty(_7)||!_6[_7].event_type||!_6[_7].css_selector){
+continue;
+}
+var _8=_6[_7].event_type;
+var _9=_6[_7].css_selector.replace(/\.|#/g,"")+" "+_8;
+var _a=_9.replace(/(\w*)/g,function(m,_c){
+return MVC.String.capitalize(_c);
+}).replace(/ /g,"");
+_5[_a]=_5[MVC.String.capitalize(_8)].curry(_6[_7].css_selector);
+this.added_helpers[_a]=_5[_a];
+}
+return _5;
+}});
 ;
 include.set_path('../../jmvc/plugins/test');
 MVC.SyntheticEvent=function(_1,_2){

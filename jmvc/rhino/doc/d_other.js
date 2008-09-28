@@ -8,8 +8,9 @@ MVCObject.DStatic = MVCObject.DPair.extend('static',
     },
     add_parent : function(scope){
         var scope_class=  scope.Class.className;
-        this.parent = scope_class == 'class' || scope_class == 'constructor' ? scope : scope.parent
-        this.parent.add(this);
+        this.parent = scope_class == 'class' || scope_class == 'constructor' ? scope : scope.parent;
+        if(scope_class != "file")
+            this.parent.add(this);
     },
     name: 'static'
 });

@@ -10,7 +10,8 @@ MVCOptions = {
         
         app.generate();
         print("Generated docs.");
-    }
+    },
+    env:"compress"
 }
 load('jmvc/rhino/htmlparser.js');
 load('jmvc/rhino/env.js');
