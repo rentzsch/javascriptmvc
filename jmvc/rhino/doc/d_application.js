@@ -57,8 +57,8 @@ MVCObject.DApplication.prototype = {
 
     },
     summary_page : function(summary){
-        var res = '<html><head><link rel="stylesheet" href="../jmvc/rhino/doc/style.css" type="text/css">'+
-            '<title>'+this.name+'<title></head><body>'
+        var res = '<html><head><link rel="stylesheet" href="../jmvc/rhino/doc/style.css" type="text/css" />'+
+            '<title>'+this.name+'</title></head><body>'
         
         res += "<div id='left_side'>"+"</div>"
         res += "<div id='right_side'>"

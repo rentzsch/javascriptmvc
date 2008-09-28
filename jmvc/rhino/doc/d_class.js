@@ -5,7 +5,7 @@ MVCObject.DClass = MVCObject.DPair.extend('class',
     listing: [],
     create_index : function(){
         var res = '<html><head><link rel="stylesheet" href="../style.css" type="text/css">'+
-            '<title>Classes<title></head><body>'
+            '<title>Classes</title></head><body>'
         res += '<h1>Classes <label>LIST</label></h1>'
         for(var i = 0; i < this.listing.length; i++){
             var name = this.listing[i].name;
@@ -54,7 +54,7 @@ MVCObject.DClass = MVCObject.DPair.extend('class',
         //return "Class: "+this.name+"\n"+parts.join("\n\n");
     },
     toFile : function(summary){
-        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css"><title>'+this.name+"<title></head><body>"
+        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
         res += "<div id='left_side'>"+summary+"</div>"
         res += "<div id='right_side'>"+this.toHTML()+"</div>";
         res +="</body></html>"

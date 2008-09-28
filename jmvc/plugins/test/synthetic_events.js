@@ -2,7 +2,7 @@
 
 /**
  * @constructor
- * Used for creating and dipatching synthetic events.
+ * Used for creating and dispatching synthetic events.
  * @init Sets up a synthetic event.
  * @param {String} type type of event
  * @param {optional:Object} options

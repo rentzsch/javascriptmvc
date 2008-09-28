@@ -4,8 +4,8 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
     starts_scope: true,
     listing: [],
     create_index : function(){
-        var res = '<html><head><link rel="stylesheet" href="../style.css" type="text/css">'+
-            '<title>Constructors<title></head><body>'
+        var res = '<html><head><link rel="stylesheet" href="../style.css" type="text/css" />'+
+            '<title>Constructors</title></head><body>'
         res += '<h1>Constructors <label>LIST</label></h1>'
         for(var i = 0; i < this.listing.length; i++){
             var name = this.listing[i].name;
@@ -64,7 +64,7 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
         //return "Class: "+this.name+"\n"+parts.join("\n\n");
     },
     toFile : function(summary){
-        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css"><title>'+this.name+"<title></head><body>"
+        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
         res += "<div id='left_side'>"+summary+"</div>"
         res+= "<div id='right_side'>"+this.toHTML()+"</div>";
         res +="</body></html>"
