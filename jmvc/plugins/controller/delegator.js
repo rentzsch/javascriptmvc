@@ -177,7 +177,7 @@ MVC.Delegator.prototype = {
      * Handles a change event for Safari.
      */
 	change_for_webkit : function(){
-		this.controller.add_register_action(this,document.documentElement, 'change');
+		this.add_to_delegator(null, 'change');
 		this.end_filters= {
 			change : function(el, event){
 				if(typeof el.value == 'undefined') return false; //sometimes it won't exist yet
