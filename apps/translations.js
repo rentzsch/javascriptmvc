@@ -1,7 +1,7 @@
 include.resources();
 include.plugins('core','view/translation');
-
-MVC.Initializer(function(){
+include.engines('modal');
+include(function(){
   include.models();
   include.controllers('translations');
   include.views();

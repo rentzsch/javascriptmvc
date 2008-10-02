@@ -329,14 +329,15 @@ MVC.Object.extend(include,{
 			
             
             var current_path = include.get_path();
-		    include.set_path(MVC.apps_root || MVC.root.join('apps') );
+		    //include.set_path(MVC.apps_root || MVC.root.join('apps') );
 
             for (var i = 0; i < arguments.length; i++) {
 				arguments[i] = f(arguments[i]);
-				included_array.push(arguments[i].match(/[^\/\\]*$/)[0].replace(/_controller/,''));
+				if(included_array)
+					included_array.push(arguments[i].match(/[^\/\\]*$/)[0].replace(/_controller/,''));
 			}
 			include.apply(null, arguments);
-            include.set_path(current_path);
+            //include.set_path(current_path);
 		}
 	},
     functions: [],
@@ -417,6 +418,7 @@ include.check_exists = function(path){
 include.controllers = include.app(function(i){return '../controllers/'+i+'_controller'}, MVC.Included.controllers);
 include.models = include.app(function(i){return '../models/'+i}, MVC.Included.models);
 include.resources = include.app(function(i){return '../resources/'+i}, MVC.Included.resources);
+include.engines = include.app(function(i){ return '../engines/'+i+"/apps/"+i+".js"} );
 
 if(MVC.script_options){
 	MVC.apps_root =  MVC.root.join('apps')
