@@ -49,6 +49,7 @@ MVC.Controller = MVC.Class.extend(
     		include('test/functional/'+ this.className+'_controller_test.js');
     		include.set_path(p);
         }
+        this._path =  include.get_path().match(/(.*?)\/controllers/)[1]+"/controllers";
     },
     add_kill_event: function(event){ //this should really be in event
 		if(!event.kill){
@@ -74,7 +75,16 @@ MVC.Controller = MVC.Class.extend(
 	},
     dispatch_closure: function(controller_name, f_name){
         return function(params){
-			MVC.Controller.add_kill_event(params.event);
+            MVC.Controller.add_kill_event(params.event);
+            params.action = f_name;
+            params.controller = controller_name;
+			return MVC.Controller.dispatch(controller_name, f_name, 
+                new MVC.Controller.Params(params)
+            );
+		};
+    },
+    publish_closure: function(controller_name, f_name){
+        return function(params){
             params.action = f_name;
             params.controller = controller_name;
 			return MVC.Controller.dispatch(controller_name, f_name, 
@@ -111,7 +121,14 @@ MVC.Controller = MVC.Class.extend(
 		return instance[action_name](params);
 	},
     controllers : [],
-    actions: []
+    actions: [],
+    publish: function(message, params){
+        var subscribers = MVC.Controller.SubscribeAction.events[message];
+        if(!subscribers) return;
+        for(var i =0 ; i < subscribers.length; i++){
+            subscribers[i](params);
+        }
+    }
 },
 /*@Prototype*/
 {
@@ -156,6 +173,9 @@ MVC.Controller = MVC.Class.extend(
         return setTimeout(function(){
             MVC.Controller.dispatch(controller_name,action_name, params );
         }, delay );
+    },
+    publish: function(message, params){
+        this.Class.publish(message,params);
     }
 });
 
@@ -176,7 +196,29 @@ MVC.Controller.Action = MVC.Class.extend(
         this.controller = controller;
     }
 });
-
+MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
+/* @Static*/
+{
+    match: new RegExp("(.*?)\\s?(subscribe)$"),
+    matches: function(action_name){
+        return this.match.exec(action_name);
+    },
+    events: {}
+},
+/* @Prototype*/
+{
+    init: function(action, f, controller){
+        this._super(action, f, controller);
+        this.message();
+        if(!this.Class.events[this.message_name]) this.Class.events[this.message_name] = [];
+        var cb = this.controller.publish_closure(controller.className, action );
+        this.Class.events[this.message_name].push(cb);
+    },
+    message: function(){
+        this.parts = this.action.match(this.Class.match);
+        this.message_name = this.parts[1];
+    }
+})
 /*
  * Default EventDelegation based actions
  */

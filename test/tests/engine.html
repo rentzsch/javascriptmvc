@@ -11,6 +11,11 @@
         </style>
 	</head>
 	<body>
-		<script type='text/javascript' src='../../jmvc/include.js?engine,development'></script>
+		<script type='text/javascript' src='../../jmvc/include.js?engine,production'></script>
+        
+        <a href="javascript: void(0)" onclick="Controller.publish('alert',{text: 'hello world'});">Alert</a><br/>
+        <a href="javascript: void(0)" onclick="Controller.publish('prompt',{text: 'hello world'});">Prompt</a><br/>
+		<a href="javascript: void(0)" onclick="Controller.publish('confirm',{text: 'hello world'});">Confirm</a>
+        
 	</body>
 </html>

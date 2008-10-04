@@ -93,6 +93,9 @@ MVC.File.prototype = {
 			return urls.concat(paths).join('/');
 		}
 	},
+    join_current: function(){
+        return this.join_from(include.get_path());
+    },
 	relative: function(){		return this.path.match(/^(https?:|file:|\/)/) == null;},
 	after_domain: function(){	return this.path.match(/(?:https?:\/\/[^\/]*)(.*)/)[1];},
 	to_reference_from_same_domain: function(url){
@@ -166,6 +169,15 @@ var add_with_defaults = function(inc, force){
     }
 	include.add(inc);
 };
+var head = function(){
+	var d = document, de = d.documentElement;
+	var heads = d.getElementsByTagName("head");
+	if(heads.length > 0 ) return heads[0];
+	var head = d.createElement('head');
+	de.insertBefore(head, de.firstChild);
+	return head;
+};
+
 
 include = function(){
 	if(include.get_env().match(/development|compress|test/)){
@@ -205,8 +217,13 @@ MVC.Object.extend(include,{
 	},
 	add: function(newInclude){
 		if(typeof newInclude == 'function'){
-            include.functions.push(newInclude);
-            current_includes.unshift(  newInclude );
+            var path = include.get_path();
+            var adjusted = function(){
+                include.set_path(path);
+                newInclude();
+            }
+            include.functions.push(adjusted);
+            current_includes.unshift(  adjusted );
             return;
         }
         
@@ -328,7 +345,7 @@ MVC.Object.extend(include,{
 		return function(){
 			
             
-            var current_path = include.get_path();
+            //var current_path = include.get_path();
 		    //include.set_path(MVC.apps_root || MVC.root.join('apps') );
 
             for (var i = 0; i < arguments.length; i++) {
@@ -344,17 +361,26 @@ MVC.Object.extend(include,{
     next_function : function(){
         var func = include.functions.pop();
         if(func) func();
+    },
+    css: function(){
+        var arg;
+        for(var i=0; i < arguments.length; i++){
+            arg = arguments[i];
+            include.create_link( new MVC.File("../stylesheets/"+arg+".css").join_from( include.get_path() )  );
+        }
+        
+        
+    },
+    create_link: function(location){
+        var link = document.createElement('link');
+    	link.rel = "stylesheet";
+    	link.href =  location;
+    	link.type = 'text/css';
+        head().appendChild(link);
     }
 });
 	
-var head = function(){
-	var d = document, de = d.documentElement;
-	var heads = d.getElementsByTagName("head");
-	if(heads.length > 0 ) return heads[0];
-	var head = d.createElement('head');
-	de.insertBefore(head, de.firstChild);
-	return head;
-};
+
 var insert_head = function(src, encode){
 	encode = encode || "UTF-8";
     var script= script_tag();

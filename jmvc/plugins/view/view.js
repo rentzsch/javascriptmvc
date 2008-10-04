@@ -56,7 +56,7 @@ MVC.View = function( options ){
 		return;
 	}
 	if(options.url || options.absolute_url){
-        var url = options.absolute_url || MVC.root.join(options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' )) ;
+        var url = options.absolute_url || options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) ;
         options.url = options.absolute_url || options.url;
 		var template = MVC.View.get(options.url, this.cache);
 		if (template) return template;
@@ -64,7 +64,8 @@ MVC.View = function( options ){
         this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
 		
 		if(this.text == null){
-			throw( {type: 'JMVC', message: 'There is no template at '+url}  );
+			print("Exception: "+'There is no template at '+url)
+            throw( {type: 'JMVC', message: 'There is no template at '+url}  );
 		}
 		this.name = options.url;
 	}else if(options.hasOwnProperty('element'))
@@ -426,7 +427,7 @@ MVC.View.config = function(options){
 	MVC.View.cache = options.cache != null ? options.cache : MVC.View.cache;
 	MVC.View.type = options.type != null ? options.type : MVC.View.type;
 	var templates_directory = {}; //nice and private container
-	
+	MVC.View.templates_directory = templates_directory;
 	MVC.View.get = function(path, cache){
 		if(cache == false) return null;
 		if(templates_directory[path]) return templates_directory[path];
@@ -443,7 +444,8 @@ MVC.View.config = function(options){
 MVC.View.config( {cache: include.get_env() == 'production', type: '<' } );
 
 MVC.View.PreCompiledFunction = function(name, f){
-	new MVC.View({name: name, precompiled: f});
+    
+	new MVC.View({name: new MVC.File("../"+name).join_current(), precompiled: f});
 };
 
 /**
@@ -488,13 +490,15 @@ MVC.Included.views = [];
 include.view = function(path){
 	MVC.Included.views.push(path.replace(/\.ejs/,''));
 	if(include.get_env() == 'development'){
-		new MVC.View({url: path});
+        //should convert path
+        
+		new MVC.View({url: new MVC.File("../"+path).join_current()});
 	}else if(include.get_env() == 'compress'){
-		var oldp = include.get_path();
-        include.set_path(MVC.root.path);
-        include({path: path, process: MVC.View.process_include, ignore: true});
-		include.set_path(oldp);
-		new MVC.View({url: path});
+		//var oldp = include.get_path();
+        //include.set_path(MVC.root.path);
+        include({path: "../"+path, process: MVC.View.process_include, ignore: true});
+		//include.set_path(oldp);
+		new MVC.View({url: new MVC.File("../"+path).join_current()});
 	}else{
 		//production, do nothing!
 	}
@@ -509,7 +513,7 @@ include.views = function(){
 MVC.View.process_include = function(script){
     var view = new MVC.View({text: script.text});
 	return 'MVC.View.PreCompiledFunction("'+script.original_path+
-				'", function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+view.out()+" return ___ViewO;}}}catch(e){e.lineNumber=null;throw e;}})";
+				'", function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+view.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
 };
 
 if(!MVC._no_conflict){

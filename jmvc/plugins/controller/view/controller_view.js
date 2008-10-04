@@ -61,17 +61,17 @@ render = function(options) {
 				return url;
 			};
 			if(options.plugin){
-                plugin_url = 'jmvc/plugins/'+options.plugin;
+                plugin_url = '../jmvc/plugins/'+options.plugin;
             }
             
 			if(options.action) {
-				var url = 'views/'+convert(options.action);
+				var url = '../views/'+convert(options.action);
             }
 			else if(options.partial) {
-                var url = 'views/'+convert(options.partial);
+                var url = '../views/'+convert(options.partial);
 			}else
             {
-                var url = 'views/'+controller_name+'/'+action_name.replace(/\.|#/g, '').replace(/ /g,'_')+'.ejs';
+                var url = '../views/'+controller_name+'/'+action_name.replace(/\.|#/g, '').replace(/ /g,'_')+'.ejs';
             }
 			var data_to_render = this;
 			if(options.locals) {
@@ -81,7 +81,7 @@ render = function(options) {
 			}
             var view;
             if(!plugin_url){
-                view = new MVC.View({url:  url  });
+                view = new MVC.View({url:  new MVC.File(url).join_from(this.Class._path)  }); //what about controllers in other folders?
             }else{
                 //load plugin if it has been included
                 try{
