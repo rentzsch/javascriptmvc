@@ -1,5 +1,5 @@
 if(!_args[0]){
-	print("Usage: js jmvc/generate/controller class_name")
+	print("Usage: js jmvc/generate/app app_name")
 	quit();
 }
 load('jmvc/generate/loader.js');

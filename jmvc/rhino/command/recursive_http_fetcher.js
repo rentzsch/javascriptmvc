@@ -50,10 +50,14 @@ RecursiveHTTPFetcher.prototype = {
         this.cwd = new MVC.File(this.cwd).dir();
     },
     download : function(link){
-        var text = readUrl( link);
+        
+        
+        
+        
+        //var text = readUrl( link);
         var bn = new MVC.File(link).basename();
         var f = new MVC.File(this.cwd).join(bn);
-        new MVC.File(f).save( text );
+        new MVC.File(f).download_from( link );
     },
     fetch : function(links ){
         var auto_fetch = !links;

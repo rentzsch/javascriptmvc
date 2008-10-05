@@ -90,5 +90,41 @@ MVC.File.prototype = {
 		out.write( text, 0, text.length() );
 		out.flush();
 		out.close();
+    },
+    download_from: function(address){
+        /*var url = new java.net.URL(address);
+        var out = new java.io.BufferedOutputStream(  new java.io.FileOutputStream(this.path));
+        var conn = url.openConnection();
+        var inp = conn.getInputStream();
+        
+        var buffer = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, 1024);
+        
+        var stream = new java.io.InputStreamReader(conn.getInputStream()),
+						buffer = new java.io.BufferedReader(stream), line, lines = [];
+        var numRead = 0;
+        while ((numRead = inp.read(buffer)) != -1) {
+				out.write(buffer, 0, numRead);
+		}
+        inp.close();
+        out.close();*/
+       
+       
+       var input = 
+           new java.io.BufferedInputStream(
+               new java.net.URL(address).openStream()
+           );
+           
+        bout = new java.io.BufferedOutputStream(
+                new java.io.FileOutputStream(this.path),
+                1024
+            );
+        var data = java.lang.reflect.Array.newInstance(java.lang.Byte.TYPE, 1024);
+        var num_read = 0;
+        while( (num_read = input.read(data,0,1024) ) >= 0    ) {
+            bout.write(data, 0 , num_read);
+        }
+        bout.close();
+               
+       
     }
 };
