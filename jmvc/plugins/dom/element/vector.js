@@ -10,7 +10,7 @@ MVC.Vector = function(){
     this.update( MVC.Array.from(arguments) );
 };
 MVC.Vector.prototype = 
-/*@Prototype*/
+/* @Prototype*/
 {
     /**
      * Applys the function to every item in the vector.  Returns the new vector.

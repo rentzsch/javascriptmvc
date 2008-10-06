@@ -88,7 +88,7 @@ MVC.Object.to_query_string.worker = function(obj,name){
  * When not in no-conflict mode, JMVC adds the following helpers to string
  */
 MVC.Native.extend('String', 
-/*@Static*/
+/* @Static*/
 {
     /*
      * Capitalizes a string
@@ -156,7 +156,7 @@ MVC.Native.extend('String',
  * When not in no-conflict mode, JMVC adds the following helpers to array
  */
 MVC.Native.extend('Array',
-/*@static*/
+/* @static*/
 { 
 	/**
 	 * Searchs an array for item.  Returns if item is in it.
@@ -188,7 +188,7 @@ MVC.Native.extend('Array',
  * When not in no-conflict mode, JMVC adds the following helpers to function
  */
 MVC.Native.extend('Function', 
-/*@static*/
+/* @static*/
 {
 	/**
 	 * Binds a function to another object.  The object the function is binding
@@ -211,7 +211,7 @@ MVC.Native.extend('Function',
  * When not in no-conflict mode, JMVC adds the following helpers to number
  */
 MVC.Native.extend('Number', 
-/*@static*/
+/* @static*/
 {
     /**
      * Changes a number to a string, but includes preceeding zeros.

@@ -76,7 +76,7 @@ Finally, you can respond to Transport errors in the same way you respond to succ
  * 
  */
 MVC.AjaxModel = MVC.Model.extend(
-/*@Static*/
+/* @Static*/
 {
     transport: MVC.Ajax,
     

@@ -17,7 +17,7 @@
   
   MVC.Class = function(){};
   // Create a new Class that inherits from the current class.
-  /*@Static*/
+  /* @Static*/
   MVC.Class.
     /**
      * Extends a class with new static and prototype functions.
@@ -112,9 +112,9 @@
      * Called on the base class when extend
      */
     if(_super_class.extended) _super_class.extended(Class);
-    /*@Prototype*/
+    /* @Prototype*/
     return Class;
-    /*@function init
+    /* @function init
      * Called with the same arguments as new Class(arguments ...) when a new class is created.
      */
   };

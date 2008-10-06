@@ -8,7 +8,7 @@ MVC.Tests = {};
  * Typically Test is not used directly but its functions are available in inheriting classes.
  */
 MVC.Test = MVC.Class.extend(
-/*@Prototype*/
+/* @Prototype*/
 {
     /**
      * Creates a new test case. A test case is a collection of test functions and helpers.

@@ -137,7 +137,7 @@
 
 MVC.Ajax.className = 'Ajax'
 MVC.Ajax.Events = ['Uninitialized', 'Loading', 'Loaded', 'Interactive', 'Complete'];
-/*@Prototype*/
+/* @Prototype*/
 MVC.Ajax.prototype = {
   
   /**

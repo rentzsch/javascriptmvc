@@ -134,7 +134,7 @@ MVC.Object.to_query_string.worker = function(obj,name){
  * When not in no-conflict mode, JMVC adds the following helpers to string
  */
 MVC.Native.extend('String', 
-/*@Static*/
+/* @Static*/
 {
     /*
      * Capitalizes a string
@@ -202,7 +202,7 @@ MVC.Native.extend('String',
  * When not in no-conflict mode, JMVC adds the following helpers to array
  */
 MVC.Native.extend('Array',
-/*@static*/
+/* @static*/
 { 
 	/**
 	 * Searchs an array for item.  Returns if item is in it.
@@ -234,7 +234,7 @@ MVC.Native.extend('Array',
  * When not in no-conflict mode, JMVC adds the following helpers to function
  */
 MVC.Native.extend('Function', 
-/*@static*/
+/* @static*/
 {
 	/**
 	 * Binds a function to another object.  The object the function is binding
@@ -257,7 +257,7 @@ MVC.Native.extend('Function',
  * When not in no-conflict mode, JMVC adds the following helpers to number
  */
 MVC.Native.extend('Number', 
-/*@static*/
+/* @static*/
 {
     /**
      * Changes a number to a string, but includes preceeding zeros.
@@ -470,7 +470,7 @@ The following calls checkForm on the form element with id 'signinForm' being sub
  * 
  */
   MVC.Event=
- /*@Static*/ 
+ /* @Static*/ 
   {
 	/**
 	 * Registers an event handler on a DOM element.
@@ -708,7 +708,7 @@ include.set_path('../../jmvc/plugins/io/ajax');
 
 MVC.Ajax.className = 'Ajax'
 MVC.Ajax.Events = ['Uninitialized', 'Loading', 'Loaded', 'Interactive', 'Complete'];
-/*@Prototype*/
+/* @Prototype*/
 MVC.Ajax.prototype = {
   
   /**
@@ -776,7 +776,7 @@ include.set_path('../../jmvc/plugins/lang/class');
   
   MVC.Class = function(){};
   // Create a new Class that inherits from the current class.
-  /*@Static*/
+  /* @Static*/
   MVC.Class.
     /**
      * Extends a class with new static and prototype functions.
@@ -871,9 +871,9 @@ include.set_path('../../jmvc/plugins/lang/class');
      * Called on the base class when extend
      */
     if(_super_class.extended) _super_class.extended(Class);
-    /*@Prototype*/
+    /* @Prototype*/
     return Class;
-    /*@function init
+    /* @function init
      * Called with the same arguments as new Class(arguments ...) when a new class is created.
      */
   };
@@ -976,7 +976,7 @@ MVC.View = function( options ){
 	MVC.View.update(this.name, this);
 	this.template = template;
 };
-/*@Prototype*/
+/* @Prototype*/
 MVC.View.prototype = {
 	/**
 	 * Renders an object with extra view helpers attached to the view.
@@ -1051,7 +1051,7 @@ MVC.View.prototype = {
 
 
 
-/*@Static*/
+/* @Static*/
 MVC.View.Scanner = function(source, left, right) {
 	this.left_delimiter = 	left +'%';	//<%
 	this.right_delimiter = 	'%'+right;	//>
@@ -1343,7 +1343,7 @@ MVC.View.PreCompiledFunction = function(name, f){
 MVC.View.Helpers = function(data){
 	this.data = data;
 };
-/*@prototype*/
+/* @prototype*/
 MVC.View.Helpers.prototype = {
     /**
      * Renders a new view.  If data is passed in, uses that to render the view.
@@ -1459,7 +1459,7 @@ MVC.Object.is_number = function(o){
  * also called actions, with combination css selector and event handlers.
  */
 MVC.Controller = MVC.Class.extend(
-/*@Static*/
+/* @Static*/
 {
     /*
      * Looks for controller actions and hooks them up to delegator
@@ -1581,7 +1581,7 @@ MVC.Controller = MVC.Class.extend(
         }
     }
 },
-/*@Prototype*/
+/* @Prototype*/
 {
     /*
      * Returns a function that when called, calls the action with parameters passed to the function. 
@@ -1674,7 +1674,7 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
  * Default EventDelegation based actions
  */
 MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
-/*@Static*/
+/* @Static*/
     match: new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
     /*
      * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
@@ -1686,7 +1686,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
         return this.match.exec(action_name);
     }
 },
-/*@Prototype*/
+/* @Prototype*/
 {    
     init: function(action, f, controller){
         this._super(action, f, controller);
@@ -1779,7 +1779,7 @@ MVC.Controller.Params = function(params){
 		if( params.hasOwnProperty(thing) ) this[thing] = params[thing];
 	}
 };
-/*@Prototype*/
+/* @Prototype*/
 MVC.Controller.Params.prototype = {
 	/*
 	 * Returns data in a hash for a form.
@@ -1876,7 +1876,7 @@ MVC.Delegator = function(selector, event, f){
 };
 
 MVC.Object.extend(MVC.Delegator,
-/*@Static*/
+/* @Static*/
 {
     /**
      * Returns an array of objects that represent the path of the node to documentElement.  Each item in the array
@@ -1943,7 +1943,7 @@ MVC.Object.extend(MVC.Delegator,
     events: {}
 })
 
-/*@Prototype*/
+/* @Prototype*/
 MVC.Delegator.prototype = {
     /*
      * returns the event that should actually be used.  In practice, this is just used to switch focus/blur
@@ -2261,7 +2261,7 @@ MVC.Vector = function(){
     this.update( MVC.Array.from(arguments) );
 };
 MVC.Vector.prototype = 
-/*@Prototype*/
+/* @Prototype*/
 {
     /**
      * Applys the function to every item in the vector.  Returns the new vector.
@@ -2394,7 +2394,7 @@ MVC.Element = function(element){
     if (!element) return element;
 	return element._mvcextend ? element : MVC.Element.extend(element);
 };
-/*@Static*/
+/* @Static*/
 MVC.Object.extend(MVC.Element, {
     /**
      * Inserts HTML into the page relative to the given element.

@@ -6,7 +6,7 @@
  * Functional tests are used to mimic user events.
  */
 MVC.Test.Functional = MVC.Test.extend(
-/*@Prototype*/
+/* @Prototype*/
 {
 	/**
 	 * Creates a new functional test case. A test case is a collection of test functions and helpers.

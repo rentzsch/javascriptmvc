@@ -23,7 +23,7 @@ Will create a new Todo instance and call TodosController::create with that insta
 </pre>
 */
 MVC.CometController = MVC.Controller.extend(
-/*@Static*/
+/* @Static*/
 {
     init : function(){
          //cancels matching controller actions  
@@ -83,7 +83,7 @@ MVC.CometController = MVC.Controller.extend(
     controller_map :{},
     error_mode: false
 },
-/*@Prototype*/
+/* @Prototype*/
 {
     run : function(){
         this.start_polling();

@@ -3,7 +3,7 @@
  * 
  */
 MVC.Test.Unit = MVC.Test.extend(
-/*@Prototype*/
+/* @Prototype*/
 {
     /**
      * Called when a new unit test case is created. A test case is a collection of test functions and helpers.

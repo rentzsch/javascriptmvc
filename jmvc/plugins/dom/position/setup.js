@@ -3,7 +3,7 @@
  * Provides helper functions that let you know if a coordinate is within an X,Y value
  */
 MVC.Position = 
-/*@Static*/
+/* @Static*/
 {
   /**
    * Needs to be called once before any calculations are made, but after

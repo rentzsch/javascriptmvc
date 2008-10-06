@@ -51,7 +51,7 @@
  * 
  */
 MVC.Comet = function(url, options) 
-/*@Prototype*/
+/* @Prototype*/
 {
 	this.url = url;
 	this.options = options || {};

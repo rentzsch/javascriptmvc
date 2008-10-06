@@ -19,7 +19,7 @@ MVC.Delegator = function(selector, event, f){
 };
 
 MVC.Object.extend(MVC.Delegator,
-/*@Static*/
+/* @Static*/
 {
     /**
      * Returns an array of objects that represent the path of the node to documentElement.  Each item in the array
@@ -86,7 +86,7 @@ MVC.Object.extend(MVC.Delegator,
     events: {}
 })
 
-/*@Prototype*/
+/* @Prototype*/
 MVC.Delegator.prototype = {
     /*
      * returns the event that should actually be used.  In practice, this is just used to switch focus/blur

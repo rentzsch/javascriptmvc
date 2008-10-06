@@ -7,7 +7,7 @@ this.assert_null(this.obj, "Expected to be null");
 this.assert(x_value > 200);</code></pre>
  */
 MVC.Test.Assertions =  MVC.Class.extend(
-/*@Prototype*/
+/* @Prototype*/
 {
 	/**
 	 * Creates a new Assertion with the given test for the test that matches test_name.

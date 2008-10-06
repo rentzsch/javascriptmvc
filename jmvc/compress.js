@@ -30,7 +30,7 @@ var base2 = {
     //    e.g. detect("MSIE|opera");
         
     var global = _;
-    var jscript = NaN/*@cc_on||@_jscript_version@*/; // http://dean.edwards.name/weblog/2007/03/sniff/#comment85164
+    var jscript = NaN/* @cc_on||@_jscript_version@*/; // http://dean.edwards.name/weblog/2007/03/sniff/#comment85164
     var java = _.java ? true : false;
     if (_.navigator) {
       var MSIE = /MSIE[\d.]+/g;
@@ -422,12 +422,12 @@ var Map = Base.extend({
 
   // Ancient browsers throw an error when we use "in" as an operator.
   has: function(key) {
-  /*@cc_on @*/
-  /*@if (@_jscript_version < 5.5)
+  /* @cc_on @*/
+  /* @if (@_jscript_version < 5.5)
     return $Legacy.has(this, _HASH + key);
   @else @*/
     return _HASH + key in this;
-  /*@end @*/
+  /* @end @*/
   },
 
   merge: function(values) {
@@ -1179,12 +1179,12 @@ function _Array_forEach(array, block, context) {
     }
   } else { // Cater for sparse arrays.
     for (i = 0; i < length; i++) {    
-    /*@cc_on @*/
-    /*@if (@_jscript_version < 5.2)
+    /* @cc_on @*/
+    /* @if (@_jscript_version < 5.2)
       if ($Legacy.has(array, i))
     @else @*/
       if (i in array)
-    /*@end @*/
+    /* @end @*/
         block.call(context, array[i], i, array);
     }
   }
@@ -1253,17 +1253,17 @@ function instanceOf(object, klass) {
 
   if (object == null) return false;
   
-  /*@cc_on  
+  /* @cc_on  
   // COM objects don't have a constructor
   if (typeof object.constructor != "function") {
     return typeOf(object) == typeof klass.prototype.valueOf();
   }
   @*/
-  /*@if (@_jscript_version < 5.1)
+  /* @if (@_jscript_version < 5.1)
     if ($Legacy.instanceOf(object, klass)) return true;
   @else @*/
     if (object instanceof klass) return true;
-  /*@end @*/
+  /* @end @*/
 
   // If the class is a base2 class then it would have passed the test above.
   if (Base.ancestorOf == klass.ancestorOf) return false;

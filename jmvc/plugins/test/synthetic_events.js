@@ -12,7 +12,7 @@ MVC.SyntheticEvent = function(type, options){
 	this.options = options || {};
 }
 MVC.SyntheticEvent.prototype = 
-/*@Prototype*/
+/* @Prototype*/
 {
 	/**
 	 * Dispatches the event on the given element

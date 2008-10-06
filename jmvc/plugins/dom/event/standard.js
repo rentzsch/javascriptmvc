@@ -30,7 +30,7 @@ The following calls checkForm on the form element with id 'signinForm' being sub
  * 
  */
   MVC.Event=
- /*@Static*/ 
+ /* @Static*/ 
   {
 	/**
 	 * Registers an event handler on a DOM element.

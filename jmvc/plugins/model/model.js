@@ -10,7 +10,7 @@
  * Model is also designed to work with ModelViewHelper.
  */
 MVC.Model = MVC.Class.extend(
-/*@Static*/
+/* @Static*/
 {
 	store_type: MVC.SimpleStore,
     /**
@@ -131,7 +131,7 @@ MVC.Model = MVC.Class.extend(
     },
     models : {}
 },
-/*@Prototype*/
+/* @Prototype*/
 {   
     /**
      * Creates, but does not save a new instance of this class

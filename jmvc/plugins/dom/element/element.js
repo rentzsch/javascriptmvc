@@ -26,7 +26,7 @@ MVC.Element = function(element){
     if (!element) return element;
 	return element._mvcextend ? element : MVC.Element.extend(element);
 };
-/*@Static*/
+/* @Static*/
 MVC.Object.extend(MVC.Element, {
     /**
      * Inserts HTML into the page relative to the given element.

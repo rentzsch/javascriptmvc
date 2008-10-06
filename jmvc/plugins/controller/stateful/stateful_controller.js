@@ -1,5 +1,5 @@
 MVC.StatefulController = MVC.Class.extend(
-/*@Static*/
+/* @Static*/
 {
     /*
      * Looks for controller actions and hooks them up to delegator
@@ -141,7 +141,7 @@ MVC.StatefulController = MVC.Class.extend(
     },
     instances : {}
 },
-/*@Prototype*/
+/* @Prototype*/
 {
     /*
      * Returns a function that when called, calls the action with parameters passed to the function. 

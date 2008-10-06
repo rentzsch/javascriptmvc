@@ -91,7 +91,7 @@ MVC.View = function( options ){
 	MVC.View.update(this.name, this);
 	this.template = template;
 };
-/*@Prototype*/
+/* @Prototype*/
 MVC.View.prototype = {
 	/**
 	 * Renders an object with extra view helpers attached to the view.
@@ -166,7 +166,7 @@ MVC.View.prototype = {
 
 
 
-/*@Static*/
+/* @Static*/
 MVC.View.Scanner = function(source, left, right) {
 	this.left_delimiter = 	left +'%';	//<%
 	this.right_delimiter = 	'%'+right;	//>
@@ -458,7 +458,7 @@ MVC.View.PreCompiledFunction = function(name, f){
 MVC.View.Helpers = function(data){
 	this.data = data;
 };
-/*@prototype*/
+/* @prototype*/
 MVC.View.Helpers.prototype = {
     /**
      * Renders a new view.  If data is passed in, uses that to render the view.
