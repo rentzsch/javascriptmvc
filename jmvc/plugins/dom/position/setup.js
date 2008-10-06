@@ -58,5 +58,27 @@ MVC.Position =
             this.ycomp <  this.offset[1] + element.offsetHeight &&
             this.xcomp >= this.offset[0] &&
             this.xcomp <  this.offset[0] + element.offsetWidth);
-  }
+  },
+  window_dimensions: function(){
+         var de = document.documentElement, 
+             st = window.pageYOffset ? window.pageYOffset : de.scrollTop,
+             sl = window.pageXOffset ? window.pageXOffset : de.scrollLeft;
+         
+         var wh = window.innerHeight ? window.innerHeight : de.clientHeight, 
+             ww = window.innerWidth ? window.innerWidth :de.clientWidth;
+         if(wh == 0){
+             wh = document.body.clientHeight;
+             ww = document.body.clientWidth;
+         }
+         return {
+             window_height: wh,
+             window_width: ww,
+             document_height: MVC.Browser.IE ? document.body.offsetHeight : de.offsetHeight,
+             document_width: MVC.Browser.IE ? document.body.offsetWidth :de.offsetWidth,
+             scroll_left: sl,
+             scroll_top: st,
+             window_right: sl+ ww,
+             window_bottom: st+ wh
+         }
+    }
 }

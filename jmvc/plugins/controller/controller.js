@@ -49,7 +49,7 @@ MVC.Controller = MVC.Class.extend(
     		include('test/functional/'+ this.className+'_controller_test.js');
     		include.set_path(p);
         }
-        this._path =  include.get_path().match(/(.*?)\/controllers/)[1]+"/controllers";
+        this._path =  include.get_path().match(/(.*?)controllers/)[1]+"controllers";
     },
     add_kill_event: function(event){ //this should really be in event
 		if(!event.kill){
@@ -160,7 +160,7 @@ MVC.Controller = MVC.Class.extend(
 		}, this);
 	},
     delay: function(delay, action_name){
-		if(typeof this[action_name] != 'function'){ throw 'There is no action named '+actaction_nameion+'. ';}
+		if(typeof this[action_name] != 'function'){ throw 'There is no action named '+action_name+'. ';}
 		
         return setTimeout(MVC.Function.bind(function(){
 			this.action_name = action_name;
@@ -260,7 +260,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
      */
     main_controller: function(){
 	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, MVC.Controller.event_closure(this.controller, this.event_type, window) );
+            MVC.Event.observe(window, this.event_type, this.controller.event_closure(this.controller, this.event_type, window) );
             return;
         }
         return this.css;
@@ -290,7 +290,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
      */
     selector : function(){
         if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, MVC.Controller.event_closure(this.controller, this.event_type, window) );
+            MVC.Event.observe(window, this.event_type, this.controller.event_closure(this.controller, this.event_type, window) );
             return;
         }
         
