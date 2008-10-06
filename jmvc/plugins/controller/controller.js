@@ -51,46 +51,17 @@ MVC.Controller = MVC.Class.extend(
         }
         this._path =  include.get_path().match(/(.*?)controllers/)[1]+"controllers";
     },
-    add_kill_event: function(event){ //this should really be in event
-		if(!event.kill){
-			var killed = false;
-			event.kill = function(){
-				killed = true;
-				if(!event) event = window.event;
-			    try{
-				    event.cancelBubble = true;
-				    if (event.stopPropagation)  event.stopPropagation(); 
-				    if (event.preventDefault)  event.preventDefault();
-			    }catch(e){}
-			};
-			event.is_killed = function(){return killed;};
-		}	
+    event_closure: function(f_name, element){
+		return MVC.Function.bind(function(event){
+			var params = new MVC.Controller.Params({event: event, element: element, action: f_name  });
+			return this.dispatch(f_name, params);
+		}, this);
 	},
-    event_closure: function(controller_name, f_name, element){
-		return function(event){
-			MVC.Controller.add_kill_event(event);
-			var params = new MVC.Controller.Params({event: event, element: element, action: f_name, controller: controller_name   });
-			return MVC.Controller.dispatch(controller_name, f_name, params);
-		};
-	},
-    dispatch_closure: function(controller_name, f_name){
-        return function(params){
-            MVC.Controller.add_kill_event(params.event);
+    dispatch_closure: function(f_name){
+        return MVC.Function.bind(function(params){
             params.action = f_name;
-            params.controller = controller_name;
-			return MVC.Controller.dispatch(controller_name, f_name, 
-                new MVC.Controller.Params(params)
-            );
-		};
-    },
-    publish_closure: function(controller_name, f_name){
-        return function(params){
-            params.action = f_name;
-            params.controller = controller_name;
-			return MVC.Controller.dispatch(controller_name, f_name, 
-                new MVC.Controller.Params(params)
-            );
-		};
+			return this.dispatch(f_name,  new MVC.Controller.Params(params) );
+		},this);
     },
     /**
      * Calls the Controller prototype function specified by controller and action_name with the given params.
@@ -98,25 +69,23 @@ MVC.Controller = MVC.Class.extend(
      * @param {String} action_name The name of the action to be called.
      * @param {Controller.Params} params The params the action will be called with.
      */
-    dispatch: function(controller, action_name, params){
-		var c_name = controller;
-		if(typeof controller == 'string'){
-            controller = MVC.Controller.controllers[c_name][0];
-        }
-		if(!controller) throw 'No controller named '+c_name+' was found for MVC.Controller.dispatch.';
+    dispatch: function(action_name, params){
 		if(!action_name) action_name = 'index';
 		
 		if(typeof action_name == 'string'){
-			if(!(action_name in controller.prototype) ) throw 'No action named '+action_name+' was found for '+c_name+'.';
-		}else{ //action passed
+			if(!(action_name in this.prototype) ) throw 'No action named '+action_name+' was found for '+this.Class.className+' controller.';
+		}else{ //action passed TODO:  WHERE IS THIS USED?
 			action_name = action_name.name;
 		}
-		var instance = new controller();
+        var instance = this._get_instance(action_name , params);
 		instance.params = params;
 		instance.action_name = action_name;
-        instance.controller_name = controller.className;
-		return MVC.Controller._dispatch_action(instance,action_name, params );
+        instance.controller_name = this.className;
+		return this._dispatch_action(instance,action_name, params );
 	},
+    _get_instance : function(action_name,  params){
+          return new this(action_name, params);
+    },
 	_dispatch_action: function(instance, action_name, params){
 		return instance[action_name](params);
 	},
@@ -130,7 +99,7 @@ MVC.Controller = MVC.Class.extend(
         }
     }
 },
-/* @Prototype*/
+/*@Prototype*/
 {
     /*
      * Returns a function that when called, calls the action with parameters passed to the function. 
@@ -211,7 +180,7 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
         this._super(action, f, controller);
         this.message();
         if(!this.Class.events[this.message_name]) this.Class.events[this.message_name] = [];
-        var cb = this.controller.publish_closure(controller.className, action );
+        var cb = this.controller.dispatch_closure(action );
         this.Class.events[this.message_name].push(cb);
     },
     message: function(){
@@ -223,7 +192,7 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
  * Default EventDelegation based actions
  */
 MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
-/* @Static*/
+/*@Static*/
     match: new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
     /*
      * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
@@ -235,7 +204,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
         return this.match.exec(action_name);
     }
 },
-/* @Prototype*/
+/*@Prototype*/
 {    
     init: function(action, f, controller){
         this._super(action, f, controller);
@@ -244,7 +213,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
         var selector = this.selector();
         if(selector != null){
             new MVC.Delegator(selector, this.event_type, 
-                this.controller.dispatch_closure(controller.className, action ) );
+                this.controller.dispatch_closure(action ) );
         }
     },
     /*
@@ -260,7 +229,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
      */
     main_controller: function(){
 	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, this.controller.event_closure(this.controller, this.event_type, window) );
+            MVC.Event.observe(window, this.event_type, this.controller.event_closure( this.event_type, window) );
             return;
         }
         return this.css;
@@ -290,7 +259,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
      */
     selector : function(){
         if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, this.controller.event_closure(this.controller, this.event_type, window) );
+            MVC.Event.observe(window, this.event_type, this.controller.event_closure(this.event_type, window) );
             return;
         }
         
@@ -324,11 +293,19 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
  * @param {Object} params An object you want to pass to a controller
  */
 MVC.Controller.Params = function(params){
-	for(var thing in params){
+	var params = params || {};
+    var killed = false;
+	this.kill = function(){
+		killed = true;
+		if(params.event.kill) params.event.kill();
+	};
+	this.is_killed = function(){return params.event.is_killed ?  params.event.is_killed() :  killed ;};
+    
+    for(var thing in params){
 		if( params.hasOwnProperty(thing) ) this[thing] = params[thing];
 	}
 };
-/* @Prototype*/
+/*@Prototype*/
 MVC.Controller.Params.prototype = {
 	/*
 	 * Returns data in a hash for a form.
