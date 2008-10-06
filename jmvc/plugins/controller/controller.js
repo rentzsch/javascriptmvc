@@ -78,15 +78,14 @@ MVC.Controller = MVC.Class.extend(
 			action_name = action_name.name;
 		}
         var instance = this._get_instance(action_name , params);
-		instance.params = params;
-		instance.action_name = action_name;
-        instance.controller_name = this.className;
 		return this._dispatch_action(instance,action_name, params );
 	},
     _get_instance : function(action_name,  params){
           return new this(action_name, params);
     },
 	_dispatch_action: function(instance, action_name, params){
+        instance.params = params;
+		instance.action_name = action_name;
 		return instance[action_name](params);
 	},
     controllers : [],
@@ -128,20 +127,12 @@ MVC.Controller = MVC.Class.extend(
 			this[action].apply(this, arguments);
 		}, this);
 	},
-    delay: function(delay, action_name){
+    delay: function(delay, action_name, params){
 		if(typeof this[action_name] != 'function'){ throw 'There is no action named '+action_name+'. ';}
 		
         return setTimeout(MVC.Function.bind(function(){
-			this.action_name = action_name;
-			this[action_name].apply(this, arguments);
+			this.Class._dispatch_action(this, action_name ,  params )
 		}, this), delay );
-    },
-    dispatch_delay: function(delay, action_name, params){
-        var controller_name = action_name.controller ? action_name.controller : this.Class.className;
-        action_name = typeof action_name == 'string' ? action_name : action_name.action;
-        return setTimeout(function(){
-            MVC.Controller.dispatch(controller_name,action_name, params );
-        }, delay );
     },
     publish: function(message, params){
         this.Class.publish(message,params);
