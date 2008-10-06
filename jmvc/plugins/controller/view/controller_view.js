@@ -122,4 +122,4 @@ render = function(options) {
 		return result;
 
 };
-MVC.StatefulController.prototype.render = MVC.Controller.prototype.render; // this needs to go
+//MVC.StatefulController.prototype.render = MVC.Controller.prototype.render; // this needs to go
