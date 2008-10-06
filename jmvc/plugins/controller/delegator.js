@@ -57,7 +57,7 @@ MVC.Object.extend(MVC.Delegator,
 		}
 
 		if(matches.length == 0) return true;
-		MVC.Controller.add_kill_event(event);
+		MVC.Delegator.add_kill_event(event);
 		matches.sort(MVC.Delegator.sort_by_order);
         var match;
 		for(var m = 0; m < matches.length; m++){
@@ -65,6 +65,21 @@ MVC.Object.extend(MVC.Delegator,
             ret_value = match.delegation_event._func( {event: event, element: match.node} ) && ret_value;
 			if(event.is_killed()) return false;
 		}
+	},
+    add_kill_event: function(event){ //this should really be in event
+		if(!event.kill){
+			var killed = false;
+			event.kill = function(){
+				killed = true;
+				if(!event) event = window.event;
+			    try{
+				    event.cancelBubble = true;
+				    if (event.stopPropagation)  event.stopPropagation(); 
+				    if (event.preventDefault)  event.preventDefault();
+			    }catch(e){}
+			};
+			event.is_killed = function(){return killed;};
+		}	
 	},
     /**
      * Used for sorting events on an object
