@@ -53,13 +53,14 @@ MVC.Controller = MVC.Class.extend(
     },
     event_closure: function(f_name, element){
 		return MVC.Function.bind(function(event){
-			var params = new MVC.Controller.Params({event: event, element: element, action: f_name  });
+			var params = new MVC.Controller.Params({event: event, element: element, action: f_name, controller: this  });
 			return this.dispatch(f_name, params);
 		}, this);
 	},
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
             params.action = f_name;
+            params.controller = this;
 			return this.dispatch(f_name,  new MVC.Controller.Params(params) );
 		},this);
     },
@@ -362,9 +363,7 @@ MVC.Controller.Params.prototype = {
      */
 	is_event_on_element : function(){ return this.event.target == this.element; },
 	_className : function(){
-		controller = this.controller;
-		var className = MVC.String.is_singular(controller) ? controller : MVC.String.singularize(controller);
-		return className;
+		return this.controller.singularName;
 	}
 };
 
