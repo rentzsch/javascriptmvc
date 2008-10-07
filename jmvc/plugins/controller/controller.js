@@ -100,7 +100,7 @@ MVC.Controller = MVC.Class.extend(
         }
     }
 },
-/*@Prototype*/
+/* @Prototype*/
 {
     /*
      * Returns a function that when called, calls the action with parameters passed to the function. 
@@ -185,7 +185,7 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
  * Default EventDelegation based actions
  */
 MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
-/*@Static*/
+/* @Static*/
     match: new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
     /*
      * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
@@ -197,7 +197,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
         return this.match.exec(action_name);
     }
 },
-/*@Prototype*/
+/* @Prototype*/
 {    
     init: function(action, f, controller){
         this._super(action, f, controller);
@@ -298,7 +298,7 @@ MVC.Controller.Params = function(params){
 		if( params.hasOwnProperty(thing) ) this[thing] = params[thing];
 	}
 };
-/*@Prototype*/
+/* @Prototype*/
 MVC.Controller.Params.prototype = {
 	/*
 	 * Returns data in a hash for a form.
