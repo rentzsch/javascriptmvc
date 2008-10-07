@@ -90,7 +90,7 @@ MVC.Controller = MVC.Class.extend(
 		instance.action_name = action_name;
 		return instance[action_name](params);
 	},
-    controllers : [],
+    controllers : {},
     actions: [],
     publish: function(message, params){
         var subscribers = MVC.Controller.SubscribeAction.events[message];
