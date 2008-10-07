@@ -5,17 +5,7 @@
 		options.url = url;
 		this.transport = {};
 	
-		options.complete = function(xmlhttp, status){
-			if(options.onComplete){
-				options.onComplete(xmlhttp);
-			}
-			if(options.onSuccess && status == 'success')
-				options.onSuccess(xmlhttp);
-			
-			if(options.onFailure && status == 'error')
-				options.onFailure(xmlhttp);
-	
-		};
+		options.complete = MVC.Ajax.get_complete_option(options);
 	
 		if(options.asynchronous != null){
 			options.async = options.asynchronous;
@@ -35,6 +25,21 @@
 		}
 		
 	};
+	
+	MVC.Ajax.get_complete_option = function(options) {
+		return function(xmlhttp, status){
+			if(options.onComplete){
+				options.onComplete(xmlhttp);
+			}
+			if(options.onSuccess && status == 'success')
+				options.onSuccess(xmlhttp);
+			
+			if(options.onFailure && status == 'error')
+				options.onFailure(xmlhttp);
+
+		};
+	}
+		
 	MVC.Ajax.factory = factory;
 })();
 
