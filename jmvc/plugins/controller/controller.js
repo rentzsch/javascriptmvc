@@ -59,6 +59,7 @@ MVC.Controller = MVC.Class.extend(
 	},
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
+            params = params || {};
             params.action = f_name;
             params.controller = this;
 			return this.dispatch(f_name,  new MVC.Controller.Params(params) );
