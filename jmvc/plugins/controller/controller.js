@@ -57,6 +57,9 @@ MVC.Controller = MVC.Class.extend(
 			return this.dispatch(f_name, params);
 		}, this);
 	},
+    subscribe_closure : function(f_name){
+        return   this.dispatch_closure(f_name);
+    },
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
             params = params || {};
@@ -173,7 +176,7 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
         this._super(action, f, controller);
         this.message();
         if(!this.Class.events[this.message_name]) this.Class.events[this.message_name] = [];
-        var cb = this.controller.dispatch_closure(action );
+        var cb = this.controller.subscribe_closure(action );
         this.Class.events[this.message_name].push(cb);
     },
     message: function(){

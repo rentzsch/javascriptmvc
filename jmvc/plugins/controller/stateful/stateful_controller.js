@@ -30,6 +30,17 @@ MVC.StatefulController = MVC.Controller.extend(
             }
 		},this);
 	},
+    subscribe_closure: function(f_name){
+        return MVC.Function.bind(function(event){
+			var params = new MVC.Controller.Params({action: f_name   });
+			for(var element_id in this.instances){
+                var instance = this.instances[element_id];
+                instance.params = params;
+        		instance.action_name = f_name;
+                this._dispatch_action(instance,f_name, params);
+            }
+		},this);
+    },
     /**
      * For an event, gets the class_element from the params.  It sees if it has an id that 
      * is in instances.  If it does, it returns that instance; otherwise, it creates a new instance
