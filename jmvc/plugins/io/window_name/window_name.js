@@ -57,6 +57,7 @@ MVC.WindowName.prototype = {
         this.domain_page = this.domain+"/blank.html"+"#" +this.frameNum;
         this.frameName = window.location +this.domain_page;
         this.frame_container = document.body;
+        this.doc = document;
         if(MVC.Browser.Gecko && ![].reduce)
             this.protectFF2()
         var frame = this.frame = document.createElement(MVC.Browser.IE ? 
@@ -96,7 +97,7 @@ MVC.WindowName.prototype = {
                 values = values instanceof Array ? values : [values];
                 for(j = 0; j < values.length; j++){
                     // create hidden inputs for all the parameters
-                    var input = doc.createElement("input");
+                    var input = this.doc.createElement("input");
                     input.type = 'hidden';
                     input.name = attr;
                     input.value = values[j];				
@@ -128,16 +129,16 @@ MVC.WindowName.prototype = {
 		this.frame_container.appendChild(this.outerFrame);
 		
 		var firstWindow = this.outerFrame.contentWindow;
-		doc = firstWindow.document;
-		doc.write("<html><body margin='0px'><iframe style='width:100%;height:100%;border:0px' name='protectedFrame'></iframe></body></html>");
-		doc.close();
+		this.doc = firstWindow.document;
+		this.doc.write("<html><body margin='0px'><iframe style='width:100%;height:100%;border:0px' name='protectedFrame'></iframe></body></html>");
+		this.doc.close();
 		var secondWindow = firstWindow[0]; 
 		firstWindow.__defineGetter__(0,function(){});
 		firstWindow.__defineGetter__("protectedFrame",function(){});
-		doc = secondWindow.document;
-		doc.write("<html><body margin='0px'></body></html>");
-		doc.close();
-		this.frame_container = doc.body;
+		this.doc = secondWindow.document;
+		this.doc.write("<html><body margin='0px'></body></html>");
+		this.doc.close();
+		this.frame_container = this.doc.body;
     }
     
     
