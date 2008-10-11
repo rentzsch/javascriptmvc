@@ -31,9 +31,9 @@ MVC.CometController = MVC.Controller.extend(
     /**
      * Starts the coment connection.
      */
-    run: function(){
+    run: function(params){
         var instance = new this();
-        instance.run();
+        instance.run(params);
     },
     /**
      * Kills the comet connection.
