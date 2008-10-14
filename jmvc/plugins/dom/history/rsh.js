@@ -721,7 +721,7 @@ MVC.History.historyChange = function(newLocation, historyData) {
 	
 	var first_s = folders.indexOf('/');
 	
-	var params = new MVC.Controller.Params(data);
+	var params = new MVC.Controller.Params(data);	
 	
 	if(first_s != -1){
 		controller_part = folders.substring(0,first_s);
@@ -734,7 +734,9 @@ MVC.History.historyChange = function(newLocation, historyData) {
 	}else{
 		throw "Can't dispatch location "+folders;
 	}
-	var result = MVC.Controller.dispatch(controller_part, action_part,params);
+	
+	var controller = window[MVC.String.classize(controller_part)+'Controller'];
+	var result = controller.dispatch(action_part,params);
 	return result;
 };
 
