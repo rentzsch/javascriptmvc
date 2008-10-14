@@ -47,21 +47,18 @@ MVC.WindowName.prototype = {
 			this.frame.contentWindow.location = this.domain_page;
 		}
 		// back to our domain, we should be able to access the frame name now
-		try{
-			if(this.state<2) this.get_data();
-		}catch(e){
-		}
+		if(this.state<2) this.get_data();
     },
     send : function(){
         this.domain = window.location.protocol+"//"+window.location.hostname;
         this.domain_page = this.domain+"/blank.html"+"#" +this.frameNum;
-        this.frameName = window.location +this.domain_page;
+        this.frameName = this.domain_page;
         this.frame_container = document.body;
         this.doc = document;
         if(MVC.Browser.Gecko && ![].reduce)
             this.protectFF2()
         var frame = this.frame = document.createElement(MVC.Browser.IE ? 
-            '<iframe name="' + frameName + '" onload="MVC.WindowName['+this.frameNum+']()">' :
+            '<iframe name="' + this.frameName + '" onload="MVC.WindowName['+this.frameNum+']()">' :
             'iframe'
         )
 		MVC.WindowName.styleFrame(this.frame);
@@ -72,7 +69,7 @@ MVC.WindowName.prototype = {
 		this.state = 0;
 		
         var self = this;
-		MVC.WindowName[this.frameName] = this.frame.onload = MVC.Function.bind(this.onload, this);
+		MVC.WindowName[this.frameNum] = this.frame.onload = MVC.Function.bind(this.onload, this);
 		
         frame.name = this.frameName;
 		if(this.params.method.match(/GET/i)){
