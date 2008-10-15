@@ -444,7 +444,7 @@ var self = window;
 			html = html.replace(/<\/?([A-Z]+)/g, function(m){
 				return m.toLowerCase();
 			});
-			
+			html = HTMLtoXML(html);
 			var nodes = this.ownerDocument.importNode(
 				new DOMDocument( new java.io.ByteArrayInputStream(
 					(new java.lang.String("<wrap>" + html + "</wrap>"))
