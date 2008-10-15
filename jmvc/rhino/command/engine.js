@@ -11,7 +11,8 @@ Engine.prototype = {
         new File("engines/"+this.name).mkdir();
         var fetcher = new RecursiveHTTPFetcher(this.uri, -1, "engines/"+this.name)
         fetcher.quiet = options.quiet || true
-        fetcher.fetch()
+        fetcher.fetch();
+        print("  Engine downloaded.")
     },
     guess_name: function(url){
       this.name = new MVC.File(url).basename();

@@ -7,12 +7,12 @@
 
 
 
-RecursiveHTTPFetcher = function(urls_to_fetch, level, cwd){
+RecursiveHTTPFetcher = function(urls_to_fetch, level, cwd, ignore){
     this.urls_to_fetch = [urls_to_fetch];
     this.level = level || 1
     this.cwd = cwd || "."
     this.quite =false
-    
+    this.ignore = ignore;
 }
 RecursiveHTTPFetcher.prototype = {
     ls: function(){
@@ -37,6 +37,8 @@ RecursiveHTTPFetcher.prototype = {
             
             if(link.match(/svnindex.xsl$/) || link.match(  /^(\w*:|)\/\//) || link.match(/^\./) ){
                 
+            }else if(this.ignore && link.match( this.ignore )  ){
+            
             }else
                 links.push( (new MVC.File(base_url)).join(link) );
         } )
@@ -50,13 +52,10 @@ RecursiveHTTPFetcher.prototype = {
         this.cwd = new MVC.File(this.cwd).dir();
     },
     download : function(link){
-        
-        
-        
-        
         //var text = readUrl( link);
         var bn = new MVC.File(link).basename();
         var f = new MVC.File(this.cwd).join(bn);
+        print("   "+f);
         new MVC.File(f).download_from( link );
     },
     fetch : function(links ){
