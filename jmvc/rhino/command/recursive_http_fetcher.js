@@ -38,8 +38,6 @@ RecursiveHTTPFetcher.prototype = {
             print
             if(link.match(/svnindex.xsl$/) || link.match(  /^(\w*:|)\/\//) || link.match(/^\./) ){
                 
-            }else if(ignore && link.match( ignore )  ){
-                print("ignoreing "+link);
             }else
                 links.push( (new MVC.File(base_url)).join(link) );
         } )
@@ -54,8 +52,14 @@ RecursiveHTTPFetcher.prototype = {
     },
     download : function(link){
         //var text = readUrl( link);
+        
         var bn = new MVC.File(link).basename();
         var f = new MVC.File(this.cwd).join(bn);
+        if(f.match(this.ignore)){
+            print("   I "+f);
+            return;
+        }
+        
         var oldsrc = readFile(f);
         new MVC.File(f).download_from( link, true );
         var newsrc = readFile(f);
