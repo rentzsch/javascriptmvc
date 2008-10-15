@@ -70,7 +70,7 @@ MVC.View = function( options ){
 			if(window._rhino) print("Exception: "+'There is no template at '+url);
             throw( {type: 'JMVC', message: 'There is no template at '+url}  );
 		}
-		this.name = options.url;
+		this.name = url;
 	}else if(options.hasOwnProperty('element'))
 	{
         if(typeof options.element == 'string'){
