@@ -1,5 +1,3 @@
-// java -jar jmvc\rhino\js.jar -e load('apps/translations/compress.js')
-
 MVCOptions = {
     onload: true,
     env: "test",
