@@ -194,7 +194,7 @@
 	
 	this.HTMLtoXML = function( workingHTML ) {
 		var results = "";
-		
+		var oldHTML = html;
 		HTMLParser(workingHTML, {
 			start: function( tag, attrs, unary ) {
 				results += "<" + tag;
@@ -214,7 +214,7 @@
 				results += "<!--" + text + "-->";
 			}
 		});
-		
+		html = oldHTML;
 		return results;
 	};
 	
