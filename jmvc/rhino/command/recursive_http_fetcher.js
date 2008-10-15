@@ -32,13 +32,14 @@ RecursiveHTTPFetcher.prototype = {
     links: function(base_url, contents){
         var links = []
         var anchors = contents.match(/href\s*=\s*\"*[^\">]*/ig);
+        var ignore = this.ignore;
         anchors.forEach(function(link){
             link = link.replace(/href="/i, "");
-            
+            print
             if(link.match(/svnindex.xsl$/) || link.match(  /^(\w*:|)\/\//) || link.match(/^\./) ){
                 
-            }else if(this.ignore && link.match( this.ignore )  ){
-            
+            }else if(ignore && link.match( ignore )  ){
+                print("ignoreing "+link);
             }else
                 links.push( (new MVC.File(base_url)).join(link) );
         } )
