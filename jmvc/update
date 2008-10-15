@@ -1,7 +1,4 @@
-if(_args < 2){
-  print("Usage: js jmvc/update")
-  quit();
-}
+
 
 
 load('jmvc/rhino/command/file.js')
