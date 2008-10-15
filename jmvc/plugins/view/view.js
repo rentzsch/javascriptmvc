@@ -55,7 +55,7 @@ MVC.View = function( options ){
 		MVC.View.update(this.name, this);
 		return;
 	}
-	if(options.url || options.absolute_url){
+	if(options.url || options.absolute_url || options.view_url){
         var url = options.absolute_url || 
                   (options.url ? options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) : 
                    MVC.root.join("view/"+options.view_url)
