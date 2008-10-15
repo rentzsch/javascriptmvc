@@ -41,7 +41,7 @@ MVC.Controller.DragAction = MVC.Controller.DelegateAction.extend({
                //go through list of events, add as parameters for
                for(var event_type in MVC.Draggable.selectors[selector].events){
                    if(MVC.Draggable.selectors[selector].events.hasOwnProperty(event_type) )
-                       params[event_type] = MVC.Controller.dispatch_closure(controller.className, MVC.Draggable.selectors[selector].events[event_type]);
+                       params[event_type] = MVC.Controller.controllers[controller.className][0].dispatch_closure(MVC.Draggable.selectors[selector].events[event_type]);
                }
                // create the dragable with the callbacks in place;
                // these callbacks should be prepared above, so they aren't created everytime you start dragging.
@@ -56,7 +56,7 @@ MVC.Controller.DragAction = MVC.Controller.DelegateAction.extend({
 MVC.Draggable = function(params){
     this.element = params.element;
     this.moved = false;
-	this.keep_dragging = true;
+    this.keep_dragging = true;
     //this.originalz = MVC.Element.get_style(this.element,'z-Index');
     //this.originallyAbsolute = MVC.Element.get_style(this.element,'position')  == 'absolute';
 
@@ -71,11 +71,34 @@ MVC.Draggable = function(params){
 
 MVC.Draggable.prototype = {
     start: function(event){
-        MVC.Element.make_positioned(this.element);
-        this.element.style.zIndex = 1000;  //make the z-Index high
         this.moved = true;
-		// only drag if dragstart doesn't return false
-        this.keep_dragging = this.dragstart({element: this.element, event: event});
+        this.keep_dragging = true;
+
+        var drag_data = {
+            element: this.element, 
+            event: event, 
+            cancel_drag: function() {
+                this.keep_dragging = false;
+            }.bind(this),
+            use_ghost: function(callback) {
+                // create a ghost by cloning the source element and attach the clone to the dom after the source element
+                var ghost = this.element.cloneNode(true);
+                MVC.Element.insert(this.element, { after: ghost });
+
+                if (callback && typeof callback == 'function')
+                    // the user supplied a callback to the function, because they want to style the ghost themselves
+                    callback(this.element, ghost);
+                else
+                    // at the very least, pull the ghost out of the document flow so it doesn't mess up the existing layout
+                    ghost.style.position = 'absolute';
+
+                // store the original element and make the ghost the dragged element
+                this.ghosted_element = this.element;
+                this.element = ghost;
+            }.bind(this)
+        };
+
+        this.dragstart(drag_data);
         MVC.Droppables.compile(); //Get the list of Droppables.
     },
     //returns the current relative offset
@@ -115,8 +138,22 @@ MVC.Event.observe(document, 'mousemove', function(event){
 MVC.Event.observe(document, 'mouseup', function(event){
     //if there is a current, we should call its dragstop
     if(MVC.Draggable.current){
-        MVC.Draggable.current.dragend({element: MVC.Draggable.current.element, event: event});
-        MVC.Droppables.fire(event,MVC.Draggable.current.element)
+        var current = MVC.Draggable.current;
+        var drag_data = { element: current.element, event: event };
+
+        // if there is a ghost, pass it and the source element in the drag data
+        if (current.ghosted_element) {
+            drag_data.ghost = drag_data.element;
+            drag_data.element = current.ghosted_element;
+        }
+
+        current.dragend(drag_data);
+        MVC.Droppables.fire(event, current.element);
+        
+        // ensure that the ghost (if it still exists in the dom) is removed
+        if (current.ghosted_element && current.element.parentNode) {
+            MVC.Element.remove(current.element);
+        }
     }
 
     MVC.Draggable.current = null;

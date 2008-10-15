@@ -22,12 +22,12 @@ MVC.Controller.DropAction = MVC.Controller.DelegateAction.extend({
         var selector = this.selector();
         // basically add selector to list of selectors:
         if(MVC.Droppables.selectors[selector]) {
-            MVC.Droppables.selectors[selector][this.event_type] = MVC.Controller.dispatch_closure(controller.className, action);
+            MVC.Droppables.selectors[selector][this.event_type] = MVC.Controller.controllers[controller.className][0].dispatch_closure(action);
             return;
         }
         MVC.Droppables.selectors[selector] = {};
-        MVC.Droppables.selectors[selector][this.event_type] = 
-            MVC.Controller.dispatch_closure(controller.className, action); 
+        MVC.Droppables.selectors[selector][this.event_type] =
+            MVC.Controller.controllers[controller.className][0].dispatch_closure(action); 
     }
 });
 
