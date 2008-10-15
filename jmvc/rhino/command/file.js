@@ -107,7 +107,7 @@ MVC.File.prototype = {
 		}
         inp.close();
         out.close();*/
-       
+
        
        var input = 
            new java.io.BufferedInputStream(
@@ -124,7 +124,5 @@ MVC.File.prototype = {
             bout.write(data, 0 , num_read);
         }
         bout.close();
-               
-       
     }
 };

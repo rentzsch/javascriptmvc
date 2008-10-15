@@ -56,8 +56,16 @@ RecursiveHTTPFetcher.prototype = {
         //var text = readUrl( link);
         var bn = new MVC.File(link).basename();
         var f = new MVC.File(this.cwd).join(bn);
-        print("   "+f);
-        new MVC.File(f).download_from( link );
+        var oldsrc = readFile(f);
+        new MVC.File(f).download_from( link, true );
+        var newsrc = readFile(f);
+        var p = "   "
+        if(oldsrc){
+            if(oldsrc == newsrc) return;
+            print(p+"U "+f);
+        }else{
+            print(p+"A "+f);
+        }
     },
     fetch : function(links ){
         var auto_fetch = !links;
