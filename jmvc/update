@@ -1,0 +1,13 @@
+if(_args < 2){
+  print("Usage: js jmvc/update")
+  quit();
+}
+
+
+load('jmvc/rhino/command/file.js')
+load('jmvc/rhino/command/recursive_http_fetcher.js');
+
+var fetcher = new RecursiveHTTPFetcher("http://javascriptmvc.googlecode.com/svn/trunk/jmvc/", -1, "jmvc", /js\.jar/)
+fetcher.quiet = false
+fetcher.fetch();
+print("  JavaScriptMVC updated!");

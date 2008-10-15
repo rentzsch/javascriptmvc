@@ -1,0 +1,7 @@
+if(_args.length < 2){
+	print("USAGE: js jmvc/generate/fixture url\n")
+	print();
+	quit();
+}
+// this needs to create a file in fixtures from the url and convert the params 
+// of the url
