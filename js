@@ -9,7 +9,7 @@ then
   exit 127
 fi
 
-if [ $1 == "-h" -o $1 == "-?" -o $1 == "--help" ]
+if [ $1 = "-h" -o $1 = "-?" -o $1 = "--help" ]
 then
 echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
 echo Available commands:
@@ -27,7 +27,7 @@ echo  -e "./js apps/[NAME]/compress.js\t\tCompress your application and generate
 fi
 
 
-if [ $1 == "-d" ]
+if [ $1 = "-d" ]
 then
 	java -classpath jmvc/rhino/js.jar org.mozilla.javascript.tools.debugger.Main
 	exit 127
