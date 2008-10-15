@@ -58,7 +58,7 @@ MVC.View = function( options ){
 	if(options.url || options.absolute_url || options.view_url){
         var url = options.absolute_url || 
                   (options.url ? options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) : 
-                   MVC.root.join("view/"+options.view_url)
+                   MVC.root.join("views/"+options.view_url)
                   );
         //options.url = options.absolute_url || options.url || options.;
 		var template = MVC.View.get(url, this.cache);
