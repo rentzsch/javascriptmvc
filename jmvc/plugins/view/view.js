@@ -56,15 +56,18 @@ MVC.View = function( options ){
 		return;
 	}
 	if(options.url || options.absolute_url){
-        var url = options.absolute_url || options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) ;
-        options.url = options.absolute_url || options.url;
-		var template = MVC.View.get(options.url, this.cache);
+        var url = options.absolute_url || 
+                  (options.url ? options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) : 
+                   MVC.root.join("view/"+options.view_url)
+                  );
+        //options.url = options.absolute_url || options.url || options.;
+		var template = MVC.View.get(url, this.cache);
 		if (template) return template;
 	    if (template == MVC.View.INVALID_PATH) return null;
         this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
 		
 		if(this.text == null){
-			print("Exception: "+'There is no template at '+url)
+			if(window._rhino) print("Exception: "+'There is no template at '+url);
             throw( {type: 'JMVC', message: 'There is no template at '+url}  );
 		}
 		this.name = options.url;
