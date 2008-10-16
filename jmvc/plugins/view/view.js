@@ -447,9 +447,9 @@ MVC.View.config = function(options){
 };
 MVC.View.config( {cache: include.get_env() == 'production', type: '<' } );
 
-MVC.View.PreCompiledFunction = function(view_name, f){
+MVC.View.PreCompiledFunction = function(original_path, path, f){
     
-	new MVC.View({name: new MVC.File("../"+view_name).join_current(), precompiled: f});
+	new MVC.View({name: path, precompiled: f});
 };
 
 /**
@@ -504,7 +504,7 @@ include.view = function(path){
 		//include.set_path(oldp);
 		new MVC.View({url: new MVC.File("../"+path).join_current()});
 	}else{
-		//production, do nothing!
+		//production, do nothing!, it will be loaded by process
 	}
 };
 
@@ -517,7 +517,7 @@ include.views = function(){
 MVC.View.process_include = function(script){
     var view = new MVC.View({text: script.text});
 	return 'MVC.View.PreCompiledFunction("'+script.original_path+
-				'", function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+view.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
+				'", "'+script.path+'",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+view.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
 };
 
 if(!MVC._no_conflict){
