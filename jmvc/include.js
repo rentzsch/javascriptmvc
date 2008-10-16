@@ -180,7 +180,7 @@ MVC.page_dir = new File(window.location.href).dir(); //here, everything must adj
 var scripts = document.getElementsByTagName("script");
 for(var i=0; i<scripts.length; i++) {
 	var src = scripts[i].src;
-	if(src.match(/include2\.js/)){
+	if(src.match(/include\.js/)){
 		MVC.include_path = src;
 		MVC.mvc_root = new File( new File(src).join_from( MVC.page_dir ) ).dir();
 		// added this to check for html files that are deeper inside the jmvc directory
