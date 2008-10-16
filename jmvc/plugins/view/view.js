@@ -447,9 +447,9 @@ MVC.View.config = function(options){
 };
 MVC.View.config( {cache: include.get_env() == 'production', type: '<' } );
 
-MVC.View.PreCompiledFunction = function(name, f){
+MVC.View.PreCompiledFunction = function(view_name, f){
     
-	new MVC.View({name: new MVC.File("../"+name).join_current(), precompiled: f});
+	new MVC.View({name: new MVC.File("../"+view_name).join_current(), precompiled: f});
 };
 
 /**
