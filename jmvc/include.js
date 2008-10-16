@@ -6,27 +6,23 @@
 
 (function(){
 	
-
+// Check if include has already been loaded, if it has call end.
 if(typeof include != 'undefined' && typeof include.end != 'undefined'){
     return include.end();
 }else if(typeof include != 'undefined' && typeof include.end == 'undefined')
 	throw("Include is defined as function or an element's id!");
 
+//Default things JMVC Has
 MVC = {
 	OPTIONS: {},
 	Test: {},
-	Included: {controllers: [], resources: [], models: [], plugins: [], views: [], functional_tests: [], unit_tests: []},
+	//Included: {controllers: [], resources: [], models: [], plugins: [], views: [], functional_tests: [], unit_tests: []},
 	_no_conflict: false,
 	no_conflict: function(){ MVC._no_conflict = true  },
 	File: function(path){ this.path = path; },
-	Initializer: function(f) {
-		MVC.user_initialize_function = f;
-		include.set_path(MVC.mvc_root);
-		include('framework');
-	},
-	Runner: function(f){
-		if(!window.in_command_window && !window._rhino)
-			f();
+	/* Ignores code in rhino */
+    Runner: function(f){
+		if(!window.in_command_window && !window._rhino) f();
 	},
 	Ajax: {},
 	Browser: {
@@ -54,22 +50,44 @@ MVC = {
 };
 	
 var File = MVC.File;
+/**
+ * Used for getting information out of a path
+ */
 MVC.File.prototype = {
-	clean: function(){
+	/**
+	 * Removes hash and params
+	 */
+    clean: function(){
 		return this.path.match(/([^\?#]*)/)[1];
 	},
+    /**
+     * Returns everything before the last /
+     */
 	dir: function(){
 		var last = this.clean().lastIndexOf('/');
 		return last != -1 ? this.clean().substring(0,last) : ''; //this.clean();
 	},
+    /**
+     * Returns the domain for the current path.
+     * Returns null if the domain is a file.
+     */
 	domain: function(){ 
 		if(this.path.indexOf('file:') == 0 ) return null;
 		var http = this.path.match(/^(?:https?:\/\/)([^\/]*)/);
 		return http ? http[1] : null;
 	},
+    /**
+     * Joins url onto path
+     * @param {Object} url
+     */
 	join: function(url){
 		return new File(url).join_from(this.path);
 	},
+    /**
+     * 
+     * @param {Object} url
+     * @param {Object} expand
+     */
 	join_from: function( url, expand){
 		if(this.is_domain_absolute()){
 			var u = new File(url);
@@ -93,12 +111,25 @@ MVC.File.prototype = {
 			return urls.concat(paths).join('/');
 		}
 	},
+    /**
+     * Joins the file to the current working directory.
+     */
     join_current: function(){
         return this.join_from(include.get_path());
     },
+    /**
+     * Returns true if the file is relative
+     */
 	relative: function(){		return this.path.match(/^(https?:|file:|\/)/) == null;},
+    /**
+     * Returns the part of the path that is after the domain part
+     */
 	after_domain: function(){	return this.path.match(/(?:https?:\/\/[^\/]*)(.*)/)[1];},
-	to_reference_from_same_domain: function(url){
+	/**
+	 * 
+	 * @param {Object} url
+	 */
+    to_reference_from_same_domain: function(url){
 		var parts = this.path.split('/'), other_parts = url.split('/'), result = '';
 		while(parts.length > 0 && other_parts.length >0 && parts[0] == other_parts[0]){
 			parts.shift(); other_parts.shift();
@@ -106,23 +137,50 @@ MVC.File.prototype = {
 		for(var i = 0; i< other_parts.length; i++) result += '../';
 		return result+ parts.join('/');
 	},
+    /**
+     * Is the file on the same domain as our page.
+     */
 	is_cross_domain : function(){
 		if(this.is_local_absolute()) return false;
 		return this.domain() != new File(location.href).domain();
 	},
 	is_local_absolute : function(){	return this.path.indexOf('/') === 0},
-	is_domain_absolute : function(){return this.path.match(/^(https?:|file:)/) != null}
+	is_domain_absolute : function(){return this.path.match(/^(https?:|file:)/) != null},
+    /*
+     * For a given path, a given working directory, and file location, update the path so 
+     * it points to the right location.
+     */
+	normalize: function(){
+		var current_path = include.get_path();
+		//if you are cross domain from the page, and providing a path that doesn't have an domain
+		var path = this.path;
+        if(new File(include.get_absolute_path()).is_cross_domain() && !this.is_domain_absolute() ){
+			//if the path starts with /
+			if( this.is_local_absolute() ){
+				var domain_part = current_path.split('/').slice(0,3).join('/');
+				path = domain_part+path;
+			}else{ //otherwise
+				path = this.join_from(current_path);
+			}
+		}else if(current_path != '' && this.relative()){
+			path = this.join_from( current_path+(current_path.lastIndexOf('/') === current_path.length - 1 ? '' : '/')  );
+		}else if(current_path != '' && options.remote && ! this.is_domain_absolute()){
+			var domain_part = current_path.split('/').slice(0,3).join('/');
+			path = domain_part+path;
+		}
+		return path;
+	}
 };
 
 
 
-MVC.page_dir = new File(window.location.href).dir();						  
+MVC.page_dir = new File(window.location.href).dir(); //here, everything must adjust to this				  
 
 //find include and get its absolute path
 var scripts = document.getElementsByTagName("script");
 for(var i=0; i<scripts.length; i++) {
 	var src = scripts[i].src;
-	if(src.match(/include\.js/)){
+	if(src.match(/include2\.js/)){
 		MVC.include_path = src;
 		MVC.mvc_root = new File( new File(src).join_from( MVC.page_dir ) ).dir();
 		// added this to check for html files that are deeper inside the jmvc directory
@@ -207,7 +265,13 @@ MVC.Object.extend(include,{
 	},
 	get_env: function() { return options.env;},
 	get_production_name: function() { return options.production;},
-	set_path: function(p) {cwd = p;},
+	/**
+	 * Sets the current directory.
+	 * @param {Object} p
+	 */
+    set_path: function(p) {
+        cwd = p;
+    },
 	get_path: function() { 
 		return options.remote ? include.get_absolute_path() : cwd;
 	},
@@ -215,6 +279,13 @@ MVC.Object.extend(include,{
 		var fwd = new File(cwd);
 		return fwd.relative() ? fwd.join_from(MVC.page_dir+'/', true) : cwd;
 	},
+    /**
+     * Adds the include to the list of includes remaining to be included.
+     * If the include is a function, adjusts the function to run from the current
+     * path, adds the include to the list of functions to be run.  Then adds it to the current includes.
+     * If it is a normal file, it normalizes the file to the current path.
+     * @param {Object} newInclude
+     */
 	add: function(newInclude){
 		if(typeof newInclude == 'function'){
             var path = include.get_path();
@@ -233,7 +304,9 @@ MVC.Object.extend(include,{
         
         
 		var pf = new File(newInclude.path);
-		newInclude.path = include.normalize(  path  );
+		newInclude.path = pf.normalize();
+        
+        //include.normalize(  path  );
 		
 		newInclude.absolute = pf.relative() ? pf.join_from(include.get_absolute_path(), true) : newInclude.path;
 		if(is_included(newInclude.absolute)) return;
@@ -248,27 +321,7 @@ MVC.Object.extend(include,{
             insert_head(MVC.root.join(arguments[i]));
         }
     },
-	normalize: function(path){
-		var current_path = include.get_path();
-		//if you are cross domain from the page, and providing a path that doesn't have an domain
-		
-		var file = new File(path);
-		if(new File(include.get_absolute_path()).is_cross_domain() && !file.is_domain_absolute() ){
-			//if the path starts with /
-			if( file.is_local_absolute() ){
-				var domain_part = current_path.split('/').slice(0,3).join('/');
-				path = domain_part+path;
-			}else{ //otherwise
-				path = file.join_from(current_path);
-			}
-		}else if(current_path != '' && file.relative()){
-			path = file.join_from( current_path+(current_path.lastIndexOf('/') === current_path.length - 1 ? '' : '/')  );
-		}else if(current_path != '' && options.remote && ! file.is_domain_absolute()){
-			var domain_part = current_path.split('/').slice(0,3).join('/');
-			path = domain_part+path;
-		}
-		return path;
-	},
+    
     close_time : function(){
         setTimeout(function(){ document.close(); },10)
     },
@@ -276,6 +329,9 @@ MVC.Object.extend(include,{
         if(include.get_env()=='production') include.close_time();
         else    include._close= true;
     },
+    /*
+     * Called after every file is loaded.  Gets the next file and includes it.
+     */
 	end: function(){
         includes = includes.concat(current_includes);
 		var latest = includes.pop();
@@ -308,7 +364,7 @@ MVC.Object.extend(include,{
                      if(parts.length > 4) parts = parts.slice(parts.length - 4);
                      print("   "+parts.join("/"));
                 }
-                latest.text = include.request(latest.path);
+                latest.text = include.request(MVC.root.join(latest.path));
             }
     		latest.ignore ? insert() : insert(latest.path);
         }
@@ -332,16 +388,16 @@ MVC.Object.extend(include,{
 	opera_called : false,
 	srcs: [],
 	plugin: function(plugin_name) {
-		MVC.Included.plugins.push(plugin_name);
+		//MVC.Included.plugins.push(plugin_name);
 		var current_path = include.get_path();
-		include.set_path(MVC.mvc_root);
-		include('plugins/'+ plugin_name+'/setup');
+		include.set_path("");
+		include('jmvc/plugins/'+ plugin_name+'/setup');
 		include.set_path(current_path);
 	},
 	plugins: function(){
 		for(var i=0; i < arguments.length; i++) include.plugin(arguments[i]);
 	},
-	app: function(f, included_array){
+	app: function(f){
 		return function(){
 			
             
@@ -350,8 +406,8 @@ MVC.Object.extend(include,{
 
             for (var i = 0; i < arguments.length; i++) {
 				arguments[i] = f(arguments[i]);
-				if(included_array)
-					included_array.push(arguments[i].match(/[^\/\\]*$/)[0].replace(/_controller/,''));
+				//if(included_array)
+				//	included_array.push(arguments[i].match(/[^\/\\]*$/)[0].replace(/_controller/,''));
 			}
 			include.apply(null, arguments);
             //include.set_path(current_path);
@@ -366,7 +422,8 @@ MVC.Object.extend(include,{
         var arg;
         for(var i=0; i < arguments.length; i++){
             arg = arguments[i];
-            include.create_link( new MVC.File("../stylesheets/"+arg+".css").join_from( include.get_path() )  );
+            var current = new MVC.File("../stylesheets/"+arg+".css").join_current();
+            include.create_link( MVC.root.join(current)  );
         }
         
         
@@ -395,7 +452,10 @@ var script_tag = function(){
 	return start;
 };
 var insert = function(src){
-
+    // source we need to know how to get to jmvc, then load 
+    // relative to path to jmvc
+    if(src)
+        src = MVC.root.join(src);
     if(! document.write){
         if(src){
             load(new MVC.File( src ).clean());
@@ -441,9 +501,9 @@ include.check_exists = function(path){
     return true;
 }
 
-include.controllers = include.app(function(i){return '../controllers/'+i+'_controller'}, MVC.Included.controllers);
-include.models = include.app(function(i){return '../models/'+i}, MVC.Included.models);
-include.resources = include.app(function(i){return '../resources/'+i}, MVC.Included.resources);
+include.controllers = include.app(function(i){return '../controllers/'+i+'_controller'});
+include.models = include.app(function(i){return '../models/'+i});
+include.resources = include.app(function(i){return '../resources/'+i});
 include.engines = include.app(function(i){ return '../engines/'+i+"/apps/"+i+".js"} );
 
 if(MVC.script_options){
@@ -452,7 +512,8 @@ if(MVC.script_options){
     if(window._rhino)
         MVC.script_options[1] = MVCOptions.env
 	if(MVC.script_options.length > 1)	include.setup({env: MVC.script_options[1], production: MVC.apps_root+'/'+MVC.script_options[0]+'/production'});
-	include(MVC.apps_root+'/'+MVC.script_options[0]);
+	
+    include('apps/'+MVC.app_name);
 	
     if(MVC.script_options[1] == 'test'){
 		var load_test = function(){

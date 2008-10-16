@@ -56,12 +56,13 @@ MVC.View = function( options ){
 		return;
 	}
 	if(options.url || options.absolute_url || options.view_url){
+        this.name = this.name ? this.name : options.url || options.absolute_url || options.view_url;
         var url = options.absolute_url || 
-                  (options.url ? options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) : 
-                   MVC.root.join("views/"+options.view_url)
+                  (options.url ? MVC.root.join( options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) ) : 
+                   MVC.root.join("views/"+options.view_url+ (options.view_url.match(/\.ejs/) ? '' : '.ejs' ))
                   );
         //options.url = options.absolute_url || options.url || options.;
-		var template = MVC.View.get(url, this.cache);
+		var template = MVC.View.get(this.name, this.cache);
 		if (template) return template;
 	    if (template == MVC.View.INVALID_PATH) return null;
         this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
@@ -70,7 +71,7 @@ MVC.View = function( options ){
 			if(window._rhino) print("Exception: "+'There is no template at '+url);
             throw( {type: 'JMVC', message: 'There is no template at '+url}  );
 		}
-		this.name = url;
+		//this.name = url;
 	}else if(options.hasOwnProperty('element'))
 	{
         if(typeof options.element == 'string'){
@@ -489,9 +490,9 @@ MVC.View.Helpers.prototype = {
 
 
 
-MVC.Included.views = [];
+//MVC.Included.views = [];
 include.view = function(path){
-	MVC.Included.views.push(path.replace(/\.ejs/,''));
+	//MVC.Included.views.push(path.replace(/\.ejs/,''));
 	if(include.get_env() == 'development'){
         //should convert path
         
