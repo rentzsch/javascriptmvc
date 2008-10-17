@@ -488,11 +488,7 @@ MVC.View.Helpers.prototype = {
 	}
 };
 
-
-
-//MVC.Included.views = [];
 include.view = function(path){
-	//MVC.Included.views.push(path.replace(/\.ejs/,''));
 	if(include.get_env() == 'development'){
         //should convert path
         

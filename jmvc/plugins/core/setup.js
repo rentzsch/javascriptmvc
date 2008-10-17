@@ -5,27 +5,21 @@ if(typeof Prototype == 'undefined') {
 			"../dom/event/standard",
 			"../io/ajax/ajax",
 			"../lang/class/setup");
-	MVC.Included.plugins.push('lang','lang/inflector','io/ajax','dom/event','lang/class');
 }else{
 	MVC.Event = Event;
 	include({path: '../lang/prototype_helpers.js', shrink_variables: false},
 			"../lang/inflector/inflector",
 			"../io/ajax/prototype_ajax");
-	MVC.Included.plugins.push('lang','lang/inflector','io/ajax');
 }
 
 if(MVC.Console)
 	include("../io/ajax/debug")
 
-MVC.Included.plugins.push('view','controller','controller/view');
 
 include('../view/view', 
 		'../controller/controller',
 		'../controller/delegator',
 		'../controller/view/controller_view');
-
-MVC.Included.plugins.push('view','controller','controller/view');
-	
     
 include.plugins('dom/element', 'controller/scaffold','model/view_helper','view/helpers')
     

@@ -1,4 +1,4 @@
-include.set_path('../../apps');
+include.set_path('apps');
 include.resources();
 include.plugins('core');
 include.engines('modalmvc');
@@ -7,7 +7,7 @@ include(function(){ //runs after prior includes are loaded
   include.controllers();
   include.views();
 });;
-include.set_path('../../jmvc/plugins/core');
+include.set_path('jmvc/plugins/core');
 
 if(typeof Prototype == 'undefined') {
 	include({path: '../lang/standard_helpers.js', shrink_variables: false},
@@ -43,7 +43,7 @@ if(include.get_env() == 'development')	include('../view/fulljslint');
 
 
 ;
-include.set_path('../../jmvc/plugins/lang');
+include.set_path('jmvc/plugins/lang');
 // Several of the methods in this plugin use code adapated from Prototype
 //  Prototype JavaScript framework, version 1.6.0.1
 //  (c) 2005-2007 Sam Stephenson
@@ -277,7 +277,7 @@ MVC.Native.extend('Number',
 })
 
 ;
-include.set_path('../../jmvc/plugins/lang/inflector');
+include.set_path('jmvc/plugins/lang/inflector');
 // based on the Inflector class found on a DZone snippet contributed by Todd Sayre
 // http://snippets.dzone.com/posts/show/3205
 
@@ -437,7 +437,7 @@ MVC.Native.extend('String', {
     return false;
   }
 });;
-include.set_path('../../jmvc/plugins/dom/event');
+include.set_path('jmvc/plugins/dom/event');
 // The code from the event plugin comes from 
 // JavaScript: the Definitive Guide by David Flanagan
 // Copyright 2006 O'Reilly Media
@@ -568,7 +568,7 @@ The following calls checkForm on the form element with id 'signinForm' being sub
 if(!MVC._no_conflict && typeof Event == 'undefined'){
 	Event = MVC.Event;
 };
-include.set_path('../../jmvc/plugins/io/ajax');
+include.set_path('jmvc/plugins/io/ajax');
 // Modified version of Ajax.Request from prototype
 //  Prototype JavaScript framework, version 1.6.0.1
 //  (c) 2005-2007 Sam Stephenson
@@ -756,7 +756,7 @@ MVC.Ajax.prototype = {
 };
 
 if(!MVC._no_conflict) Ajax = MVC.Ajax;;
-include.set_path('../../jmvc/plugins/lang/class');
+include.set_path('jmvc/plugins/lang/class');
 //MVC.Class 
 // This is a modified version of John Resig's class
 // It provides class level inheritence and callbacks.
@@ -882,7 +882,732 @@ include.set_path('../../jmvc/plugins/lang/class');
 if(!MVC._no_conflict && typeof Class == 'undefined'){
 	Class = MVC.Class;
 };
-include.set_path('../../jmvc/plugins/view');
+include.set_path('engines/modalmvc/apps');
+include.resources();
+include.plugins('controller','view');
+include.css("style");
+include(function(){ //runs after prior includes are loaded
+  include.models();
+  include.controllers('modal');
+  include.views('views/modal/alert_subscribe',
+		'views/modal/prompt_subscribe');
+});
+;
+include.set_path('jmvc/plugins/controller');
+include.plugins('lang','lang/inflector','dom/event','lang/class');
+include('delegator','controller');
+if(MVC.View) include.plugins('controller/view');
+//if(include.get_env() == 'test') include('test');
+include.set_path('jmvc/plugins/lang');
+/* -------------
+	Helpers defines the following:
+
+	Object
+	* extend
+	* to_query_string
+	
+	
+	String
+	* capitalize
+	* include
+	* ends_with
+	* camelize
+	
+	Array
+	* include
+	* from
+	
+	Function
+	* bind
+ ------------  */
+
+if(typeof Prototype != 'undefined'){
+	include({path: 'prototype_helpers.js', shrink_variables: false});
+}else if(typeof jQuery != 'undefined'){
+	include({path: 'jquery_helpers.js', shrink_variables: false});
+}else{
+	include({path: 'standard_helpers.js', shrink_variables: false});
+}
+	;
+include.set_path('jmvc/plugins/lang/inflector');
+include.plugins('lang');
+include('inflector');;
+include.set_path('jmvc/plugins/dom/event');
+/**
+ * Event describes 2 functions
+ * 	Event.observe
+ * 	Event.stopObserving
+ */
+
+if(typeof Prototype == 'undefined') 
+	include("standard");
+else{
+	include("prototype_event");
+}
+	
+//jQuery's wont work for controllers because it doesn't allow capture;
+include.set_path('jmvc/plugins/controller');
+/**
+ * @constructor
+ * Attaches listeners for delegated events.
+ * @init Creates a new delegator listener
+ * @param {String} selector a css selector
+ * @param {String} event a dom event
+ * @param {Function} f a function to call
+ */
+MVC.Delegator = function(selector, event, f){
+    this._event = event;
+    this._selector = selector;
+    this._func = f;
+    if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
+    if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
+	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
+	if(event == 'change' && MVC.Browser.WebKit) return this.change_for_webkit();
+	
+    this.add_to_delegator();
+};
+
+MVC.Object.extend(MVC.Delegator,
+/* @Static*/
+{
+    /**
+     * Returns an array of objects that represent the path of the node to documentElement.  Each item in the array
+     * has a tag, className, id, and element attribute.
+     * @param {Object} el element in the dom that is nested under the documentElement
+     * @return {Array} representation of the path between the element and the DocumentElement
+     */
+    node_path: function(el){
+		var body = document.documentElement,parents = [],iterator =el;
+		while(iterator != body){
+			parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
+			iterator = iterator.parentNode;
+			if(iterator == null) return [];
+		}
+		parents.push(body);
+		return parents;
+	},
+    /**
+     * Goes through the delegated events for the given event type (e.g. Click).  Orders the matches
+     * by how nested they are in the dom.  Adds the kill function on the event, then dispatches each
+     * event.  If kill is called, it will stop dispatching other events.
+     * @param {Event} event the DOM event returned by a normal event handler.
+     */
+	dispatch_event: function(event){
+		var target = event.target, matched = false, ret_value = true,matches = [];
+		var delegation_events = MVC.Delegator.events[event.type];
+        var parents_path = MVC.Delegator.node_path(target);
+        
+		for(var i =0; i < delegation_events.length;  i++){
+			var delegation_event = delegation_events[i];
+			var match_result = delegation_event.match(target, event, parents_path);
+			if(match_result){
+				matches.push(match_result);
+			}
+		}
+
+		if(matches.length == 0) return true;
+		MVC.Delegator.add_kill_event(event);
+		matches.sort(MVC.Delegator.sort_by_order);
+        var match;
+		for(var m = 0; m < matches.length; m++){
+            match = matches[m];
+            ret_value = match.delegation_event._func( {event: event, element: match.node} ) && ret_value;
+			if(event.is_killed()) return false;
+		}
+	},
+    add_kill_event: function(event){ //this should really be in event
+		if(!event.kill){
+			var killed = false;
+			event.kill = function(){
+				killed = true;
+				if(!event) event = window.event;
+			    try{
+				    event.cancelBubble = true;
+				    if (event.stopPropagation)  event.stopPropagation(); 
+				    if (event.preventDefault)  event.preventDefault();
+			    }catch(e){}
+			};
+			event.is_killed = function(){return killed;};
+		}	
+	},
+    /**
+     * Used for sorting events on an object
+     * @param {Object} a
+     * @param {Object} b
+     * @return {Number} -1,0,1 depending on how a and b should be sorted.
+     */
+    sort_by_order: function(a,b){
+    	if(a.order < b.order) return 1;
+    	if(b.order < a.order) return -1;
+    	var ae = a._event, be = b._event;
+    	if(ae == 'click' &&  be == 'change') return 1;
+    	if(be == 'click' &&  ae == 'change') return -1;
+    	return 0;
+    },
+    /**
+     * Stores all delegated events
+     */
+    events: {}
+})
+
+/* @Prototype*/
+MVC.Delegator.prototype = {
+    /*
+     * returns the event that should actually be used.  In practice, this is just used to switch focus/blur
+     * to activate/deactivate for ie.
+     * @return {String} the adjusted event name.
+     */
+    event: function(){
+    	if(MVC.Browser.IE){
+            if(this._event == 'focus')
+    			return 'activate';
+    		else if(this._event == 'blur')
+    			return 'deactivate';
+    	}
+    	return this._event;
+    },
+    /*
+     * Returns if capture should be used (blur and focus)
+     * @return {Boolean} true for focus / blur, false if otherwise
+     */
+    capture: function(){
+        return MVC.Array.include(['focus','blur'],this._event);
+    },
+    /**
+     * If there are no special cases, this is called to add to the delegator.
+     * @param {String} selector - css selector
+     * @param {String} event - event selector
+     * @param {Function} func - a function that will be called
+     */
+    add_to_delegator: function(selector, event, func){
+        var s = selector || this._selector;
+        var e = event || this.event();
+        var f = func || this._func;
+        
+        if(!MVC.Delegator.events[e]){
+            MVC.Event.observe(document.documentElement, e, MVC.Delegator.dispatch_event, this.capture() );
+            MVC.Delegator.events[e] = [];
+		}
+		MVC.Delegator.events[e].push(this);
+    },
+    /*
+     * Handles the submit case for IE.  It checks if a keypress return happens in an
+     * input area or a submit button is clicked.
+     */
+    submit_for_ie : function(){
+		this.add_to_delegator(null, 'click');
+        this.add_to_delegator(null, 'keypress');
+        
+        this.filters= {
+			click : function(el, event, parents){
+				//check you are in a form
+                if(el.nodeName.toUpperCase() == 'INPUT' && el.type.toLowerCase() == 'submit'){
+                    for(var e = 0; e< parents.length ; e++) if(parents[e].tag == 'FORM') return true;
+                }
+                return false;
+                
+			},
+			keypress : function(el, event, parents){
+				if(el.nodeName.toUpperCase()!= 'INPUT') return false;
+				var res = typeof Prototype != 'undefined' ? (event.keyCode == 13) : (event.charCode == 13)
+                if(res){
+                    for(var e = 0; e< parents.length ; e++) if(parents[e].tag == 'FORM') return true;
+                }
+                return false;
+			}
+		};
+	},
+    /*
+     * Handles change events for IE.
+     */
+	change_for_ie : function(){
+		this.add_to_delegator(null, 'click');
+        this.end_filters= {
+			click : function(el, event){
+				if(typeof el.selectedIndex == 'undefined' || el.nodeName.toUpperCase() != 'SELECT') return false; //sometimes it won't exist yet
+				var old = el.getAttribute('_old_value');
+				if( old == null){
+					el.setAttribute('_old_value', el.selectedIndex);
+					return false;
+				}else{
+					if(old == el.selectedIndex.toString()) return false;
+					el.setAttribute('_old_value', null);
+					return true;
+				}
+			}
+		};
+	},
+    /*
+     * Handles a change event for Safari.
+     */
+	change_for_webkit : function(){
+		this.add_to_delegator(null, 'change');
+		this.end_filters= {
+			change : function(el, event){
+				if(typeof el.value == 'undefined') return false; //sometimes it won't exist yet
+				var old = el.getAttribute('_old_value');
+				el.setAttribute('_old_value', el.value);
+				return el.value != old;
+			}
+		};
+	},
+    /**
+     * Handles a right click for Opera.  It looks for clicks with shiftkey pressed.
+     */
+    context_for_opera : function(){
+        this.add_to_delegator(null, 'click');
+        this.end_filters= {
+			click : function(el, event){
+				return event.shiftKey;
+			}
+        }
+    },
+    regexp_patterns:  {tag :    		/^\s*(\*|[\w\-]+)(\b|$)?/,
+        				id :            /^#([\w\-\*]+)(\b|$)/,
+    					className :     /^\.([\w\-\*]+)(\b|$)/},
+    /*
+     * returns and caches the select order for the css patern.
+     * @retun {Array} array of objects that are used to match with the node_path
+     */
+    selector_order : function(){
+		if(this.order) return this.order;
+		var selector_parts = this._selector.split(/\s+/);
+		var patterns = this.regexp_patterns;
+		var order = [];
+		for(var i =0; i< selector_parts.length; i++){
+			var v = {}, r, p =selector_parts[i];
+			for(var attr in patterns){
+				if( patterns.hasOwnProperty(attr) ){
+					if( (r = p.match(patterns[attr]))  ) {
+						if(attr == 'tag')
+							v[attr] = r[1].toUpperCase();
+						else
+							v[attr] = r[1];
+						p = p.replace(r[0],'');
+					}
+				}
+			}
+			order.push(v);
+		}
+		this.order = order;
+		return this.order;
+	},
+    /**
+     * Tests if an event matches an element.
+     * @param {Object} el the element we are testing
+     * @param {Object} event the event
+     * @param {Object} parents an array of node order objects for the element
+     * @return {Object} returns an object with node, order, and delegation_event attributes.
+     */
+    match: function(el, event, parents){
+        if(this.filters && !this.filters[event.type](el, event, parents)) return null;
+		//if(this.controller.className != 'main' &&  (el == document.documentElement || el==document.body) ) return false;
+		var matching = 0;
+		for(var n=0; n < parents.length; n++){
+			var node = parents[n], match = this.selector_order()[matching], matched = true;
+			for(var attr in match){
+				if(!match.hasOwnProperty(attr) || attr == 'element') continue;
+				if(match[attr] && attr == 'className'){
+					if(! MVC.Array.include(node.className.split(' '),match[attr])) matched = false;
+				}else if(match[attr] && node[attr] != match[attr]){
+					matched = false;
+				}
+			}
+			if(matched){
+				matching++;
+                if(matching >= this.selector_order().length) {
+                    if(this.end_filters && !this.end_filters[event.type](el, event)) return null;
+                    return {node: node.element, order: n, delegation_event: this};
+                }
+			}
+		}
+		return null;
+    }
+};;
+include.set_path('jmvc/plugins/controller');
+// submitted by kangax
+MVC.Object.is_number = function(o){
+    return o &&(  typeof o == 'number' || ( typeof o == 'string' && !isNaN(o) ) );
+};
+
+/* Controllers respond to events such as mouseovers, clicks, and form submits. 
+ * They do this by naming functions, 
+ * also called actions, with combination css selector and event handlers.
+ */
+MVC.Controller = MVC.Class.extend(
+/* @Static*/
+{
+    /*
+     * Looks for controller actions and hooks them up to delegator
+     */
+    init: function(){
+        if(!this.className) return;
+        this.singularName =  MVC.String.singularize(this.className);
+        if(!MVC.Controller.controllers[this.className]) MVC.Controller.controllers[this.className] = [];
+        MVC.Controller.controllers[this.className].push(this);
+        var val, act;
+        this.actions = {};
+        for(var action_name in this.prototype){
+    		val = this.prototype[action_name];
+    		if( typeof val == 'function' && action_name != 'Class'){
+                for(var a = 0 ; a < MVC.Controller.actions.length; a++){
+                    act = MVC.Controller.actions[a];
+                    if(act.matches(action_name)){
+                        this.actions[action_name] =new act(action_name, val, this);
+                    }
+                }
+            }
+	    }
+        this.modelName = MVC.String.classize(
+            MVC.String.is_singular(this.className) ? this.className : MVC.String.singularize(this.className)
+        );
+        //load tests
+        if(include.get_env() == 'test'){
+            var path = MVC.root.join('test/functional/'+this.className+'_controller_test.js');
+    		var exists = include.check_exists(path);
+    		if(exists)
+    			MVC.Console.log('Loading: "test/functional/'+this.className+'_controller_test.js"');
+    		else {
+    			MVC.Console.log('Test Controller not found at "test/functional/'+this.className+'_controller_test.js"');
+    			return;
+    		}
+    		var p = include.get_path();
+    		include.set_path(MVC.root.path);
+    		include('test/functional/'+ this.className+'_controller_test.js');
+    		include.set_path(p);
+        }
+        this._path =  include.get_path().match(/(.*?)controllers/)[1]+"controllers";
+    },
+    event_closure: function(f_name, element){
+		return MVC.Function.bind(function(event){
+			var params = new MVC.Controller.Params({event: event, element: element, action: f_name, controller: this  });
+			return this.dispatch(f_name, params);
+		}, this);
+	},
+    subscribe_closure : function(f_name){
+        return   this.dispatch_closure(f_name);
+    },
+    dispatch_closure: function(f_name){
+        return MVC.Function.bind(function(params){
+            params = params || {};
+            params.action = f_name;
+            params.controller = this;
+			return this.dispatch(f_name,  new MVC.Controller.Params(params) );
+		},this);
+    },
+    /**
+     * Calls the Controller prototype function specified by controller and action_name with the given params.
+     * @param {Controller/String} controller The controller class or its className (i.e. 'todos').
+     * @param {String} action_name The name of the action to be called.
+     * @param {Controller.Params} params The params the action will be called with.
+     */
+    dispatch: function(action_name, params){
+		if(!action_name) action_name = 'index';
+		
+		if(typeof action_name == 'string'){
+			if(!(action_name in this.prototype) ) throw 'No action named '+action_name+' was found for '+this.Class.className+' controller.';
+		}else{ //action passed TODO:  WHERE IS THIS USED?
+			action_name = action_name.name;
+		}
+        var instance = this._get_instance(action_name , params);
+		return this._dispatch_action(instance,action_name, params );
+	},
+    _get_instance : function(action_name,  params){
+          return new this(action_name, params);
+    },
+	_dispatch_action: function(instance, action_name, params){
+        instance.params = params;
+		instance.action_name = action_name;
+		return instance[action_name](params);
+	},
+    controllers : {},
+    actions: [],
+    publish: function(message, params){
+        var subscribers = MVC.Controller.SubscribeAction.events[message];
+        if(!subscribers) return;
+        for(var i =0 ; i < subscribers.length; i++){
+            subscribers[i](params);
+        }
+    }
+},
+/* @Prototype*/
+{
+    /*
+     * Returns a function that when called, calls the action with parameters passed to the function. 
+     * This is very useful for creating callbacks for Ajax functionality. 
+     * The callback is called on the same controller instance that created the callback. 
+     * This allows you to easily pass objects between request and response without resorting to closures. 
+     * Example:
+<pre><code>Controller('todos',{
+   "a click" : function(params){ 
+      this.element = params.element;
+	  this.element.innerHTML = 'deleting ...';
+	  new Ajax.Request('delete', {onComplete: <span class="magic">this.continue_to('deleted')</span>}
+   },
+   deleted : function(response){
+      this.element.parentNode.removeChild(this.element);
+   }
+});</code></pre>
+     * @param {String} action Name of prototype function you want called
+     * @return {Function} function that when called, directs to another controller function
+     */
+    continue_to :function(action){
+		if(!action) action = this.action.name+'ing';
+		if(typeof this[action] != 'function'){ throw 'There is no action named '+action+'. ';}
+		return MVC.Function.bind(function(){
+			this.action_name = action;
+			this[action].apply(this, arguments);
+		}, this);
+	},
+    delay: function(delay, action_name, params){
+		if(typeof this[action_name] != 'function'){ throw 'There is no action named '+action_name+'. ';}
+		
+        return setTimeout(MVC.Function.bind(function(){
+			this.Class._dispatch_action(this, action_name ,  params )
+		}, this), delay );
+    },
+    publish: function(message, params){
+        this.Class.publish(message,params);
+    }
+});
+
+
+
+/*
+ * Genaric base action.  This must provide a matches base function.
+ */
+MVC.Controller.Action = MVC.Class.extend(
+{
+    init: function(){
+        if(this.matches) MVC.Controller.actions.push(this);
+    }
+},{
+    init: function(action, f, controller){
+        this.action = action;
+        this.func = f;
+        this.controller = controller;
+    }
+});
+MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
+/* @Static*/
+{
+    match: new RegExp("(.*?)\\s?(subscribe)$"),
+    matches: function(action_name){
+        return this.match.exec(action_name);
+    },
+    events: {}
+},
+/* @Prototype*/
+{
+    init: function(action, f, controller){
+        this._super(action, f, controller);
+        this.message();
+        if(!this.Class.events[this.message_name]) this.Class.events[this.message_name] = [];
+        var cb = this.controller.subscribe_closure(action );
+        this.Class.events[this.message_name].push(cb);
+    },
+    message: function(){
+        this.parts = this.action.match(this.Class.match);
+        this.message_name = this.parts[1];
+    }
+})
+/*
+ * Default EventDelegation based actions
+ */
+MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
+/* @Static*/
+    match: new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
+    /*
+     * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
+     * mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, 
+     * focus, blur, load, unload
+     * @return {Boolean} true if a prototype function name matches an action.
+     */
+    matches: function(action_name){
+        return this.match.exec(action_name);
+    }
+},
+/* @Prototype*/
+{    
+    init: function(action, f, controller){
+        this._super(action, f, controller);
+        this.css_and_event();
+        
+        var selector = this.selector();
+        if(selector != null){
+            new MVC.Delegator(selector, this.event_type, 
+                this.controller.dispatch_closure(action ) );
+        }
+    },
+    /*
+     * Splits the action name into its css and event parts.
+     */
+    css_and_event: function(){
+        this.parts = this.action.match(this.Class.match);
+        this.css = this.parts[1];
+        this.event_type = this.parts[2];
+    },
+    /*
+     * Deals with main controller specific delegation (blur and focus)
+     */
+    main_controller: function(){
+	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
+            MVC.Event.observe(window, this.event_type, this.controller.event_closure( this.event_type, window) );
+            return;
+        }
+        return this.css;
+    },
+    /*
+     * Handles a plural controller name
+     * @return {String} the css with the controller name included
+     */
+    plural_selector : function(){
+		if(this.css == "#" || this.css.substring(0,2) == "# "){
+			var newer_action_name = this.css.substring(2,this.css.length);
+            return '#'+this.controller.className + (newer_action_name ?  ' '+newer_action_name : '') ;
+		}else{
+			return '.'+MVC.String.singularize(this.controller.className)+(this.css? ' '+this.css : '' );
+		}
+	},
+    /*
+     * Handles a singular controller name
+     * @return {String} the css with the controller name included
+     */
+    singular_selector : function(){
+        return '#'+this.controller.className+(this.css? ' '+this.css : '' );
+    },
+    /*
+     * Gets the full css selector for this action
+     * @return {String/null} returns a string css if Delegator should be used, null if otherwise.
+     */
+    selector : function(){
+        if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
+            MVC.Event.observe(window, this.event_type, this.controller.event_closure(this.event_type, window) );
+            return;
+        }
+        
+        
+        if(this.controller.className == 'main') 
+            this.css_selector = this.main_controller();
+        else
+            this.css_selector = MVC.String.is_singular(this.controller.className) ? 
+                this.singular_selector() : this.plural_selector();
+        return this.css_selector;
+    }
+});
+
+/* @Constructor
+ * Instances of Controller.Params are passed to Event based actions.
+ * 
+ * <h3>Example</h3>
+ * <pre><code>MVC.Controller.extend('todos', {
+   mouseover : function(params){ 
+      <span class="magic">params</span>.element.style.backgroundColor = 'Red';
+   },
+   mouseout : function(params){
+      <span class="magic">params</span>.element.style.backgroundColor = '';
+      <span class="magic">params</span>.event.stop();
+   },
+   "img click" : function(params){
+   	  <span class="magic">params</span>.class_element().parentNode.removeSibiling(params.class_element());
+   }
+})</code></pre>
+ * @init Creates a new Controller.Params object.
+ * @param {Object} params An object you want to pass to a controller
+ */
+MVC.Controller.Params = function(params){
+	var params = params || {};
+    var killed = false;
+	this.kill = function(){
+		killed = true;
+		if(params.event.kill) params.event.kill();
+	};
+	this.is_killed = function(){return params.event.is_killed ?  params.event.is_killed() :  killed ;};
+    
+    for(var thing in params){
+		if( params.hasOwnProperty(thing) ) this[thing] = params[thing];
+	}
+};
+/* @Prototype*/
+MVC.Controller.Params.prototype = {
+	/*
+	 * Returns data in a hash for a form.
+	 * @return {Object} Nested form data.
+	 */
+    form_params : function(){
+		var data = {};
+		if(this.element.nodeName.toLowerCase() != 'form') return data;
+		var els = this.element.elements, uri_params = [];
+		for(var i=0; i < els.length; i++){
+			var el = els[i];
+			if(el.type.toLowerCase()=='submit') continue;
+			var key = el.name || el.id, key_components = key.match(/(\w+)/g), value;
+            if(!key) continue;     
+			/* Check for checkbox and radio buttons */
+			switch(el.type.toLowerCase()) {
+				case 'checkbox':
+				case 'radio':
+					value = !!el.checked;
+					break;
+				default:
+					value = el.value;
+					break;
+			}
+			//if( MVC.Object.is_number(value) ) value = parseFloat(value);
+			if( key_components.length > 1 ) {
+				var last = key_components.length - 1;
+				var nested_key = key_components[0].toString();
+				if(! data[nested_key] ) data[nested_key] = {};
+				var nested_hash = data[nested_key];
+				for(var k = 1; k < last; k++){
+					nested_key = key_components[k];
+					if( ! nested_hash[nested_key] ) nested_hash[nested_key] ={};
+					nested_hash = nested_hash[nested_key];
+				}
+				nested_hash[ key_components[last] ] = value;
+			} else {
+		        if (key in data) {
+		        	if (typeof data[key] == 'string' ) data[key] = [data[key]];
+		         	data[key].push(value);
+		        }
+		        else data[key] = value;
+			}
+		}
+		return data;
+	},
+    /*
+     * Returns the class element for the element selected
+     * @return {HTMLElement} the element that shares the controller's id or classname
+     */
+	class_element : function(){
+		var start = this.element;
+		var className = this._className();
+		while(start && start.className.indexOf(className) == -1 ){
+			start = start.parentNode;
+			if(start == document) return null;
+		}
+		return start;
+	},
+    /*
+     * Returns if the event happened directly on the element in the params.
+     * @return {Boolean} true if the event's target is the element, false if otherwise.
+     */
+	is_event_on_element : function(){ return this.event.target == this.element; },
+	_className : function(){
+		return this.controller.singularName;
+	}
+};
+
+if(!MVC._no_conflict && typeof Controller == 'undefined'){
+	Controller = MVC.Controller
+};
+include.set_path('jmvc/plugins/view');
+include.plugins('lang');
+include('view');
+if(include.get_env() == 'development')	include('fulljslint');
+
+if(MVC.Controller) include.plugins('controller/view');;
+include.set_path('jmvc/plugins/view');
 // Copyright (c) 2007 Edward Benson http://www.edwardbenson.com/projects/ejs
 
 /**
@@ -940,19 +1665,23 @@ MVC.View = function( options ){
 		MVC.View.update(this.name, this);
 		return;
 	}
-	if(options.url || options.absolute_url){
-        var url = options.absolute_url || options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) ;
-        options.url = options.absolute_url || options.url;
-		var template = MVC.View.get(options.url, this.cache);
+	if(options.url || options.absolute_url || options.view_url){
+        this.name = this.name ? this.name : options.url || options.absolute_url || "views/"+options.view_url;
+        var url = options.absolute_url || 
+                  (options.url ? MVC.root.join( options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) ) : 
+                   MVC.root.join("views/"+options.view_url+ (options.view_url.match(/\.ejs/) ? '' : '.ejs' ))
+                  );
+        //options.url = options.absolute_url || options.url || options.;
+		var template = MVC.View.get(this.name, this.cache);
 		if (template) return template;
 	    if (template == MVC.View.INVALID_PATH) return null;
         this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
 		
 		if(this.text == null){
-			print("Exception: "+'There is no template at '+url)
+			if(window._rhino) print("Exception: "+'There is no template at '+url);
             throw( {type: 'JMVC', message: 'There is no template at '+url}  );
 		}
-		this.name = options.url;
+		//this.name = url;
 	}else if(options.hasOwnProperty('element'))
 	{
         if(typeof options.element == 'string'){
@@ -1328,9 +2057,9 @@ MVC.View.config = function(options){
 };
 MVC.View.config( {cache: include.get_env() == 'production', type: '<' } );
 
-MVC.View.PreCompiledFunction = function(name, f){
+MVC.View.PreCompiledFunction = function(original_path, path, f){
     
-	new MVC.View({name: new MVC.File("../"+name).join_current(), precompiled: f});
+	new MVC.View({name: path, precompiled: f});
 };
 
 /**
@@ -1371,9 +2100,9 @@ MVC.View.Helpers.prototype = {
 
 
 
-MVC.Included.views = [];
+//MVC.Included.views = [];
 include.view = function(path){
-	MVC.Included.views.push(path.replace(/\.ejs/,''));
+	//MVC.Included.views.push(path.replace(/\.ejs/,''));
 	if(include.get_env() == 'development'){
         //should convert path
         
@@ -1385,7 +2114,7 @@ include.view = function(path){
 		//include.set_path(oldp);
 		new MVC.View({url: new MVC.File("../"+path).join_current()});
 	}else{
-		//production, do nothing!
+		//production, do nothing!, it will be loaded by process
 	}
 };
 
@@ -1398,7 +2127,7 @@ include.views = function(){
 MVC.View.process_include = function(script){
     var view = new MVC.View({text: script.text});
 	return 'MVC.View.PreCompiledFunction("'+script.original_path+
-				'", function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+view.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
+				'", "'+script.path+'",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+view.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
 };
 
 if(!MVC._no_conflict){
@@ -1448,676 +2177,10 @@ MVC.Native.extend('String', {
         return string.substr(0, string.length - 1);
     }
 });
-include.set_path('../../jmvc/plugins/controller');
-// submitted by kangax
-MVC.Object.is_number = function(o){
-    return o &&(  typeof o == 'number' || ( typeof o == 'string' && !isNaN(o) ) );
-};
-
-/* Controllers respond to events such as mouseovers, clicks, and form submits. 
- * They do this by naming functions, 
- * also called actions, with combination css selector and event handlers.
- */
-MVC.Controller = MVC.Class.extend(
-/* @Static*/
-{
-    /*
-     * Looks for controller actions and hooks them up to delegator
-     */
-    init: function(){
-        if(!this.className) return;
-        this.singularName =  MVC.String.singularize(this.className);
-        if(!MVC.Controller.controllers[this.className]) MVC.Controller.controllers[this.className] = [];
-        MVC.Controller.controllers[this.className].push(this);
-        var val, act;
-        this.actions = {};
-        for(var action_name in this.prototype){
-    		val = this.prototype[action_name];
-    		if( typeof val == 'function' && action_name != 'Class'){
-                for(var a = 0 ; a < MVC.Controller.actions.length; a++){
-                    act = MVC.Controller.actions[a];
-                    if(act.matches(action_name)){
-                        this.actions[action_name] =new act(action_name, val, this);
-                    }
-                }
-            }
-	    }
-        this.modelName = MVC.String.classize(
-            MVC.String.is_singular(this.className) ? this.className : MVC.String.singularize(this.className)
-        );
-        //load tests
-        if(include.get_env() == 'test'){
-            var path = MVC.root.join('test/functional/'+this.className+'_controller_test.js');
-    		var exists = include.check_exists(path);
-    		if(exists)
-    			MVC.Console.log('Loading: "test/functional/'+this.className+'_controller_test.js"');
-    		else {
-    			MVC.Console.log('Test Controller not found at "test/functional/'+this.className+'_controller_test.js"');
-    			return;
-    		}
-    		var p = include.get_path();
-    		include.set_path(MVC.root.path);
-    		include('test/functional/'+ this.className+'_controller_test.js');
-    		include.set_path(p);
-        }
-        this._path =  include.get_path().match(/(.*?)\/controllers/)[1]+"/controllers";
-    },
-    add_kill_event: function(event){ //this should really be in event
-		if(!event.kill){
-			var killed = false;
-			event.kill = function(){
-				killed = true;
-				if(!event) event = window.event;
-			    try{
-				    event.cancelBubble = true;
-				    if (event.stopPropagation)  event.stopPropagation(); 
-				    if (event.preventDefault)  event.preventDefault();
-			    }catch(e){}
-			};
-			event.is_killed = function(){return killed;};
-		}	
-	},
-    event_closure: function(controller_name, f_name, element){
-		return function(event){
-			MVC.Controller.add_kill_event(event);
-			var params = new MVC.Controller.Params({event: event, element: element, action: f_name, controller: controller_name   });
-			return MVC.Controller.dispatch(controller_name, f_name, params);
-		};
-	},
-    dispatch_closure: function(controller_name, f_name){
-        return function(params){
-            MVC.Controller.add_kill_event(params.event);
-            params.action = f_name;
-            params.controller = controller_name;
-			return MVC.Controller.dispatch(controller_name, f_name, 
-                new MVC.Controller.Params(params)
-            );
-		};
-    },
-    publish_closure: function(controller_name, f_name){
-        return function(params){
-            params.action = f_name;
-            params.controller = controller_name;
-			return MVC.Controller.dispatch(controller_name, f_name, 
-                new MVC.Controller.Params(params)
-            );
-		};
-    },
-    /**
-     * Calls the Controller prototype function specified by controller and action_name with the given params.
-     * @param {Controller/String} controller The controller class or its className (i.e. 'todos').
-     * @param {String} action_name The name of the action to be called.
-     * @param {Controller.Params} params The params the action will be called with.
-     */
-    dispatch: function(controller, action_name, params){
-		var c_name = controller;
-		if(typeof controller == 'string'){
-            controller = MVC.Controller.controllers[c_name][0];
-        }
-		if(!controller) throw 'No controller named '+c_name+' was found for MVC.Controller.dispatch.';
-		if(!action_name) action_name = 'index';
-		
-		if(typeof action_name == 'string'){
-			if(!(action_name in controller.prototype) ) throw 'No action named '+action_name+' was found for '+c_name+'.';
-		}else{ //action passed
-			action_name = action_name.name;
-		}
-		var instance = new controller();
-		instance.params = params;
-		instance.action_name = action_name;
-        instance.controller_name = controller.className;
-		return MVC.Controller._dispatch_action(instance,action_name, params );
-	},
-	_dispatch_action: function(instance, action_name, params){
-		return instance[action_name](params);
-	},
-    controllers : [],
-    actions: [],
-    publish: function(message, params){
-        var subscribers = MVC.Controller.SubscribeAction.events[message];
-        if(!subscribers) return;
-        for(var i =0 ; i < subscribers.length; i++){
-            subscribers[i](params);
-        }
-    }
-},
-/* @Prototype*/
-{
-    /*
-     * Returns a function that when called, calls the action with parameters passed to the function. 
-     * This is very useful for creating callbacks for Ajax functionality. 
-     * The callback is called on the same controller instance that created the callback. 
-     * This allows you to easily pass objects between request and response without resorting to closures. 
-     * Example:
-<pre><code>Controller('todos',{
-   "a click" : function(params){ 
-      this.element = params.element;
-	  this.element.innerHTML = 'deleting ...';
-	  new Ajax.Request('delete', {onComplete: <span class="magic">this.continue_to('deleted')</span>}
-   },
-   deleted : function(response){
-      this.element.parentNode.removeChild(this.element);
-   }
-});</code></pre>
-     * @param {String} action Name of prototype function you want called
-     * @return {Function} function that when called, directs to another controller function
-     */
-    continue_to :function(action){
-		if(!action) action = this.action.name+'ing';
-		if(typeof this[action] != 'function'){ throw 'There is no action named '+action+'. ';}
-		return MVC.Function.bind(function(){
-			this.action_name = action;
-			this[action].apply(this, arguments);
-		}, this);
-	},
-    delay: function(delay, action_name){
-		if(typeof this[action_name] != 'function'){ throw 'There is no action named '+actaction_nameion+'. ';}
-		
-        return setTimeout(MVC.Function.bind(function(){
-			this.action_name = action_name;
-			this[action_name].apply(this, arguments);
-		}, this), delay );
-    },
-    dispatch_delay: function(delay, action_name, params){
-        var controller_name = action_name.controller ? action_name.controller : this.Class.className;
-        action_name = typeof action_name == 'string' ? action_name : action_name.action;
-        return setTimeout(function(){
-            MVC.Controller.dispatch(controller_name,action_name, params );
-        }, delay );
-    },
-    publish: function(message, params){
-        this.Class.publish(message,params);
-    }
-});
-
-
-
-/*
- * Genaric base action.  This must provide a matches base function.
- */
-MVC.Controller.Action = MVC.Class.extend(
-{
-    init: function(){
-        if(this.matches) MVC.Controller.actions.push(this);
-    }
-},{
-    init: function(action, f, controller){
-        this.action = action;
-        this.func = f;
-        this.controller = controller;
-    }
-});
-MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
-/* @Static*/
-{
-    match: new RegExp("(.*?)\\s?(subscribe)$"),
-    matches: function(action_name){
-        return this.match.exec(action_name);
-    },
-    events: {}
-},
-/* @Prototype*/
-{
-    init: function(action, f, controller){
-        this._super(action, f, controller);
-        this.message();
-        if(!this.Class.events[this.message_name]) this.Class.events[this.message_name] = [];
-        var cb = this.controller.publish_closure(controller.className, action );
-        this.Class.events[this.message_name].push(cb);
-    },
-    message: function(){
-        this.parts = this.action.match(this.Class.match);
-        this.message_name = this.parts[1];
-    }
-})
-/*
- * Default EventDelegation based actions
- */
-MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
-/* @Static*/
-    match: new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
-    /*
-     * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
-     * mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, 
-     * focus, blur, load, unload
-     * @return {Boolean} true if a prototype function name matches an action.
-     */
-    matches: function(action_name){
-        return this.match.exec(action_name);
-    }
-},
-/* @Prototype*/
-{    
-    init: function(action, f, controller){
-        this._super(action, f, controller);
-        this.css_and_event();
-        
-        var selector = this.selector();
-        if(selector != null){
-            new MVC.Delegator(selector, this.event_type, 
-                this.controller.dispatch_closure(controller.className, action ) );
-        }
-    },
-    /*
-     * Splits the action name into its css and event parts.
-     */
-    css_and_event: function(){
-        this.parts = this.action.match(this.Class.match);
-        this.css = this.parts[1];
-        this.event_type = this.parts[2];
-    },
-    /*
-     * Deals with main controller specific delegation (blur and focus)
-     */
-    main_controller: function(){
-	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, MVC.Controller.event_closure(this.controller, this.event_type, window) );
-            return;
-        }
-        return this.css;
-    },
-    /*
-     * Handles a plural controller name
-     * @return {String} the css with the controller name included
-     */
-    plural_selector : function(){
-		if(this.css == "#" || this.css.substring(0,2) == "# "){
-			var newer_action_name = this.css.substring(2,this.css.length);
-            return '#'+this.controller.className + (newer_action_name ?  ' '+newer_action_name : '') ;
-		}else{
-			return '.'+MVC.String.singularize(this.controller.className)+(this.css? ' '+this.css : '' );
-		}
-	},
-    /*
-     * Handles a singular controller name
-     * @return {String} the css with the controller name included
-     */
-    singular_selector : function(){
-        return '#'+this.controller.className+(this.css? ' '+this.css : '' );
-    },
-    /*
-     * Gets the full css selector for this action
-     * @return {String/null} returns a string css if Delegator should be used, null if otherwise.
-     */
-    selector : function(){
-        if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, MVC.Controller.event_closure(this.controller, this.event_type, window) );
-            return;
-        }
-        
-        
-        if(this.controller.className == 'main') 
-            this.css_selector = this.main_controller();
-        else
-            this.css_selector = MVC.String.is_singular(this.controller.className) ? 
-                this.singular_selector() : this.plural_selector();
-        return this.css_selector;
-    }
-});
-
-/* @Constructor
- * Instances of Controller.Params are passed to Event based actions.
- * 
- * <h3>Example</h3>
- * <pre><code>MVC.Controller.extend('todos', {
-   mouseover : function(params){ 
-      <span class="magic">params</span>.element.style.backgroundColor = 'Red';
-   },
-   mouseout : function(params){
-      <span class="magic">params</span>.element.style.backgroundColor = '';
-      <span class="magic">params</span>.event.stop();
-   },
-   "img click" : function(params){
-   	  <span class="magic">params</span>.class_element().parentNode.removeSibiling(params.class_element());
-   }
-})</code></pre>
- * @init Creates a new Controller.Params object.
- * @param {Object} params An object you want to pass to a controller
- */
-MVC.Controller.Params = function(params){
-	for(var thing in params){
-		if( params.hasOwnProperty(thing) ) this[thing] = params[thing];
-	}
-};
-/* @Prototype*/
-MVC.Controller.Params.prototype = {
-	/*
-	 * Returns data in a hash for a form.
-	 * @return {Object} Nested form data.
-	 */
-    form_params : function(){
-		var data = {};
-		if(this.element.nodeName.toLowerCase() != 'form') return data;
-		var els = this.element.elements, uri_params = [];
-		for(var i=0; i < els.length; i++){
-			var el = els[i];
-			if(el.type.toLowerCase()=='submit') continue;
-			var key = el.name || el.id, key_components = key.match(/(\w+)/g), value;
-            if(!key) continue;     
-			/* Check for checkbox and radio buttons */
-			switch(el.type.toLowerCase()) {
-				case 'checkbox':
-				case 'radio':
-					value = !!el.checked;
-					break;
-				default:
-					value = el.value;
-					break;
-			}
-			//if( MVC.Object.is_number(value) ) value = parseFloat(value);
-			if( key_components.length > 1 ) {
-				var last = key_components.length - 1;
-				var nested_key = key_components[0].toString();
-				if(! data[nested_key] ) data[nested_key] = {};
-				var nested_hash = data[nested_key];
-				for(var k = 1; k < last; k++){
-					nested_key = key_components[k];
-					if( ! nested_hash[nested_key] ) nested_hash[nested_key] ={};
-					nested_hash = nested_hash[nested_key];
-				}
-				nested_hash[ key_components[last] ] = value;
-			} else {
-		        if (key in data) {
-		        	if (typeof data[key] == 'string' ) data[key] = [data[key]];
-		         	data[key].push(value);
-		        }
-		        else data[key] = value;
-			}
-		}
-		return data;
-	},
-    /*
-     * Returns the class element for the element selected
-     * @return {HTMLElement} the element that shares the controller's id or classname
-     */
-	class_element : function(){
-		var start = this.element;
-		var className = this._className();
-		while(start && start.className.indexOf(className) == -1 ){
-			start = start.parentNode;
-			if(start == document) return null;
-		}
-		return start;
-	},
-    /*
-     * Returns if the event happened directly on the element in the params.
-     * @return {Boolean} true if the event's target is the element, false if otherwise.
-     */
-	is_event_on_element : function(){ return this.event.target == this.element; },
-	_className : function(){
-		controller = this.controller;
-		var className = MVC.String.is_singular(controller) ? controller : MVC.String.singularize(controller);
-		return className;
-	}
-};
-
-if(!MVC._no_conflict && typeof Controller == 'undefined'){
-	Controller = MVC.Controller
-};
-include.set_path('../../jmvc/plugins/controller');
-/**
- * @constructor
- * Attaches listeners for delegated events.
- * @init Creates a new delegator listener
- * @param {String} selector a css selector
- * @param {String} event a dom event
- * @param {Function} f a function to call
- */
-MVC.Delegator = function(selector, event, f){
-    this._event = event;
-    this._selector = selector;
-    this._func = f;
-    if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
-    if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
-	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
-	if(event == 'change' && MVC.Browser.WebKit) return this.change_for_webkit();
-	
-    this.add_to_delegator();
-};
-
-MVC.Object.extend(MVC.Delegator,
-/* @Static*/
-{
-    /**
-     * Returns an array of objects that represent the path of the node to documentElement.  Each item in the array
-     * has a tag, className, id, and element attribute.
-     * @param {Object} el element in the dom that is nested under the documentElement
-     * @return {Array} representation of the path between the element and the DocumentElement
-     */
-    node_path: function(el){
-		var body = document.documentElement,parents = [],iterator =el;
-		while(iterator != body){
-			parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
-			iterator = iterator.parentNode;
-			if(iterator == null) return [];
-		}
-		parents.push(body);
-		return parents;
-	},
-    /**
-     * Goes through the delegated events for the given event type (e.g. Click).  Orders the matches
-     * by how nested they are in the dom.  Adds the kill function on the event, then dispatches each
-     * event.  If kill is called, it will stop dispatching other events.
-     * @param {Event} event the DOM event returned by a normal event handler.
-     */
-	dispatch_event: function(event){
-		var target = event.target, matched = false, ret_value = true,matches = [];
-		var delegation_events = MVC.Delegator.events[event.type];
-        var parents_path = MVC.Delegator.node_path(target);
-        
-		for(var i =0; i < delegation_events.length;  i++){
-			var delegation_event = delegation_events[i];
-			var match_result = delegation_event.match(target, event, parents_path);
-			if(match_result){
-				matches.push(match_result);
-			}
-		}
-
-		if(matches.length == 0) return true;
-		MVC.Controller.add_kill_event(event);
-		matches.sort(MVC.Delegator.sort_by_order);
-        var match;
-		for(var m = 0; m < matches.length; m++){
-            match = matches[m];
-            ret_value = match.delegation_event._func( {event: event, element: match.node} ) && ret_value;
-			if(event.is_killed()) return false;
-		}
-	},
-    /**
-     * Used for sorting events on an object
-     * @param {Object} a
-     * @param {Object} b
-     * @return {Number} -1,0,1 depending on how a and b should be sorted.
-     */
-    sort_by_order: function(a,b){
-    	if(a.order < b.order) return 1;
-    	if(b.order < a.order) return -1;
-    	var ae = a._event, be = b._event;
-    	if(ae == 'click' &&  be == 'change') return 1;
-    	if(be == 'click' &&  ae == 'change') return -1;
-    	return 0;
-    },
-    /**
-     * Stores all delegated events
-     */
-    events: {}
-})
-
-/* @Prototype*/
-MVC.Delegator.prototype = {
-    /*
-     * returns the event that should actually be used.  In practice, this is just used to switch focus/blur
-     * to activate/deactivate for ie.
-     * @return {String} the adjusted event name.
-     */
-    event: function(){
-    	if(MVC.Browser.IE){
-            if(this._event == 'focus')
-    			return 'activate';
-    		else if(this._event == 'blur')
-    			return 'deactivate';
-    	}
-    	return this._event;
-    },
-    /*
-     * Returns if capture should be used (blur and focus)
-     * @return {Boolean} true for focus / blur, false if otherwise
-     */
-    capture: function(){
-        return MVC.Array.include(['focus','blur'],this._event);
-    },
-    /**
-     * If there are no special cases, this is called to add to the delegator.
-     * @param {String} selector - css selector
-     * @param {String} event - event selector
-     * @param {Function} func - a function that will be called
-     */
-    add_to_delegator: function(selector, event, func){
-        var s = selector || this._selector;
-        var e = event || this.event();
-        var f = func || this._func;
-        
-        if(!MVC.Delegator.events[e]){
-            MVC.Event.observe(document.documentElement, e, MVC.Delegator.dispatch_event, this.capture() );
-            MVC.Delegator.events[e] = [];
-		}
-		MVC.Delegator.events[e].push(this);
-    },
-    /*
-     * Handles the submit case for IE.  It checks if a keypress return happens in an
-     * input area or a submit button is clicked.
-     */
-    submit_for_ie : function(){
-		this.add_to_delegator(null, 'click');
-        this.add_to_delegator(null, 'keypress');
-        
-        this.filters= {
-			click : function(el, event, parents){
-				//check you are in a form
-                if(el.nodeName.toUpperCase() == 'INPUT' && el.type.toLowerCase() == 'submit'){
-                    for(var e = 0; e< parents.length ; e++) if(parents[e].tag == 'FORM') return true;
-                }
-                return false;
-                
-			},
-			keypress : function(el, event, parents){
-				if(el.nodeName.toUpperCase()!= 'INPUT') return false;
-				var res = typeof Prototype != 'undefined' ? (event.keyCode == 13) : (event.charCode == 13)
-                if(res){
-                    for(var e = 0; e< parents.length ; e++) if(parents[e].tag == 'FORM') return true;
-                }
-                return false;
-			}
-		};
-	},
-    /*
-     * Handles change events for IE.
-     */
-	change_for_ie : function(){
-		this.add_to_delegator(null, 'click');
-        this.end_filters= {
-			click : function(el, event){
-				if(typeof el.selectedIndex == 'undefined' || el.nodeName.toUpperCase() != 'SELECT') return false; //sometimes it won't exist yet
-				var old = el.getAttribute('_old_value');
-				if( old == null){
-					el.setAttribute('_old_value', el.selectedIndex);
-					return false;
-				}else{
-					if(old == el.selectedIndex.toString()) return false;
-					el.setAttribute('_old_value', null);
-					return true;
-				}
-			}
-		};
-	},
-    /*
-     * Handles a change event for Safari.
-     */
-	change_for_webkit : function(){
-		this.add_to_delegator(null, 'change');
-		this.end_filters= {
-			change : function(el, event){
-				if(typeof el.value == 'undefined') return false; //sometimes it won't exist yet
-				var old = el.getAttribute('_old_value');
-				el.setAttribute('_old_value', el.value);
-				return el.value != old;
-			}
-		};
-	},
-    /**
-     * Handles a right click for Opera.  It looks for clicks with shiftkey pressed.
-     */
-    context_for_opera : function(){
-        this.add_to_delegator(null, 'click');
-        this.end_filters= {
-			click : function(el, event){
-				return event.shiftKey;
-			}
-        }
-    },
-    regexp_patterns:  {tag :    		/^\s*(\*|[\w\-]+)(\b|$)?/,
-        				id :            /^#([\w\-\*]+)(\b|$)/,
-    					className :     /^\.([\w\-\*]+)(\b|$)/},
-    /*
-     * returns and caches the select order for the css patern.
-     * @retun {Array} array of objects that are used to match with the node_path
-     */
-    selector_order : function(){
-		if(this.order) return this.order;
-		var selector_parts = this._selector.split(/\s+/);
-		var patterns = this.regexp_patterns;
-		var order = [];
-		for(var i =0; i< selector_parts.length; i++){
-			var v = {}, r, p =selector_parts[i];
-			for(var attr in patterns){
-				if( patterns.hasOwnProperty(attr) ){
-					if( (r = p.match(patterns[attr]))  ) {
-						if(attr == 'tag')
-							v[attr] = r[1].toUpperCase();
-						else
-							v[attr] = r[1];
-						p = p.replace(r[0],'');
-					}
-				}
-			}
-			order.push(v);
-		}
-		this.order = order;
-		return this.order;
-	},
-    /**
-     * Tests if an event matches an element.
-     * @param {Object} el the element we are testing
-     * @param {Object} event the event
-     * @param {Object} parents an array of node order objects for the element
-     * @return {Object} returns an object with node, order, and delegation_event attributes.
-     */
-    match: function(el, event, parents){
-        if(this.filters && !this.filters[event.type](el, event, parents)) return null;
-		//if(this.controller.className != 'main' &&  (el == document.documentElement || el==document.body) ) return false;
-		var matching = 0;
-		for(var n=0; n < parents.length; n++){
-			var node = parents[n], match = this.selector_order()[matching], matched = true;
-			for(var attr in match){
-				if(!match.hasOwnProperty(attr) || attr == 'element') continue;
-				if(match[attr] && attr == 'className'){
-					if(! MVC.Array.include(node.className.split(' '),match[attr])) matched = false;
-				}else if(match[attr] && node[attr] != match[attr]){
-					matched = false;
-				}
-			}
-			if(matched){
-				matching++;
-                if(matching >= this.selector_order().length) {
-                    if(this.end_filters && !this.end_filters[event.type](el, event)) return null;
-                    return {node: node.element, order: n, delegation_event: this};
-                }
-			}
-		}
-		return null;
-    }
-};;
-include.set_path('../../jmvc/plugins/controller/view');
+include.set_path('jmvc/plugins/controller/view');
+include.plugins('view', 'controller');
+include('controller_view');;
+include.set_path('jmvc/plugins/controller/view');
 /**
  * @add class MVC.Controller Prototype
  */
@@ -2242,1143 +2305,9 @@ render = function(options) {
 		return result;
 
 };
-;
-include.set_path('../../jmvc/plugins/dom/element');
-include('vector');
-
-
-	include('element');;
-include.set_path('../../jmvc/plugins/dom/element');
-/**
- * @constructor
- * A vector class
- * @init creates a new vector instance from the arguments.  Example:
- * <pre>new MVC.Vector(1,2)</pre>
- * 
- */
-
-MVC.Vector = function(){
-    this.update( MVC.Array.from(arguments) );
-};
-MVC.Vector.prototype = 
-/* @Prototype*/
-{
-    /**
-     * Applys the function to every item in the vector.  Returns the new vector.
-     * @param {Function} f
-     * @return {MVC.Vector} new vector class.
-     */
-    app: function(f){
-          var newArr = [];
-          
-          for(var i=0; i < this.array.length; i++)
-              newArr.push( f(  this.array[i] ) );
-          var vec = new MVC.Vector();
-          return vec.update(newArr);
-    },
-    /**
-     * Adds two vectors together.  Example:
-     * <pre>new Vector(1,2).plus(2,3) -> &lt;3,5>
-     * new Vector(3,5).plus(new Vector(4,5)) -> &lt;7,10>
-     * @return {MVC.Vector}
-     */
-    plus: function(){
-        var args = arguments[0] instanceof MVC.Vector ? 
-                 arguments[0].array : 
-                 MVC.Array.from(arguments), 
-            arr=this.array.slice(0), 
-            vec = new MVC.Vector();
-        for(var i=0; i < args.length; i++)
-            arr[i] = (arr[i] ? arr[i] : 0) + args[i];
-        return vec.update(arr);
-    },
-    /**
-     * Like plus but subtracts 2 vectors
-     * @return {MVC.Vector}
-     */
-    minus: function(){
-         var args = arguments[0] instanceof MVC.Vector ? 
-                 arguments[0].array : 
-                 MVC.Array.from(arguments), 
-             arr=this.array.slice(0), vec = new MVC.Vector();
-         for(var i=0; i < args.length; i++)
-            arr[i] = (arr[i] ? arr[i] : 0) - args[i];
-         return vec.update(arr);
-    },
-    /*
-     * Returns the 2nd value of the vector
-     * @return {Number}
-     */
-    x : function(){ return this.array[0] },
-    /**
-     * Returns the first value of the vector
-     * @return {Number}
-     */
-    y : function(){ return this.array[1] },
-    /**
-     * Same as x()
-     * @return {Number}
-     */
-    top : function(){ return this.array[1] },
-    /**
-     * same as y()
-     * @return {Number}
-     */
-    left : function(){ return this.array[0] },
-    /**
-     * returns (x,y)
-     * @return {String}
-     */
-    toString: function(){
-        return "("+this.array[0]+","+this.array[1]+")";
-    },
-    /**
-     * Replaces the vectors contents
-     * @param {Object} array
-     */
-    update: function(array){
-        if(this.array){
-            for(var i =0; i < this.array.length; i++) delete this.array[i];
-        }
-        this.array = array;
-        for(var i =0; i < array.length; i++) this[i]= this.array[i];
-        return this;
-    }
-};
-
-/**
- * @add class MVC.Event Static
- */
-MVC.Event.
-/**
- * Returns the position of the event
- * @plugin dom/element
- * @param {Event} event
- * @return {MVC.Vector}
- */
-pointer = function(event){
-	return new MVC.Vector( 
-        event.pageX || (event.clientX +
-          (document.documentElement.scrollLeft || document.body.scrollLeft)),
-          event.pageY || (event.clientY +
-          (document.documentElement.scrollTop || document.body.scrollTop)
-         )
-    );
-};;
-include.set_path('../../jmvc/plugins/dom/element');
-//Much of the code in this plugin is adapated from Prototype
-// Prototype JavaScript framework, version 1.6.0.1
-// (c) 2005-2007 Sam Stephenson
-
-
-/* @constructor
- * The Element API provides useful functions for manipulating and traversing the DOM. 
- * All of these elements are classed under $E. When using the Element or $E function, 
- * all Element functions that have their first argument as element are added to the element.
- * 
- * <h3>Examples</h3>
- * <pre><code>Element('element_id') -> HTMLElement
-$E('element_id') -> HTMLElement
-
-$E('element_id').next() -> HTMLElement
-Element.next('element_id') -> HTMLElement
-
-$E('element_id').insert({after: '&lt;p&gt;inserted text&lt;/p&gt;'})</code></pre>
- * @init the HTML Element for the given id with functions in Element.
- * @param {String/HTMLElement} element Either an HTMLElement or a string describing the element's id.
- * @return {HTMLElement} the HTML Element for the given id with functions in Element.
- */
-MVC.Element = function(element){
-	if(typeof element == 'string')
-		element = document.getElementById(element);
-    if (!element) return element;
-	return element._mvcextend ? element : MVC.Element.extend(element);
-};
-/* @Static*/
-MVC.Object.extend(MVC.Element, {
-    /**
-     * Inserts HTML into the page relative to the given element.
-     * @param {String/HTMLElement} element Either an HTML Element or a string describing the element's id. 
-     * @param {Object} insertions Is an object with one of the following attributes:
-     *     <table class="options">
-					<tbody><tr><th>Option</th><th>Description</th></tr>
-					<tr>
-						<td>after</td>
-						<td>Inserts the given HTML after the given element.</td>
-					</tr>
-					<tr>
-						<td>before</td>
-						<td>Inserts the given HTML before the given element.</td>
-					</tr>
-					<tr>
-						<td>bottom</td>
-						<td>Inserts the given HTML at the bottom of the given element's children.</td>
-					</tr>
-					<tr>
-						<td>top</td>
-						<td>Inserts the given HTML at the top of the given element's children.</td>
-					</tr>
-				</tbody>
-			</table>
-     * 
-     */
-	insert: function(element, insertions) {
-		element = MVC.$E(element);
-		if(typeof insertions == 'string'){insertions = {bottom: insertions};};
-
-		var content, insert, tagName, childNodes;
-		for (position in insertions) {
-		  if(! insertions.hasOwnProperty(position)) continue;
-		  content  = insertions[position];
-		  position = position.toLowerCase();
-		  insert = MVC.$E._insertionTranslations[position];
-		  if (content && content.nodeType == 1) {
-		    insert(element, content);
-		    continue;
-		  }
-		  tagName = ((position == 'before' || position == 'after') ? element.parentNode : element).tagName.toUpperCase();
-		  childNodes = MVC.$E._getContentFromAnonymousElement(tagName, content);
-		  if (position == 'top' || position == 'after') childNodes.reverse();
-		  for(var c = 0; c < childNodes.length; c++){
-		  	insert(element, childNodes[c]);
-		  }
-		}
-		return element;
-	},
-	_insertionTranslations: {
-	  before: function(element, node) { element.parentNode.insertBefore(node, element);},
-	  top: function(element, node) { element.insertBefore(node, element.firstChild);},
-	  bottom: function(element, node) { element.appendChild(node);},
-	  after: function(element, node) { element.parentNode.insertBefore(node, element.nextSibling);},
-	  tags: {
-	    TABLE:  ['<table>',                '</table>',                   1],
-	    TBODY:  ['<table><tbody>',         '</tbody></table>',           2],
-	    TR:     ['<table><tbody><tr>',     '</tr></tbody></table>',      3],
-	    TD:     ['<table><tbody><tr><td>', '</td></tr></tbody></table>', 4],
-	    SELECT: ['<select>',               '</select>',                  1]
-	  }
-	},
-	_getContentFromAnonymousElement: function(tagName, html) {
-	  var div = document.createElement('div'), t = MVC.$E._insertionTranslations.tags[tagName];
-	  if (t) {
-	    div.innerHTML = t[0] + html + t[1];
-		for(var i=0; i < t[2]; i++){
-			div = div.firstChild;
-		}
-	  }else div.innerHTML = html;
-	  return MVC.Array.from(div.childNodes);
-	},
-    /*
-     * Returns children with nodeType = 1
-     */
-    get_children : function(element){
-        var els = [];
-        var el = element.first();
-        while(el){ els.push(el);el = el.next(); }
-        return els;
-    },
-    /*
-     * Returns the first child with nodeType = 1
-     */
-    first : function(element, check){
-        check = check || function(){return true;}
-        var next = element.firstChild;
-		while(next && next.nodeType != 1 || (next && !check(next)) )
-			next = next.nextSibling;
-        return MVC.$E(next);
-    },
-    /*
-     * returns the last child element with nodeType = 1
-     */
-    last : function(element, check){
-        check = check || function(){return true;}
-        var previous = element.lastChild;
-		while(previous && previous.nodeType != 1  || (previous && ! check(previous))  )
-			previous = previous.previousSibling;
-        return MVC.$E(previous);
-    },
-    /*
-     * Returns the next sibling with nodeType = 1
-     */
-	next : function(element, wrap, check){
-		check = check || function(){return true;}
-        var next = element.nextSibling;
-		while(next && next.nodeType != 1 || (next && ! check(next)  ) )
-			next = next.nextSibling;
-        if(!next && wrap) return MVC.$E( element.parentNode ).first(check);
-		return MVC.$E(next);
-	},
-    /*
-     * Returns the previous sibling with nodeType = 1
-     */
-    previous : function(element, wrap, check){
-		check = check || function(){return true;}
-        var previous = element.previousSibling;
-		while(previous && previous.nodeType != 1 || (previous && ! check(previous))  )
-			previous = previous.previousSibling;
-        if(!previous && wrap) return MVC.$E( element.parentNode ).last(check);
-        return MVC.$E(previous);
-	},
-    /*
-     * Toggles the style display.  It is assumed that no css is already being used to 
-     * hide the element.  If you want to have the element hidden to start, write
-     * style="display:none" in your html.
-     */
-	toggle : function(element){
-		return element.style.display == 'none' ? element.style.display = '' : element.style.display = 'none';
-	},
-    /*
-     * Makes an element position ('relative', 'absolute', or 'static')
-     */
-    make_positioned: function(element) {
-        element = MVC.$E(element);
-        var pos = MVC.Element.get_style(element, 'position');
-        if (pos == 'static' || !pos) {
-          element._madePositioned = true;
-          element.style.position = 'relative';
-          // Opera returns the offset relative to the positioning context, when an
-          // element is position relative but top and left have not been defined
-          if (window.opera) {
-            element.style.top = 0;
-            element.style.left = 0;
-          }
-        }
-        return element;
-    },
-    /*
-     * Returns the style for a given element.
-     */
-    get_style:  function(element, style) {
-        element = MVC.$E(element);
-        style = style == 'float' ? 'cssFloat' : MVC.String.camelize(style);
-        var value;
-        if(element.currentStyle){
-            var value = element.currentStyle[style];
-        }else{
-             var css = document.defaultView.getComputedStyle(element, null);
-             value = css ? css[style] : null;
-        }
-        if (style == 'opacity') return value ? parseFloat(value) : 1.0;
-        return value == 'auto' ? null : value;
-    },
-    /*
-     * Returns the vector
-     * @return {Vector} a vector
-     */
-    cumulative_offset: function(element) {
-        var valueT = 0, valueL = 0;
-        do {
-          valueT += element.offsetTop  || 0;
-          valueL += element.offsetLeft || 0;
-          element = element.offsetParent;
-        } while (element);
-        return new MVC.Vector( valueL, valueT );
-    },
-    cumulative_scroll_offset: function(element) {
-        var valueT = 0, valueL = 0;
-        do {
-          valueT += element.scrollTop  || 0;
-          valueL += element.scrollLeft || 0;
-          element = element.parentNode;
-        } while (element);
-        return new MVC.Vector( valueL, valueT );
-    },
-    is_parent: function(element,child ) {
-      if(typeof child == 'string') child = MVC.$E(child);
-      if (!child.parentNode || child == element) return false;
-      if (child.parentNode == element) return true;
-      return MVC.Element.is_parent(child.parentNode, element);
-    },
-    /*
-     * Returns true or false if one element is inside another element.
-     */
-    has: function(element, b){
-      if(typeof b == 'string') b = MVC.$E(b);
-      return element.contains ?
-        element != b && element.contains(b) :
-        !!(element.compareDocumentPosition(b) & 16);
-    },
-    /*
-     * Updates an element with content.  This works for IE's table elements.
-     */
-    update: function(element, content){
-        element = MVC.$E(element);
-        var tagName = element.tagName.toUpperCase();
-        if ( ( !MVC.Browser.IE && !MVC.Browser.Opera  )|| !( tagName in MVC.$E._insertionTranslations.tags) ){
-            element.innerHTML = content;
-        }else{
-          //remove children
-          var node;
-          while( (node =  element.childNodes[0]) ){ element.removeChild(node) }
-          
-          var children = MVC.$E._getContentFromAnonymousElement(tagName, content);
-          for(var c=0; c < children.length; c++){
-              element.appendChild(children[c]);
-          }
-        }
-        return element;
-   },
-   /*
-    * Removes an element
-    */
-   remove: function(element){
-   		return element.parentNode.removeChild(element);
-   },
-   /*
-    * Returns a vector with the dimensions of the element
-    */
-   dimensions: function(element){
-        var display = element.style.display;
-        if (display != 'none' && display != null) // Safari bug
-          return new MVC.Vector( element.offsetWidth, element.offsetHeight );
-        // All *Width and *Height properties give 0 on elements with display none,
-        // so enable the element temporarily
-        var els = element.style;
-        var originalVisibility = els.visibility;
-        var originalPosition = els.position;
-        var originalDisplay = els.display;
-        els.visibility = 'hidden';
-        els.position = 'absolute';
-        els.display = 'block';
-        var originalWidth = element.clientWidth;
-        var originalHeight = element.clientHeight;
-        els.display = originalDisplay;
-        els.position = originalPosition;
-        els.visibility = originalVisibility;
-        return new MVC.Vector( originalWidth, originalHeight);
-    }
-});
-
-
-
-
-
-
-MVC.Element.extend = function(el){
-	for(var f in MVC.Element){
-		if(!MVC.Element.hasOwnProperty(f)) continue;
-		var func = MVC.Element[f];
-		if(typeof func == 'function'){
-			//var names = MVC.Function.params(func);
-			//if( names.length == 0) continue;
-			//var first_arg = names[0];
-			if( f[0] != "_" ) MVC.Element._extend(func, f, el);
-		}
-	}
-	el._mvcextend = true;
-	return el;
-};
-MVC.Element._extend = function(f,name,el){
-	el[name] = function(){
-		var arg = MVC.Array.from(arguments);
-		arg.unshift(el);
-		return f.apply(el, arg); 
-	};
-};
-MVC.$E = MVC.Element;
-if(!MVC._no_conflict){
-	$E = MVC.$E;
-};
-include.set_path('../../jmvc/plugins/controller/scaffold');
-/*include.views(
-	include.get_path()+'/list',
-	include.get_path()+'/edit',
-	include.get_path()+'/display',
-	include.get_path()+'/show'
-);*/
-
-MVC.Controller.scaffold = function(){
-    //go through list of prototype functions, if one doesn't exist copy
-    if(!this.className) return;
-    
-    var class_name = MVC.String.singularize( MVC.String.classize(this.className)  );
-    this.scaffold_model = window[class_name];
-    this.singular_name = MVC.String.singularize(this.className);
-    for(var action_name in MVC.Controller.scaffold.functions){
-        if(this.prototype[action_name]) continue;
-        this.prototype[action_name] = MVC.Controller.scaffold.functions[action_name]
-    }
-    if(! window[class_name+'ViewHelper']   )
-        this.scaffold_view_helper = window[class_name+'ViewHelper'] = MVC.ModelViewHelper.extend(this.singular_name);
-    else{
-        this.scaffold_view_helper = window[class_name+'ViewHelper']
-    }
-};
-
-
-MVC.Controller.scaffold.functions = {
-    load: function(params){
-        //we should make sure the element exists
-        if(!MVC.$E(this.controller_name)){
-            var div = document.createElement('div')
-            div.id = this.controller_name;
-            document.body.appendChild(div);
-        };
-        this.Class.scaffold_model.find('all', {} , this.continue_to('list'))
-    },
-    list: function(objects){
-        this.singular_name = this.Class.singular_name;
-        this[this.controller_name] = objects;
-        this.objects = objects;
-        this.render({to: this.controller_name, plugin: 'controller/scaffold/display', action: this.controller_name});
-    },
-    '# form submit' : function(params){
-        params.event.kill();
-        this.Class.scaffold_model.create( params.form_params()[this.Class.singular_name], this.continue_to('created') );
-    },
-    created: function(object){
-		if(object.errors.length > 0){
-            
-            object.View().show_errors();
-            
-		}else{
-            
-            this.Class.scaffold_model.View().clear();
-            object.View().clear_errors();
-            this[this.controller_name] = [object];
-            this.objects = [object];
-            this.singular_name = this.Class.singular_name;
-            this.render({bottom: 'recipe_list', plugin: 'controller/scaffold/list', action: 'list'});//?
-            
-		}
-    },
-    '.delete click' : function(params){
-        this[this.Class.singular_name] = params.object_data();
-        if(confirm("Are you sure you want to delete"))
-            this[this.Class.singular_name].destroy(this.continue_to('destroyed'));
-    },
-    '.edit click' : function(params){
-        this[this.Class.singular_name] = params.object_data();
-        this.singular_name = this.Class.singular_name;
-        this.render({to: this[this.Class.singular_name].View().element_id(), action: 'edit', plugin: 'controller/scaffold/edit'}); //!
-    },
-    '.cancel click': function(params){
-        this.show(params.object_data());
-    },
-    '.save click': function(params){
-        this[this.Class.singular_name] = params.object_data();
-        var attrs = this[this.Class.singular_name].View().edit_values(); 
-        this[this.Class.singular_name].update_attributes( attrs, this.continue_to('show') );
-    },
-    show: function(object){
-        this[this.Class.singular_name] = object;
-        this.singular_name = this.Class.singular_name;
-        this.render({to: this[this.Class.singular_name].View().element_id(), action: 'show', plugin: 'controller/scaffold/show'} );
-    },
-    destroyed: function(destroyed){
-        if(destroyed)
-            this[this.Class.singular_name].View().destroy();   
-    }
-};
-include.set_path('../../jmvc/plugins/model/view_helper');
-include('model_view_helper');
-include.set_path('../../jmvc/plugins/model/view_helper');
-MVC.ModelViewHelper = MVC.Class.extend(
-{
-    init: function(){
-        if(!this.className) return;
-        //add yourself to your model
-        var modelClass;
-        if(!this.className) return;
-        
-        if(!(modelClass = this.modelClass = window[MVC.String.classize(this.className)]) ) 
-            throw "ModelViewHelpers can't find class "+this.className;
-        var viewClass = this;
-        this.modelClass.View = function(){ 
-            return viewClass;
-        };
-        
-        
-        this.modelClass.prototype.View = function(){
-            return new viewClass(this);
-        };
-        if(this.modelClass.attributes){
-            this._view = new MVC.View.Helpers({});
-            var type;
-            for(var attr in this.modelClass.attributes){
-                if(! this.modelClass.attributes.hasOwnProperty(attr) || typeof this.modelClass.attributes[attr] != 'string') continue;
-                this.add_helper(attr);
-            }
-        }
-    },
-    form_helper: function(attr){
-        if(! this.helpers[attr]+"_field" ){
-            this.add_helper(attr);
-        }
-        var f = this.helpers[attr+"_field"];
-        var args = MVC.Array.from(arguments);
-        args.shift();
-        return f.apply(this._view, args);
-    },
-    add_helper : function(attr){
-        var h = this._helper(attr);
-        this.helpers[attr+"_field"] = h;
-    },
-    helpers : {},
-    _helper: function(attr){
-        var helper = this._view_helper(attr);
-        var modelh = this;
-        var name = this.modelClass.className+'['+attr+']';
-        var id = this.modelClass.className+'_'+attr;
-        return function(){
-            var args = MVC.Array.from(arguments);
-            args.unshift(name);
-            args[2] = args[2] || {};
-            args[2].id = id;
-            return helper.apply(modelh._view, args);
-        }
-    },
-    _view_helper: function(attr){
-         switch(this.modelClass.attributes[attr].toLowerCase()) {
-				case 'boolean': 
-                    return this._view.check_box_tag;
-                case 'text':
-                    return this._view.text_area_tag;
-				default:
-					return this._view.text_field_tag;
-	    }
-    },
-    clear: function(){
-        var mname = this.modelClass.className, el;
-        for(var attr in this.modelClass.attributes){
-            if( (el = MVC.$E(mname+"_"+attr)) ){
-                el.value = '';
-            }
-        }
-    },
-    from_html: function(element_or_id){
-        var el =MVC.$E(element_or_id);
-        
-        var el_class = this.modelClass ? this.modelClass : window[ MVC.String.classize(el.getAttribute('type')) ];
-        
-        if(! el_class) return null;
-        //get data here
-        var attributes = {};
-        attributes[el_class.id] = this.element_id_to_id(el.id);
-        //for(var attr in modelClass.attributes){
-        //    if(MVC.$E(  ) )
-        //}
-        
-        return el_class.create_as_existing(attributes);
-    },
-    element_id_to_id: function(element_id){
-        var re = new RegExp(this.className+'_', "");
-        return element_id.replace(re, '');
-    }
-},
-{
-    init: function(model_instance){
-        this._inst = model_instance;
-        this._className = this._inst.Class.className;
-        this._Class = this._inst.Class;
-    },
-    id : function(){
-        return this._inst[this._inst.Class.id];
-    },
-    element : function(){
-        if(this._element) return this._element;
-        this._element = MVC.$E(this.element_id());
-        if(this._element) return this._element;
-    },
-	create_element: function(){
-        this._element = document.createElement('div');
-        this._element.id = this.element_id();
-        this._element.className = this._className;
-        this._element.setAttribute('type', this._className);
-        return this._element;
-	},
-    element_id : function(){
-        return this._className+'_'+this._inst[this._inst.Class.id];
-    },
-    show_errors : function(){
-        var err = MVC.$E(this._className+"_error");
-        var err = err || MVC.$E(this._className+"_error");
-        var errs = [];
-        for(var i=0; i< this._inst.errors.length; i++){
-			var error = this._inst.errors[i];
-			var el = MVC.$E(this._className+"_"+error[0]);
-			if(el){
-				el.className="error";
-                var er_el = MVC.$E(this._className+"_"+error[0]+"_error" );
-				if(er_el) er_el.innerHTML = error[1];
-			}
-			else
-                errs.push(error[0]+' is '+error[1]);
-            
-		}
-        if(errs.length > 0){
-             if(err) err.innerHTML = errs.join(", "); 
-             else alert(errs.join(", "));
-        }
-    },
-    clear_errors: function(){
-        var p;
-        var cn = this._className;
-        for(var attribute in this._Class.attributes){
-            if(this._Class.attributes.hasOwnProperty(attribute)){
-                var el = MVC.$E(cn+"_"+p);
-                if(el) el.className = el.className.replace(/(^|\\s+)error(\\s+|$)/, ' '); //from prototype
-                var er_el = MVC.$E(cn+"_"+attribute+"_error" );
-    		    if(er_el) er_el.innerHTML = '&nbsp;';
-            }
-        }
-        
-        var bigel = MVC.$E(cn+"_error");
-        if(bigel) bigel.innerHTML = '';
-    },
-    edit: function(attr){
-        //get the helper function, add args, return
-         var args = MVC.Array.from(arguments);
-         var name = this._className+'['+attr+']'
-         args.shift();
-         args.unshift( {id: this.edit_id(attr)} ); //change to ID
-         args.unshift(this._inst[attr]); //value
-         args.unshift(name); //name
-         var helper =this.Class._view_helper(attr)
-         return helper.apply(this.Class._view, args);
-    },
-    edit_values: function(){
-        var values = {};
-        var cn = this._className, p, el;
-        for(var attr in this._Class.attributes){
-            if(this._Class.attributes.hasOwnProperty( attr ) )
-            el = MVC.$E(this.edit_id(attr));
-            if(el) values[attr] = el.value;
-            
-        }
-        return values;
-    },
-    edit_id: function(attr){
-        return this._className+'_'+this._inst.id+'_'+attr+'_edit';
-    },
-    destroy: function(){
-        var el = this.element();
-        el.parentNode.removeChild(el);
-    }
-}
-);
-
-/**
- * @add class MVC.Controller.Params Prototype
- */
-MVC.Controller.Params.prototype.
-/*
- * If the element (or one of its parents) has an id like "todo_5" this will return the instance that the 
- * element represents.
- * @return {Object} the instance object the form represents.
- */
-object_data = function(){
-	// use the class name of the controller
-	var className = this._className(), 
-        model, 
-        element = this.element, 
-        matcher = new RegExp("^"+className+"_(.*)$");
-    if(! (model=MVC.Model.models[className])  ) return;
-
-	// loop through parents, this element, or one of its parents should have "todo_4" as its' id
-	// this allows more complex html structures, such as <div id='todo_4'><div class='todo'></div></div>
-
-    while(element && element.parentNode && !element.id.match(matcher) ) { 
-        element = element.parentNode;
-    }
-    
-	if(!element) return null;
-	var id = element.id.match(matcher)[1];
-	return model.store.find_one(id);
-};
-include.set_path('../../jmvc/plugins/view/helpers');
-include.plugins('view');
-include('view_helpers');
-include.set_path('../../jmvc/plugins/view');
-include.plugins('lang');
-include('view');
-if(include.get_env() == 'development')	include('fulljslint');
-
-if(MVC.Controller) include.plugins('controller/view');;
-include.set_path('../../jmvc/plugins/lang');
-/* -------------
-	Helpers defines the following:
-
-	Object
-	* extend
-	* to_query_string
-	
-	
-	String
-	* capitalize
-	* include
-	* ends_with
-	* camelize
-	
-	Array
-	* include
-	* from
-	
-	Function
-	* bind
- ------------  */
-
-if(typeof Prototype != 'undefined'){
-	include({path: 'prototype_helpers.js', shrink_variables: false});
-}else if(typeof jQuery != 'undefined'){
-	include({path: 'jquery_helpers.js', shrink_variables: false});
-}else{
-	include({path: 'standard_helpers.js', shrink_variables: false});
-}
-	;
-include.set_path('../../jmvc/plugins/controller/view');
-include.plugins('view', 'controller');
-include('controller_view');;
-include.set_path('../../jmvc/plugins/controller');
-include.plugins('lang','lang/inflector','dom/event','lang/class');
-include('delegator','controller');
-if(MVC.View) include.plugins('controller/view');
-//if(include.get_env() == 'test') include('test');
-include.set_path('../../jmvc/plugins/lang/inflector');
-include.plugins('lang');
-include('inflector');;
-include.set_path('../../jmvc/plugins/dom/event');
-/**
- * Event describes 2 functions
- * 	Event.observe
- * 	Event.stopObserving
- */
-
-if(typeof Prototype == 'undefined') 
-	include("standard");
-else{
-	include("prototype_event");
-}
-	
-//jQuery's wont work for controllers because it doesn't allow capture;
-include.set_path('../../jmvc/plugins/view/helpers');
-// JavaScriptMVC framework and server, 1.1.22
-//  - built on 2008/05/07 19:44
-/**
- * @add constructor MVC.View.Helpers Prototype
- */
-MVC.Object.extend(MVC.View.Helpers.prototype, {
-    /**
-     * Creates a check box tag
-     * @plugin view/helpers
-     * @param {Object} name
-     * @param {Object} value
-     * @param {Object} options
-     * @param {Object} checked
-     */
-	check_box_tag: function(name, value, options, checked){
-        options = options || {};
-        if(checked) options.checked = "checked";
-        return this.input_field_tag(name, value, 'checkbox', options);
-    },
-    /**
-     * @plugin view/helpers
-     * @param {Object} name
-     * @param {Object} value
-     * @param {Object} html_options
-     */
-    date_tag: function(name, value , html_options) {
-	    if(! (value instanceof Date)) value = new Date();
-		
-		var years = [], months = [], days =[];
-		var year = value.getFullYear(), month = value.getMonth(), day = value.getDate();
-		for(var y = year - 15; y < year+15 ; y++) years.push({value: y, text: y});
-		for(var m = 0; m < 12; m++) months.push({value: (m), text: MVC.Date.month_names[m]});
-		for(var d = 0; d < 31; d++) days.push({value: (d+1), text: (d+1)});
-		
-		var year_select = this.select_tag(name+'[year]', year, years, {id: name+'[year]'} );
-		var month_select = this.select_tag(name+'[month]', month, months, {id: name+'[month]'});
-		var day_select = this.select_tag(name+'[day]', day, days, {id: name+'[day]'});
-		
-	    return year_select+month_select+day_select;
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} name
-     * @param {Object} value
-     * @param {Object} html_options
-     */
-	file_tag: function(name, value, html_options) {
-	    return this.input_field_tag(name+'[file]', value , 'file', html_options);
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} url_for_options
-     * @param {Object} html_options
-     */
-	form_tag: function(url_for_options, html_options) {
-	    html_options = html_options  || {};
-		if(html_options.multipart == true) {
-	        html_options.method = 'post';
-	        html_options.enctype = 'multipart/form-data';
-	    }
-		html_options.action = url_for_options;
-	    return this.start_tag_for('form', html_options);
-	},
-    /**
-     * @plugin view/helpers
-     */
-	form_tag_end: function() { return this.tag_end('form'); },
-	/**
-	 * @plugin view/helpers
-	 * @param {Object} name
-	 * @param {Object} value
-	 * @param {Object} html_options
-	 */
-    hidden_field_tag: function(name, value, html_options) { 
-	    return this.input_field_tag(name, value, 'hidden', html_options); 
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} name
-     * @param {Object} value
-     * @param {Object} inputType
-     * @param {Object} html_options
-     */
-	input_field_tag: function(name, value , inputType, html_options) {
-	    html_options = html_options || {};
-	    html_options.id  = html_options.id  || name;
-	    html_options.value = value || '';
-	    html_options.type = inputType || 'text';
-	    html_options.name = name;
-	    return this.single_tag_for('input', html_options);
-	},
-    /**
-	 * @plugin view/helpers
-	 * @param {Object} text
-	 * @param {Object} html_options
-	 */
-	label_tag: function(text, html_options) {
-		html_options = html_options || {};
-		return this.start_tag_for('label', html_options) + text + this.tag_end('label');
-	},
-	/**
-     * @plugin view/helpers
-     * @param {Object} name
-     * @param {Object} url
-     * @param {Object} html_options
-     */
-	link_to: function(name, url, html_options) {
-	    if(!name) var name = 'null';
-	    if(!html_options) var html_options = {};
-		this.set_confirm(html_options);
-		html_options.href=url;
-		return this.start_tag_for('a', html_options)+name+ this.tag_end('a');
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} condition
-     * @param {Object} name
-     * @param {Object} url
-     * @param {Object} html_options
-     */
-    link_to_if: function(condition, name, url, html_options) {
-		return this.link_to_unless((!condition), name, url, html_options);
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} condition
-     * @param {Object} name
-     * @param {Object} url
-     * @param {Object} html_options
-     */
-    link_to_unless: function(condition, name, url, html_options){
-        if(condition) return name;
-        return this.link_to(name, url, html_options);
-    },
-    /**
-     * @plugin view/helpers
-     * @param {Object} html_options
-     */
-	set_confirm: function(html_options){
-		if(html_options.confirm){
-			html_options.onclick = html_options.onclick || '';
-			html_options.onclick = html_options.onclick+
-			"; var ret_confirm = confirm(\""+html_options.confirm+"\"); if(!ret_confirm){ return false;} ";
-			html_options.confirm = null;
-		}
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} name
-     * @param {Object} options
-     * @param {Object} html_options
-     * @param {Object} post
-     */
-	submit_link_to: function(name, options, html_options, post){
-		if(!name) var name = 'null';
-	    if(!html_options) html_options = {};
-		html_options.type = 'submit';
-	    html_options.value = name;
-		this.set_confirm(html_options);
-		html_options.onclick=html_options.onclick+';window.location="'+options+'"; return false;';
-		return this.single_tag_for('input', html_options);
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} name
-     * @param {Object} value
-     * @param {Object} html_options
-     */
-	password_field_tag: function(name, value, html_options) { return this.input_field_tag(name, value, 'password', html_options); },
-	/**
-	 * @plugin view/helpers
-	 * @param {Object} name
-	 * @param {Object} value
-	 * @param {Object} choices
-	 * @param {Object} html_options
-	 */
-    select_tag: function(name, value, choices, html_options) {     
-	    html_options = html_options || {};
-	    html_options.id  = html_options.id  || name;
-	    //html_options.value = value;
-		html_options.name = name;
-	    var txt = '';
-	    txt += this.start_tag_for('select', html_options);
-	    for(var i = 0; i < choices.length; i++)
-	    {
-	        var choice = choices[i];
-	        if(typeof choice == 'string') choice = {value: choice};
-			if(!choice.text) choice.text = choice.value;
-			if(!choice.value) choice.text = choice.text;
-			
-			var optionOptions = {value: choice.value};
-	        if(choice.value == value)
-	            optionOptions.selected ='selected';
-	        txt += this.start_tag_for('option', optionOptions )+choice.text+this.tag_end('option');
-	    }
-	    txt += this.tag_end('select');
-	    return txt;
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} tag
-     * @param {Object} html_options
-     */
-	single_tag_for: function(tag, html_options) { return this.tag(tag, html_options, '/>');},
-	/**
-	 * @plugin view/helpers
-	 * @param {Object} tag
-	 * @param {Object} html_options
-	 */
-    start_tag_for: function(tag, html_options)  { return this.tag(tag, html_options); },
-	/**
-	 * @plugin view/helpers
-	 * @param {Object} name
-	 * @param {Object} html_options
-	 */
-    submit_tag: function(name, html_options) {  
-	    html_options = html_options || {};
-	    html_options.type = html_options.type  || 'submit';
-	    html_options.value = name || 'Submit';
-	    return this.single_tag_for('input', html_options);
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} tag
-     * @param {Object} html_options
-     * @param {Object} end
-     */
-	tag: function(tag, html_options, end) {
-	    end = end || '>';
-	    var txt = ' ';
-	    for(var attr in html_options) { 
-	       if(html_options.hasOwnProperty(attr)){
-			   value = html_options[attr] != null ? html_options[attr].toString() : '';
-
-		       if(attr == "Class" || attr == "klass") attr = "class";
-		       if( value.indexOf("'") != -1 )
-		            txt += attr+'=\"'+value+'\" ' ;
-		       else
-		            txt += attr+"='"+value+"' " ;
-		   }
-	    }
-	    return '<'+tag+txt+end;
-	},
-    /**
-     * @plugin view/helpers
-     * @param {Object} tag
-     */
-	tag_end: function(tag)             { return '</'+tag+'>'; },
-	/**
-	 * @plugin view/helpers
-	 * @param {Object} name
-	 * @param {Object} value
-	 * @param {Object} html_options
-	 */
-    text_area_tag: function(name, value, html_options) { 
-	    html_options = html_options || {};
-	    html_options.id  = html_options.id  || name;
-	    html_options.name  = html_options.name  || name;
-		value = value || '';
-	    if(html_options.size) {
-	        html_options.cols = html_options.size.split('x')[0];
-	        html_options.rows = html_options.size.split('x')[1];
-	        delete html_options.size;
-	    }
-	    html_options.cols = html_options.cols  || 50;
-	    html_options.rows = html_options.rows  || 4;
-	    return  this.start_tag_for('textarea', html_options)+value+this.tag_end('textarea');
-	},
-	/**
-	 * @plugin view/helpers
-	 * @param {Object} name
-	 * @param {Object} value
-	 * @param {Object} html_options
-	 */
-    text_field_tag: function(name, value, html_options) { return this.input_field_tag(name, value, 'text', html_options); },
-	/**
-	 * @plugin view/helpers
-	 * @param {Object} image_location
-	 * @param {Object} options
-	 */
-    img_tag: function(image_location, options){
-		options = options || {};
-		options.src = "resources/images/"+image_location;
-		return this.single_tag_for('img', options);
-	}
-	
-});
-
-MVC.View.Helpers.prototype.text_tag = MVC.View.Helpers.prototype.text_area_tag;
-
-
-(function(){
-	var data = {};
-	var name = 0;
-	MVC.View.Helpers.link_data = function(store){
-		var functionName = name++;
-		data[functionName] = store;	
-		return "_data='"+functionName+"'";
-	};
-	MVC.View.Helpers.get_data = function(el){
-		if(!el) return null;
-		var dataAt = el.getAttribute('_data');
-		if(!dataAt) return null;
-		return data[parseInt(dataAt)];
-	};
-	MVC.View.Helpers.prototype.link_data = function(store){
-		return MVC.View.Helpers.link_data(store)
-	};
-	MVC.View.Helpers.prototype.get_data = function(el){
-		return MVC.View.Helpers.get_data(el)
-	};
-})();
-
-;
-include.set_path('../../engines/modalmvc/apps');
-include.resources();
-include.plugins('controller','view');
-include.css("style");
-include(function(){ //runs after prior includes are loaded
-  include.models();
-  include.controllers('modal');
-  include.views('views/modal/alert_subscribe',
-		'views/modal/prompt_subscribe');
-});
-;
+//MVC.StatefulController.prototype.render = MVC.Controller.prototype.render; // this needs to go;
 include.next_function();
-include.set_path('../../engines/modalmvc/controllers');
+include.set_path('engines/modalmvc/controllers');
 
 /**
  * Used for Modal alert and prompts
@@ -3484,8 +2413,8 @@ MVC.Dimensions = function(){
          window_bottom: st+ wh
      }
 };
-include.set_path('../../engines/modalmvc/views/modal');
-MVC.View.PreCompiledFunction("../views/modal/alert_subscribe.ejs", function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {var ___ViewO = [];; ___ViewO.push("<div class=\"modalBackground\">\n");
+include.set_path('engines/modalmvc/views/modal');
+MVC.View.PreCompiledFunction("../views/modal/alert_subscribe.ejs", "engines/modalmvc/views/modal/alert_subscribe.ejs",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {var ___ViewO = [];; ___ViewO.push("<div class=\"modalBackground\">\n");
 ___ViewO.push("</div>\n");
 ___ViewO.push("<div class=\"modalContainer\">\n");
 ___ViewO.push("    <div class=\"modal\">\n");
@@ -3502,8 +2431,8 @@ ___ViewO.push("            \n");
 ___ViewO.push("        </div>\n");
 ___ViewO.push("    </div>\n");
 ___ViewO.push("</div>"); return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}});
-include.set_path('../../engines/modalmvc/views/modal');
-MVC.View.PreCompiledFunction("../views/modal/prompt_subscribe.ejs", function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {var ___ViewO = [];; ___ViewO.push("<div class=\"modalBackground\">\n");
+include.set_path('engines/modalmvc/views/modal');
+MVC.View.PreCompiledFunction("../views/modal/prompt_subscribe.ejs", "engines/modalmvc/views/modal/prompt_subscribe.ejs",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {var ___ViewO = [];; ___ViewO.push("<div class=\"modalBackground\">\n");
 ___ViewO.push("</div>\n");
 ___ViewO.push("<div class=\"modalContainer\">\n");
 ___ViewO.push("    <div class=\"modal\">\n");

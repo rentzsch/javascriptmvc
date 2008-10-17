@@ -388,7 +388,6 @@ MVC.Object.extend(include,{
 	opera_called : false,
 	srcs: [],
 	plugin: function(plugin_name) {
-		//MVC.Included.plugins.push(plugin_name);
 		var current_path = include.get_path();
 		include.set_path("");
 		include('jmvc/plugins/'+ plugin_name+'/setup');
