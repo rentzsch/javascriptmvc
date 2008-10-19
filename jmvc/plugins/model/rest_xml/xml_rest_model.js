@@ -9,7 +9,7 @@ MVC.XMLRestModel = MVC.AjaxModel.extend(
         this.singular_name =  this.className;
         this._super();
     },
-    find_one_get_url : function(id){ return '/'+this.plural_name+'/'+id+'.xml'},
+    find_one_get_url : function(params){ return '/'+this.plural_name+'/'+params.id+'.xml'},
 	find_one_get_success : function(transport, callback){
 		var doc = MVC.Tree.parseXML(transport.responseText);
 		var obj = doc[this.singular_name];
