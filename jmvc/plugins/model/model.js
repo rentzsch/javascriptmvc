@@ -271,6 +271,18 @@ MVC.Model = MVC.Class.extend(
         for(var attr in cas){
             if(cas.hasOwnProperty(attr) ) this[attr] = null;
         }
+    },
+    /**
+     * Returns the suggested element id for this instance
+     */
+    element_id : function(){
+        return this.Class.className+'_'+this[this.Class.id];
+    },
+    /**
+     * Returns the element found by using element_id for this instance
+     */
+    element : function(){
+        return MVC.$E(this.element_id());;
     }
 });
 

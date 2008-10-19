@@ -278,6 +278,20 @@ MVC.Object.extend(MVC.Element, {
         els.position = originalPosition;
         els.visibility = originalVisibility;
         return new MVC.Vector( originalWidth, originalHeight);
+    },
+    add_class : function(element, className){
+        var cns = element.className.split(/\s+/);
+        if(MVC.Array.include(cns, className)) return;
+        cns.push(className);
+        element.className = cns.join(" ");
+    },
+    remove_class : function(element, className){
+        var cns = element.className.split(/\s+/);
+        var newcns = [];
+        for(var i =0; i < cns.length; i++){
+            if(cns[i] != className) newcns.push(cns[i]);
+        }
+        element.className = newcns.join(" ");
     }
 });
 

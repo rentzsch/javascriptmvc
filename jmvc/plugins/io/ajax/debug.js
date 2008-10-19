@@ -8,7 +8,8 @@
 	MVC.Ajax.setup_request= function(url,options){
 		if( options.use_fixture == null || options.use_fixture == true  ){
 		    var testurl = url;
-            testurl = testurl.replace(/%2F/,"~");
+            testurl = testurl.replace(/%2F/g,"~").replace(/%20/g,"_");
+
             if(options.parameters) 
                 testurl += (MVC.String.include(testurl,'?') ? '&' : '?') + MVC.Object.to_query_string(options.parameters)
             

@@ -19,7 +19,7 @@ var f = new MVC.File(_args[1])
 var folder_part = f.dir();
 
 var folders = folder_part.split("/");
-var file_name = f.basename().replace(/%2F/,"~");
+var file_name = f.basename().replace(/%2F/g,"~").replace(/%20/g," ");
 
 
 var base = ["test/fixtures"]
