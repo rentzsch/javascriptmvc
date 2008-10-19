@@ -125,7 +125,7 @@ MVC.Controller = MVC.Class.extend(
      * @return {Function} function that when called, directs to another controller function
      */
     continue_to :function(action){
-		if(!action) action = this.action.name+'ing';
+		if(!action) action = this.action_name+'ing';
 		if(typeof this[action] != 'function'){ throw 'There is no action named '+action+'. ';}
 		return MVC.Function.bind(function(){
 			this.action_name = action;
