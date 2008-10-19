@@ -28,7 +28,7 @@ MVC.Model = MVC.Class.extend(
     find : function(id, params, callbacks){
         if(!params)  params = {};
         if(typeof params == 'function') {
-            callback = params;
+            callbacks = params;
             params = {};
         }
         if(id == 'all'){
