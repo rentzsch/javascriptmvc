@@ -1,10 +1,3 @@
-/*include.views(
-	include.get_path()+'/list',
-	include.get_path()+'/edit',
-	include.get_path()+'/display',
-	include.get_path()+'/show'
-);*/
-
 MVC.Controller.scaffold = function(){
     //go through list of prototype functions, if one doesn't exist copy
     if(!this.className) return;
@@ -27,18 +20,19 @@ MVC.Controller.scaffold = function(){
 MVC.Controller.scaffold.functions = {
     load: function(params){
         //we should make sure the element exists
-        if(!MVC.$E(this.controller_name)){
+        if(!MVC.$E(this.Class.className)){
             var div = document.createElement('div')
-            div.id = this.controller_name;
+            div.id = this.Class.className;
             document.body.appendChild(div);
         };
         this.Class.scaffold_model.find('all', {} , this.continue_to('list'))
     },
     list: function(objects){
         this.singular_name = this.Class.singular_name;
-        this[this.controller_name] = objects;
+        this[this.Class.className] = objects;
+		this.controller_name = this.Class.className;
         this.objects = objects;
-        this.render({to: this.controller_name, plugin: 'controller/scaffold/display', action: this.controller_name});
+        this.render({to: this.Class.className, plugin: 'controller/scaffold/display', action: this.Class.className});
     },
     '# form submit' : function(params){
         params.event.kill();
@@ -53,7 +47,7 @@ MVC.Controller.scaffold.functions = {
             
             this.Class.scaffold_model.View().clear();
             object.View().clear_errors();
-            this[this.controller_name] = [object];
+            this[this.Class.className] = [object];
             this.objects = [object];
             this.singular_name = this.Class.singular_name;
             this.render({bottom: 'recipe_list', plugin: 'controller/scaffold/list', action: 'list'});//?
