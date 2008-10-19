@@ -13,7 +13,7 @@ MVC.XMLRestModel = MVC.AjaxModel.extend(
 	find_one_get_success : function(transport, callback){
 		var doc = MVC.Tree.parseXML(transport.responseText);
 		var obj = doc[this.singular_name];
-		var instance = this.create_as_existing(obj);
+		var instance = this.create_as_existing(this._attributesFromTree(obj));
 		return instance;
 	},
     find_all_get_url : function(){ return '/'+this.plural_name+'.xml'},
@@ -51,13 +51,15 @@ MVC.XMLRestModel = MVC.AjaxModel.extend(
     	}
         return collection;
     },
-    create_request: function(attributes){
+	create_post_url : function(){ return '/'+this.plural_name+'.xml'},
+    create_request: function(attributes, defaultURL){
         var instance = new this(attributes);
         instance.validate()
         if( !instance.valid() ) return instance;
         var params = {};
         params[this.singular_name] = attributes;
-        this.request('/'+this.plural_name+'.xml', params, {method: 'post'}, instance );
+		var url = typeof this.create_post_url == 'function'? this.create_post_url() : this.create_post_url;
+        this.request(url, params, {method: 'post'}, instance );
         return instance;
     },
     create_success: function(transport, callback, instance){
@@ -80,7 +82,8 @@ MVC.XMLRestModel = MVC.AjaxModel.extend(
           }
     	  return instance;
     },
-    update_request: function(id, attributes){
+	update_put_url : function(id){ return '/'+this.plural_name+'/'+id+'.xml'},
+    update_request: function(id, attributes, defaultURL){
         delete attributes.id
         var params = {};
         params[this.singular_name] = attributes;
@@ -90,7 +93,7 @@ MVC.XMLRestModel = MVC.AjaxModel.extend(
         instance.validate()
         if( !instance.valid() ) return instance;
         
-        this.request('/'+this.plural_name+'/'+id+'.xml', params, {method: 'put'}, instance );
+        this.request(this.update_put_url(id), params, {method: 'put'}, instance );
     },
     update_success: function(transport, callback, instance){
         if (/\w+/.test(transport.responseText)) {
