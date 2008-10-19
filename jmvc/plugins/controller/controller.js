@@ -368,7 +368,14 @@ MVC.Controller.Params.prototype = {
 	is_event_on_element : function(){ return this.event.target == this.element; },
 	_className : function(){
 		return this.controller.singularName;
-	}
+	},
+    element_instance : function(){
+        var model, matcher, className = this._className();
+        if(! (model=MVC.Model.models[className])  ) throw "No model for the "+ className+ " controller!";
+        matcher = new RegExp("^"+className+"_(.*)$");
+        var id = this.class_element().id.match(matcher)[1];
+	    return model.store.find_one(id);
+    }
 };
 
 if(!MVC._no_conflict && typeof Controller == 'undefined'){

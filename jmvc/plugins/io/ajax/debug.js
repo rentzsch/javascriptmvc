@@ -8,6 +8,7 @@
 	MVC.Ajax.setup_request= function(url,options){
 		if( options.use_fixture == null || options.use_fixture == true  ){
 		    var testurl = url;
+            testurl = testurl.replace(/%2F/,"~");
             if(options.parameters) 
                 testurl += (MVC.String.include(testurl,'?') ? '&' : '?') + MVC.Object.to_query_string(options.parameters)
             
@@ -21,13 +22,14 @@
 				right = match[2].replace(/\#|&/g,'-').replace(/\//g, '~')+right;
 			}
 			right = right+MVC.Ajax.add_url(left+right);
-			if(include.get_env() != 'test')
-			MVC.Console.log('Requesting "'+url+'".  As a fixture it would be:\n    "test/fixtures/'+left+right);
+			if(include.get_env() != 'test' && MVC.Console)
+                MVC.Console.log('Requesting "'+url+'".  As a fixture it would be:\n    "test/fixtures/'+left+right);
 		}
 		
-		if(include.get_env() == 'test' && (options.use_fixture == null || options.use_fixture == true)){
-			MVC.Console.log('Loading "test/fixtures/'+left+right+'" for\n        "'+url+'"' );
-			url = MVC.root.join('test/fixtures/'+left+encodeURIComponent( right));
+		if( (include.get_env() == 'test' && (options.use_fixture == null || options.use_fixture == true)) || MVC.use_fixtures){
+			if(MVC.Console) MVC.Console.log('Loading "test/fixtures/'+left+right+'" for\n        "'+url+'"' );
+			
+            url = MVC.root.join('test/fixtures/'+left+encodeURIComponent( right));
 			options.method = 'get';
 		}
 		options.url = url;

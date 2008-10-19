@@ -10,7 +10,7 @@ MVC.SimpleStore = MVC.Class.extend({
 		return this._data[id];
 	},
 	create: function(obj){
-		var id = obj.id;
+		var id = obj[obj.Class.id];
 		this._data[id] = obj;
 	},
 	destroy: function(id){

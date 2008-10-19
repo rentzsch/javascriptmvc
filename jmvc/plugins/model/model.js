@@ -50,6 +50,7 @@ MVC.Model = MVC.Class.extend(
         if(attributes.attributes) attributes = attributes.attributes();
         var inst = new this(attributes);
         inst.is_new_record = this.new_record_func;
+        if(MVC.Controller) MVC.Controller.publish(this.className + ":create_as_existing", {data: inst});
         return inst;
     },
     /**

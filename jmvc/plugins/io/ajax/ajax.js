@@ -90,8 +90,9 @@
 	      this.options.method = 'post';
 	    }
 	
-		if (this.options.method == 'get' && this.options.parameters != '' ){
-            this.url += (MVC.String.include(this.url,'?') ? '&' : '?') + MVC.Object.to_query_string(this.options.parameters);
+		if (this.options.method == 'get'){
+            var string_params = MVC.Object.to_query_string(this.options.parameters);
+            if(string_params != "") this.url += (MVC.String.include(this.url,'?') ? '&' : '?') + string_params;
             delete this.options.parameters;
         }
 		//else if (/Konqueror|Safari|KHTML/.test(navigator.userAgent))

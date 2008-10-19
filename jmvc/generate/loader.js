@@ -1,6 +1,8 @@
 load('jmvc/rhino/env.js');
-
-MVC ={ Included: {} };
+if(typeof MVC == 'undefined')
+    MVC ={ Included: {} };
+else
+    MVC.Included = {};
 var window = this;
 var self = window;
 include = function(){}

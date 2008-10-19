@@ -160,7 +160,7 @@ MVC.AjaxModel = MVC.Model.extend(
             this.request = function(url, request_params, options){
                 //url is optional!
                 request_called = true;
-                request_params = request_params || params;
+                request_params = typeof request_params != 'undefined' ? request_params : params;
                 options = options || defaultOptions;
                 var remaining_args = MVC.Array.from(arguments).splice(2, arguments.length - 2);
                 if(typeof url != 'string'){
