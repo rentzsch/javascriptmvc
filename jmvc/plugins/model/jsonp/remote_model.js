@@ -12,7 +12,7 @@ MVC.JsonPModel = MVC.Model.extend(
     find_all: function(params, cbs){
         var callbacks = this._clean_callbacks(cbs);
         var callback = callbacks.onSuccess;
-        var error_callback = callbacks.onError;
+        var error_callback = callbacks.onFailure;
         var n = parseInt(Math.random()*100000);
         //params.callback = MVC.String.classize(this.className)+'.listCallback'+n;
         var url = this.find_url ? this.find_url+"?" : this.domain+'/'+this.plural_controller_name+'.json?';

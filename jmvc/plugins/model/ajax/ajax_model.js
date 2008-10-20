@@ -68,7 +68,7 @@ Finally, you can respond to Transport errors in the same way you respond to succ
    dir_get_success: function(transport){
        return transport.responseText;
    },
-   dir_get_error: function(transport){
+   dir_get_failure: function(transport){
        return "error data"
    }
 },{})</pre>
@@ -103,7 +103,7 @@ MVC.AjaxModel = MVC.Model.extend(
     _default_options: function(cleaned_name, method, remaining_args, callbacks){
         var defaultOptions = {};
         this._add_default_callback(defaultOptions, 'success', method, cleaned_name, remaining_args, callbacks);
-        this._add_default_callback(defaultOptions, 'error', method, cleaned_name, remaining_args, callbacks);
+        this._add_default_callback(defaultOptions, 'failure', method, cleaned_name, remaining_args, callbacks);
         return defaultOptions;
     },
     _add_default_callback : function(defaultOptions, callback_name,method, cleaned_name, remaining_args, callbacks ){
@@ -152,7 +152,7 @@ MVC.AjaxModel = MVC.Model.extend(
              * If the first argument is not a string, it assumes the first 2 arguments are
              * the request params and the options.  If there are more than 3 arguments, those
              * arguments
-             * will be used when calling back the success or error functions.
+             * will be used when calling back the success or failure functions.
              * @param {optional:Object} url
              * @param {Object} request_params parameters passed to the request
              * @param {Object} options options sent to the transport

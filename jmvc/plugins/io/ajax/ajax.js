@@ -119,7 +119,7 @@
 				if(state == 'Complete'){
 					if(!this.options.onSuccess) ; // do nothing
 					else if(this.success()) this.options.onSuccess(this.transport);
-					else if(this.options.onError) this.options.onError(this.transport);
+					else if(this.options.onFailure) this.options.onFailure(this.transport);
 				}
 				if(this.options['on'+state]){
 					this.options['on'+state](this.transport);

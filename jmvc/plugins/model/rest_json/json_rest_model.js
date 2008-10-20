@@ -55,7 +55,7 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
      * @param {Object} transport
      * @return {Array} Array of json model instances that get passed to the callback 
      */
-    find_all_get_success : function(transport){  //error is either success, complete or error
+    find_all_get_success : function(transport){  //error is either success, complete or failure
         var data = this.json_from_string(transport.responseText);
         return this.convert_response_into_instances(data);
     },
@@ -135,7 +135,7 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
      * @return {String} /plural_name/id.xml
      */
     destroy_delete_url : function(id){return  '/'+this.plural_name+'/'+id+'.xml' },
-    destroy_delete_error: function(){ return false;},
+    destroy_delete_failure: function(){ return false;},
     destroy_delete_success: function(transport){ return transport.status == 200}
 },
 {

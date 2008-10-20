@@ -11,7 +11,7 @@ MVC.WindowNameModel = MVC.Model.extend(
     find_all: function(params, cbs){
         var callbacks = this._clean_callbacks(cbs);
         var callback = callbacks.onSuccess;
-        var error_callback = callbacks.onError;
+        var error_callback = callbacks.onFailure;
         var url = this.find_url ? this.find_url+"?" : this.domain+'/'+this.plural_controller_name+'.html?';
 		if(!callback) callback = (function(){});
         

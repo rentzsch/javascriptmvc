@@ -50,7 +50,6 @@ MVC.Model = MVC.Class.extend(
         if(attributes.attributes) attributes = attributes.attributes();
         var inst = new this(attributes);
         inst.is_new_record = this.new_record_func;
-        if(MVC.Controller) MVC.Controller.publish(this.className + ":create_as_existing", {data: inst});
         return inst;
     },
     /**
@@ -116,7 +115,7 @@ MVC.Model = MVC.Class.extend(
     },
     attributes: {},
     /**
-     * Used for converting callbacks to to seperate error and succcess
+     * Used for converting callbacks to to seperate failure and succcess
      * @param {Object} callbacks
      */
     _clean_callbacks : function(callbacks){
@@ -124,10 +123,10 @@ MVC.Model = MVC.Class.extend(
             if(this.asynchronous) throw "You must supply a callback!"; else return null;
         }
         if(typeof callbacks == 'function')
-            return {onSuccess: callbacks, onError: callbacks};
+            return {onSuccess: callbacks, onFailure: callbacks};
         if(!callbacks.onSuccess && !callbacks.onComplete) throw "You must supply a positive callback!";
         if(!callbacks.onSuccess) callbacks.onSuccess = callbacks.onComplete;
-        if(!callbacks.onError && callbacks.onComplete) callbacks.onError = callbacks.onComplete;
+        if(!callbacks.onFailure && callbacks.onComplete) callbacks.onFailure = callbacks.onComplete;
 		return callbacks;
     },
     models : {}
@@ -271,18 +270,6 @@ MVC.Model = MVC.Class.extend(
         for(var attr in cas){
             if(cas.hasOwnProperty(attr) ) this[attr] = null;
         }
-    },
-    /**
-     * Returns the suggested element id for this instance
-     */
-    element_id : function(){
-        return this.Class.className+'_'+this[this.Class.id];
-    },
-    /**
-     * Returns the element found by using element_id for this instance
-     */
-    element : function(){
-        return MVC.$E(this.element_id());;
     }
 });
 

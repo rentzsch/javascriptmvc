@@ -31,7 +31,7 @@
 	<tr>
 		<td>onFailure</td>
 		<td>&nbsp;</td>
-		<td>This function is called if the transport's onError is called</td>
+		<td>This function is called if the transport's onFailure is called</td>
 	</tr>
 	<tr>
 		<td>transport</td>
