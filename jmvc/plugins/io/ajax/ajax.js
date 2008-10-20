@@ -90,9 +90,8 @@
 	      this.options.method = 'post';
 	    }
 	
-		if (this.options.method == 'get'){
-            var string_params = MVC.Object.to_query_string(this.options.parameters);
-            if(string_params != "") this.url += (MVC.String.include(this.url,'?') ? '&' : '?') + string_params;
+		if (this.options.method == 'get' && this.options.parameters != '' ){
+            this.url += (MVC.String.include(this.url,'?') ? '&' : '?') + MVC.Object.to_query_string(this.options.parameters);
             delete this.options.parameters;
         }
 		//else if (/Konqueror|Safari|KHTML/.test(navigator.userAgent))
@@ -120,7 +119,7 @@
 				if(state == 'Complete'){
 					if(!this.options.onSuccess) ; // do nothing
 					else if(this.success()) this.options.onSuccess(this.transport);
-					else if(this.options.onFailure) this.options.onFailure(this.transport);
+					else if(this.options.onError) this.options.onError(this.transport);
 				}
 				if(this.options['on'+state]){
 					this.options['on'+state](this.transport);
