@@ -516,10 +516,7 @@ if(MVC.script_options){
 	
     if(MVC.script_options[1] == 'test'){
 		var load_test = function(){
-			var path = include.get_path();
-			include.set_path(MVC.apps_root)
-			include(MVC.app_name+'/test')
-			include.set_path(path)
+			include('apps/'+MVC.app_name+'/test');
 		}
 		// check exists doesn't block other scripts from loading in FF3, so this causes problems
 		if (navigator.userAgent.match(/Firefox\/3/)) { // FF 3

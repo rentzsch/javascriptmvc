@@ -37,17 +37,15 @@ MVC.Controller = MVC.Class.extend(
         //load tests
         if(include.get_env() == 'test'){
             var path = MVC.root.join('test/functional/'+this.className+'_controller_test.js');
+    		include('../test/functional/'+this.className+'_controller_test.js');
     		var exists = include.check_exists(path);
-    		if(exists)
-    			MVC.Console.log('Loading: "test/functional/'+this.className+'_controller_test.js"');
-    		else {
-    			MVC.Console.log('Test Controller not found at "test/functional/'+this.className+'_controller_test.js"');
-    			return;
-    		}
-    		var p = include.get_path();
-    		include.set_path(MVC.root.path);
-    		include('test/functional/'+ this.className+'_controller_test.js');
-    		include.set_path(p);
+    		if (exists) {
+				MVC.Console.log('Loading: "test/functional/' + this.className + '_controller_test.js"');
+			}
+			else {
+				MVC.Console.log('Test Controller not found at "test/functional/' + this.className + '_controller_test.js"');
+				return;
+			}
         }
         this._path =  include.get_path().match(/(.*?)controllers/)[1]+"controllers";
     },
