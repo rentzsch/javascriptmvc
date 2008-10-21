@@ -32,6 +32,7 @@ window.MVC.History = {
 	isKonquerer: false,
 	isGecko: false,
 	isSupported: false,
+    throwErrors: true,
 	
 	/*Public: Create the DHTML history infrastructure*/
 	create: function(options) {
@@ -732,7 +733,8 @@ MVC.History.historyChange = function(newLocation, historyData) {
 		controller_part = 'main';
 		action_part = folders;
 	}else{
-		throw "Can't dispatch location "+folders;
+		if(MVC.History.throwErrors)
+            throw "Can't dispatch location "+folders;
 	}
 	
 	var controller = window[MVC.String.classize(controller_part)+'Controller'];
