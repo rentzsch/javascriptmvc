@@ -9,13 +9,13 @@ var data = {class_name: _args[0]}
 data.name = MVC.String.classize(_args[0])+'Controller';
 
 
-c = new View({absolute_url: "jmvc/command/generators/controller.ejs"});
+c = new View({absolute_url: "jmvc/rhino/command/templates/controller.ejs"});
 MVCOptions.save("controllers/"+_args[0]+"_controller.js",  c.render(data)  )
 
 print("Generating ... controllers/"+_args[0]+"_controller.js");
 
 
-t = new View({absolute_url: "jmvc/command/generators/controller_test.ejs"});
+t = new View({absolute_url: "jmvc/rhino/command/templates/controller_test.ejs"});
 MVCOptions.save("test/functional/"+_args[0]+"_controller_test.js",  t.render(data)  );
 
 

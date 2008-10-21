@@ -16,7 +16,7 @@ MVCOptions.create_folder("engines/"+_args[0]+"/images");
 MVCOptions.create_folder("engines/"+_args[0]+"/stylesheets");
 MVCOptions.create_folder("engines/"+_args[0]+"/views");
 
-render_to("engines/"+_args[0]+"/apps/"+_args[0]+".js", "jmvc/command/generators/application.ejs", data);
+render_to("engines/"+_args[0]+"/apps/"+_args[0]+".js", "jmvc/rhino/command/templates/application.ejs", data);
 
 
 print("\nMake sure to add new engines to your application files!\n");

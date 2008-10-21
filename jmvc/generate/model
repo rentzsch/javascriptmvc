@@ -11,7 +11,7 @@ var data = {class_name: _args[1]}
 data.name = MVC.String.classize(_args[1]);
 data.type = MVC.String.classize(_args[0]);
 
-v = new View({absolute_url: "jmvc/command/generators/model.ejs"});
+v = new View({absolute_url: "jmvc/rhino/command/templates/model.ejs"});
 MVCOptions.save("models/"+_args[1]+".js",  v.render(data)  );
 
 print("Generating ... models/"+_args[1]+".js");

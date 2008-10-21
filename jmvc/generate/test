@@ -11,7 +11,7 @@ var data = {class_name: _args[1]}
 ttype = _args[0].toLowerCase();
 
 render_to(	"test/"+ttype+"/"+_args[1]+"_test.js", 
-			"jmvc/command/generators/"+ttype+"_test.ejs", data);
+			"jmvc/rhino/command/templates/"+ttype+"_test.ejs", data);
 
 
 print("\n               Make sure to add to your test files!\n");

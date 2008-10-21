@@ -40,7 +40,7 @@ var data = {
 //test/tests/engine.html -> ../../jmvc/include.js
 
 try{
-	render_to(loc, "jmvc/command/generators/page.ejs", data);
+	render_to(loc, "jmvc/rhino/command/templates/page.ejs", data);
 }catch(e){
 	print("  ERROR! Unable to render to "+loc+". Make sure folder exists!");
 }

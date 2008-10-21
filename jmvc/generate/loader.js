@@ -1,4 +1,4 @@
-load('jmvc/rhino/env.js');
+load('jmvc/rhino/compression/env.js');
 if(typeof MVC == 'undefined')
     MVC ={ Included: {} };
 else
@@ -25,7 +25,7 @@ include.request = function(path){
 };
 
 MVCOptions = {};
-load('jmvc/rhino/helpers.js');
+load('jmvc/rhino/compression/helpers.js');
 
 var first = true;
 render_to = function(file, ejs, data){
