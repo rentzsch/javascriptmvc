@@ -50,6 +50,10 @@ MVC.Model = MVC.Class.extend(
         if(attributes.attributes) attributes = attributes.attributes();
         var inst = new this(attributes);
         inst.is_new_record = this.new_record_func;
+        
+        OpenAjax.hub.publish(this.className + ".create.as_existing", {data: inst});
+        
+        //if(MVC.Controller) MVC.Controller.publish(this.className + ":create_as_existing", );
         return inst;
     },
     /**
@@ -270,6 +274,18 @@ MVC.Model = MVC.Class.extend(
         for(var attr in cas){
             if(cas.hasOwnProperty(attr) ) this[attr] = null;
         }
+    },
+    /**
+     * Returns the suggested element id for this instance
+     */
+    element_id : function(){
+        return this.Class.className+'_'+this[this.Class.id];
+    },
+    /**
+     * Returns the element found by using element_id for this instance
+     */
+    element : function(){
+        return MVC.$E(this.element_id());;
     }
 });
 

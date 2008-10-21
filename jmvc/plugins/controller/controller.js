@@ -56,7 +56,13 @@ MVC.Controller = MVC.Class.extend(
 		}, this);
 	},
     subscribe_closure : function(f_name){
-        return   this.dispatch_closure(f_name);
+        return  MVC.Function.bind(function(event_name, data){
+            var params = data || {};
+            params.action = f_name;
+            params.controller = this;
+            params.event_name = event_name;
+			return this.dispatch(f_name,  new MVC.Controller.Params( params)  );
+		},this);
     },
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
@@ -94,11 +100,12 @@ MVC.Controller = MVC.Class.extend(
     controllers : {},
     actions: [],
     publish: function(message, params){
-        var subscribers = MVC.Controller.SubscribeAction.events[message];
-        if(!subscribers) return;
-        for(var i =0 ; i < subscribers.length; i++){
-            subscribers[i](params);
-        }
+        //var subscribers = MVC.Controller.SubscribeAction.events[message];
+        //if(!subscribers) return;
+        //for(var i =0 ; i < subscribers.length; i++){
+        //    subscribers[i](params);
+        //}
+        OpenAjax.hub.publish(message, params);
     }
 },
 /* @Prototype*/
@@ -165,17 +172,17 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
     match: new RegExp("(.*?)\\s?(subscribe)$"),
     matches: function(action_name){
         return this.match.exec(action_name);
-    },
-    events: {}
+    }
 },
 /* @Prototype*/
 {
     init: function(action, f, controller){
         this._super(action, f, controller);
         this.message();
-        if(!this.Class.events[this.message_name]) this.Class.events[this.message_name] = [];
-        var cb = this.controller.subscribe_closure(action );
-        this.Class.events[this.message_name].push(cb);
+        OpenAjax.hub.subscribe(this.message_name, this.controller.subscribe_closure(action ) );
+        //if(!this.Class.events[this.message_name]) this.Class.events[this.message_name] = [];
+        //var cb = this.controller.subscribe_closure(action );
+        //this.Class.events[this.message_name].push(cb);
     },
     message: function(){
         this.parts = this.action.match(this.Class.match);
