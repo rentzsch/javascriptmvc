@@ -1,0 +1,20 @@
+if(typeof load != 'undefined'){
+    load('jmvc/rhino/documentation/class.js');
+    load('jmvc/rhino/documentation/d_pair.js');
+    load('jmvc/rhino/documentation/d_function.js');
+    load('jmvc/rhino/documentation/d_class.js');
+    load('jmvc/rhino/documentation/d_constructor.js');
+    load('jmvc/rhino/documentation/d_file.js');
+    load('jmvc/rhino/documentation/d_application.js');
+    load('jmvc/rhino/documentation/d_other.js');
+}else{
+    include(
+        'class',
+        'd_pair', 
+        'd_function',
+        'd_class', 
+        'd_constructor',
+        'd_other',
+        'd_file', 
+        'd_application');
+}
