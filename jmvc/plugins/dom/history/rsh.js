@@ -717,7 +717,7 @@ MVC.History.historyChange = function(newLocation, historyData) {
 	var data = MVC.Path.get_data(path);
 	var folders = path.folder();
 	var action_part = null, controller_part;
-	if(folders == null){folders = ''};
+	if(folders == null){folders = 'index'};
 	
 	var first_s = folders.indexOf('/');
 	
