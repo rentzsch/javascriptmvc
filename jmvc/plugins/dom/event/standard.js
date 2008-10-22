@@ -8,7 +8,7 @@ if(document.addEventListener) {
 			if(capture == null) capture = false; 
 			el.addEventListener(eventType, handler, capture);
     	},
-		stop_observing : function(el, eventType, handler) {
+		stop_observing : function(el, eventType, handler, capture) {
 	        if(capture == null) capture = false;
 	        el.removeEventListener(eventType, handler, false);
 	    }
