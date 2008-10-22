@@ -76,7 +76,7 @@ MVC.CometController = MVC.Controller.extend(
                 //now pass to controller
                 //var controller = window[MVC.String.pluralize(className)+'controller']
                 var controller_name = this.controller_map[className] ? this.controller_map[className] : MVC.String.pluralize(className).toLowerCase();
-                MVC.Controller.publish(controller_name+":"+action, {
+                MVC.Controller.publish(controller_name+"."+action, {
 					data: objects
 				});
             }
