@@ -28,9 +28,7 @@ MVC.Controller.HoverAction = MVC.Controller.DelegateAction.extend({
                 this.current_position = MVC.Event.pointer(event);
             }, this);
             MVC.Event.observe(params.element, "mousemove", this.mousemove);
-            
-            //MVC.Controller.HoverAction.running_actions[this.selector()] = this;
-            
+
             this.timer = setTimeout(MVC.Function.bind(this.check, this), MVC.Controller.HoverAction.interval);
             
         }, this));

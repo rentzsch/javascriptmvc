@@ -73,14 +73,16 @@ MVC.Draggable.prototype = {
     start: function(event){
         this.moved = true;
         this.keep_dragging = true;
-
+        
+        
+        
         var drag_data = {
             element: this.element, 
             event: event, 
-            cancel_drag: function() {
+            cancel_drag: MVC.Function.bind(function() {
                 this.keep_dragging = false;
-            }.bind(this),
-            use_ghost: function(callback) {
+            }, this),
+            use_ghost: MVC.Function.bind( function(callback) {
                 // create a ghost by cloning the source element and attach the clone to the dom after the source element
                 var ghost = this.element.cloneNode(true);
                 MVC.Element.insert(this.element, { after: ghost });
@@ -95,10 +97,21 @@ MVC.Draggable.prototype = {
                 // store the original element and make the ghost the dragged element
                 this.ghosted_element = this.element;
                 this.element = ghost;
-            }.bind(this)
-        };
+            },this),
+            revert : MVC.Function.bind( function(){
+                this._revert = true;
+            }, this)
+        }
 
+        
+        
+        
         this.dragstart(drag_data);
+        
+        MVC.Element.make_positioned(this.element);
+        this.start_position =MVC.Element.cumulative_offset(this.element);
+        this.element.style.zIndex = 1000;
+        
         MVC.Droppables.compile(); //Get the list of Droppables.
     },
     //returns the current relative offset
@@ -114,7 +127,9 @@ MVC.Draggable.prototype = {
 		if(!this.keep_dragging) return;
         MVC.Position.prepare();
         var pos = MVC.Element.cumulative_offset(this.element).minus(this.currentDelta());//current position, minus offset = where element should be
+        
         var p = pointer.minus(pos).minus( this.mouse_position_on_element );  //from mouse position
+        
         var s = this.element.style;
         s.top =  p.top()+"px";
         s.left =  p.left()+"px";
@@ -148,6 +163,11 @@ MVC.Event.observe(document, 'mouseup', function(event){
         }
 
         current.dragend(drag_data);
+        if(current._revert){
+            new MVC.Animate(current.element, {top: "0px", left: "0px"});
+        }
+        
+        
         MVC.Droppables.fire(event, current.element);
         
         // ensure that the ghost (if it still exists in the dom) is removed
