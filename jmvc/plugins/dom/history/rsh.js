@@ -735,6 +735,7 @@ MVC.History.historyChange = function(newLocation, historyData) {
 	}else{
 		if(MVC.History.throwErrors)
             throw "Can't dispatch location "+folders;
+        return;
 	}
 	
 	var controller = window[MVC.String.classize(controller_part)+'Controller'];
