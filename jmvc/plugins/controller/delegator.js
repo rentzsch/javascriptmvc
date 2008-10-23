@@ -34,7 +34,7 @@ MVC.Object.extend(MVC.Delegator,
 			iterator = iterator.parentNode;
 			if(iterator == null) return [];
 		}
-		parents.push(body);
+		//parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
 		return parents;
 	},
     /**
