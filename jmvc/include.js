@@ -277,7 +277,7 @@ MVC.Object.extend(include,{
 	},
 	get_absolute_path: function(){
 		var fwd = new File(cwd);
-		return fwd.relative() ? fwd.join_from(MVC.page_dir+'/', true) : cwd;
+		return fwd.relative() ? fwd.join_from(MVC.root.path, true) : cwd;
 	},
     /**
      * Adds the include to the list of includes remaining to be included.
@@ -453,8 +453,11 @@ var script_tag = function(){
 var insert = function(src){
     // source we need to know how to get to jmvc, then load 
     // relative to path to jmvc
-    if(src)
-        src = MVC.root.join(src);
+    if(src){
+		var src_file = new MVC.File(src);
+		if(!src_file.is_local_absolute() && !src_file.is_domain_absolute())
+	        src = MVC.root.join(src);
+	}
     if(! document.write){
         if(src){
             load(new MVC.File( src ).clean());
