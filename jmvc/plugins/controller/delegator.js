@@ -268,7 +268,7 @@ MVC.Delegator.prototype = {
 				matching++;
                 if(matching >= this.selector_order().length) {
                     if(this.end_filters && !this.end_filters[event.type](el, event)) return null;
-                    return {node: el, order: n, delegation_event: this};
+                    return {node: node.element, order: n, delegation_event: this};
                 }
 			}
 		}
