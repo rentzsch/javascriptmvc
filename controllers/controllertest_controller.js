@@ -16,6 +16,12 @@ MainController = MVC.Controller.extend('main',{
 	}
 });
 
+LoginController = MVC.Controller.extend('login',{
+	'# submit' :function(params){
+		params.event.kill();
+		alert(params.element);
+	},
+});
 
 
 
