@@ -74,39 +74,13 @@ MVC.Draggable.prototype = {
         this.moved = true;
         this.keep_dragging = true;
         
-        
-        
-        var drag_data = {
-            element: this.element, 
-            event: event, 
-            cancel_drag: MVC.Function.bind(function() {
-                this.keep_dragging = false;
-            }, this),
-            use_ghost: MVC.Function.bind( function(callback) {
-                // create a ghost by cloning the source element and attach the clone to the dom after the source element
-                var ghost = this.element.cloneNode(true);
-                MVC.Element.insert(this.element, { after: ghost });
+        var params = new MVC.Controller.DragParams({
+            event: event,
+            element: this.element,
+            drag_action: this
+        })
 
-                if (callback && typeof callback == 'function')
-                    // the user supplied a callback to the function, because they want to style the ghost themselves
-                    callback(this.element, ghost);
-                else
-                    // at the very least, pull the ghost out of the document flow so it doesn't mess up the existing layout
-                    ghost.style.position = 'absolute';
-
-                // store the original element and make the ghost the dragged element
-                this.ghosted_element = this.element;
-                this.element = ghost;
-            },this),
-            revert : MVC.Function.bind( function(){
-                this._revert = true;
-            }, this)
-        }
-
-        
-        
-        
-        this.dragstart(drag_data);
+        this.dragstart(params);
         
         MVC.Element.make_positioned(this.element);
         this.start_position =MVC.Element.cumulative_offset(this.element);
@@ -134,7 +108,10 @@ MVC.Draggable.prototype = {
         s.top =  p.top()+"px";
         s.left =  p.left()+"px";
         MVC.Droppables.show(pointer, this.element, event);  //Tell dropables where mouse is
-        this.dragging({element: this.element, event: event}); //Callback to controller dragging action
+        
+         var params = new MVC.Controller.DragParams({ event: event, element: this.element, drag_action: this});
+        
+        this.dragging(params); //Callback to controller dragging action
     }
 }
 MVC.Draggable.selectors = {};
@@ -155,14 +132,12 @@ MVC.Event.observe(document, 'mouseup', function(event){
     if(MVC.Draggable.current){
         var current = MVC.Draggable.current;
         var drag_data = { element: current.element, event: event };
-
-        // if there is a ghost, pass it and the source element in the drag data
         if (current.ghosted_element) {
             drag_data.ghost = drag_data.element;
             drag_data.element = current.ghosted_element;
         }
-
-        current.dragend(drag_data);
+        current.dragend(new MVC.Controller.DragParams(drag_data));
+        
         if(current._revert){
             new MVC.Animate(current.element, {top: "0px", left: "0px"});
         }
@@ -179,6 +154,34 @@ MVC.Event.observe(document, 'mouseup', function(event){
     MVC.Draggable.current = null;
 });
 
+//Assume passed, element, event, and drag_action
+MVC.Controller.DragParams = MVC.Controller.Params
 
+MVC.Controller.DragParams.prototype = new MVC.Controller.Params();
+MVC.Object.extend(MVC.Controller.DragParams.prototype, {
+    cancel_drag: function() {
+        this.drag_action.keep_dragging = false;
+    },
+    ghost: function(callback) {
+        // create a ghost by cloning the source element and attach the clone to the dom after the source element
+        var ghost = this.element.cloneNode(true);
+        MVC.Element.insert(this.element, { after: ghost });
 
+        if (callback && typeof callback == 'function')
+            // the user supplied a callback to the function, because they want to style the ghost themselves
+            callback(this.element, ghost);
+        else
+            // at the very least, pull the ghost out of the document flow so it doesn't mess up the existing layout
+            // TODO, we should handle copying the ghost.  You can set it to absolute, but get
+            // the current's elements attributes.  Though, the ghost should probably be in
+            // the body to make it a little easier
+            ghost.style.position = 'absolute';
 
+        // store the original element and make the ghost the dragged element
+        this.drag_action.ghosted_element = this.element;
+        this.drag_action.element = ghost;
+    },
+    revert : function(){
+        this.drag_action._revert = true;
+    }
+})

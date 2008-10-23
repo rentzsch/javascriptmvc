@@ -69,7 +69,8 @@ MVC.Controller = MVC.Class.extend(
             params = params || {};
             params.action = f_name;
             params.controller = this;
-			return this.dispatch(f_name,  new MVC.Controller.Params(params) );
+            params = params.constructor == MVC.Controller.Params ? params : new MVC.Controller.Params(params)
+			return this.dispatch(f_name,  params );
 		},this);
     },
     /**
@@ -293,6 +294,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
  * @init Creates a new Controller.Params object.
  * @param {Object} params An object you want to pass to a controller
  */
+
 MVC.Controller.Params = function(params){
 	var params = params || {};
     var killed = false;
@@ -305,7 +307,9 @@ MVC.Controller.Params = function(params){
     for(var thing in params){
 		if( params.hasOwnProperty(thing) ) this[thing] = params[thing];
 	}
+    this.constructor = MVC.Controller.Params;
 };
+
 /* @Prototype*/
 MVC.Controller.Params.prototype = {
 	/*

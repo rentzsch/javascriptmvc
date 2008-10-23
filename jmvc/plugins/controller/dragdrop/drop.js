@@ -122,7 +122,7 @@ MVC.Droppables = {
     if (this.isAffected(MVC.Event.pointer(event), element, this.last_active))
       
       if (this.last_active.dropped) {
-        this.last_active.dropped({dropped_element: element, event: event, element: this.last_active.element}); 
+        this.last_active.dropped({drag_element: element, event: event, element: this.last_active.element}); 
         return true; 
       }
   },
