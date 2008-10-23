@@ -9,9 +9,6 @@
 	</head>
 	<body>
         
-		<form id="login">
-			<input type="submit" value="Submit test"/>           
-        </form>
 		
 <p><b>Instructions:</b>  The following form and input elements are
 		being matched by a Controller.  By performing various events on
@@ -30,6 +27,9 @@
 			<input class='test' value='mouseover, mouseout, click, focus, and blur me' id='input' size='50' />
 			<input type='submit' value='submit me'/>
 		</form>
+		<form id="login">
+			<input type="submit" value="Submit test"/>           
+        </form>
 		<table>
 		    <tr>
 		        <td id='load' class='failure'>Test load</td>
@@ -48,6 +48,7 @@
             <tr>
                 <td  id='mouseout' class='failure'>MouseOut</td>
                 <td  id='click' class='failure'>Click</td>
+                <td  id='form_submit' class='failure'>Form Submit</td>
             </tr>
 		</table>
 
