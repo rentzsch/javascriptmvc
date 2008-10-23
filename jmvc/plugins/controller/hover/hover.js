@@ -24,7 +24,9 @@ MVC.Controller.HoverAction = MVC.Controller.DelegateAction.extend({
             this.called = false;
             this.starting_position = MVC.Event.pointer(params.event);
             this.element = params.element;
+            this.mouseover_event = params.event;
             this.mousemove = MVC.Function.bind( function(event){
+                this.mousemove_event = event;
                 this.current_position = MVC.Event.pointer(event);
             }, this);
             MVC.Event.observe(params.element, "mousemove", this.mousemove);
@@ -44,7 +46,7 @@ MVC.Controller.HoverAction = MVC.Controller.DelegateAction.extend({
             if(this.called){ //call hoverout
                 var hoverout = MVC.Controller.HoverAction.hoverouts[this.selector()];
                 if(hoverout)
-                    hoverout.func({element: this.element});
+                    hoverout.func({element: this.element, event: params.event});
             }
         }, this));
         
@@ -55,7 +57,7 @@ MVC.Controller.HoverAction = MVC.Controller.DelegateAction.extend({
         if(size < MVC.Controller.HoverAction.sensitivity){
             //fire hover and set as called
             this.called = true;
-            this.func({element: this.element});
+            this.func({element: this.element, mousemove_event: this.mousemove_event, mouseover_event: this.mouseover_event});
             MVC.Event.stop_observing(this.element, "mousemove", this.mousemove);
         }else{
             this.current_position = this.starting_position;
