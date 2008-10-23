@@ -398,18 +398,10 @@ MVC.Object.extend(include,{
 	},
 	app: function(f){
 		return function(){
-			
-            
-            //var current_path = include.get_path();
-		    //include.set_path(MVC.apps_root || MVC.root.join('apps') );
-
             for (var i = 0; i < arguments.length; i++) {
 				arguments[i] = f(arguments[i]);
-				//if(included_array)
-				//	included_array.push(arguments[i].match(/[^\/\\]*$/)[0].replace(/_controller/,''));
 			}
 			include.apply(null, arguments);
-            //include.set_path(current_path);
 		}
 	},
     functions: [],
