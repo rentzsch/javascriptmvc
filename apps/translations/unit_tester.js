@@ -44,9 +44,8 @@ MVCOptions = {
         print('\nCompleted Unit Tests ('+test.passes+'/'+test.tests.length+')' + (test.passes == test.tests.length ? ' Wow!' : '')+"\n" )
     }
 }
-load('jmvc/rhino/htmlparser.js');
-load('jmvc/rhino/env.js');
-load('jmvc/rhino/helpers.js');
-load('jmvc/rhino/doc.js');
+
+load('jmvc/rhino/compression/setup.js');
+load('jmvc/rhino/documentation/setup.js');
 window.location = 'apps/translations/index.html';
 
