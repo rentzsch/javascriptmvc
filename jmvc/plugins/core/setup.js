@@ -9,7 +9,8 @@ if(typeof Prototype == 'undefined') {
 	MVC.Event = Event;
 	include({path: '../lang/prototype_helpers.js', shrink_variables: false},
 			"../lang/inflector/inflector",
-			"../io/ajax/prototype_ajax");
+			"../io/ajax/prototype_ajax",
+			"../lang/class/setup");
 }
 
 if(MVC.Console)
