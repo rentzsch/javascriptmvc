@@ -33,6 +33,7 @@ window.MVC.History = {
 	isGecko: false,
 	isSupported: false,
     throwErrors: true,
+    fireInitialChange: true,
 	
 	/*Public: Create the DHTML history infrastructure*/
 	create: function(options) {
@@ -693,22 +694,14 @@ if(typeof Prototype == 'undefined'){
 MVC.Event.observe(window, 'load', function(){
 	MVC.History.initialize();
 	MVC.History.addListener(MVC.History.historyChange);
-	MVC.History.historyChange();
+	if(MVC.History.fireInitialChange)
+        MVC.History.historyChange();
 	
 });
 
 MVC.Controller.test_dispatch = function(controller, action){
 	if(!controller) return false;
-	var controller_name = MVC.String.classize(controller)+'Controller';
-	if(!action) action = 'index';
-	if(window[controller_name]){
-		if(action in window[controller_name].prototype){
-			return true;
-		}else{
-			return false;
-		}
-	}else
-		return false;
+	return MVC.Controller.get_controller_with_name_and_action(controller, action ) != null;
 };
 
 
@@ -737,9 +730,9 @@ MVC.History.historyChange = function(newLocation, historyData) {
             throw "Can't dispatch location "+folders;
         return;
 	}
-	
-	var controller = window[MVC.String.classize(controller_part)+'Controller'];
+	var controller = MVC.Controller.get_controller_with_name_and_action(controller_part, action )
 	var result = controller.dispatch(action_part,params);
+    OpenAjax.hub.publish("history."+folders.replace("/","."), params );
 	return result;
 };
 

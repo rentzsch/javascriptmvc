@@ -107,7 +107,15 @@ MVC.Controller = MVC.Class.extend(
         //    subscribers[i](params);
         //}
         OpenAjax.hub.publish(message, params);
-    }
+    },
+    get_controller_with_name_and_action: function(name, action) {
+        var controllers = MVC.Controller.controllers[name];
+        for(var i = 0; i < controllers.length; i++) {
+            var controller = controllers[i];
+            if (controller.actions[action]) return controller;
+        }
+        return null;
+     }
 },
 /* @Prototype*/
 {
