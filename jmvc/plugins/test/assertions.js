@@ -25,8 +25,9 @@ MVC.Test.Assertions =  MVC.Class.extend(
 		this._delays = 0;
 		this._test_name = test_name;
 		this._last_called = test_name;
-		if(!window._rhino)
-            MVC.Console.window.running(this._test, this._test_name);
+		
+        OpenAjax.hub.publish("jmvc.test.running", this);
+        
 		if(this.setup) 
 			this._setup();
 		else{
@@ -254,10 +255,8 @@ MVC.Test.Assertions =  MVC.Class.extend(
 			if(this._do_blur_back)
 				this._blur_back();
 			
-            if(!window._rhino)
-                MVC.Console.window.update(this._test, this._test_name, this);
-            else
-                MVCOptions.report(this);
+            OpenAjax.hub.publish("jmvc.test.assertions.update", this);
+            
 			this.failures == 0 && this.errors == 0?  this._test.pass(): this._test.fail();
 			this._test.run_next();
 		}

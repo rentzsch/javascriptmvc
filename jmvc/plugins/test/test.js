@@ -42,8 +42,7 @@ MVC.Test = MVC.Class.extend(
 		this.failures = 0;
 		
 		MVC.Tests[this.name] = this;
-		if(!window._rhino)
-            this.updateElements(this);
+		OpenAjax.hub.publish("jmvc.test.created", this);
 	},
     /**
      * Adds to the test case's failure count.
@@ -94,10 +93,8 @@ MVC.Test = MVC.Class.extend(
 			this.working_test++;
 			this.run_test(this.test_names[this.working_test-1]);
 		}else if(this.working_test != null){
-			if(!window._rhino)
-                MVC.Console.window.update_test(this)
-            else
-                MVCOptions.update_test(this);
+			OpenAjax.hub.publish("jmvc.test.update", this);
+
 			this.working_test = null;
 			if(this.callback){
 				this.callback();
@@ -110,43 +107,6 @@ MVC.Test = MVC.Class.extend(
 		// setTimeout with delay of 0 is necessary for Opera and Safari to trick them into thinking
 		// the calling window was the application and not the console
 		setTimeout(function(){ this.assertions = new saved_this.Assertions(saved_this, test_id); },0);
-	},
-	prepare_page : function(type) {
-		MVC.Console.window.document.getElementById(type+'_explanation').style.display = 'none';
-		MVC.Console.window.document.getElementById(type+'_test_runner').style.display = 'block';
-	},
-	updateElements : function(test){
-		
-		if(test.type == 'unit')
-			this.prepare_page('unit');
-		else
-			this.prepare_page('functional');
-		var insert_into = MVC.Console.window.document.getElementById(test.type+'_tests');
-		var txt = "<h3><img alt='run' src='playwhite.png' onclick='find_and_run(\""+test.name+"\")'/>"+test.name+" <span id='"+test.name+"_results'></span></h3>";
-		txt += "<div class='table_container'><table cellspacing='0px'><thead><tr><th>tests</th><th>result</th></tr></thead><tbody>";
-		for(var t in test.tests ){
-			if(! test.tests.hasOwnProperty(t) ) continue;
-			if(t.indexOf('test') != 0 ) continue;
-			var name = t.substring(5)
-			txt+= '<tr class="step" id="step_'+test.name+'_'+t+'">'+
-			"<td class='name'>"+
-			"<a href='javascript: void(0);' onclick='find_and_run(\""+test.name+"\",\""+t+"\")'>"+name+'</a></td>'+
-			'<td class="result">&nbsp;</td></tr>'
-		}
-		txt+= "</tbody></table></div>";
-		if(this.added_helpers){
-			txt+= "<div class='helpers'>Helpers: "
-			var helpers = [];
-			for(var h in test.added_helpers)
-				if( test.added_helpers.hasOwnProperty(h) ) 
-					helpers.push( "<a href='javascript: void(0)' onclick='run_helper(\""+test.name+"\",\""+h+"\")'>"+h+"</a>")
-			txt+= helpers.join(', ')+"</div>";
-		}
-		//var t = document.getElementById('functional_tests');
-		var t = MVC.Console.window.document.createElement('div');
-		t.className = 'test'
-		t.innerHTML  = txt;
-		insert_into.appendChild(t);
 	}
 });
 

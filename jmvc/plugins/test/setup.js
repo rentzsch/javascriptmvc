@@ -1,4 +1,5 @@
-include.plugins('lang','dom/query')
+include.plugins('lang','dom/query','lang/class','lang/openajax')
+
 if(!window._rhino){
     include.plugins('debug')
 }else{
@@ -7,7 +8,12 @@ if(!window._rhino){
     }}
 }
 
-include.plugins('lang/class');
-include('test','runner','assertions',
-    'unit','functional','controller',
-'synthetic_events')
+
+include(
+    'test',
+    'runner',
+    'assertions',
+    'unit',
+    'functional',
+    'controller',
+    'synthetic_events')
