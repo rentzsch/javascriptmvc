@@ -1,23 +1,17 @@
 new MVC.Test.Unit('model',{
    test_find_all_no_params: function() {
-      Todo.find('all', this.next_callback());
-   },
-   found_all : function(instances){
-       this.assert_equal(2, instances.length);
-       this.assert_equal(2, instances.length)
-       this.assert_equal("string", Todo.attributes.name);
-       this.assert_equal("string", Todo.attributes.description);
+      var instances = Todo.find('all');
+      this.assert_equal(2, instances.length);
+      this.assert_equal(2, instances.length)
+      this.assert_equal("string", Todo.attributes.name);
+      this.assert_equal("string", Todo.attributes.description);
    },
    test_find_all_params: function(){
-       Todo.find('all', {},this.next_callback());
-   },
-   found_all_params : function(instances){
+       var instances = Todo.find('all', {});
        this.assert_equal(2, instances.length);
    },
    test_find_one : function(){
-       Todo.find('first', this.next_callback());
-   },
-   found_one : function(instance){
+       var instance = Todo.find('first');
        this.assert_equal("trash", instance.name);
        this.assert_equal("take it out", instance.description);
        this.assert_not(instance.is_new_record());
@@ -43,11 +37,10 @@ new MVC.Test.Unit('model',{
    },
    test_update_attributes : function(){
         var todo = new Todo({ description: "er"});
-        todo.update_attributes({name: "thing"}, this.next_callback())
-   },
-   updated_attributes : function(todo){
-       this.assert_equal("thing", todo.name  );
-       this.assert(todo.is_new_record());
+        todo.update_attributes({name: "thing"})
+        
+        this.assert_equal("thing", todo.name  );
+        this.assert_not(todo.is_new_record());
    },
    test_guess_type : function(){
        this.assert_equal("array", MVC.Object.guess_type( [] )  );

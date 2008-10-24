@@ -47,7 +47,7 @@ MVCOptions = {
 	    print('\n  Completed '+test.name+' test ('+test.passes+'/'+test.test_names.length+ ')\n')
     },
     unit_results : function(called,test){
-        print('\nCompleted Unit Tests ('+test.passes+'/'+test.tests.length+')' + (test.passes == test.tests.length ? ' Wow!' : '')+"\n" )
+        print('\COMPLETED UNIT TESTS ('+test.passes+'/'+test.tests.length+')' + (test.passes == test.tests.length ? ' Wow!' : '')+"\n" )
     }
 }
 

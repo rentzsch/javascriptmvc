@@ -30,8 +30,8 @@ MVC.Timer.prototype = {
         if(time_passed >= this.time){
             current = this.to;
             this.update_callback(current);
-            this.kill();
             this.complete_callback(current);
+            this.kill();
         }else{
             var percentage = time_passed / this.time;
             current = this.easing(percentage, time_passed, this.from, this.distance  );

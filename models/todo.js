@@ -1,28 +1,22 @@
 Todo = MVC.Model.extend('todo', 
 {
-    find_one : function(params, callbacks){
-        var cbs = this._clean_callbacks(callbacks);
-        var instances = this.create_as_existing( {name: "trash", description: "take it out"  });
-        cbs.onSuccess( instances  );
+    find_one : function(params){
+        return {name: "trash", description: "take it out"  };
     },
     find_all : function(params, callbacks){
-        var cbs = this._clean_callbacks(callbacks);
-        var instances = this.create_many_as_existing( [
+         return [
             {name: "dishes", description: "clean them"  },
-            {name: "shovel snow", description: "clear all the snow"}] );
-        cbs.onSuccess( instances  );
+            {name: "shovel snow", description: "clear all the snow"}] ;
     },
     create : function(attributes, callbacks){
         var inst = new this(attributes);
-        var cbs = this._clean_callbacks(callbacks);
-        cbs.onSuccess( inst  );
+        return inst;
     },
     update : function(id, attributes, callbacks){
         
         var inst = this.store.find_one(id);
         inst.set_attributes(attributes);
-        var cbs = this._clean_callbacks(callbacks);
-        cbs.onSuccess( inst  );
+        return inst;
     }
 },
 {
