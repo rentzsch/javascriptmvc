@@ -380,7 +380,14 @@ var self = window;
 		},
 		get outerHTML(){
 			return this.nodeValue;
-		}
+		},
+        //I am sure there is a faster way
+        contains : function(node){
+            while(node && node != this ){
+                node = node.parentNode;
+            }
+            return !!node;
+        }
 	};
 
 	// DOM Element
