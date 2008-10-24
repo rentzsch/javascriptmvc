@@ -204,7 +204,7 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
  */
 MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
 /* @Static*/
-    match: new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
+    match: new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
     /*
      * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
      * mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, 
