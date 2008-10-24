@@ -1,9 +1,12 @@
 new MVC.Test.Unit('element_test',{
-	test_insert_bottom: function(){
-		if(!MVC.Element) {
-			this.messages.push("Skipping because Element plugin isn't included.");
-			return;
-		}
+	setup: function(){
+          MVC.$E('testarea').innerHTML = "<div id='insertion_test' style='width: 100px; height:100px;'></div>"
+    },
+    teardown : function(){
+          MVC.$E('testarea').innerHTML = "";
+    },
+    test_insert_bottom: function(){
+
 		var b = MVC.$E('insertion_test');
 		b.insert({bottom: '<p id="append_bottom">Bottom</p>'})
 		this.assert_equal(b.firstChild.nodeName, 'P')
@@ -11,96 +14,95 @@ new MVC.Test.Unit('element_test',{
 		this.assert_equal(b.firstChild.innerHTML, 'Bottom')
 	},
 	test_insert_after: function(){
-		if(!MVC.Element) {
-			this.messages.push("Skipping because Element plugin isn't included.");
-			return;
-		}
-		var b = MVC.$E('append_bottom');
+
+		var b = MVC.$E('insertion_test');
 		b.insert({after: '<p id="insert_after">After</p>'});
 		this.assert_equal(b.nextSibling.nodeName, 'P')
 		this.assert_equal(b.nextSibling.id, 'insert_after')
 		this.assert_equal(b.nextSibling.innerHTML, 'After')
 	},
 	test_insert_before: function(){
-		if(!MVC.Element) {
-			this.messages.push("Skipping because Element plugin isn't included.");
-			return;
-		}
-		var b = MVC.$E('append_bottom');
+
+		var b = MVC.$E('insertion_test');
 		b.insert({before: '<p id="insert_before">Before</p>'});
 		this.assert_equal(b.previousSibling.nodeName, 'P')
 		this.assert_equal(b.previousSibling.id, 'insert_before')
 		this.assert_equal(b.previousSibling.innerHTML, 'Before')
 	},
 	test_insert_top: function(){
-		if(!MVC.Element) {
-			this.messages.push("Skipping because Element plugin isn't included.");
-			return;
-		}
+
 		var b = MVC.$E('insertion_test');
+        b.insert({top: '<p id="second_top">second</p>'});
 		b.insert({top: '<p id="insert_top">Top</p>'});
 		this.assert_equal(b.childNodes[0].id, 'insert_top')
-		this.assert_equal(b.childNodes[1].id, 'insert_before')
-		this.assert_equal(b.childNodes[2].id, 'append_bottom')
-		this.assert_equal(b.childNodes[3].id, 'insert_after')
+		this.assert_equal(b.childNodes[1].id, 'second_top')
 	},
     test_get_children: function(){
-        this.assert_equal(3, MVC.$E('tests').get_children().length  );
+        
+        var b = MVC.$E('insertion_test');
+        b.innerHTML = "<p> a </p> b <p>c</p>"
+        this.assert_equal(2, MVC.$E('insertion_test').get_children().length  );
+    },
+    insert_two: function(){
+        var b = MVC.$E('insertion_test');
+        b.insert({top: '<p id="second_top">second</p>'});
+		b.insert({top: '<p id="insert_top">Top</p>'});
     },
     test_first: function(){
-        this.assert_equal("sel", MVC.$E('tests').first().id  );
+        this.insert_two();
+        this.assert_equal("insert_top", MVC.$E('insertion_test').first().id  );
     },
     test_last: function(){
-        this.assert_equal("submit", MVC.$E('tests').last().type  );
+        this.insert_two();
+        this.assert_equal("second_top", MVC.$E('insertion_test').last().id  );
     },
     test_next: function(){
-        this.assert_equal("input", MVC.$E('sel').next().id  );
+        this.insert_two();
+        this.assert_equal("second_top", MVC.$E('insert_top').next().id  );
     },
     test_previous: function(){
-        this.assert_equal("sel", MVC.$E('input').previous().id  );
+        this.insert_two();
+        this.assert_equal("insert_top", MVC.$E('second_top').previous().id  );
     },
     test_toggle: function(){
-        MVC.$E('sel').toggle();
-        this.assert_equal("none", MVC.$E('sel').get_style('display')  );
-        MVC.$E('sel').toggle();
-        this.assert(  MVC.String.include(MVC.$E('sel').get_style('display'), "inline")   );
+        MVC.$E('insertion_test').toggle();
+        this.assert_equal("none", MVC.$E('insertion_test').get_style('display')  );
+        MVC.$E('insertion_test').toggle();
+        this.assert(  MVC.String.include(MVC.$E('insertion_test').get_style('display'), "block")   );
         
     },
     test_get_style: function(){
-        MVC.$E('sel').style.border="solid 1px Black";
-        this.assert_equal("1px", MVC.$E('sel').get_style('borderBottomWidth')  );
+        MVC.$E('insertion_test').style.border="solid 1px Black";
+        this.assert_equal("1px", MVC.$E('insertion_test').get_style('borderBottomWidth')  );
     },
     test_cumulative_offset: function(){
-        var off = MVC.$E('sel').cumulative_offset();
+        var off = MVC.$E('insertion_test').cumulative_offset();
         this.assert( off.x() > 0 );
         this.assert(off.y() > 0  );
     },
     test_cumulative_scroll_offset: function(){
-         var off = MVC.$E('sel').cumulative_scroll_offset();
+         var off = MVC.$E('insertion_test').cumulative_scroll_offset();
         this.assert_equal("number", typeof off.x()  );
         this.assert_equal("number", typeof off.y()  );
     },
-    test_is_parent: function(){
-        this.assert(  MVC.$E('tests').is_parent('sel') )
-        this.assert_not(  MVC.$E('sel').is_parent('tests') )
-        this.assert_not(  MVC.$E('element_el').is_parent('tests') )
-        
-    },
     test_has: function(){
-        this.assert(  MVC.$E('tests').has('sel') )
-        this.assert_not(  MVC.$E('sel').has('tests') )
-        this.assert_not(  MVC.$E('element_el').has('tests') )
+        this.insert_two();
+        this.assert(  MVC.$E('insertion_test').has('insert_top') )
+        this.assert_not(  MVC.$E('insert_top').has('second_top') )
+        this.assert_not(  MVC.$E('second_top').has('insert_top') )
     },
     test_update: function(){
+        MVC.$E('insertion_test').update("<table id='update_test'><tr><td></td></tr></table>")
         MVC.$E('update_test').update("<tr><td id='td_content'>This is my table</td></tr>");
         this.assert_equal("This is my table", MVC.$E('td_content').innerHTML );
     },
     test_remove: function(){
-        MVC.$E('remove_test').remove()
-        this.assert_null(MVC.$E('remove_test'));
+        this.insert_two();
+        MVC.$E('insert_top').remove()
+        this.assert_null(MVC.$E('insert_top'));
     },
     dimensions: function(){
-        var off = MVC.$E('sel').dimensions();
+        var off = MVC.$E('insertion_test').dimensions();
         this.assert_equal("number", typeof off.x()  );
         this.assert_equal("number", typeof off.y()  );
     }

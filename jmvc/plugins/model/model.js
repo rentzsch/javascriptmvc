@@ -2,10 +2,11 @@
  * Provides abstract functionality for a wide variety of models.  It provides a base which 
  * one can assume all other models must have.  A model must provide:
  * <ul>
- *     <li>Model.find_one</li>
- *     <li>Model.find_all</li>
- *     <li>Model.create</li>
- *     <li>Model.update</li>
+ *     <li>Model.find_one(params, callbacks)</li>
+ *     <li>Model.find_all(params, callbacks)</li>
+ *     <li>Model.create(attributes, callbacks)</li>
+ *     <li>Model.update(id, attributes, callbacks)</li>
+ *     <li>Model.destroy(id, callbacks)</li>
  * </ul>
  * Model is also designed to work with ModelViewHelper.
  */
@@ -86,26 +87,12 @@ MVC.Model = MVC.Class.extend(
     },
     _associations: [],
     /**
-     * Creates an instance of the object from an HTML element.
-     * @param {Object} element_or_id
-     */
-    from_html: function(element_or_id){
-        var el =MVC.$E(element_or_id);
-        var el_class = window[ MVC.String.classize(el.getAttribute('type')) ];
-        
-        if(! el_class) return null;
-        //get data here
-        var attributes = {};
-        attributes[el_class.id] = this.element_id_to_id(el.id);
-        return el_class.create_as_existing(attributes);
-    },
-    /**
      * Takes an element ID like 'todo_5' and returns '5'
      * @param {Object} element_id
      * @return {String} 
      */
     element_id_to_id: function(element_id){
-        var re = new RegExp(this.className+'_', "");
+        var re = new RegExp(this.className+'_', "i");
         return element_id.replace(re, '');
     },
     /**
@@ -116,8 +103,11 @@ MVC.Model = MVC.Class.extend(
     add_attribute : function(property, type){
         if(! this.attributes[property])
             this.attributes[property] = type;
+        if(! this.default_attributes[property])
+            this.default_attributes[property] = null;
     },
     attributes: {},
+    default_attributes: {},
     /**
      * Used for converting callbacks to to seperate failure and succcess
      * @param {Object} callbacks
@@ -145,11 +135,8 @@ MVC.Model = MVC.Class.extend(
         //this._properties = [];
         this.errors = [];
         
-        this.set_attributes(this.Class._attributes || {});
+        this.set_attributes(this.Class.default_attributes || {});
         this.set_attributes(attributes);
-    },
-    setup : function(){
-        
     },
     /**
      * Sets a hash of attributes for this instance
@@ -270,7 +257,7 @@ MVC.Model = MVC.Class.extend(
     	}*/
     },
     _clear : function() {
-        var cas = this.Class.attributes;
+        var cas = this.Class.default_attributes;
         for(var attr in cas){
             if(cas.hasOwnProperty(attr) ) this[attr] = null;
         }

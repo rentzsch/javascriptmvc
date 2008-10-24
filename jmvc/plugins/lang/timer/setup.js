@@ -5,7 +5,7 @@ MVC.Timer = function(options){
     this.to = options.to || 1;
     this.interval = options.interval||1;
     this.update_callback = options.onUpdate || function(){};
-    this.complete_callback = options.onCompete || function(){};
+    this.complete_callback = options.onComplete || function(){};
     this.distance = this.to - this.from;
     if(options.easing){
         this.easing = typeof options.easing == 'string' ? MVC.Timer.easings[options.easing] : options.easing;

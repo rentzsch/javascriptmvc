@@ -120,17 +120,13 @@
 				document.getElementById('noproto_el').style.backgroundColor = '#ddffdd';
 			}
 				
+			(function(){
+                include.setup({env: 'test'})
+			    include('../../apps/helpers/test')
+            })()
 			
-			include.setup({env: 'test'})
-			include('../../apps/helpers/test')
 			
-			
-			if(location.href.indexOf('element') != -1){
-				include.plugin('dom/element');
-				document.getElementById('element_el').style.backgroundColor = '#ddffdd';
-			}else{
-				document.getElementById('noelement_el').style.backgroundColor = '#ddffdd';
-			}
+
 			
 			
 			

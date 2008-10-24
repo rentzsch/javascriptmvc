@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+            "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+	<head>
+		<title>testing</title>
+        <style type='text/css'>
+            body {font-family: verdana}
+            .error {border: solid 1px red;}
+            .error_text { color: red; font-size: 10px;}
+            td {padding: 3px;}
+        </style>
+	</head>
+	<body>
+	    <h1>JavaScriptMVC Testing</h1>
+        <p><a href='javascript: void(0)' onclick='normal()' id='normal_el'>normal</a>
+		   <a href='javascript: void(0)' onclick='noconflict()' id='no_conflict_el'>no conflict</a></p>
+		
+		
+		<p><a href='javascript: void(0)' onclick='proto()' id='proto_el'>Prototype</a>
+			<a href='javascript: void(0)' onclick='noproto()' id='noproto_el'>no prototype</a>
+			
+		</p>
+		
+		<p><a href='javascript: void(0)' onclick='jq()' id='jq_el'>jQuery</a>
+			<a href='javascript: void(0)' onclick='nojq()' id='nojq_el'>no jQuery</a>
+			
+		</p>
+
+        <div id='testarea'></div>
+		<script type='text/javascript' src='../jmvc/include.js?testing,test'></script>
+	</body>
+</html>
