@@ -2,15 +2,17 @@ MVCOptions = {
     onload: true,
     env: "test",
     done_loading : function(){
-        print('\n\nRunning Unit tests');
-        //assign handlers for messages
-        
-        
-        
-        
+        print('\n\nRUNNING UNIT TESTS\n');
+        OpenAjax.hub.subscribe("jmvc.test.assertions.update", this.report);
+        OpenAjax.hub.subscribe("jmvc.test.test.complete", this.update_test);
+        OpenAjax.hub.subscribe("jmvc.test.unit.complete", this.unit_results);
+        OpenAjax.hub.subscribe("jmvc.test.test.start", this.start_test);
         MVC.Test.Unit.run()
     },
-    report : function(assertions){
+    start_test : function(called, test){
+        print(test.name.toUpperCase()+" TEST ------------------------");
+    },
+    report : function(called, assertions){
         
         clean_messages = function(messages){
         	for(var m = 0; m < messages.length; m++){
@@ -18,39 +20,37 @@ MVCOptions = {
         	}
         	return messages
         }
+        var test_name = assertions._test_name.replace("test_","");
 
-        print(assertions._test.name+":"+assertions._test_name)
         
         add_s = function(array){
         	return array == 1 ? '' : 's'
         };
         
         if(assertions.failures == 0 && assertions.errors == 0){
-    		print('     Passed: '+assertions.assertions+' assertion'+add_s(assertions.assertions)+  
+    		print('  Passed - '+test_name+" : "+assertions.assertions+' assertion'+add_s(assertions.assertions)+  
                 (assertions.messages.length> 0?' \n     ':'')+
     			clean_messages(assertions.messages).join("\n     ") )
     		
     	}else{
     		
-    		print('     Failed: '+assertions.assertions+' assertion'+add_s(assertions.assertions)+
+    		print('\n  Failed - '+test_name+" : "+assertions.assertions+' assertion'+
+            add_s(assertions.assertions)+
     		', '+assertions.failures+' failure'+add_s(assertions.failures)+
     		', '+assertions.errors+' error'+add_s(assertions.errors)+
             (assertions.messages.length> 0? ' \n     ': '')+
     			clean_messages(assertions.messages).join("\n     ") )
+            print(" ");
     	}
-        
-        
     },
-    update_test: function(test){
-
-	print('     Completed '+test.name+' Test ('+test.passes+'/'+test.test_names.length+ ')')
+    update_test: function(called,test){
+	    print('\n  Completed '+test.name+' test ('+test.passes+'/'+test.test_names.length+ ')\n')
     },
-    unit_results : function(test){
+    unit_results : function(called,test){
         print('\nCompleted Unit Tests ('+test.passes+'/'+test.tests.length+')' + (test.passes == test.tests.length ? ' Wow!' : '')+"\n" )
     }
 }
 
 load('jmvc/rhino/compression/setup.js');
-load('jmvc/rhino/documentation/setup.js');
-window.location = 'apps/translations/index.html';
+window.location = 'test/index.html';
 

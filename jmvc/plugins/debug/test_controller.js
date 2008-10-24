@@ -90,7 +90,7 @@ opener.OpenAjax.hub.subscribe("jmvc.test.created", function(called, test){
 	insert_into.appendChild(t);
 });
 
-opener.OpenAjax.hub.subscribe("jmvc.test.update", function(called, test){
+opener.OpenAjax.hub.subscribe("jmvc.test.test.complete", function(called, test){
 	var el = document.getElementById(test.name+"_results")
 	el.innerHTML = '('+test.passes+'/'+test.test_names.length+ ')'
 });

@@ -71,10 +71,11 @@ MVC.Test = MVC.Class.extend(
      * @param {optional:Function} callback optional callback for when the test is complete
      */
 	run: function(callback){
-		this.working_test = 0;
+        this.working_test = 0;
 		this.callback = callback;
 		this.passes = 0;
 		this.failures = 0;
+        OpenAjax.hub.publish("jmvc.test.test.start", this);
 		this.run_next();
 	},
     /**
@@ -93,7 +94,7 @@ MVC.Test = MVC.Class.extend(
 			this.working_test++;
 			this.run_test(this.test_names[this.working_test-1]);
 		}else if(this.working_test != null){
-			OpenAjax.hub.publish("jmvc.test.update", this);
+			OpenAjax.hub.publish("jmvc.test.test.complete", this);
 
 			this.working_test = null;
 			if(this.callback){
@@ -103,7 +104,7 @@ MVC.Test = MVC.Class.extend(
 		}
 	},
 	run_test: function(test_id){
-		var saved_this = this;
+        var saved_this = this;
 		// setTimeout with delay of 0 is necessary for Opera and Safari to trick them into thinking
 		// the calling window was the application and not the console
 		setTimeout(function(){ this.assertions = new saved_this.Assertions(saved_this, test_id); },0);

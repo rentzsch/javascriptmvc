@@ -4,7 +4,7 @@ new MVC.Test.Unit('timer',{
           time: 1000,
           from: 10,
           to: -1,
-          onComplete: this.next_callback()
+          onComplete: this.next_callback('timer_complete')
       })
       timer.start();
    },

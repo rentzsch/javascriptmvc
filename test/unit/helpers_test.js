@@ -8,10 +8,19 @@ new MVC.Test.Unit('helpers',{
 	   this.assert_equal('four', b.three)
 	},
 	test_to_query_string : function(){
-		   this.assert_equal('one=two&two=three', MVC.Object.to_query_string({one: 'two', two: 'three'}))
 	   this.assert_equal('two=three', MVC.Object.to_query_string({two: 'three'}))
-	   this.assert_equal(null, MVC.Object.to_query_string());
-	   this.assert_equal('one=two&two=three&object%5Bhello%5D=world', MVC.Object.to_query_string({one: 'two', two: 'three', object: {hello: 'world'} }))
+       this.assert_equal(null, MVC.Object.to_query_string());
+       
+       var d1 = MVC.Path.get_data( MVC.Object.to_query_string({one: 'two', two: 'three'}) ) ;
+       
+       this.assert_equal('two',d1.one )
+       this.assert_equal('three',d1.two )
+       
+       var d2 = MVC.Path.get_data( MVC.Object.to_query_string({one: 'two', two: 'three', object: {hello: 'world'} }) ) ;
+       
+       this.assert_equal('two',d2.one )
+       this.assert_equal('three',d2.two )
+       this.assert_equal('world',d2.object.hello )
 	},
 	test_string_capitalize : function(){
 		this.assert_equal('Yes', MVC.String.capitalize('yes'));
@@ -151,3 +160,41 @@ new MVC.Test.Unit('conflict_helpers',{
 		this.assert_each(['one','two','three'], function( one, two ,three){ return 'yes'}.params()  )
 	}
 });
+
+MVC.Path = {};
+
+//used to get the object
+MVC.Path.get_data = function(path) {
+	var search = path;
+	if(! search || ! search.match(/([^?#]*)(#.*)?$/) ) return {};
+	var data = {};
+	var parts = search.split('&');
+	for(var i=0; i < parts.length; i++){
+		var pair = parts[i].split('=');
+		if(pair.length != 2) continue;
+		var key = decodeURIComponent(pair[0]), value = decodeURIComponent(pair[1]);
+		var key_components = MVC.String.rsplit(key,/\[[^\]]*\]/);
+		
+		if( key_components.length > 1 ) {
+			var last = key_components.length - 1;
+			var nested_key = key_components[0].toString();
+			if(! data[nested_key] ) data[nested_key] = {};
+			var nested_hash = data[nested_key];
+			
+			for(var k = 1; k < last; k++){
+				nested_key = key_components[k].substring(1, key_components[k].length - 1);
+				if( ! nested_hash[nested_key] ) nested_hash[nested_key] ={};
+				nested_hash = nested_hash[nested_key];
+			}
+			nested_hash[ key_components[last].substring(1, key_components[last].length - 1) ] = value;
+		} else {
+	        if (key in data) {
+	        	if (typeof data[key] == 'string' ) data[key] = [data[key]];
+	         	data[key].push(value);
+	        }
+	        else data[key] = value;
+		}
+		
+	}
+	return data;
+}

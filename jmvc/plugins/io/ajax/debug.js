@@ -2,11 +2,14 @@
 	var request = MVC.Ajax;
 
 	MVC.Ajax = function(url,options){
-		var options = MVC.Ajax.setup_request(url,options);
+        var options = MVC.Ajax.setup_request(url,options);
 		return MVC.Ajax.make_request(options.url,options);
 	};
+    
 	MVC.Ajax.setup_request= function(url,options){
-		if( options.use_fixture == null || options.use_fixture == true  ){
+		
+        var using = options.use_fixture != false
+        if( using  ){
 		    var testurl = url;
             testurl = testurl.replace(/%2F/g,"~").replace(/%20/g,"_");
 
@@ -25,17 +28,17 @@
 			right = right+MVC.Ajax.add_url(left+right);
 			if(include.get_env() != 'test' && MVC.Console)
                 MVC.Console.log('Requesting "'+url+'".  As a fixture it would be:\n    "test/fixtures/'+left+right);
-		}
-		
-		if( (include.get_env() == 'test' && (options.use_fixture == null || options.use_fixture == true)) || MVC.use_fixtures){
+
 			if(MVC.Console) MVC.Console.log('Loading "test/fixtures/'+left+right+'" for\n        "'+url+'"' );
 			
             url = MVC.root.join('test/fixtures/'+left+encodeURIComponent( right));
 			options.method = 'get';
+            
 		}
 		options.url = url;
 		return options;
 	}
+    
 	MVC.Ajax.make_request= function(url,options){
 		var req =  new request(url,options);
 		return req;

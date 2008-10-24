@@ -311,10 +311,10 @@
             		    var newLocation = oldCurParent.getAttribute('src').match(/([^\?#]*)/)[1];
                         if(! newLocation.match(/include\.js$/) ){
                             //lets break it up by / and only show the last 3 levels
-                            var parts = newLocation.split("/")
-                            if(parts.length > 4) parts = parts.slice(parts.length - 4);
+                            //var parts = newLocation.split("/")
+                            //if(parts.length > 4) parts = parts.slice(parts.length - 4);
 
-                            print("   "+parts.join("/"));
+                            //print("   "+parts.join("/"));
                         }
                         xhr.open("GET", newLocation, false);
                         xhr.send(null);

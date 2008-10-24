@@ -65,6 +65,7 @@ new MVC.Test.Unit('element_test',{
         this.assert_equal("insert_top", MVC.$E('second_top').previous().id  );
     },
     test_toggle: function(){
+        if(window._rhino) return this.messages.push("Skipping -> style related test in Rhino.");
         MVC.$E('insertion_test').toggle();
         this.assert_equal("none", MVC.$E('insertion_test').get_style('display')  );
         MVC.$E('insertion_test').toggle();
@@ -72,16 +73,25 @@ new MVC.Test.Unit('element_test',{
         
     },
     test_get_style: function(){
+        if(window._rhino) return this.messages.push("Skipping -> style related test in Rhino.");
         MVC.$E('insertion_test').style.border="solid 1px Black";
         this.assert_equal("1px", MVC.$E('insertion_test').get_style('borderBottomWidth')  );
     },
     test_cumulative_offset: function(){
+        if(window._rhino) return this.messages.push("Skipping -> style related test in Rhino.");
+		
+        
         var off = MVC.$E('insertion_test').cumulative_offset();
         this.assert( off.x() > 0 );
         this.assert(off.y() > 0  );
     },
     test_cumulative_scroll_offset: function(){
-         var off = MVC.$E('insertion_test').cumulative_scroll_offset();
+        if(window._rhino) {
+			this.messages.push("Skipping -> style related test in Rhino.");
+			return;
+		}
+        
+        var off = MVC.$E('insertion_test').cumulative_scroll_offset();
         this.assert_equal("number", typeof off.x()  );
         this.assert_equal("number", typeof off.y()  );
     },

@@ -359,9 +359,11 @@ MVC.Object.extend(include,{
             include.set_path(latest.start);
     		include.current = latest.path;
     		if(include.get_env()=='compress'){
-                if(latest.ignore && typeof print != 'undefined'){
-                    var parts = latest.path.split("/")
+                if( typeof print != 'undefined'){
+                     
+                     var parts = latest.path.split("/")
                      if(parts.length > 4) parts = parts.slice(parts.length - 4);
+                     
                      print("   "+parts.join("/"));
                 }
                 latest.text = include.request(MVC.root.join(latest.path));
