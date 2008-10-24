@@ -66,7 +66,7 @@ MVC.Droppables = {
     var deepest = drops[0];
       
     for (i = 1; i < drops.length; ++i)
-      if (MVC.Element.is_parent(drops[i].element, deepest.element))
+      if (MVC.Element.has(drops[i].element, deepest.element))
         deepest = drops[i];
     
     return deepest;

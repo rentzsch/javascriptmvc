@@ -711,7 +711,7 @@ MVC.History.historyChange = function(newLocation, historyData) {
 	var data = MVC.Path.get_data(path);
 	var folders = path.folder();
 	var action_part = null, controller_part;
-	if(folders == null){folders = 'index'};
+	if(!folders){folders = 'index'};
 	
 	var first_s = folders.indexOf('/');
 	
@@ -720,8 +720,6 @@ MVC.History.historyChange = function(newLocation, historyData) {
 	if(first_s != -1){
 		controller_part = folders.substring(0,first_s);
 		action_part = folders.substring(first_s+1);
-	}else if( MVC.Controller.test_dispatch(folders) ){
-		controller_part = folders;
 	}else if( MVC.Controller.test_dispatch('main',folders) ){
 		controller_part = 'main';
 		action_part = folders;
@@ -730,7 +728,7 @@ MVC.History.historyChange = function(newLocation, historyData) {
             throw "Can't dispatch location "+folders;
         return;
 	}
-	var controller = MVC.Controller.get_controller_with_name_and_action(controller_part, action )
+	var controller = MVC.Controller.get_controller_with_name_and_action(controller_part, action_part )
 	var result = controller.dispatch(action_part,params);
     OpenAjax.hub.publish("history."+folders.replace("/","."), params );
 	return result;

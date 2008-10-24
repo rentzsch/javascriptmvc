@@ -215,12 +215,6 @@ MVC.Object.extend(MVC.Element, {
         } while (element);
         return new MVC.Vector( valueL, valueT );
     },
-    is_parent: function(element,child ) {
-      if(typeof child == 'string') child = MVC.$E(child);
-      if (!child.parentNode || child == element) return false;
-      if (child.parentNode == element) return true;
-      return MVC.Element.is_parent(child.parentNode, element);
-    },
     /*
      * Returns true or false if one element is inside another element.
      */
