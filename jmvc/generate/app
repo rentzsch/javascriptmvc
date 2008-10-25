@@ -18,7 +18,7 @@ render_to("apps/"+_args[0]+"/compress.js", "jmvc/rhino/command/templates/compres
 
 
 render_to("apps/"+_args[0]+"/index.html", "jmvc/rhino/command/templates/compress_page.ejs", data);
-
+render_to("apps/"+_args[0]+"/run_unit.js", "jmvc/rhino/command/templates/unit_script.ejs", data);
 
 render_to("apps/"+_args[0]+"/test.js", "jmvc/rhino/command/templates/test.ejs", data);
 
