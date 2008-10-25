@@ -1,3 +1,37 @@
+MVC.Controller.CompoundAction = MVC.Controller.DelegateAction.extend({
+    match: new RegExp("(.*?)\\s?(mouseenter|mouseleave)$")
+},
+//Prototype functions
+{    
+    init: function(action, f, controller){
+        this.action = action;
+        this.func = f;
+        this.controller = controller;
+        this.css_and_event();
+        var selector = this.selector();
+        this[this.event_type]()
+    },
+    mouseenter : function(){
+        new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind( function(params){
+            //set a timeout and compare position
+			var related_target = params.event.relatedTarget;
+			if(params.element == related_target || MVC.$E(params.element).has(related_target)) return true;
+			this.func(params);
+            
+        }, this));
+    },
+    mouseleave : function(){
+        //add myself to hover outs to be called on the mouseout
+        new MVC.Delegator(this.selector(), 'mouseout', MVC.Function.bind( function(params){
+            //set a timeout and compare position
+			var related_target = params.event.relatedTarget;
+			if(params.element == related_target || MVC.$E(params.element).has(related_target)) return true;
+			this.func(params);
+        }, this));
+    }
+});
+
+
 // Idea, and very small amonts of code taken from 
 // http://cherne.net/brian/resources/jquery.hoverIntent.js
 // @author    Brian Cherne <brian@cherne.net>
@@ -89,3 +123,6 @@ MVC.Controller.HoverAction = MVC.Controller.DelegateAction.extend({
 });
 
 MVC.Controller.HoverAction.hoverouts = {};
+
+
+
