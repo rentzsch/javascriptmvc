@@ -3,7 +3,7 @@
 // @author    Brian Cherne <brian@cherne.net>
 
 MVC.Controller.HoverAction = MVC.Controller.DelegateAction.extend({
-    match: new RegExp("(.*?)\\s?(hoverover|hoverout)$"),
+    match: new RegExp("(.*?)\\s?(hoverover|hoverout|hoverenter|hoverleave)$"),
     sensitivity: 6,
     interval: 100,
     timeout: 0
@@ -18,10 +18,23 @@ MVC.Controller.HoverAction = MVC.Controller.DelegateAction.extend({
         var selector = this.selector();
         this[this.event_type]()
     },
+	hoverenter : function(){
+		this.hoverover()
+	},
+	hoverleave : function(){
+		this.hoverout();
+	},
     hoverover : function(){
         new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind( function(params){
             //set a timeout and compare position
-            this.called = false;
+            if(this.event_type == "hoverenter"){
+				var related_target = params.event.relatedTarget;
+				if(params.element == related_target || MVC.$E(params.element).has(related_target))
+					return true;
+			}
+			
+			
+			this.called = false;
             this.starting_position = MVC.Event.pointer(params.event);
             this.element = params.element;
             this.mouseover_event = params.event;
@@ -40,7 +53,12 @@ MVC.Controller.HoverAction = MVC.Controller.DelegateAction.extend({
             //check if hoverover has been called, if it has fire hoverout, otherwise, do nothing
             //cancel timeout
             //unbind mousemove
-            
+            //run if only where you are going is right
+			if(this.event_type == "hoverenter"){
+				var related_target = params.event.relatedTarget;
+				if(params.element == related_target || MVC.$E(params.element).has(related_target))
+					return true;
+			}
             clearTimeout(this.timer);
             MVC.Event.stop_observing(params.element, "mousemove", this.mousemove);
             if(this.called){ //call hoverout
