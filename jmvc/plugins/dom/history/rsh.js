@@ -729,7 +729,13 @@ MVC.History.historyChange = function(newLocation, historyData) {
         return;
 	}
 	var controller = MVC.Controller.get_controller_with_name_and_action(controller_part, action_part )
-	var result = controller.dispatch(action_part,params);
+	var result = null;
+	if(!controller){
+		if(MVC.History.throwErrors)
+            throw "Can't dispatch location "+folders;
+	}else{
+		result = controller.dispatch(action_part,params);
+	}
     OpenAjax.hub.publish("history."+folders.replace("/","."), params );
 	return result;
 };
