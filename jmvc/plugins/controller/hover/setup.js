@@ -1,2 +1,2 @@
-include.plugins('controller','lang/vector')
+include.plugins('controller','lang/vector','dom/element')
 include('hover')
