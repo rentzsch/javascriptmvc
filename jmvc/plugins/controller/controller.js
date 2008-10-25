@@ -111,7 +111,8 @@ MVC.Controller = MVC.Class.extend(
     },
     get_controller_with_name_and_action: function(controller_name, action) {
         var controllers = MVC.Controller.controllers[controller_name];
-        for(var i = 0; i < controllers.length; i++) {
+        if(!controllers) return null;
+		for(var i = 0; i < controllers.length; i++) {
             var controller = controllers[i];
             if (controller.prototype[action]) return controller;
         }
