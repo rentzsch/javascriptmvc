@@ -233,7 +233,7 @@ MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
      */
     css_and_event: function(){
         this.parts = this.action.match(this.Class.match);
-        this.css = this.parts[1];
+        this.css = this.parts[1] || "";
         this.event_type = this.parts[2];
     },
     /*
