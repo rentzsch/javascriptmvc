@@ -17,7 +17,7 @@ MVC.Animate = function(element, params, duration, easing, callback){
         },
         onComplete : function(){
             for(var param in starting_values){
-                element.style[param] = starting_values[param].end();
+                element.style[param] = starting_values[param].last();
             }
             callback(element);
         }

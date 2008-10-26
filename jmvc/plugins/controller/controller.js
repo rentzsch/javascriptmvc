@@ -310,7 +310,7 @@ MVC.Controller.Params = function(params){
     var killed = false;
 	this.kill = function(){
 		killed = true;
-		if(params.event.kill) params.event.kill();
+        if(params.event && params.event.kill) params.event.kill();
 	};
 	this.is_killed = function(){return params.event.is_killed ?  params.event.is_killed() :  killed ;};
     

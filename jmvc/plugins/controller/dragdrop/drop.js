@@ -86,18 +86,19 @@ MVC.Droppables = {
       MVC.Position.withinIncludingScrolloffsets(drop.element, point[0], point[1]) );
   },
 
-  deactivate: function(drop, element, event) {
+  deactivate: function(drop, drag, event) {
     this.last_active = null;
-    if(drop.dragout) drop.dragout( {element: drop.element, drag_element: element, event: event });
+    if(drop.dragout) drop.dragout( {element: drop.element, drag: drag, event: event });
   }, //this is where we should call out
 
-  activate: function(drop, element, event) { //this is where we should call over
+  activate: function(drop, drag, event) { //this is where we should call over
     this.last_active = drop;
-    if(drop.dragover) drop.dragover( {element: drop.element, drag_element: element, event: event });
+    if(drop.dragover) drop.dragover( {element: drop.element, drag: drag, event: event });
       
   },
 
-  show: function(point, element, event) {
+  show: function(point, drag, event) {
+    var element = drag.drag_element;
     if(!this.drops.length) return;
     var drop, affected = [];
     
@@ -108,10 +109,10 @@ MVC.Droppables = {
     if(affected.length>0)
       drop = MVC.Droppables.findDeepestChild(affected);
 
-    if(this.last_active && this.last_active != drop) this.deactivate(this.last_active, element, event);
+    if(this.last_active && this.last_active != drop) this.deactivate(this.last_active, drag, event);
     if (drop) {
       MVC.Position.within(drop.element, point[0], point[1]);  
-      if (drop != this.last_active) MVC.Droppables.activate(drop, element, event);
+      if (drop != this.last_active) MVC.Droppables.activate(drop, drag, event);
     }
   },
 
