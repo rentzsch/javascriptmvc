@@ -95,6 +95,10 @@ MVC.Model = MVC.Class.extend(
         var re = new RegExp(this.className+'_', "i");
         return element_id.replace(re, '');
     },
+	find_by_element: function(el){
+		var re = new RegExp(this.className+'_', "i");
+		return this.store.find_one(el.id.replace(re, ''));
+	},
     /**
      * Adds an attribute to the list of attributes for this class.
      * @param {String} property
