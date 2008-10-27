@@ -8,9 +8,11 @@ MVC.Position =
   /**
    * Needs to be called once before any calculations are made, but after
    * all CSS has been applied.  Sets deltaX and deltaY
+   * @return {Boolean} true if scrolling hasn't been changed
    */
   prepare: function() {
-    this.deltaX =  window.pageXOffset
+    var oldx = this.deltaX, oldy = this.deltaY;
+	this.deltaX =  window.pageXOffset
                 || document.documentElement.scrollLeft
                 || document.body.scrollLeft
                 || 0;
@@ -18,8 +20,9 @@ MVC.Position =
                 || document.documentElement.scrollTop
                 || document.body.scrollTop
                 || 0;
+	this._static = ((oldx - this.deltaX)==0) && ((oldy - this.deltaY) == 0);
+	return this._static;
   },
-
   /**
    * Returns if a coordinate is within another element.
    * caches x/y coordinate pair to use with overlap
@@ -45,19 +48,31 @@ MVC.Position =
    * @param {HTMLElement} element
    * @param {Number} x
    * @param {Number} y
+   * @param {Object} cache If present, an object that will be used to cache position lookups
    * @return {Boolean} true if x, y is inside the element, false if otherwise.
    */
-  withinIncludingScrolloffsets: function(element, x, y) {
-    var offsetcache = MVC.Element.cumulative_scroll_offset(element);
+  withinIncludingScrolloffsets: function(element, x, y, cache) {
+  	cache = cache || {};
+	var caching = 	this._static && 
+					cache._cache && 
+					cache._cumulative_scroll_offset && 
+					cache._cumulative_offset;
+	if(!caching){
+		cache._cumulative_scroll_offset = MVC.Element.cumulative_scroll_offset(element);
+		cache._cumulative_offset = MVC.Element.cumulative_offset(element);
+	}else{
 
-    this.xcomp = x + offsetcache[0] - this.deltaX;
-    this.ycomp = y + offsetcache[1] - this.deltaY;
-    this.offset = MVC.Element.cumulative_offset(element);
+	}
+	
+    var xcomp = x + cache._cumulative_scroll_offset[0] - this.deltaX;
+    var ycomp = y + cache._cumulative_scroll_offset[1] - this.deltaY;
+	
+	
 
-    return (this.ycomp >= this.offset[1] &&
-            this.ycomp <  this.offset[1] + element.offsetHeight &&
-            this.xcomp >= this.offset[0] &&
-            this.xcomp <  this.offset[0] + element.offsetWidth);
+    return (ycomp >= cache._cumulative_offset[1] &&
+            ycomp <  cache._cumulative_offset[1] + element.offsetHeight &&
+            xcomp >= cache._cumulative_offset[0] &&
+            xcomp <  cache._cumulative_offset[0] + element.offsetWidth);
   },
   window_dimensions: function(){
          var de = document.documentElement, 
