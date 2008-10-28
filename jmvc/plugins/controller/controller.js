@@ -17,7 +17,7 @@ MVC.Controller = MVC.Class.extend(
         if(!this.className) return;
         this.singularName =  MVC.String.singularize(this.className);
         if(!MVC.Controller.controllers[this.className]) MVC.Controller.controllers[this.className] = [];
-        MVC.Controller.controllers[this.className].push(this);
+        MVC.Controller.controllers[this.className].unshift(this);
         var val, act;
         this.actions = {};
         for(var action_name in this.prototype){
