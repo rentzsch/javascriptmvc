@@ -84,6 +84,10 @@ MVC.File.prototype = {
         var out = new java.io.File( this.path )
         out.mkdir();
     },
+    mkdirs: function(){
+        var out = new java.io.File( this.path )
+        out.mkdirs();
+    },
     save: function(src){
         var out = new java.io.FileWriter( new java.io.File( this.path )),
             text = new java.lang.String( src || "" );
