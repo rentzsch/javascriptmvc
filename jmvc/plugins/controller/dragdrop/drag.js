@@ -157,7 +157,7 @@ MVC.Draggable.prototype = {
         this.dragend(new MVC.Controller.DragParams(drag_data));
         
 		//tell droppables a drop has happened
-		MVC.Droppables.fire(event, this.element);
+		MVC.Droppables.fire(event, this);
 		
 		//Handle closing animations if necessary
         if(this._revert){

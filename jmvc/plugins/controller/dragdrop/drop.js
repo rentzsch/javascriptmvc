@@ -143,13 +143,14 @@ MVC.Droppables = {
 	 * @param {Object} event
 	 * @param {Object} element
 	 */
-	fire: function(event, element) {
+	fire: function(event, drag) {
 		if(!this.last_active) return;
 		MVC.Position.prepare();
 		
-		if( this.isAffected(MVC.Event.pointer(event), element, this.last_active) && //last is still activated
+		if( this.isAffected(MVC.Event.pointer(event), drag.drag_element, this.last_active) && //last is still activated
 			this.last_active.dropped	){ 											//drop was ok
-			this.last_active.dropped({drag_element: element, event: event, element: this.last_active.element}); 
+			
+            this.last_active.dropped({drag: drag, event: event, element: this.last_active.element}); 
 		    return true; 
 		}
 	},
