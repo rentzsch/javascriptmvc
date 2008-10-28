@@ -248,7 +248,8 @@ include = function(){
 		return;
 	}
 	if(first && !MVC.Browser.Opera){
-		first = false;insert();
+		first = false;
+        insert();
 	}
 };
 	
@@ -258,8 +259,10 @@ MVC.Object.extend(include,{
 
 		options.production = options.production+(options.production.indexOf('.js') == -1 ? '.js' : '' );
 
-		if(options.env == 'compress' && !window._rhino) include.compress_window = window.open(MVC.mvc_root+'/compress.html', null, "width=600,height=680,scrollbars=no,resizable=yes");
-		if(options.env == 'test') include.plugins('test');
+		if(options.env == 'compress' && !window._rhino) 
+            include.compress_window = window.open(MVC.mvc_root+'/compress.html', null, "width=600,height=680,scrollbars=no,resizable=yes");
+		if(options.env == 'test') 
+            include.plugins('test');
 		if(options.env == 'production' && ! MVC.Browser.Opera && ! options.remote)
 			return document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>');
 	},
@@ -294,7 +297,7 @@ MVC.Object.extend(include,{
                 newInclude();
             }
             include.functions.push(adjusted);
-            current_includes.unshift(  adjusted );
+            current_includes.unshift(  adjusted ); //add to the front
             return;
         }
         
@@ -332,7 +335,7 @@ MVC.Object.extend(include,{
     /*
      * Called after every file is loaded.  Gets the next file and includes it.
      */
-	end: function(){
+	end: function(src){
         includes = includes.concat(current_includes);
 		var latest = includes.pop();
 		if(!latest) {
@@ -448,7 +451,7 @@ var insert = function(src){
     // source we need to know how to get to jmvc, then load 
     // relative to path to jmvc
     if(src){
-		var src_file = new MVC.File(src);
+        var src_file = new MVC.File(src);
 		if(!src_file.is_local_absolute() && !src_file.is_domain_absolute())
 	        src = MVC.root.join(src);
 	}
@@ -469,10 +472,15 @@ var insert = function(src){
 	}else{
         document.write(
 			(src? '<script type="text/javascript" src="'+src+(true ? '': '?'+MVC.random )+'"></script>':'')+
-			'<script type="text/javascript" src="'+MVC.include_path+(MVC.Browser.Gecko ? '': '?'+MVC.random )+'"></script>'
+			call_end()
 		);
 	}
 };
+
+var call_end = function(src){
+    return MVC.Browser.Gecko ? '<script type="text/javascript">include.end()</script>' : 
+    '<script type="text/javascript" src="'+MVC.include_path+'?'+MVC.random+'"></script>'
+}
 
 MVC.random = MVC.get_random(6);
 
@@ -503,11 +511,15 @@ include.resources = include.app(function(i){return '../resources/'+i});
 include.engines = include.app(function(i){ return '../engines/'+i+"/apps/"+i+".js"} );
 
 if(MVC.script_options){
-	MVC.apps_root =  MVC.root.join('apps')
+	first = false;
+    MVC.apps_root =  MVC.root.join('apps')
 	MVC.app_name = MVC.script_options[0];
     if(window._rhino)
         MVC.script_options[1] = MVCOptions.env
-	if(MVC.script_options.length > 1)	include.setup({env: MVC.script_options[1], production: MVC.apps_root+'/'+MVC.script_options[0]+'/production'});
+	if(MVC.script_options.length > 1)	
+        include.setup(
+            {env: MVC.script_options[1], 
+             production: MVC.apps_root+'/'+MVC.script_options[0]+'/production'});
 	
     include('apps/'+MVC.app_name);
 	
@@ -528,7 +540,7 @@ if(MVC.script_options){
 	    	}
 		}
     }
-    
+    insert();
     include.opera();
 }
 if(MVC.Browser.Opera) 
