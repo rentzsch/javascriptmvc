@@ -4,9 +4,10 @@
  * dropover -> Called when a drag is over a drop
  * dropout    -> Called when a drag is moved out of a drop area
  * dropped    -> Called when a drag is dropped on the drop
+ * dropmove   -> Called as an element moves over a drop
  */
 MVC.Controller.DropAction = MVC.Controller.DelegateAction.extend({
-    match: new RegExp("(.*?)\\s?(dropover|dropped|dropout|dropadd)$")
+    match: new RegExp("(.*?)\\s?(dropover|dropped|dropout|dropadd|dropmove)$")
 },
 /* @prototype */
 {    
@@ -108,6 +109,9 @@ MVC.Droppables = {
 		this.last_active = drop;
 		if(drop.dropover) drop.dropover( {element: drop.element, drag: drag, event: event });
 	},
+    dropmove : function(drop, drag, event){
+        if(drop.dropmove) drop.dropmove( {element: drop.element, drag: drag, event: event });
+    },
 	/**
 	* Gives a point, the object being dragged, and the latest mousemove event.
 	* Go through each droppable and see if it is affected.  Called on every mousemove.
@@ -129,6 +133,7 @@ MVC.Droppables = {
 
 		drop = MVC.Droppables.findDeepestChild(affected);
 		
+        
 		//if we've activated something, but it is not this drop, deactivate (dropout)
 		if(this.last_active && this.last_active != drop) 
 		    this.deactivate(this.last_active, drag, event);
@@ -137,6 +142,9 @@ MVC.Droppables = {
 		if (drop && drop != this.last_active) 
 		  this.activate(drop, drag, event);
 		
+        if(drop && this.last_active){
+          this.dropmove(drop, drag, event);
+        }
 	},
 	/**
 	 * Called on mouse up of a dragged element.

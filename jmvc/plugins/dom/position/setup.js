@@ -60,8 +60,6 @@ MVC.Position =
 	if(!caching){
 		cache._cumulative_scroll_offset = MVC.Element.cumulative_scroll_offset(element);
 		cache._cumulative_offset = MVC.Element.cumulative_offset(element);
-	}else{
-
 	}
 	
     var xcomp = x + cache._cumulative_scroll_offset[0] - this.deltaX;
@@ -73,6 +71,22 @@ MVC.Position =
             ycomp <  cache._cumulative_offset[1] + element.offsetHeight &&
             xcomp >= cache._cumulative_offset[0] &&
             xcomp <  cache._cumulative_offset[0] + element.offsetWidth);
+  },
+  event_position_relative_to_element : function(element, event, cache){
+      cache = cache || {};
+      var caching = 	this._static && 
+    					cache._cache && 
+    					cache._cumulative_scroll_offset && 
+    					cache._cumulative_offset;
+     if(!caching){
+		cache._cumulative_scroll_offset = MVC.Element.cumulative_scroll_offset(element);
+		cache._cumulative_offset = MVC.Element.cumulative_offset(element);
+	 }
+     var point = MVC.Event.pointer(event);
+     var xcomp = point.x() + cache._cumulative_scroll_offset[0] - this.deltaX;
+     var ycomp = point.y() + cache._cumulative_scroll_offset[1] - this.deltaY;
+     
+     return new MVC.Vector(xcomp -cache._cumulative_offset[0] , ycomp - cache._cumulative_offset[1]);
   },
   window_dimensions: function(){
          var de = document.documentElement, 
