@@ -164,9 +164,6 @@ MVC.File.prototype = {
 			}
 		}else if(current_path != '' && this.relative()){
 			path = this.join_from( current_path+(current_path.lastIndexOf('/') === current_path.length - 1 ? '' : '/')  );
-		}else if(current_path != '' && options.remote && ! this.is_domain_absolute()){
-			var domain_part = current_path.split('/').slice(0,3).join('/');
-			path = domain_part+path;
 		}
 		return path;
 	}
@@ -194,7 +191,7 @@ for(var i=0; i<scripts.length; i++) {
 
 
 //configurable options
-var options = {	remote: typeof MVCOptions == 'object' && MVCOptions.remote, 
+var options = {	dont_load_production: typeof MVCOptions == 'object' && MVCOptions.dont_load_production, 
 				env: 'development', 
 				production: '/javascripts/production.js',
 				base62: false, shrink_variables: true};
@@ -263,7 +260,7 @@ MVC.Object.extend(include,{
             include.compress_window = window.open(MVC.mvc_root+'/compress.html', null, "width=600,height=680,scrollbars=no,resizable=yes");
 		if(options.env == 'test') 
             include.plugins('test');
-		if(options.env == 'production' && ! MVC.Browser.Opera && ! options.remote)
+		if(options.env == 'production' && ! MVC.Browser.Opera && ! options.dont_load_production)
 			return document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>');
 	},
 	get_env: function() { return options.env;},
@@ -276,7 +273,7 @@ MVC.Object.extend(include,{
         cwd = p;
     },
 	get_path: function() { 
-		return options.remote ? include.get_absolute_path() : cwd;
+		return cwd;
 	},
 	get_absolute_path: function(){
 		var fwd = new File(cwd);
@@ -386,7 +383,7 @@ MVC.Object.extend(include,{
 	},
 	opera: function(){
 		include.opera_called = true;
-		if(MVC.Browser.Opera && ! options.remote){
+		if(MVC.Browser.Opera){
 			options.env == 'production' ? document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>') : include.end();
 		}
 	},
@@ -544,5 +541,5 @@ if(MVC.script_options){
     include.opera();
 }
 if(MVC.Browser.Opera) 
-    setTimeout(function(){ if(!include.opera_called && !options.remote){ alert("You forgot include.opera().")}}, 10000);
+    setTimeout(function(){ if(!include.opera_called){ alert("You forgot include.opera().")}}, 10000);
 })();
