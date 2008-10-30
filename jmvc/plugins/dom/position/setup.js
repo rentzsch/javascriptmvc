@@ -67,10 +67,43 @@ MVC.Position =
 	
 	
 
-    return (ycomp >= cache._cumulative_offset[1] &&
-            ycomp <  cache._cumulative_offset[1] + element.offsetHeight &&
-            xcomp >= cache._cumulative_offset[0] &&
-            xcomp <  cache._cumulative_offset[0] + element.offsetWidth);
+    return this.within_box(xcomp, ycomp, 
+		cache._cumulative_offset[0],cache._cumulative_offset[1],
+		element.offsetWidth,  element.offsetHeight )
+  },
+  withinBoxIncludingScrollingOffsets : function(element, left, top, width, height, cache){
+  	cache = cache || {};
+	var caching = 	this._static && 
+					cache._cache && 
+					cache._cumulative_scroll_offset && 
+					cache._cumulative_offset;
+	if(!caching){
+		cache._cumulative_scroll_offset = MVC.Element.cumulative_scroll_offset(element);
+		cache._cumulative_offset = MVC.Element.cumulative_offset(element);
+	}
+	
+	//get element coords
+	var ex = cache._cumulative_offset[0];
+	var ey = cache._cumulative_offset[1];
+	
+	var ew = element.clientWidth, eh = element.clientHeight;
+	
+    //var xcomp = x + cache._cumulative_scroll_offset[0] - this.deltaX;
+    //var ycomp = y + cache._cumulative_scroll_offset[1] - this.deltaY;
+	//console.log("- the top of box A lies below the bottom of box B "+(ey > top+height))
+	//console.log("- the bottom of box A lies above the top of box B "+(ey+eh < top))
+	//console.log("- the left edge of A lies to the right of B's right edge "+(ex > left+width ) )
+	//console.log("- the right edge of A lies to the left of B's left edge "+(ex+ew < left) )
+	
+	
+	return !( (ey > top+height) || (ey+eh < top) || (ex > left+width ) || (ex+ew < left));
+
+  },
+  within_box : function(x, y, left, top, width, height ){
+	return (y >= top &&
+            y <  top + height &&
+            x >= left &&
+            x <  left + width)
   },
   event_position_relative_to_element : function(element, event, cache){
       cache = cache || {};
