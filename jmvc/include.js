@@ -537,9 +537,9 @@ if(MVC.script_options){
 	    	}
 		}
     }
-    insert();
+	if(!MVC.Browser.Opera) insert();
     include.opera();
 }
 if(MVC.Browser.Opera) 
-    setTimeout(function(){ if(!include.opera_called){ alert("You forgot include.opera().")}}, 10000);
+    setTimeout(function(){ if(!include.opera_called && !options.dont_load_production){ alert("You forgot include.opera().")}}, 10000);
 })();
