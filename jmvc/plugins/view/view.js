@@ -522,7 +522,7 @@ if(!MVC._no_conflict){
 
 
 /**
- * @add class MVC.String Static
+ * @add MVC.String Static
  */
 MVC.Native.extend('String', {
     /**

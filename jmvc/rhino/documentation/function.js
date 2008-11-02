@@ -67,9 +67,8 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
      * @param {String} line
      */
     param_add: function(line){
-        var parts = line.match(/@param\w?(?:\{(?:(optional):)?([\w\.\/]+)\})?\w??([\w\.]+) ?(.*)?/);
+        var parts = line.match(/\s*@param\s+(?:\{(?:(optional):)?([\w\.\/]+)\})?\s+([\w\.]+) ?(.*)?/);
         if(!parts) return;
-        
         var description = parts.pop();
         var n = parts.pop();
         
@@ -87,7 +86,7 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
      * @param {Object} line
      */
     return_add: function(line){
-        var parts = line.match(/@return (?:\{([\w\.\/]+)\})? ?(.*)?/);
+        var parts = line.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s+?(.*)?/);
         if(!parts) return;
         var description = parts.pop() || "";
         var type = parts.pop();
@@ -99,7 +98,7 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
      * @param {Object} line
      */
     function_add: function(line){
-        var m = line.match(/^@\w+ ([\w\.]+)/)
+        var m = line.match(/^@\w+\s+([\w\.]+)/)
         if(m) this.name = m[1];
     },
     /**

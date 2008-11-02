@@ -1,5 +1,5 @@
 /**
- * @add class MVC.Controller Prototype
+ * @add MVC.Controller Prototype
  */
 
 MVC.Controller.prototype.

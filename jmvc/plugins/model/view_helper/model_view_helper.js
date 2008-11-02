@@ -184,7 +184,7 @@ MVC.ModelViewHelper = MVC.Class.extend(
 );
 
 /**
- * @add class MVC.Controller.Params Prototype
+ * @add MVC.Controller.Params Prototype
  */
 MVC.Controller.Params.prototype.
 /*

@@ -96,7 +96,7 @@ MVC.Vector.prototype =
 };
 
 /**
- * @add class MVC.Event Static
+ * @add MVC.Event Static
  */
 MVC.Event.
 /**

@@ -8,20 +8,47 @@ MVC.render_to = function(file, ejs, data){
     //first = false;
 };
 
-
+/**
+ * @class MVC.Doc
+ * JavaScriptMVC comes with powerful and easy to extend documentation functionality - MVC Doc.
+ * MVC Doc is designed specifically for documenting JavaScript.  It understands a little about
+ * JavaScript syntax to guess at things like function names and parameters.  But, you can also
+ * document complex functionality across multiple files.
+ * 
+ * MVC Doc is pure JavaScript so it is easy to modify and make improvements.  First, lets get through
+ * what JavaScriptMVC can document: <br/>
+ * 
+ * [MVC.Doc.Class], [MVC.Doc.Constructor], [MVC.Doc.Function], [MVC.Doc.Attribute]<br/>
+ * 
+ * MVC Doc lets you manipulate the scope of your code with: <br/>
+ * 
+ * [MVC.Doc.Prototype], [MVC.Doc.Static], [MVC.Doc.Add]
+ * 
+ */
 MVC.Doc = {
     render_to: function(file, ejs, data){
         var v = new View({text: readFile(ejs), name: ejs });
         MVCOptions.save(file,  v.render(data)  );
     },
+    /**
+     * Replaces content in brackets [] with a link to source.
+     * @param {String} content Any text, usually a commment.
+     */
     link_content : function(content){
         return content.replace(/\[\s*([^\|\]\s]*)\s*\|?\s*([^\]]*)\s*\]/g, function(match, first, name){
             //need to get last
             //need to remove trailing whitespace
             var url = MVC.Doc.objects[first];
+            if(!name){
+                name = first.replace(/\.prototype|\.static/)
+            }
             return url ? "<a href='"+url+"'>"+name+"</a>" : match;
         })
     },
+    /**
+     * A map of the full name of all the objects the application creates and the url to 
+     * the documentation for them.
+     */
     objects : {}
 };
 

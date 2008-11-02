@@ -11,6 +11,10 @@ MVC.Doc.File = MVC.Doc.Pair.extend('file',
     
     splitter : new RegExp("(?:/\\*+((?:[^*]|(?:\\*+[^*/]))*)\\*+/\[^\\w\\{\\(\\[]*([^\\r\\n]*))")
 },{
+    /**
+     * Generates docs for a file.
+     * @param {Object} inc an object that has path and text attributes
+     */
     init : function(inc){
         this.children = [];
         this.name = inc.path;

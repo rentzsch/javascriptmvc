@@ -1,7 +1,7 @@
 // JavaScriptMVC framework and server, 1.1.22
 //  - built on 2008/05/07 19:44
 /**
- * @add constructor MVC.View.Helpers Prototype
+ * @add MVC.View.Helpers Prototype
  */
 MVC.Object.extend(MVC.View.Helpers.prototype, {
     /**
