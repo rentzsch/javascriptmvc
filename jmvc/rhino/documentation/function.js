@@ -9,7 +9,7 @@
 MVC.Doc.Function = MVC.Doc.Pair.extend('function',
 /* @static */
 {
-    code_match: /([\w\.]+)\s*[:=]\s*function\(([^\)]*)/
+    code_match: /([\w\.\$]+)\s*[:=]\s*function\(([^\)]*)/
 },
 /* @prototype */
 {
@@ -57,6 +57,7 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
                 this[last+'_add_more'](line, last_data);
             }
         }
+        if(this.comment_setup_complete) this.comment_setup_complete();
     },
     param_add_more : function(line, last){
         if(last)
@@ -98,7 +99,7 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
      * @param {Object} line
      */
     function_add: function(line){
-        var m = line.match(/^@\w+\s+([\w\.]+)/)
+        var m = line.match(/^@\w+\s+([\w\.\$]+)/)
         if(m) this.name = m[1];
     },
     /**

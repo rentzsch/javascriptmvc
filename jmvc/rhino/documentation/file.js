@@ -48,4 +48,3 @@ MVC.Doc.File = MVC.Doc.Pair.extend('file',
         return "";
     }
 });
-print(typeof MVC.Doc.File)

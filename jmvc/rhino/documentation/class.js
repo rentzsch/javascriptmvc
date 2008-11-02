@@ -16,12 +16,24 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         }
         res +="</body></html>"
         MVCOptions.save('docs/classes/index.html', res)
+    },
+    init : function(){
+        this._super();
+        var ejs = "jmvc/rhino/documentation/templates/file.ejs"
+        this._file_view = new View({text: readFile(ejs), name: ejs });
     }
 },
 {
     init: function(comment, code, scope ){
         this._super(comment, code, scope);
         this.Class.listing.push(this);
+    },
+    comment_setup_complete : function(){
+        if(!this.name){
+            print("Error! No name defined for \n-----------------------")
+            print(this.comment)
+            print('-----------------------')
+        }  
     },
     add_parent : function(scope){
         //always go back to the file:
@@ -42,11 +54,15 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         }
     },
     toFile : function(summary){
-        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/documentation/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
-        res += "<div id='left_side'>"+summary+"</div>"
-        res += "<div id='right_side'>"+this.toHTML()+"</div>";
-        res +="</body></html>"
-        MVCOptions.save('docs/classes/'+this.name+".html", res)
+        this.summary = summary
+        try{
+            var res = this.Class._file_view.render(this)
+            MVCOptions.save('docs/classes/'+this.name+".html", res)
+        }catch(e ){
+            print("Unable to generate class for "+this.name+" !")
+            print("  Error: "+e)
+        }
+        
     },
     get_quicklinks : function(){
         var inside = this.linker().sort(MVC.Doc.Pair.sort_by_full_name);

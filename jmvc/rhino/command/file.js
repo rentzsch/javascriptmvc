@@ -2,7 +2,7 @@ MVC = {
 	OPTIONS: {},
 	Test: {},
 	File: function(path){ this.path = path; },
-	Runner: function(f){
+	runner: function(f){
 		if(!window.in_command_window && !window._rhino)
 			f();
 	},

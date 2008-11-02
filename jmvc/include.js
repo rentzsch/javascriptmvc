@@ -30,6 +30,7 @@ if(typeof include != 'undefined' && typeof include.end != 'undefined'){
 	throw("Include is defined as function or an element's id!");
 
 /**
+ * @class MVC
  * Default values in MVC namespace.
  */
 MVC = {
@@ -44,7 +45,7 @@ MVC = {
 	 * Used to ignore Rhino
 	 * @param {Object} f
 	 */
-    Runner: function(f){
+    runner: function(f){
 		if(!MVC.Browser.Rhino) f();
 	},
 	Ajax: {},
@@ -95,6 +96,7 @@ MVC = {
         extend: function(d, s) { for (var p in s) d[p] = s[p]; return d;} 
     },
     /**
+     * @function $E
      * Helper function for getting an element by ID.
      * @param {Object} id
      */
@@ -123,21 +125,27 @@ MVC = {
     K : function(){}
 };
 /**
- * A random number to use for loading things.
+ * A static random number.
  */
 MVC.random = MVC.get_random(6);
-/**
- * Returns a useful XHR object
- */
+
+
 MVC.Ajax.factory = function(){ return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();};
 
 
 /**
+ * @Constructor
  * Used for getting information out of a path
+ * @init
+ * Takes a path
+ * @param {String} path 
  */
 MVC.File = function(path){ this.path = path; };
 var File = MVC.File;
-MVC.File.prototype = {
+
+MVC.File.prototype = 
+/* @Prototype */
+{
 	/**
 	 * Removes hash and params
 	 * @return {String}
@@ -256,14 +264,12 @@ MVC.File.prototype = {
 
 
 
-/*
- * Extract information about the page and how include is loaded.
- * -Inspects the DOM for the script tag that included include.js, with it extracts:
- *     * the location of include
- *     * the location of the application directory
- *     * the application's name
- *     * the environment (development, compress, test, production)
- */
+// Extract information about the page and how include is loaded.
+// -Inspects the DOM for the script tag that included include.js, with it extracts:
+//     * the location of include
+//     * the location of the application directory
+//     * the application's name
+//     * the environment (development, compress, test, production)
 MVC.page_dir = new File(window.location.href).dir();
 
 //find include
@@ -297,35 +303,13 @@ var first = true ,                                 //If we haven't included a fi
 	total = [];                                    //
 
 
-/**
- * Checks if a path has been included yet
- * @param {Object} path
- */
-var is_included = function(path){
-	for(var i = 0; i < includes.length; i++) if(includes[i].absolute == path) return true;
-	for(var i = 0; i < current_includes.length; i++) if(current_includes[i].absolute == path) return true;
-	for(var i = 0; i < total.length; i++) if(total[i].absolute == path) return true;
-	return false;
-};
-/**
- * Adds default values to an include
- * @param {Object} inc
- * @param {Object} force
- */
-var add_defaults = function(inc){
-	if(typeof inc == 'string') 
-      inc = {path: inc.indexOf('.js') == -1  ? inc+'.js' : inc};
-	if(typeof inc != 'function'){
-        inc.original_path = inc.path;
-        inc = MVC.Object.extend( MVC.Object.extend({},options), inc);
-        //if(force) inc.compress = false
-    }
-	include.add(inc);
-};
+
 
 
 /**
- * Includes paths or 
+ * @class include
+ * Used to include JavaScript files.
+ * 
  */
 include = function(){
 	if(include.get_env().match(/development|compress|test/)){
@@ -347,12 +331,29 @@ include = function(){
         insert();
 	}
 };
-	
-MVC.Object.extend(include,{
-	/**
-	 * Adds defaults to an included parameter
-	 * @param {Object} inc
-	 */
+
+
+var add_defaults = function(inc){
+	if(typeof inc == 'string') 
+      inc = {path: inc.indexOf('.js') == -1  ? inc+'.js' : inc};
+	if(typeof inc != 'function'){
+        inc.original_path = inc.path;
+        inc = MVC.Object.extend( MVC.Object.extend({},options), inc);
+        //if(force) inc.compress = false
+    }
+	include.add(inc);
+};
+
+MVC.Object.extend(include,
+/* @Static */
+{
+	is_included: function(path){
+    	for(var i = 0; i < includes.length; i++) if(includes[i].absolute == path) return true;
+    	for(var i = 0; i < current_includes.length; i++) if(current_includes[i].absolute == path) return true;
+    	for(var i = 0; i < total.length; i++) if(total[i].absolute == path) return true;
+    	return false;
+    },
+	//Adds defaults to an included parameter
     add_defaults : function(inc){
     	if(typeof inc == 'string') 
           inc = {path: inc.indexOf('.js') == -1  ? inc+'.js' : inc};            //add .js to it, if not there
@@ -394,6 +395,9 @@ MVC.Object.extend(include,{
     set_path: function(p) {
         cwd = p;
     },
+    /**
+     * Gets the current working directory
+     */
 	get_path: function() { 
 		return cwd;
 	},
@@ -401,10 +405,7 @@ MVC.Object.extend(include,{
 		var fwd = new File(cwd);
 		return fwd.relative() ? fwd.join_from(MVC.root.path, true) : cwd;
 	},
-    /**
-     * Adds an include to the pending list of includes.
-     * @param {Object} newInclude
-     */
+    // Adds an include to the pending list of includes.
 	add: function(newInclude){
         //If include is a function, adjust the function to first set the path right before including
         if(typeof newInclude == 'function'){
@@ -430,7 +431,7 @@ MVC.Object.extend(include,{
 		newInclude.start = new MVC.File(newInclude.path).dir();
         
         //add to the current list of includes if it hasn't already been included
-        if(! is_included(newInclude.absolute))
+        if(! include.is_included(newInclude.absolute))
 		    current_includes.unshift(  newInclude );
 	},
     /**
@@ -452,9 +453,7 @@ MVC.Object.extend(include,{
         if(include.get_env()=='production') include.close_time();
         else    include._close= true;
     },
-    /*
-     * Called after every file is loaded.  Gets the next file and includes it.
-     */
+    // Called after every file is loaded.  Gets the next file and includes it.
 	end: function(src){
         // add includes that were just added to the end of the list
         includes = includes.concat(current_includes);
@@ -497,9 +496,7 @@ MVC.Object.extend(include,{
     		latest.ignore ? insert() : insert(latest.path);
         }
 	},
-    /**
-     * include.end_of_production is written at the end of the production script to call this function
-     */
+    //include.end_of_production is written at the end of the production script to call this function
 	end_of_production: function(){ first_wave_done = true; },
 	compress: function(){
         MVCOptions.compress_callback(total)
@@ -511,10 +508,6 @@ MVC.Object.extend(include,{
 		}
 	},
 	opera_called : false,
-	/**
-	 * Loads a plugin from anywhere
-	 * @param {String} plugin_name
-	 */
     plugin: function(plugin_name) {
 		var current_path = include.get_path();
 		include.set_path("");
@@ -527,12 +520,8 @@ MVC.Object.extend(include,{
 	plugins: function(){
 		for(var i=0; i < arguments.length; i++) include.plugin(arguments[i]);
 	},
-    /**
-     * Returns a function that applies a function to a list of arguments.  Then includes those
-     * arguments.
-     * @param {Object} f
-     * @return {Function}
-     */
+    // Returns a function that applies a function to a list of arguments.  Then includes those
+    // arguments.
 	app: function(f){
 		return function(){
             for (var i = 0; i < arguments.length; i++) {
@@ -541,13 +530,7 @@ MVC.Object.extend(include,{
 			include.apply(null, arguments);
 		}
 	},
-    /**
-     * A list of included functions
-     */
     functions: [],
-    /**
-     * Calls the next function
-     */
     next_function : function(){
         var func = include.functions.pop();
         if(func) func();
@@ -615,25 +598,31 @@ MVC.Object.extend(include,{
     	head().appendChild(script);
     }
 });
-
+/**
+ * @function controllers
+ */
 include.controllers = include.app(function(i){return '../controllers/'+i+'_controller'});
+/**
+ * @function models
+ */
 include.models = include.app(function(i){return '../models/'+i});
+/**
+ * @function resources
+ */
 include.resources = include.app(function(i){return '../resources/'+i});
+/**
+ * @function engines
+ */
 include.engines = include.app(function(i){ return '../engines/'+i+"/apps/"+i+".js"} );
 
 
-/**
- * Creates a script tag
- */
+
 var script_tag = function(){
 	var start = document.createElement('script');
 	start.type = 'text/javascript';
 	return start;
 };
-/**
- * Inserts script tags that will load src, and call include.end() after the file has been loaded.
- * @param {Object} src
- */
+
 var insert = function(src){
     // source we need to know how to get to jmvc, then load 
     // relative to path to jmvc
@@ -663,17 +652,12 @@ var insert = function(src){
 		);
 	}
 };
-/**
- * Returns html that will call end appropriately for the browser
- * @param {Object} src
- */
+
 var call_end = function(src){
     return MVC.Browser.Gecko ? '<script type="text/javascript">include.end()</script>' : 
     '<script type="text/javascript" src="'+MVC.include_path+'?'+MVC.random+'"></script>'
 }
-/**
- * Gets the head element.  If one doesn't exist, creates one.  
- */
+
 var head = function(){
 	var d = document, de = d.documentElement;
 	var heads = d.getElementsByTagName("head");
@@ -684,11 +668,11 @@ var head = function(){
 };
 
 
-/*
- * The following code tries to load initial files by default.  The 
- * environment and application name are provided by the parameters in the script
- * include tag.
- */
+
+// The following code tries to load initial files by default.  The 
+// environment and application name are provided by the parameters in the script
+// include tag.
+
 
 if(MVC.script_options){
 	first = false;

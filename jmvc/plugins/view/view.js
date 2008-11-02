@@ -503,8 +503,15 @@ include.view = function(path){
 		//production, do nothing!, it will be loaded by process
 	}
 };
+/**
+ * @add include Static
+ */
 
-include.views = function(){
+include.
+/**
+ * @plugin view
+ */
+views = function(){
 	for(var i=0; i< arguments.length; i++){
 		include.view(arguments[i]+'.ejs');
 	}

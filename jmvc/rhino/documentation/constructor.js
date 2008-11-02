@@ -6,12 +6,12 @@
  * To describe the construction function, write that after init.  Example:
  * 
  * <pre>
- * /* @constructor
+ * <div class='comment'>/* @constructor
  *  * Person represents a human with a name 
  *  * @init 
  *  * You must pass in a name.
  *  * @params {String} name A person's name
- *  *|
+ *  *|</div>
  * Person = function(name){
  *    this.name = name
  *    Person.count ++;
@@ -49,6 +49,11 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
         }
         res +="</body></html>"
         MVCOptions.save('docs/constructors/index2.html', res)
+    },
+    init : function(){
+        this._super();
+        var ejs = "jmvc/rhino/documentation/templates/file.ejs"
+        this._file_view = new View({text: readFile(ejs), name: ejs });
     }
 },
 /* @Prototype */
@@ -104,11 +109,13 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
         this.init_description +="\n"+ line;
     },
     toFile : function(summary){
-        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/documentation/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
-        res += "<div id='left_side'>"+summary+"</div>"
-        res+= "<div id='right_side'>"+this.toHTML()+"</div>";
-        res +="</body></html>"
-        MVCOptions.save('docs/classes/'+this.name+".html", res)
+        this.summary = summary
+        //try{
+            var res = this.Class._file_view.render(this)
+            MVCOptions.save('docs/classes/'+this.name+".html", res)
+        //}catch(e ){
+        //    throw
+        //}
     },
     get_quicklinks : function(){
         var inside = this.linker().sort(MVC.Doc.Pair.sort_by_full_name);
