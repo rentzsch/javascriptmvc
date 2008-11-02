@@ -1,3 +1,4 @@
+
 /**
  * Represents a file.
  * Breaks up file into comment and code parts.
@@ -38,4 +39,5 @@ MVC.Doc.File = MVC.Doc.Pair.extend('file',
     full_name: function(){
         return "";
     }
-})
+});
+print(typeof MVC.Doc.File)

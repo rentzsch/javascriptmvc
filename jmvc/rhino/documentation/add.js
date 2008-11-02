@@ -1,43 +1,8 @@
 /**
- * 
+ * Used to add functionality from one place to another
+ * @param {Object} line
  */
-MVC.Doc.Static = MVC.Doc.Pair.extend('static',
-{starts_scope: true},
-{
-    add_parent : function(scope){
-        var scope_class=  scope.Class.className;
-        this.parent = scope_class == 'class' || scope_class == 'constructor' ? scope : scope.parent;
-        if(scope_class != "file" && this.parent)
-            this.parent.add(this);
-    },
-    name: 'static'
-});
-/**
- * 
- */
-MVC.Doc.Prototype = MVC.Doc.Static.extend('prototype',
-{
-    name: 'prototype'
-});
-
-
-
-
-/**
- * 
- */
-MVC.Doc.Attribute = MVC.Doc.Pair.extend('attribute',{
-     code_match: function(code){
-         return code.match(/(\w+)\s*[:=]\s*/) && !code.match(/(\w+)\s*[:=]\s*function\(([^\)]*)/)  
-     }
- },{
-     code_setup: function(){
-        var parts = this.code.match(/(\w+)\s*[:=]\s*/);
-        this.name = parts[1];
-     }
- })
-
-MVC.Doc.Attribute = MVC.Doc.Pair.extend('add',
+MVC.Doc.Add = MVC.Doc.Pair.extend('add',
 {
     comment_setup: MVC.Doc.Function.prototype.comment_setup,
     add_add : function(line){

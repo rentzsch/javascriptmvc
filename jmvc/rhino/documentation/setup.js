@@ -2,7 +2,7 @@
 load('jmvc/plugins/lang/standard_helpers.js');
 //Make sure view is here
 load('jmvc/plugins/view/view.js');
-load('jmvc/plugins/lang/class/view.js');
+load('jmvc/plugins/lang/setup.js');
     
 
 load('jmvc/rhino/documentation/application.js');
@@ -12,4 +12,7 @@ load('jmvc/rhino/documentation/class.js');
 load('jmvc/rhino/documentation/constructor.js');
 load('jmvc/rhino/documentation/file.js');
 
-load('jmvc/rhino/documentation/other.js');
+load('jmvc/rhino/documentation/add.js');
+load('jmvc/rhino/documentation/static.js');
+load('jmvc/rhino/documentation/prototype.js');
+load('jmvc/rhino/documentation/attribute.js');

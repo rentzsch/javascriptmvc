@@ -30,8 +30,10 @@ MVC.Doc.Application = function(total, app_name){
    
     for(var s=0; s < total.length; s++){
 		script = total[s];
-        if(typeof script != 'function' && !script.process)
+        if(typeof script != 'function' && !script.process){
             this.files.push( new MVC.Doc.File(total[s]) ) 
+        }
+            
 	}
 }
 
