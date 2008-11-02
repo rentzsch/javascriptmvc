@@ -1,7 +1,8 @@
 /**
- * A pair of comment and code
+ * A base class for a comment and the line of code following it.
  */
 MVC.Doc.Pair = MVC.Class.extend(
+/* @Static */
 {
     code_match: function(){ return null},
     classes: [],
@@ -10,9 +11,16 @@ MVC.Doc.Pair = MVC.Class.extend(
             this.classes.push(Klass)
         }
     },
+    /**
+     * From the comment and code, guesses at the type of comment and creates a new
+     * instance of that type.
+     * @param {String} comment - the comment
+     * @param {String} code - the first line of source following the comment
+     * @param {MVC.Doc.Pair} scope - The current scope of documentation.  
+     * This is typically a Class, Constructor, Static, or Prototype
+     * @return {MVC.Doc.Pair} - If a type can be found, the new Doc object; otherwise, null.
+     */
     create: function(comment, code, scope){
-        //first lets get the type!
-        //check the comment
         var check =  comment.match(/^@(\w+)/), type
 
         if(!(type = this.has_type(check ? check[1] : null)) ){ //try code
@@ -21,6 +29,10 @@ MVC.Doc.Pair = MVC.Class.extend(
         if(!type) return null;
         return new type(comment, code, scope)
     },
+    /**
+     * Looks for a Doc class with a className for the given type
+     * @param {String} type a potential className
+     */
     has_type: function(type){
         if(!type) return null;
         for(var i=0;i< this.classes.length; i++){
@@ -29,6 +41,10 @@ MVC.Doc.Pair = MVC.Class.extend(
         }
         return null;
     },
+    /**
+     * Tries to guess at a piece of code's type.
+     * @param {Object} code
+     */
     guess_type: function(code){
         for(var i=0;i< this.classes.length; i++){
             if(this.classes[i].code_match(code) ) 
@@ -37,6 +53,11 @@ MVC.Doc.Pair = MVC.Class.extend(
         return null;
     },
     starts_scope: false,
+    /**
+     * Given a and b, sorts by their full_name property.
+     * @param {Object} a
+     * @param {Object} b
+     */
     sort_by_full_name : function(a, b){
        
        if(a.full_name == b.full_name) return 0;
@@ -47,6 +68,9 @@ MVC.Doc.Pair = MVC.Class.extend(
        if(a.name == b.name) return 0;
        return a.name > b.name ? 1: -1;
     },
+    /**
+     * Loads a template to use to render different doc types.
+     */
     init : function(){
         if(this.className){
              var ejs = "jmvc/rhino/documentation/templates/"+this.className+".ejs"
@@ -54,6 +78,7 @@ MVC.Doc.Pair = MVC.Class.extend(
         }
     }
 },
+/* @Prototype */
 {
     init : function(comment, code, scope ){
         this.children = []
@@ -66,6 +91,16 @@ MVC.Doc.Pair = MVC.Class.extend(
         if(this.Class.code_match(this.code))
             this.code_setup();
         this.comment_setup();
+        
+        
+        var par = this;
+        while(par && !par.url){
+            par = par.parent;
+        }
+        if(par){
+            MVC.Doc.objects[this.full_name()] = par.url()+"#"+this.full_name();
+        }
+        
     },
     add: function(child){
         this.children.push(child);

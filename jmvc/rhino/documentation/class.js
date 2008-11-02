@@ -1,3 +1,6 @@
+/**
+ * Hey o [MVC.Doc.Constructor.prototype.init | Constructor's init]
+ */
 MVC.Doc.Class = MVC.Doc.Pair.extend('class',
 {
     code_match: /([\w\.]+)\s*=\s*([\w\.]+?).extend\(/,
@@ -54,5 +57,12 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         }
         return result.join(", ")
         
+    },
+    cleaned_comment : function(){
+        return MVC.Doc.link_content(this.real_comment);
+    },
+    url : function(){
+        return this.name+".html";
     }
+    
 });

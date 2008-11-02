@@ -1,10 +1,17 @@
 /**
- * Documents a function
+ * Documents a function.
+ * Doc can guess at a functions name and params if the source following a comment
+ * matches something like:
+ * <pre>
+ * myFuncOne : function(param1, param2){}  //or
+ * myFuncTwo = function(param1, param2){} </pre>
  */
 MVC.Doc.Function = MVC.Doc.Pair.extend('function',
+/* @static */
 {
     code_match: /([\w\.]+)\s*[:=]\s*function\(([^\)]*)/
 },
+/* @prototype */
 {
     code_setup: function(){
         var parts = this.Class.code_match(this.code);
@@ -19,6 +26,15 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         }
         
     },
+    /**
+     * Goes throw the comments.  Searches them for lines starting with @<i>directive</i>.
+     * If a line with a directive is found, it sees if the instance has a function that matches
+     * <i>directive</i>_add exists.  If it does, <i>directive</i>_add is called on that object.
+     * If following lines do not have a directive, the <i>directive</i>_add_more function is called
+     * on the instance
+     * <br/>
+     * Initial comments are added to real_comment.
+     */
     comment_setup: function(){
         var i = 0;
         var lines = this.comment.split("\n");
@@ -26,10 +42,9 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         if(!this.params) this.params = {};
         if(!this.ret) this.ret = {type: 'undefined',description: ""};
         var last, last_data;
-
         for(var l=0; l < lines.length; l++){
             var line = lines[l];
-            var match = line.match(/@(\w+)/)
+            var match = line.match(/^[\s*]?@(\w+)/)
             if(match){
                 var fname = (match[1]+'_add').toLowerCase();
                 if(! this[fname]) continue;
@@ -44,11 +59,15 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         }
     },
     param_add_more : function(line, last){
-        if(last);
+        if(last)
             last.description += "\n"+line;
     },
+    /**
+     * Adds @param data to the constructor function
+     * @param {String} line
+     */
     param_add: function(line){
-        var parts = line.match(/@param (?:\{(?:(optional):)?([\w\.\/]+)\})? ?([\w\.]+) ?(.*)?/);
+        var parts = line.match(/@param\w?(?:\{(?:(optional):)?([\w\.\/]+)\})?\w??([\w\.]+) ?(.*)?/);
         if(!parts) return;
         
         var description = parts.pop();
@@ -63,6 +82,10 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         
         return this.params[n];
     },
+    /**
+     * 
+     * @param {Object} line
+     */
     return_add: function(line){
         var parts = line.match(/@return (?:\{([\w\.\/]+)\})? ?(.*)?/);
         if(!parts) return;
@@ -71,10 +94,17 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         this.ret = {description: description, type: type};
         return this.ret;
     },
+    /**
+     * Sets the function's name if one can't be determined from the source
+     * @param {Object} line
+     */
     function_add: function(line){
         var m = line.match(/^@\w+ ([\w\.]+)/)
         if(m) this.name = m[1];
     },
+    /**
+     * Returns the HTML signiture of the function.
+     */
     signiture : function(){
         var res = [];
         var ordered = this.ordered_params();

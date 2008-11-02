@@ -1,4 +1,40 @@
+/**
+ * Documents javascript constructor classes typically created like:
+ * new MyContructor(args).
+ * 
+ * A constructor can be described by putting @constructor as the first declaritive.
+ * To describe the construction function, write that after init.  Example:
+ * 
+ * <pre>
+ * /* @constructor
+ *  * Person represents a human with a name 
+ *  * @init 
+ *  * You must pass in a name.
+ *  * @params {String} name A person's name
+ *  *|
+ * Person = function(name){
+ *    this.name = name
+ *    Person.count ++;
+ * }
+ * /* @Static *|
+ * MVC.Object.extend(Person, {
+ *    /* Number of People *|
+ *    count: 0
+ * })
+ * /* @Prototype *|
+ * Person.prototype = {
+ *   /* Returns a formal name 
+ *    * @return {String} the name with "Mrs." added
+ *    *|
+ *   fancy_name : function(){
+ *      return "Mrs. "+this.name;
+ *   }
+ * }</pre>
+ * 
+ * [MVC.Doc.Class | MVC.Doc.Class]
+ */
 MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
+/* @Static */
 {
     code_match: /([\w\.]+)\s*[:=]\s*function\(([^\)]*)/,
     starts_scope: true,
@@ -15,7 +51,14 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
         MVCOptions.save('docs/constructors/index2.html', res)
     }
 },
+/* @Prototype */
 {
+    /**
+     * 
+     * @param {Object} comment
+     * @param {Object} code
+     * @param {Object} scope
+     */
     init: function(comment, code, scope ){
         this._super(comment, code, scope);
         this.Class.listing.push(this);
@@ -28,40 +71,37 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
     code_setup: MVC.Doc.Function.prototype.code_setup,
     comment_setup: MVC.Doc.Function.prototype.comment_setup,
     return_add: MVC.Doc.Function.prototype.return_add,
+    /**
+     * @function param_add
+     * Adds @param data to the constructor function
+     * @param {String} line
+     */
     param_add: MVC.Doc.Function.prototype.param_add,
+    /**
+     * @function param_add_more
+     * Adds data on lines following a @param to the previous @param
+     * @param {String} line
+     */
     param_add_more: MVC.Doc.Function.prototype.param_add_more,
+    /**
+     * Adds the @init data to the constructor.  Adds to init_description.
+     * @param {String} line the first line that has @init
+     */
     init_add: function(line){
-            var parts = line.match(/@init (.*)/);
-            if(!parts) return;
-            this.constructor = parts.pop();
-            return this.constructor;
+            var parts = line.match(/\s?@init (.*)/);
+            if(!parts){
+                this.init_description = "";
+                return true;
+            } 
+            this.init_description = parts.pop();
+            return this.init_description;
     },
+    /**
+     * Adds lines called after a @param to the init_description
+     * @param {Object} line
+     */
     init_add_more: function(line){
-        this.constructor +="\n"+ line;
-    },
-    toHTML : function(){
-        //get children
-        var ret = "<div><h1>"+this.name+" <label>API</label></h1>"
-        ret+= "<div id='shortcuts'>"+this.get_quicklinks()+"</div>";
-        ret += "<div class='group'>"+this.real_comment+"</div>\n"
-        
-        ret += "<div class='method'>"+
-                        "<h3 id="+this.full_name()+">"+this.name+"</h4>"+
-                        "<pre class='signiture'><code>"+this.signiture()+"<code></pre>"+
-                        "<p>"+this.constructor+"</p>"+
-                        //this.long_desc+
-                        this.paramsHTML()+"</div>"
-        
-        
-        ret+= this.make(this.children);
-
-        //get names
-        
-        //go through and get static/prototype method and attributes
-        
-        
-        return ret+"</div>"
-        //return "Class: "+this.name+"\n"+parts.join("\n\n");
+        this.init_description +="\n"+ line;
     },
     toFile : function(summary){
         var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/documentation/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
@@ -80,6 +120,9 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
         return result.join(", ")
         
     },
+    /**
+     * Returns the HTML signiture of the constructor function.
+     */
     signiture : function(){
             var res = [];
             for(var n in this.params){
@@ -95,13 +138,8 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
                 this.ret.type = this.name.toLowerCase();
             }
             return n+"("+res.join(", ")+") -> "+this.ret.type;
-        },
-        paramsHTML : function(){
-            var res = '';
-            for(var n in this.params){
-                var param = this.params[n];
-                res += "<div class='param'><label>"+n+"</label> <code>"+param.type+"</code> "+param.description+"</div>"
-            }
-            return res;
-        }
+    },
+    url : function(){
+        return this.name+".html";
+    }
 });

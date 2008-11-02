@@ -13,11 +13,23 @@ MVC.Doc = {
     render_to: function(file, ejs, data){
         var v = new View({text: readFile(ejs), name: ejs });
         MVCOptions.save(file,  v.render(data)  );
-    }
+    },
+    link_content : function(content){
+        return content.replace(/\[\s*([^\|\]\s]*)\s*\|?\s*([^\]]*)\s*\]/g, function(match, first, name){
+            //need to get last
+            //need to remove trailing whitespace
+            var url = MVC.Doc.objects[first];
+            return url ? "<a href='"+url+"'>"+name+"</a>" : match;
+        })
+    },
+    objects : {}
 };
 
 /**
- * 
+ * @constructor
+ * abc
+ * @init
+ * asfda
  * @param {Object} total
  * @param {Object} app_name
  */
@@ -33,7 +45,6 @@ MVC.Doc.Application = function(total, app_name){
         if(typeof script != 'function' && !script.process){
             this.files.push( new MVC.Doc.File(total[s]) ) 
         }
-            
 	}
 }
 
@@ -60,17 +71,11 @@ MVC.Doc.Application.prototype = {
         var res = "<h3>Documentation</h3><ul>"
 
         var things = MVC.Doc.Class.listing.concat( MVC.Doc.Constructor.listing ).sort( MVC.Doc.Pair.sort_by_name );
-        
 
         for(var i = 0; i < things.length; i++){
             var name = things[i].name;
             res += "<li><a href='../classes/"+name+".html'>"+name+"</a></li>"
         }
-        
-        
-        
-
-        
         return res + "</ul>"
 
     },
