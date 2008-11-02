@@ -9,13 +9,13 @@
         	<h1>Application Summary <label><%= name%></label></h1>
             
             <h2>Classes</h2>
-            <% things = RMVC.DClass.listing.sort( RMVC.DPair.sort_by_name )%>
+            <% things = MVC.Doc.Class.listing.sort( MVC.Doc.Pair.sort_by_name )%>
             <% for(var i = 0; i < things.length; i++){ %>
                 <% var n = things[i].name%>
                 <div><a href='classes/<%=n%>.html'><%=n%></a></div>
             <% }%>
             <h2>Constructors </h2>
-            <% var sorted_constructors = RMVC.DConstructor.listing.sort( RMVC.DPair.sort_by_name )%>
+            <% var sorted_constructors = MVC.Doc.Constructor.listing.sort( MVC.Doc.Pair.sort_by_name )%>
             <% for(var i = 0; i < sorted_constructors.length; i++){ %>
                 <% var n =sorted_constructors[i].name%>
                 <div><a href='classes/<%=n%>.html'><%=n%></a></div>
