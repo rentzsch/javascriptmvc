@@ -1,4 +1,4 @@
-MVCObject.DFunction = MVCObject.DPair.extend('function',
+RMVC.DFunction = RMVC.DPair.extend('function',
     {
         code_match: /([\w\.]+)\s*[:=]\s*function\(([^\)]*)/
         

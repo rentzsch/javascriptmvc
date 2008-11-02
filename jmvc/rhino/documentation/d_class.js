@@ -1,4 +1,4 @@
-MVCObject.DClass = MVCObject.DPair.extend('class',
+RMVC.DClass = RMVC.DPair.extend('class',
 {
     code_match: /([\w\.]+)\s*=\s*([\w\.]+?).extend\(/,
     starts_scope: true,
@@ -31,7 +31,7 @@ MVCObject.DClass = MVCObject.DPair.extend('class',
         this.name = parts[1];
         this.sup = parts[2];
     },
-    comment_setup: MVCObject.DFunction.prototype.comment_setup,
+    comment_setup: RMVC.DFunction.prototype.comment_setup,
     class_add: function(line){
         var m = line.match(/^@\w+ ([\w\.]+)/)
         if(m){
@@ -54,14 +54,14 @@ MVCObject.DClass = MVCObject.DPair.extend('class',
         //return "Class: "+this.name+"\n"+parts.join("\n\n");
     },
     toFile : function(summary){
-        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
+        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/documentation/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
         res += "<div id='left_side'>"+summary+"</div>"
         res += "<div id='right_side'>"+this.toHTML()+"</div>";
         res +="</body></html>"
         MVCOptions.save('docs/classes/'+this.name+".html", res)
     },
     get_quicklinks : function(){
-        var inside = this.linker().sort(MVCObject.DPair.sort_by_full_name);
+        var inside = this.linker().sort(RMVC.DPair.sort_by_full_name);
         var result = [];
         for(var i = 0; i < inside.length; i++){
             var link = inside[i];

@@ -1,4 +1,4 @@
-MVCObject.DFile = MVCObject.DPair.extend('file',
+RMVC.DFile = RMVC.DPair.extend('file',
 {
     group : new RegExp("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/\[^\\w\\{\\(\\[]*[^\\n]*)", "g"),
     splitter : new RegExp("(?:/\\*+((?:[^*]|(?:\\*+[^*/]))*)\\*+/\[^\\w\\{\\(\\[]*([^\\r\\n]*))")
@@ -28,7 +28,7 @@ MVCObject.DFile = MVCObject.DPair.extend('file',
             var splits = pairs[i].match(this.Class.splitter);
             var comment = splits[1].replace(/^[^\w@]*/,'').replace(/\r?\n(\s*\*+)?/g,'\n');
             var code = splits[2];
-            var pair = MVCObject.DPair.create( comment , code, scope);
+            var pair = RMVC.DPair.create( comment , code, scope);
             if(pair)
                 scope = pair.scope();
         }

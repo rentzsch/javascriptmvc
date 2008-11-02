@@ -1,4 +1,4 @@
-MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
+RMVC.DConstructor = RMVC.DPair.extend('constructor',
 {
     code_match: /([\w\.]+)\s*[:=]\s*function\(([^\)]*)/,
     starts_scope: true,
@@ -25,11 +25,11 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
         this.parent = scope;
         this.parent.add(this);
     },
-    code_setup: MVCObject.DFunction.prototype.code_setup,
-    comment_setup: MVCObject.DFunction.prototype.comment_setup,
-    return_add: MVCObject.DFunction.prototype.return_add,
-    param_add: MVCObject.DFunction.prototype.param_add,
-    param_add_more: MVCObject.DFunction.prototype.param_add_more,
+    code_setup: RMVC.DFunction.prototype.code_setup,
+    comment_setup: RMVC.DFunction.prototype.comment_setup,
+    return_add: RMVC.DFunction.prototype.return_add,
+    param_add: RMVC.DFunction.prototype.param_add,
+    param_add_more: RMVC.DFunction.prototype.param_add_more,
     init_add: function(line){
             var parts = line.match(/@init (.*)/);
             if(!parts) return;
@@ -64,14 +64,14 @@ MVCObject.DConstructor = MVCObject.DPair.extend('constructor',
         //return "Class: "+this.name+"\n"+parts.join("\n\n");
     },
     toFile : function(summary){
-        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/doc/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
+        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/documentation/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
         res += "<div id='left_side'>"+summary+"</div>"
         res+= "<div id='right_side'>"+this.toHTML()+"</div>";
         res +="</body></html>"
         MVCOptions.save('docs/classes/'+this.name+".html", res)
     },
     get_quicklinks : function(){
-        var inside = this.linker().sort(MVCObject.DPair.sort_by_full_name);
+        var inside = this.linker().sort(RMVC.DPair.sort_by_full_name);
         var result = [];
         for(var i = 0; i < inside.length; i++){
             var link = inside[i];

@@ -1,10 +1,10 @@
-MVCObject = {};
+RMVC = {};
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
-  MVCObject.Class = function(){};
+  RMVC.Class = function(){};
   // Create a new Class that inherits from this class
-  MVCObject.Class.extend = function(className, klass, proto) {
+  RMVC.Class.extend = function(className, klass, proto) {
     if(typeof className != 'string'){
         proto = klass;
         klass = className;

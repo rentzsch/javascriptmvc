@@ -1,4 +1,4 @@
-MVCObject.DPair = MVCObject.Class.extend(
+RMVC.DPair = RMVC.Class.extend(
 {
     code_match: function(){ return null},
     classes: [],

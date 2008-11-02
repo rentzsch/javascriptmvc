@@ -1,9 +1,9 @@
-MVCObject.DStatic = MVCObject.DPair.extend('static',
+RMVC.DStatic = RMVC.DPair.extend('static',
 {starts_scope: true},
 {
     toHTML: function(){
         var ret = "<h2>Static Methods</h2>"
-        ret+= this.make(this.children.sort(MVCObject.DPair.sort_by_name)  );
+        ret+= this.make(this.children.sort(RMVC.DPair.sort_by_name)  );
         return ret;
     },
     add_parent : function(scope){
@@ -15,11 +15,11 @@ MVCObject.DStatic = MVCObject.DPair.extend('static',
     name: 'static'
 });
 
-MVCObject.DPrototype = MVCObject.DStatic.extend('prototype',
+RMVC.DPrototype = RMVC.DStatic.extend('prototype',
 {
     toHTML: function(){
         var ret = "<h2>Prototype Methods</h2>"
-        ret+= this.make(this.children.sort(MVCObject.DPair.sort_by_name));
+        ret+= this.make(this.children.sort(RMVC.DPair.sort_by_name));
         return ret;
     },
     name: 'prototype'
@@ -29,7 +29,7 @@ MVCObject.DPrototype = MVCObject.DStatic.extend('prototype',
 
 
  
- MVCObject.DAttribute = MVCObject.DPair.extend('attribute',{
+ RMVC.DAttribute = RMVC.DPair.extend('attribute',{
      code_match: function(code){
          return code.match(/(\w+)\s*[:=]\s*/) && !code.match(/(\w+)\s*[:=]\s*function\(([^\)]*)/)  
      }
@@ -44,9 +44,9 @@ MVCObject.DPrototype = MVCObject.DStatic.extend('prototype',
      }
  })
 
-MVCObject.DAdd = MVCObject.DPair.extend('add',
+RMVC.DAdd = RMVC.DPair.extend('add',
 {
-    comment_setup: MVCObject.DFunction.prototype.comment_setup,
+    comment_setup: RMVC.DFunction.prototype.comment_setup,
     add_add : function(line){
         //@add class MVC.String Static
         var m = line.match(/^@add (class|constructor) ([\w\.]+) ([\w\.]+)?/i)
@@ -60,7 +60,7 @@ MVCObject.DAdd = MVCObject.DPair.extend('add',
     scope : function(){
         if(!this.type) return this;
         
-        var Class = this.type.toLowerCase() == "class" ? MVCObject.DClass : MVCObject.DConstructor
+        var Class = this.type.toLowerCase() == "class" ? RMVC.DClass : RMVC.DConstructor
         //find
         var inst;
         for(var l =0 ; l < Class.listing.length; l++){
