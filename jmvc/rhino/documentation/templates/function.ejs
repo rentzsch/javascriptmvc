@@ -1,0 +1,24 @@
+<div class='method'>
+ <% if(this.plugin){%> 
+     <div class='added_by'><%= this.plugin%></div>
+ <% } %>
+ 
+ <h3 id="<%= this.full_name()%>"><%=this.name%></h4>
+ <pre class='signiture'><code><%= this.signiture()%><code></pre>
+ <p><%= this.real_comment%></p>
+ <% var ordered = this.ordered_params() 
+  	for(var n = 0; n < ordered.length; n++){   
+       var param = ordered[n]; %>  
+      <div class='param <% param.optional ? "optional" : ""%>'>
+          <label><%= param.name%></label>
+          <code>{<%=(param.optional ? '' : '') +""+param.type %>}</code> - <%= param.description %>
+      </div>
+ <% } %>
+
+ <% if(this.ret.type != "undefined") {%>
+     <div class='return'>
+         <label>returns</label> 
+         <code>{<%=this.ret.type%>}</code> - <%= this.ret.description%>
+     </div>
+ <% } %>               
+</div>

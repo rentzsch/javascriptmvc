@@ -38,21 +38,6 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
             this.name = m[1];
         }
     },
-    toHTML : function(){
-        //get children
-        var ret = "<div><h1>"+this.name+" <label>API</label></h1>"
-        ret+= "<div id='shortcuts'>"+this.get_quicklinks()+"</div>";
-        ret += "<div class='group'>"+this.real_comment+"</div>\n"
-        ret+= this.make(this.children);
-
-        //get names
-        
-        //go through and get static/prototype method and attributes
-        
-        
-        return ret+"</div>"
-        //return "Class: "+this.name+"\n"+parts.join("\n\n");
-    },
     toFile : function(summary){
         var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/documentation/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
         res += "<div id='left_side'>"+summary+"</div>"

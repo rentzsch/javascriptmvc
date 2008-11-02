@@ -1,3 +1,6 @@
+/**
+ * A pair of comment and code
+ */
 MVC.Doc.Pair = MVC.Class.extend(
 {
     code_match: function(){ return null},
@@ -43,6 +46,12 @@ MVC.Doc.Pair = MVC.Class.extend(
        
        if(a.name == b.name) return 0;
        return a.name > b.name ? 1: -1;
+    },
+    init : function(){
+        if(this.className){
+             var ejs = "jmvc/rhino/documentation/templates/"+this.className+".ejs"
+             this._view = new View({text: readFile(ejs), name: ejs });
+        }
     }
 },
 {
@@ -71,12 +80,13 @@ MVC.Doc.Pair = MVC.Class.extend(
     code_setup: function(){},
     comment_setup: function(){},
     toHTML : function(){
-        var parts = [];
-        for(var c=0; c<this.children.length; c++){
-            parts.push( this.children[c].toHTML());
-        }
-        
-        return this.Class.className+": "+this.name+"\n"+parts.join("\n\n");
+       // var parts = [];
+       //for(var c=0; c<this.children.length; c++){
+       //     parts.push( this.children[c].toHTML());
+       // }
+       // 
+       // return this.Class.className+": "+this.name+"\n"+parts.join("\n\n");
+       return this.Class._view.render(this)
     },
     full_name: function(){
         var par = this.parent.full_name()

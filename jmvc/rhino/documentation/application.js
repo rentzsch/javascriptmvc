@@ -6,32 +6,33 @@ MVC.render_to = function(file, ejs, data){
     //print( (first ? "Generating ...":"              ") + " "+file);
     
     //first = false;
-}
+};
+
+
 MVC.Doc = {
     render_to: function(file, ejs, data){
         var v = new View({text: readFile(ejs), name: ejs });
         MVCOptions.save(file,  v.render(data)  );
     }
 };
+
+/**
+ * 
+ * @param {Object} total
+ * @param {Object} app_name
+ */
 MVC.Doc.Application = function(total, app_name){
     
     this.name = app_name;
     this.total = total;
     this.files = [];
     
-    
-    print('total '+total.length)
-    
-    
+   
     for(var s=0; s < total.length; s++){
 		script = total[s];
         if(typeof script != 'function' && !script.process)
             this.files.push( new MVC.Doc.File(total[s]) ) 
 	}
-        
-    
-    
-    
 }
 
 
