@@ -1,9 +1,9 @@
-RMVC.DStatic = RMVC.DPair.extend('static',
+MVC.Doc.Static = MVC.Doc.Pair.extend('static',
 {starts_scope: true},
 {
     toHTML: function(){
         var ret = "<h2>Static Methods</h2>"
-        ret+= this.make(this.children.sort(RMVC.DPair.sort_by_name)  );
+        ret+= this.make(this.children.sort(MVC.Doc.Pair.sort_by_name)  );
         return ret;
     },
     add_parent : function(scope){
@@ -15,11 +15,11 @@ RMVC.DStatic = RMVC.DPair.extend('static',
     name: 'static'
 });
 
-RMVC.DPrototype = RMVC.DStatic.extend('prototype',
+MVC.Doc.Prototype = MVC.Doc.Static.extend('prototype',
 {
     toHTML: function(){
         var ret = "<h2>Prototype Methods</h2>"
-        ret+= this.make(this.children.sort(RMVC.DPair.sort_by_name));
+        ret+= this.make(this.children.sort(MVC.Doc.Pair.sort_by_name));
         return ret;
     },
     name: 'prototype'
@@ -29,7 +29,7 @@ RMVC.DPrototype = RMVC.DStatic.extend('prototype',
 
 
  
- RMVC.DAttribute = RMVC.DPair.extend('attribute',{
+ MVC.Doc.Attribute = MVC.Doc.Pair.extend('attribute',{
      code_match: function(code){
          return code.match(/(\w+)\s*[:=]\s*/) && !code.match(/(\w+)\s*[:=]\s*function\(([^\)]*)/)  
      }
@@ -44,9 +44,9 @@ RMVC.DPrototype = RMVC.DStatic.extend('prototype',
      }
  })
 
-RMVC.DAdd = RMVC.DPair.extend('add',
+MVC.Doc.Attribute = MVC.Doc.Pair.extend('add',
 {
-    comment_setup: RMVC.DFunction.prototype.comment_setup,
+    comment_setup: MVC.Doc.Function.prototype.comment_setup,
     add_add : function(line){
         //@add class MVC.String Static
         var m = line.match(/^@add (class|constructor) ([\w\.]+) ([\w\.]+)?/i)
@@ -60,7 +60,7 @@ RMVC.DAdd = RMVC.DPair.extend('add',
     scope : function(){
         if(!this.type) return this;
         
-        var Class = this.type.toLowerCase() == "class" ? RMVC.DClass : RMVC.DConstructor
+        var Class = this.type.toLowerCase() == "class" ? MVC.Doc.Class : MVC.Doc.Constructor
         //find
         var inst;
         for(var l =0 ; l < Class.listing.length; l++){

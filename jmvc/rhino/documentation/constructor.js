@@ -1,4 +1,4 @@
-RMVC.DConstructor = RMVC.DPair.extend('constructor',
+MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
 {
     code_match: /([\w\.]+)\s*[:=]\s*function\(([^\)]*)/,
     starts_scope: true,
@@ -25,11 +25,11 @@ RMVC.DConstructor = RMVC.DPair.extend('constructor',
         this.parent = scope;
         this.parent.add(this);
     },
-    code_setup: RMVC.DFunction.prototype.code_setup,
-    comment_setup: RMVC.DFunction.prototype.comment_setup,
-    return_add: RMVC.DFunction.prototype.return_add,
-    param_add: RMVC.DFunction.prototype.param_add,
-    param_add_more: RMVC.DFunction.prototype.param_add_more,
+    code_setup: MVC.Doc.Function.prototype.code_setup,
+    comment_setup: MVC.Doc.Function.prototype.comment_setup,
+    return_add: MVC.Doc.Function.prototype.return_add,
+    param_add: MVC.Doc.Function.prototype.param_add,
+    param_add_more: MVC.Doc.Function.prototype.param_add_more,
     init_add: function(line){
             var parts = line.match(/@init (.*)/);
             if(!parts) return;
@@ -71,7 +71,7 @@ RMVC.DConstructor = RMVC.DPair.extend('constructor',
         MVCOptions.save('docs/classes/'+this.name+".html", res)
     },
     get_quicklinks : function(){
-        var inside = this.linker().sort(RMVC.DPair.sort_by_full_name);
+        var inside = this.linker().sort(MVC.Doc.Pair.sort_by_full_name);
         var result = [];
         for(var i = 0; i < inside.length; i++){
             var link = inside[i];

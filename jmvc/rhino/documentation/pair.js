@@ -1,4 +1,4 @@
-RMVC.DPair = RMVC.Class.extend(
+MVC.Doc.Pair = MVC.Class.extend(
 {
     code_match: function(){ return null},
     classes: [],

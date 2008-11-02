@@ -1,5 +1,5 @@
-RMVC.render_to = function(file, ejs, data){
-    var v = new View({text: readFile(ejs) });
+MVC.render_to = function(file, ejs, data){
+    var v = new View({text: readFile(ejs), name: ejs });
     
     MVCOptions.save(file,  v.render(data)  );
     
@@ -7,8 +7,13 @@ RMVC.render_to = function(file, ejs, data){
     
     //first = false;
 }
-
-RMVC.DApplication = function(total, app_name){
+MVC.Doc = {
+    render_to: function(file, ejs, data){
+        var v = new View({text: readFile(ejs), name: ejs });
+        MVCOptions.save(file,  v.render(data)  );
+    }
+};
+MVC.Doc.Application = function(total, app_name){
     
     this.name = app_name;
     this.total = total;
@@ -21,7 +26,7 @@ RMVC.DApplication = function(total, app_name){
     for(var s=0; s < total.length; s++){
 		script = total[s];
         if(typeof script != 'function' && !script.process)
-            this.files.push( new RMVC.DFile(total[s]) ) 
+            this.files.push( new MVC.Doc.File(total[s]) ) 
 	}
         
     
@@ -30,19 +35,19 @@ RMVC.DApplication = function(total, app_name){
 }
 
 
-RMVC.DApplication.prototype = {
+MVC.Doc.Application.prototype = {
     generate : function(){
         var summary = this.summary();
         
         //make classes
-        for(var i = 0; i < RMVC.DClass.listing.length; i++){
-            RMVC.DClass.listing[i].toFile(summary);
+        for(var i = 0; i < MVC.Doc.Class.listing.length; i++){
+            MVC.Doc.Class.listing[i].toFile(summary);
         }
-        //RMVC.DClass.create_index();
+        //MVC.Doc.Class.create_index();
         
         //make constructors
-        for(var i = 0; i < RMVC.DConstructor.listing.length; i++){
-            RMVC.DConstructor.listing[i].toFile(summary);
+        for(var i = 0; i < MVC.Doc.Constructor.listing.length; i++){
+            MVC.Doc.Constructor.listing[i].toFile(summary);
         }
 
         this.summary_page(summary)
@@ -51,7 +56,7 @@ RMVC.DApplication.prototype = {
 
         var res = "<h3>Documentation</h3><ul>"
 
-        var things = RMVC.DClass.listing.concat( RMVC.DConstructor.listing ).sort( RMVC.DPair.sort_by_name );
+        var things = MVC.Doc.Class.listing.concat( MVC.Doc.Constructor.listing ).sort( MVC.Doc.Pair.sort_by_name );
         
 
         for(var i = 0; i < things.length; i++){
@@ -69,7 +74,7 @@ RMVC.DApplication.prototype = {
     summary_page : function(summary){
         print("rendering summary");
 
-        RMVC.render_to('docs/'+this.name+".html","jmvc/rhino/documentation/templates/summary.ejs" , this)
+        MVC.Doc.render_to('docs/'+this.name+".html","jmvc/rhino/documentation/templates/summary.ejs" , this)
 
     },
     

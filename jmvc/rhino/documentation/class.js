@@ -1,88 +1,73 @@
-RMVC = {};
-(function(){
-  var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
-  // The base Class implementation (does nothing)
-  RMVC.Class = function(){};
-  // Create a new Class that inherits from this class
-  RMVC.Class.extend = function(className, klass, proto) {
-    if(typeof className != 'string'){
-        proto = klass;
-        klass = className;
-        className = null;
-    }
-    if(!proto){
-        proto = klass;
-        klass = null;
-    }
-    var _super_class = this;
-    var _super = this.prototype;
-    // Instantiate a base class (but only create the instance,
-    // don't run the init constructor)
-    initializing = true;
-    var prototype = new this();
-    initializing = false;
-    // Copy the properties over onto the new prototype
-    for (var name in proto) {
-      // Check if we're overwriting an existing function
-      prototype[name] = typeof proto[name] == "function" &&
-        typeof _super[name] == "function" && fnTest.test(proto[name]) ?
-        (function(name, fn){
-          return function() {
-            var tmp = this._super;
-           
-            // Add a new ._super() method that is the same method
-            // but on the super-class
-            this._super = _super[name];
-           
-            // The method only need to be bound temporarily, so we
-            // remove it when we're done executing
-            var ret = fn.apply(this, arguments);       
-            this._super = tmp;
-           
-            return ret;
-          };
-        })(name, proto[name]) :
-        proto[name];
-    }
-    // The dummy class constructor
-    function Class() {
-      // All construction is actually done in the init method
-      if ( !initializing && this.init )
-        this.init.apply(this, arguments);
-    }
-    // Populate our constructed prototype object
-    Class.prototype = prototype;
-    Class.prototype.Class = Class;
-    // Enforce the constructor to be what we expect
-    Class.constructor = Class;
-    // And make this class extendable
-    
-    for(var name in this){
-        if(this.hasOwnProperty(name) && name != 'prototype'){
-            Class[name] = this[name];
+MVC.Doc.Class = MVC.Doc.Pair.extend('class',
+{
+    code_match: /([\w\.]+)\s*=\s*([\w\.]+?).extend\(/,
+    starts_scope: true,
+    listing: [],
+    create_index : function(){
+        var res = '<html><head><link rel="stylesheet" href="../style.css" type="text/css">'+
+            '<title>Classes</title></head><body>'
+        res += '<h1>Classes <label>LIST</label></h1>'
+        for(var i = 0; i < this.listing.length; i++){
+            var name = this.listing[i].name;
+            res += "<a href='"+name+".html'>"+name+"</a> "
         }
+        res +="</body></html>"
+        MVCOptions.save('docs/classes/index.html', res)
     }
-    
-    for (var name in klass) {
-      Class[name] = typeof klass[name] == "function" &&
-        typeof Class[name] == "function" && fnTest.test(klass[name]) ?
-        (function(name, fn){
-          return function() {
-            var tmp = this._super;
-            this._super = _super_class[name];
-            var ret = fn.apply(this, arguments);       
-            this._super = tmp;
-            return ret;
-          };
-        })(name, klass[name]) :
-        klass[name];
-	};
-    Class.extend = arguments.callee;
-    if(className) Class.className = className;
-    
-    if(Class.init) Class.init(Class);
-    if(_super_class.extended) _super_class.extended(Class);
-    
-    return Class;
-  };
-})();
+},
+{
+    init: function(comment, code, scope ){
+        this._super(comment, code, scope);
+        this.Class.listing.push(this);
+    },
+    add_parent : function(scope){
+        //always go back to the file:
+        while(scope.Class.className != 'file') scope = scope.parent;
+        this.parent = scope;
+        this.parent.add(this);
+    },
+    code_setup: function(){
+        var parts = this.code.match(this.Class.code_match);
+        this.name = parts[1];
+        this.sup = parts[2];
+    },
+    comment_setup: MVC.Doc.Function.prototype.comment_setup,
+    class_add: function(line){
+        var m = line.match(/^@\w+ ([\w\.]+)/)
+        if(m){
+            this.name = m[1];
+        }
+    },
+    toHTML : function(){
+        //get children
+        var ret = "<div><h1>"+this.name+" <label>API</label></h1>"
+        ret+= "<div id='shortcuts'>"+this.get_quicklinks()+"</div>";
+        ret += "<div class='group'>"+this.real_comment+"</div>\n"
+        ret+= this.make(this.children);
+
+        //get names
+        
+        //go through and get static/prototype method and attributes
+        
+        
+        return ret+"</div>"
+        //return "Class: "+this.name+"\n"+parts.join("\n\n");
+    },
+    toFile : function(summary){
+        var res = '<html><head><link rel="stylesheet" href="../../jmvc/rhino/documentation/style.css" type="text/css" /><title>'+this.name+"</title></head><body>"
+        res += "<div id='left_side'>"+summary+"</div>"
+        res += "<div id='right_side'>"+this.toHTML()+"</div>";
+        res +="</body></html>"
+        MVCOptions.save('docs/classes/'+this.name+".html", res)
+    },
+    get_quicklinks : function(){
+        var inside = this.linker().sort(MVC.Doc.Pair.sort_by_full_name);
+        var result = [];
+        for(var i = 0; i < inside.length; i++){
+            var link = inside[i];
+            result.push( "<a href='#"+link.full_name+"'>"+link.name+"</a>"  )
+        }
+        return result.join(", ")
+        
+    }
+});

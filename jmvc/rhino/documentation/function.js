@@ -1,4 +1,4 @@
-RMVC.DFunction = RMVC.DPair.extend('function',
+MVC.Doc.Function = MVC.Doc.Pair.extend('function',
     {
         code_match: /([\w\.]+)\s*[:=]\s*function\(([^\)]*)/
         
