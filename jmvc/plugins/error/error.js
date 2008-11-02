@@ -1,4 +1,4 @@
-MVC.ApplicationError = MVC.RemoteModel.extend('application_error',
+MVC.ApplicationError = MVC.JsonPModel.extend('application_error',
 {
     controller_name: "error",
     domain: 'https://damnit.jupiterit.com', name: 'error',
