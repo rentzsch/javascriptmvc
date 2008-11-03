@@ -80,6 +80,13 @@ MVC.Doc.Pair = MVC.Class.extend(
 },
 /* @Prototype */
 {
+    /**
+     * Saves coment, code.  Adds self to parent.  Calls code_setup and comment_setup.
+     * Finally, adds to MVC.Doc.objects.
+     * @param {String} comment
+     * @param {String} code
+     * @param {MVC.Doc.Pair} scope
+     */
     init : function(comment, code, scope ){
         this.children = []
         this.comment = comment;
@@ -114,13 +121,8 @@ MVC.Doc.Pair = MVC.Class.extend(
     },
     code_setup: function(){},
     comment_setup: function(){},
+    
     toHTML : function(){
-       // var parts = [];
-       //for(var c=0; c<this.children.length; c++){
-       //     parts.push( this.children[c].toHTML());
-       // }
-       // 
-       // return this.Class.className+": "+this.name+"\n"+parts.join("\n\n");
        return this.Class._view.render(this)
     },
     full_name: function(){
@@ -150,6 +152,9 @@ MVC.Doc.Pair = MVC.Class.extend(
         }
         return result;
     },
+    /**
+     * Orders params into an array.
+     */
     ordered_params : function(){
             var arr = [];
             for(var n in this.params){
@@ -158,6 +163,10 @@ MVC.Doc.Pair = MVC.Class.extend(
             }
             return arr;
     },
+    /**
+     * Can add this to another object.
+     * @param {Object} line
+     */
     plugin_add : function(line){
         this.plugin = line.match(/@plugin ([^ ]+)/)[1];
     }

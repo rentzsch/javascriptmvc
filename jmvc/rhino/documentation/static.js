@@ -1,5 +1,8 @@
 /**
- * 
+ * Sets the following functions and attributes to be added
+ * to Class or Constructor static (class) functions.
+ * <h3>Example</h3>
+ * <pre>/* @static *|</pre>
  */
 MVC.Doc.Static = MVC.Doc.Pair.extend('static',
 {starts_scope: true},
