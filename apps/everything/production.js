@@ -1,38 +1,27 @@
-include.set_path('../../apps');
+include.set_path('apps');
 include.resources();
-include.plugins("core","controller/comet","controller/dragdrop","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/rest_xml","model/view_helper","test");
-include("../jmvc/rhino/doc");
-MVC.Initializer(function(){
-include.models();
-include.views();
-resp=new Ajax("../../jmvc/plugins/dom/event/standard.js?"+Math.random(),{asynchronous:false,method:"get"});
-var _1=new MVCObject.DFile({text:resp.responseText,path:"call.js"});
-resp=new Ajax("../../jmvc/plugins/dom/element/vector.js?"+Math.random(),{asynchronous:false,method:"get"});
-var _1=new MVCObject.DFile({text:resp.responseText,path:"call.js"});
-document.getElementById("CLASSIN").innerHTML=MVCObject.DConstructor.listing[0].toHTML();
+include.plugins("core","controller/comet","controller/dragdrop","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/rest_xml","model/view_helper","test","controller/stateful");
+MVC.load_doc=true;
+include(function(){
 });
 ;
-include.set_path('../../jmvc/plugins/core');
+include.set_path('jmvc/plugins/core');
 if(typeof Prototype=="undefined"){
 include({path:"../lang/standard_helpers.js",shrink_variables:false},"../lang/inflector/inflector","../dom/event/standard","../io/ajax/ajax","../lang/class/setup");
-MVC.Included.plugins.push("lang","lang/inflector","io/ajax","dom/event","lang/class");
 }else{
 MVC.Event=Event;
-include({path:"../lang/prototype_helpers.js",shrink_variables:false},"../lang/inflector/inflector","../io/ajax/prototype_ajax");
-MVC.Included.plugins.push("lang","lang/inflector","io/ajax");
+include({path:"../lang/prototype_helpers.js",shrink_variables:false},"../lang/inflector/inflector","../io/ajax/prototype_ajax","../lang/class/setup");
 }
 if(MVC.Console){
 include("../io/ajax/debug");
 }
-MVC.Included.plugins.push("view","controller","controller/view");
 include("../view/view","../controller/controller","../controller/delegator","../controller/view/controller_view");
-MVC.Included.plugins.push("view","controller","controller/view");
 include.plugins("dom/element","controller/scaffold","model/view_helper","view/helpers");
 if(include.get_env()=="development"){
 include("../view/fulljslint");
 }
 ;
-include.set_path('../../jmvc/plugins/lang');
+include.set_path('jmvc/plugins/lang');
 MVC.String={};
 MVC.String.strip=function(_1){
 return _1.replace(/^\s+/,"").replace(/\s+$/,"");
@@ -170,7 +159,7 @@ ret+="0";
 return ret+_37;
 }});
 ;
-include.set_path('../../jmvc/plugins/lang/inflector');
+include.set_path('jmvc/plugins/lang/inflector');
 MVC.Inflector={Inflections:{plural:[[/(quiz)$/i,"$1zes"],[/^(ox)$/i,"$1en"],[/([m|l])ouse$/i,"$1ice"],[/(matr|vert|ind)ix|ex$/i,"$1ices"],[/(x|ch|ss|sh)$/i,"$1es"],[/([^aeiouy]|qu)y$/i,"$1ies"],[/(hive)$/i,"$1s"],[/(?:([^f])fe|([lr])f)$/i,"$1$2ves"],[/sis$/i,"ses"],[/([ti])um$/i,"$1a"],[/(buffal|tomat)o$/i,"$1oes"],[/(bu)s$/i,"$1ses"],[/(alias|status)$/i,"$1es"],[/(octop|vir)us$/i,"$1i"],[/(ax|test)is$/i,"$1es"],[/s$/i,"s"],[/$/,"s"]],singular:[[/(quiz)zes$/i,"$1"],[/(matr)ices$/i,"$1ix"],[/(vert|ind)ices$/i,"$1ex"],[/^(ox)en/i,"$1"],[/(alias|status)es$/i,"$1"],[/(octop|vir)i$/i,"$1us"],[/(cris|ax|test)es$/i,"$1is"],[/(shoe)s$/i,"$1"],[/(o)es$/i,"$1"],[/(bus)es$/i,"$1"],[/([m|l])ice$/i,"$1ouse"],[/(x|ch|ss|sh)es$/i,"$1"],[/(m)ovies$/i,"$1ovie"],[/(s)eries$/i,"$1eries"],[/([^aeiouy]|qu)ies$/i,"$1y"],[/([lr])ves$/i,"$1f"],[/(tive)s$/i,"$1"],[/(hive)s$/i,"$1"],[/([^f])ves$/i,"$1fe"],[/(^analy)ses$/i,"$1sis"],[/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$/i,"$1$2sis"],[/([ti])a$/i,"$1um"],[/(n)ews$/i,"$1ews"],[/s$/i,""]],irregular:[["move","moves"],["sex","sexes"],["child","children"],["man","men"],["foreman","foremen"],["person","people"]],uncountable:["sheep","fish","series","species","money","rice","information","equipment"]},pluralize:function(_1){
 for(var i=0;i<MVC.Inflector.Inflections.uncountable.length;i++){
 var _3=MVC.Inflector.Inflections.uncountable[i];
@@ -233,75 +222,75 @@ return true;
 return false;
 }});
 ;
-include.set_path('../../jmvc/plugins/dom/event');
+include.set_path('jmvc/plugins/dom/event');
 if(document.addEventListener){
 MVC.Event={observe:function(el,_2,_3,_4){
 if(_4==null){
 _4=false;
 }
 el.addEventListener(_2,_3,_4);
-},stop_observing:function(el,_6,_7){
-if(capture==null){
-capture=false;
+},stop_observing:function(el,_6,_7,_8){
+if(_8==null){
+_8=false;
 }
 el.removeEventListener(_6,_7,false);
 }};
 }else{
 if(document.attachEvent){
-MVC.Event={observe:function(_8,_9,_a){
-if(MVC.Event._find(_8,_9,_a)!=-1){
+MVC.Event={observe:function(_9,_a,_b){
+if(MVC.Event._find(_9,_a,_b)!=-1){
 return;
 }
-var _b=function(e){
+var _c=function(e){
 if(!e){
 e=window.event;
 }
-var _d={_event:e,type:e.type,target:e.srcElement,currentTarget:_8,relatedTarget:_9=="mouseover"?e.fromElement:e.toElement,eventPhase:(e.srcElement==_8)?2:3,clientX:e.clientX,clientY:e.clientY,screenX:e.screenX,screenY:e.screenY,altKey:e.altKey,ctrlKey:e.ctrlKey,shiftKey:e.shiftKey,charCode:e.keyCode,stopPropagation:function(){
+var _e={_event:e,type:e.type,target:e.srcElement,currentTarget:_9,relatedTarget:_a=="mouseover"?e.fromElement:e.toElement,eventPhase:(e.srcElement==_9)?2:3,clientX:e.clientX,clientY:e.clientY,screenX:e.screenX,screenY:e.screenY,altKey:e.altKey,ctrlKey:e.ctrlKey,shiftKey:e.shiftKey,charCode:e.keyCode,stopPropagation:function(){
 this._event.cancelBubble=true;
 },preventDefault:function(){
 this._event.returnValue=false;
 }};
 if(Function.prototype.call){
-_a.call(_8,_d);
+_b.call(_9,_e);
 }else{
-_8._currentHandler=_a;
-_8._currentHandler(_d);
-_8._currentHandler=null;
+_9._currentHandler=_b;
+_9._currentHandler(_e);
+_9._currentHandler=null;
 }
 };
-_8.attachEvent("on"+_9,_b);
-var h={element:_8,eventType:_9,handler:_a,wrappedHandler:_b};
-var d=_8.document||_8,w=d.parentWindow,id=MVC.Event._uid();
+_9.attachEvent("on"+_a,_c);
+var h={element:_9,eventType:_a,handler:_b,wrappedHandler:_c};
+var d=_9.document||_9,w=d.parentWindow,id=MVC.Event._uid();
 if(!w._allHandlers){
 w._allHandlers={};
 }
 w._allHandlers[id]=h;
-if(!_8._handlers){
-_8._handlers=[];
+if(!_9._handlers){
+_9._handlers=[];
 }
-_8._handlers.push(id);
+_9._handlers.push(id);
 if(!w._onunloadHandlerRegistered){
 w._onunloadHandlerRegistered=true;
 w.attachEvent("onunload",MVC.Event._removeAllHandlers);
 }
-},stop_observing:function(_12,_13,_14){
-var i=MVC.Event._find(_12,_13,_14);
+},stop_observing:function(_13,_14,_15){
+var i=MVC.Event._find(_13,_14,_15);
 if(i==-1){
 return;
 }
-var d=_12.document||_12,w=d.parentWindow,_18=_12._handlers[i],h=w._allHandlers[_18];
-_12.detachEvent("on"+_13,h.wrappedHandler);
-_12._handlers.splice(i,1);
-delete w._allHandlers[_18];
-},_find:function(_1a,_1b,_1c){
-var _1d=_1a._handlers;
-if(!_1d){
+var d=_13.document||_13,w=d.parentWindow,_19=_13._handlers[i],h=w._allHandlers[_19];
+_13.detachEvent("on"+_14,h.wrappedHandler);
+_13._handlers.splice(i,1);
+delete w._allHandlers[_19];
+},_find:function(_1b,_1c,_1d){
+var _1e=_1b._handlers;
+if(!_1e){
 return -1;
 }
-var d=_1a.document||_1a,w=d.parentWindow;
-for(var i=_1d.length-1;i>=0;i--){
-var h=w._allHandlers[_1d[i]];
-if(h.eventType==_1b&&h.handler==_1c){
+var d=_1b.document||_1b,w=d.parentWindow;
+for(var i=_1e.length-1;i>=0;i--){
+var h=w._allHandlers[_1e[i]];
+if(h.eventType==_1c&&h.handler==_1d){
 return i;
 }
 }
@@ -327,7 +316,7 @@ if(!MVC._no_conflict&&typeof Event=="undefined"){
 Event=MVC.Event;
 }
 ;
-include.set_path('../../jmvc/plugins/io/ajax');
+include.set_path('jmvc/plugins/io/ajax');
 (function(){
 var _1=MVC.Ajax.factory;
 MVC.Ajax=function(_2,_3){
@@ -432,7 +421,7 @@ if(!MVC._no_conflict){
 Ajax=MVC.Ajax;
 }
 ;
-include.set_path('../../jmvc/plugins/lang/class');
+include.set_path('jmvc/plugins/lang/class');
 (function(){
 var _1=false,_2=/xyz/.test(function(){
 xyz;
@@ -506,7 +495,7 @@ if(!MVC._no_conflict&&typeof Class=="undefined"){
 Class=MVC.Class;
 }
 ;
-include.set_path('../../jmvc/plugins/view');
+include.set_path('jmvc/plugins/view');
 MVC.View=function(_1){
 this.set_options(_1);
 if(_1.precompiled){
@@ -515,10 +504,10 @@ this.template.process=_1.precompiled;
 MVC.View.update(this.name,this);
 return;
 }
-if(_1.url||_1.absolute_url){
-var _2=_1.absolute_url||MVC.root.join(_1.url+(_1.url.match(/\.ejs/)?"":".ejs"));
-_1.url=_1.absolute_url||_1.url;
-var _3=MVC.View.get(_1.url,this.cache);
+if(_1.url||_1.absolute_url||_1.view_url){
+this.name=this.name?this.name:_1.url||_1.absolute_url||"views/"+_1.view_url;
+var _2=_1.absolute_url||(_1.url?MVC.root.join(_1.url+(_1.url.match(/\.ejs/)?"":".ejs")):MVC.root.join("views/"+_1.view_url+(_1.view_url.match(/\.ejs/)?"":".ejs")));
+var _3=MVC.View.get(this.name,this.cache);
 if(_3){
 return _3;
 }
@@ -527,9 +516,11 @@ return null;
 }
 this.text=include.request(_2+(this.cache||window._rhino?"":"?"+Math.random()));
 if(this.text==null){
+if(window._rhino){
+print("Exception: "+"There is no template at "+_2);
+}
 throw ({type:"JMVC",message:"There is no template at "+_2});
 }
-this.name=_1.url;
 }else{
 if(_1.hasOwnProperty("element")){
 if(typeof _1.element=="string"){
@@ -802,6 +793,7 @@ MVC.View.config=function(_31){
 MVC.View.cache=_31.cache!=null?_31.cache:MVC.View.cache;
 MVC.View.type=_31.type!=null?_31.type:MVC.View.type;
 var _32={};
+MVC.View.templates_directory=_32;
 MVC.View.get=function(_33,_34){
 if(_34==false){
 return null;
@@ -820,41 +812,36 @@ _32[_35]=_36;
 MVC.View.INVALID_PATH=-1;
 };
 MVC.View.config({cache:include.get_env()=="production",type:"<"});
-MVC.View.PreCompiledFunction=function(_37,f){
-new MVC.View({name:_37,precompiled:f});
+MVC.View.PreCompiledFunction=function(_37,_38,f){
+new MVC.View({name:_38,precompiled:f});
 };
-MVC.View.Helpers=function(_39){
-this.data=_39;
+MVC.View.Helpers=function(_3a){
+this.data=_3a;
 };
-MVC.View.Helpers.prototype={partial:function(_3a,_3b){
-if(!_3b){
-_3b=this.data;
+MVC.View.Helpers.prototype={partial:function(_3b,_3c){
+if(!_3c){
+_3c=this.data;
 }
-return new MVC.View(_3a).render(_3b);
-},to_text:function(_3c,_3d){
-if(_3c==null||_3c===undefined){
-return _3d||"";
+return new MVC.View(_3b).render(_3c);
+},to_text:function(_3d,_3e){
+if(_3d==null||_3d===undefined){
+return _3e||"";
 }
-if(_3c instanceof Date){
-return _3c.toDateString();
+if(_3d instanceof Date){
+return _3d.toDateString();
 }
-if(_3c.toString){
-return _3c.toString().replace(/\n/g,"<br />").replace(/''/g,"'");
+if(_3d.toString){
+return _3d.toString().replace(/\n/g,"<br />").replace(/''/g,"'");
 }
 return "";
 }};
-MVC.Included.views=[];
-include.view=function(_3e){
-MVC.Included.views.push(_3e.replace(/\.ejs/,""));
+include.view=function(_3f){
 if(include.get_env()=="development"){
-new MVC.View({url:_3e});
+new MVC.View({url:new MVC.File("../"+_3f).join_current()});
 }else{
 if(include.get_env()=="compress"){
-var _3f=include.get_path();
-include.set_path(MVC.root.path);
-include({path:_3e,process:MVC.View.process_include,ignore:true});
-include.set_path(_3f);
-new MVC.View({url:_3e});
+include({path:"../"+_3f,process:MVC.View.process_include,ignore:true});
+new MVC.View({url:new MVC.File("../"+_3f).join_current()});
 }else{
 }
 }
@@ -866,7 +853,7 @@ include.view(arguments[i]+".ejs");
 };
 MVC.View.process_include=function(_41){
 var _42=new MVC.View({text:_41.text});
-return "MVC.View.PreCompiledFunction(\""+_41.original_path+"\", function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {"+_42.out()+" return ___ViewO;}}}catch(e){e.lineNumber=null;throw e;}})";
+return "MVC.View.PreCompiledFunction(\""+_41.original_path+"\", \""+_41.path+"\",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {"+_42.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
 };
 if(!MVC._no_conflict){
 View=MVC.View;
@@ -894,7 +881,7 @@ return _46;
 return _4a.substr(0,_4a.length-1);
 }});
 ;
-include.set_path('../../jmvc/plugins/controller');
+include.set_path('jmvc/plugins/controller');
 MVC.Object.is_number=function(o){
 return o&&(typeof o=="number"||(typeof o=="string"&&!isNaN(o)));
 };
@@ -906,7 +893,7 @@ this.singularName=MVC.String.singularize(this.className);
 if(!MVC.Controller.controllers[this.className]){
 MVC.Controller.controllers[this.className]=[];
 }
-MVC.Controller.controllers[this.className].push(this);
+MVC.Controller.controllers[this.className].unshift(this);
 var _2,_3;
 this.actions={};
 for(var _4 in this.prototype){
@@ -926,135 +913,130 @@ var _6=MVC.root.join("test/functional/"+this.className+"_controller_test.js");
 var _7=include.check_exists(_6);
 if(_7){
 MVC.Console.log("Loading: \"test/functional/"+this.className+"_controller_test.js\"");
+include("../test/functional/"+this.className+"_controller_test.js");
 }else{
 MVC.Console.log("Test Controller not found at \"test/functional/"+this.className+"_controller_test.js\"");
 return;
 }
-var p=include.get_path();
-include.set_path(MVC.root.path);
-include("test/functional/"+this.className+"_controller_test.js");
-include.set_path(p);
 }
-},add_kill_event:function(_9){
-if(!_9.kill){
-var _a=false;
-_9.kill=function(){
-_a=true;
-if(!_9){
-_9=window.event;
+this._path=include.get_path().match(/(.*?)controllers/)[1]+"controllers";
+},event_closure:function(_8,_9){
+return MVC.Function.bind(function(_a){
+var _b=new MVC.Controller.Params({event:_a,element:_9,action:_8,controller:this});
+return this.dispatch(_8,_b);
+},this);
+},subscribe_closure:function(_c){
+return MVC.Function.bind(function(_d,_e){
+var _f=_e||{};
+_f.action=_c;
+_f.controller=this;
+_f.event_name=_d;
+return this.dispatch(_c,new MVC.Controller.Params(_f));
+},this);
+},dispatch_closure:function(_10){
+return MVC.Function.bind(function(_11){
+_11=_11||{};
+_11.action=_10;
+_11.controller=this;
+_11=_11.constructor==MVC.Controller.Params?_11:new MVC.Controller.Params(_11);
+return this.dispatch(_10,_11);
+},this);
+},dispatch:function(_12,_13){
+if(!_12){
+_12="index";
 }
-try{
-_9.cancelBubble=true;
-if(_9.stopPropagation){
-_9.stopPropagation();
-}
-if(_9.preventDefault){
-_9.preventDefault();
-}
-}
-catch(e){
-}
-};
-_9.is_killed=function(){
-return _a;
-};
-}
-},event_closure:function(_b,_c,_d){
-return function(_e){
-MVC.Controller.add_kill_event(_e);
-var _f=new MVC.Controller.Params({event:_e,element:_d,action:_c,controller:_b});
-return MVC.Controller.dispatch(_b,_c,_f);
-};
-},dispatch_closure:function(_10,_11){
-return function(_12){
-MVC.Controller.add_kill_event(_12.event);
-_12.action=_11;
-_12.controller=_10;
-return MVC.Controller.dispatch(_10,_11,new MVC.Controller.Params(_12));
-};
-},dispatch:function(_13,_14,_15){
-var _16=_13;
-if(typeof _13=="string"){
-_13=MVC.Controller.controllers[_16][0];
-}
-if(!_13){
-throw "No controller named "+_16+" was found for MVC.Controller.dispatch.";
-}
-if(!_14){
-_14="index";
-}
-if(typeof _14=="string"){
-if(!(_14 in _13.prototype)){
-throw "No action named "+_14+" was found for "+_16+".";
+if(typeof _12=="string"){
+if(!(_12 in this.prototype)){
+throw "No action named "+_12+" was found for "+this.Class.className+" controller.";
 }
 }else{
-_14=_14.name;
+_12=_12.name;
 }
-var _17=new _13();
-_17.params=_15;
-_17.action_name=_14;
-_17.controller_name=_13.className;
-return MVC.Controller._dispatch_action(_17,_14,_15);
-},_dispatch_action:function(_18,_19,_1a){
-return _18[_19](_1a);
-},controllers:[],actions:[]},{continue_to:function(_1b){
-if(!_1b){
-_1b=this.action.name+"ing";
+var _14=this._get_instance(_12,_13);
+return this._dispatch_action(_14,_12,_13);
+},_get_instance:function(_15,_16){
+return new this(_15,_16);
+},_dispatch_action:function(_17,_18,_19){
+_17.params=_19;
+_17.action_name=_18;
+return _17[_18](_19);
+},controllers:{},actions:[],publish:function(_1a,_1b){
+OpenAjax.hub.publish(_1a,_1b);
+},get_controller_with_name_and_action:function(_1c,_1d){
+var _1e=MVC.Controller.controllers[_1c];
+if(!_1e){
+return null;
 }
-if(typeof this[_1b]!="function"){
-throw "There is no action named "+_1b+". ";
+for(var i=0;i<_1e.length;i++){
+var _20=_1e[i];
+if(_20.prototype[_1d]){
+return _20;
+}
+}
+return null;
+}},{continue_to:function(_21){
+if(!_21){
+_21=this.action_name+"ing";
+}
+if(typeof this[_21]!="function"){
+throw "There is no action named "+_21+". ";
 }
 return MVC.Function.bind(function(){
-this.action_name=_1b;
-this[_1b].apply(this,arguments);
+this.action_name=_21;
+this[_21].apply(this,arguments);
 },this);
-},delay:function(_1c,_1d){
-if(typeof this[_1d]!="function"){
-throw "There is no action named "+actaction_nameion+". ";
+},delay:function(_22,_23,_24){
+if(typeof this[_23]!="function"){
+throw "There is no action named "+_23+". ";
 }
 return setTimeout(MVC.Function.bind(function(){
-this.action_name=_1d;
-this[_1d].apply(this,arguments);
-},this),_1c);
-},dispatch_delay:function(_1e,_1f,_20){
-var _21=_1f.controller?_1f.controller:this.Class.className;
-_1f=typeof _1f=="string"?_1f:_1f.action;
-return setTimeout(function(){
-MVC.Controller.dispatch(_21,_1f,_20);
-},_1e);
+this.Class._dispatch_action(this,_23,_24);
+},this),_22);
+},publish:function(_25,_26){
+this.Class.publish(_25,_26);
 }});
 MVC.Controller.Action=MVC.Class.extend({init:function(){
 if(this.matches){
 MVC.Controller.actions.push(this);
 }
-}},{init:function(_22,f,_24){
-this.action=_22;
+}},{init:function(_27,f,_29){
+this.action=_27;
 this.func=f;
-this.controller=_24;
+this.controller=_29;
 }});
-MVC.Controller.DelegateAction=MVC.Controller.Action.extend({match:new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),matches:function(_25){
-return this.match.exec(_25);
-}},{init:function(_26,f,_28){
-this._super(_26,f,_28);
+MVC.Controller.SubscribeAction=MVC.Controller.Action.extend({match:new RegExp("(.*?)\\s?(subscribe)$"),matches:function(_2a){
+return this.match.exec(_2a);
+}},{init:function(_2b,f,_2d){
+this._super(_2b,f,_2d);
+this.message();
+OpenAjax.hub.subscribe(this.message_name,this.controller.subscribe_closure(_2b));
+},message:function(){
+this.parts=this.action.match(this.Class.match);
+this.message_name=this.parts[1];
+}});
+MVC.Controller.DelegateAction=MVC.Controller.Action.extend({match:new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),matches:function(_2e){
+return this.match.exec(_2e);
+}},{init:function(_2f,f,_31){
+this._super(_2f,f,_31);
 this.css_and_event();
-var _29=this.selector();
-if(_29!=null){
-new MVC.Delegator(_29,this.event_type,this.controller.dispatch_closure(_28.className,_26));
+var _32=this.selector();
+if(_32!=null){
+new MVC.Delegator(_32,this.event_type,this.controller.dispatch_closure(_2f));
 }
 },css_and_event:function(){
 this.parts=this.action.match(this.Class.match);
-this.css=this.parts[1];
+this.css=this.parts[1]||"";
 this.event_type=this.parts[2];
 },main_controller:function(){
 if(!this.css&&MVC.Array.include(["blur","focus"],this.event_type)){
-MVC.Event.observe(window,this.event_type,MVC.Controller.event_closure(this.controller,this.event_type,window));
+MVC.Event.observe(window,this.event_type,this.controller.event_closure(this.event_type,window));
 return;
 }
 return this.css;
 },plural_selector:function(){
 if(this.css=="#"||this.css.substring(0,2)=="# "){
-var _2a=this.css.substring(2,this.css.length);
-return "#"+this.controller.className+(_2a?" "+_2a:"");
+var _33=this.css.substring(2,this.css.length);
+return "#"+this.controller.className+(_33?" "+_33:"");
 }else{
 return "."+MVC.String.singularize(this.controller.className)+(this.css?" "+this.css:"");
 }
@@ -1062,7 +1044,7 @@ return "."+MVC.String.singularize(this.controller.className)+(this.css?" "+this.
 return "#"+this.controller.className+(this.css?" "+this.css:"");
 },selector:function(){
 if(MVC.Array.include(["load","unload","resize","scroll"],this.event_type)){
-MVC.Event.observe(window,this.event_type,MVC.Controller.event_closure(this.controller,this.event_type,window));
+MVC.Event.observe(window,this.event_type,this.controller.event_closure(this.event_type,window));
 return;
 }
 if(this.controller.className=="main"){
@@ -1072,86 +1054,104 @@ this.css_selector=MVC.String.is_singular(this.controller.className)?this.singula
 }
 return this.css_selector;
 }});
-MVC.Controller.Params=function(_2b){
-for(var _2c in _2b){
-if(_2b.hasOwnProperty(_2c)){
-this[_2c]=_2b[_2c];
-}
+MVC.Controller.Params=function(_34){
+var _34=_34||{};
+var _35=false;
+this.kill=function(){
+_35=true;
+if(_34.event&&_34.event.kill){
+_34.event.kill();
 }
 };
-MVC.Controller.Params.prototype={form_params:function(){
-var _2d={};
-if(this.element.nodeName.toLowerCase()!="form"){
-return _2d;
+this.is_killed=function(){
+return _34.event.is_killed?_34.event.is_killed():_35;
+};
+for(var _36 in _34){
+if(_34.hasOwnProperty(_36)){
+this[_36]=_34[_36];
 }
-var els=this.element.elements,_2f=[];
+}
+this.constructor=MVC.Controller.Params;
+};
+MVC.Controller.Params.prototype={form_params:function(){
+var _37={};
+if(this.element.nodeName.toLowerCase()!="form"){
+return _37;
+}
+var els=this.element.elements,_39=[];
 for(var i=0;i<els.length;i++){
 var el=els[i];
 if(el.type.toLowerCase()=="submit"){
 continue;
 }
-var key=el.name||el.id,_33=key.match(/(\w+)/g),_34;
+var key=el.name||el.id,_3d=key.match(/(\w+)/g),_3e;
 if(!key){
 continue;
 }
 switch(el.type.toLowerCase()){
 case "checkbox":
 case "radio":
-_34=!!el.checked;
+_3e=!!el.checked;
 break;
 default:
-_34=el.value;
+_3e=el.value;
 break;
 }
-if(_33.length>1){
-var _35=_33.length-1;
-var _36=_33[0].toString();
-if(!_2d[_36]){
-_2d[_36]={};
+if(_3d.length>1){
+var _3f=_3d.length-1;
+var _40=_3d[0].toString();
+if(!_37[_40]){
+_37[_40]={};
 }
-var _37=_2d[_36];
-for(var k=1;k<_35;k++){
-_36=_33[k];
-if(!_37[_36]){
-_37[_36]={};
+var _41=_37[_40];
+for(var k=1;k<_3f;k++){
+_40=_3d[k];
+if(!_41[_40]){
+_41[_40]={};
 }
-_37=_37[_36];
+_41=_41[_40];
 }
-_37[_33[_35]]=_34;
+_41[_3d[_3f]]=_3e;
 }else{
-if(key in _2d){
-if(typeof _2d[key]=="string"){
-_2d[key]=[_2d[key]];
+if(key in _37){
+if(typeof _37[key]=="string"){
+_37[key]=[_37[key]];
 }
-_2d[key].push(_34);
+_37[key].push(_3e);
 }else{
-_2d[key]=_34;
+_37[key]=_3e;
 }
 }
 }
-return _2d;
+return _37;
 },class_element:function(){
-var _39=this.element;
-var _3a=this._className();
-while(_39&&_39.className.indexOf(_3a)==-1){
-_39=_39.parentNode;
-if(_39==document){
+var _43=this.element;
+var _44=this._className();
+while(_43&&_43.className.indexOf(_44)==-1){
+_43=_43.parentNode;
+if(_43==document){
 return null;
 }
 }
-return _39;
+return _43;
 },is_event_on_element:function(){
 return this.event.target==this.element;
 },_className:function(){
-controller=this.controller;
-var _3b=MVC.String.is_singular(controller)?controller:MVC.String.singularize(controller);
-return _3b;
+return this.controller.singularName;
+},element_instance:function(){
+var _45,_46,_47=this._className();
+if(!(_45=MVC.Model.models[_47])){
+throw "No model for the "+_47+" controller!";
+}
+_46=new RegExp("^"+_47+"_(.*)$");
+var id=this.class_element().id.match(_46)[1];
+return _45.store.find_one(id);
 }};
 if(!MVC._no_conflict&&typeof Controller=="undefined"){
 Controller=MVC.Controller;
 }
 ;
-include.set_path('../../jmvc/plugins/controller');
+include.set_path('jmvc/plugins/controller');
 MVC.Delegator=function(_1,_2,f){
 this._event=_2;
 this._selector=_1;
@@ -1179,7 +1179,6 @@ if(_7==null){
 return [];
 }
 }
-_6.push(_5);
 return _6;
 },dispatch_event:function(_8){
 var _9=_8.target,_a=false,_b=true,_c=[];
@@ -1195,7 +1194,7 @@ _c.push(_11);
 if(_c.length==0){
 return true;
 }
-MVC.Controller.add_kill_event(_8);
+MVC.Delegator.add_kill_event(_8);
 _c.sort(MVC.Delegator.sort_by_order);
 var _12;
 for(var m=0;m<_c.length;m++){
@@ -1204,6 +1203,30 @@ _b=_12.delegation_event._func({event:_8,element:_12.node})&&_b;
 if(_8.is_killed()){
 return false;
 }
+}
+},add_kill_event:function(_14){
+if(!_14.kill){
+var _15=false;
+_14.kill=function(){
+_15=true;
+if(!_14){
+_14=window.event;
+}
+try{
+_14.cancelBubble=true;
+if(_14.stopPropagation){
+_14.stopPropagation();
+}
+if(_14.preventDefault){
+_14.preventDefault();
+}
+}
+catch(e){
+}
+};
+_14.is_killed=function(){
+return _15;
+};
 }
 },sort_by_order:function(a,b){
 if(a.order<b.order){
@@ -1234,10 +1257,10 @@ return "deactivate";
 return this._event;
 },capture:function(){
 return MVC.Array.include(["focus","blur"],this._event);
-},add_to_delegator:function(_18,_19,_1a){
-var s=_18||this._selector;
-var e=_19||this.event();
-var f=_1a||this._func;
+},add_to_delegator:function(_1a,_1b,_1c){
+var s=_1a||this._selector;
+var e=_1b||this.event();
+var f=_1c||this._func;
 if(!MVC.Delegator.events[e]){
 MVC.Event.observe(document.documentElement,e,MVC.Delegator.dispatch_event,this.capture());
 MVC.Delegator.events[e]=[];
@@ -1246,23 +1269,23 @@ MVC.Delegator.events[e].push(this);
 },submit_for_ie:function(){
 this.add_to_delegator(null,"click");
 this.add_to_delegator(null,"keypress");
-this.filters={click:function(el,_1f,_20){
+this.filters={click:function(el,_21,_22){
 if(el.nodeName.toUpperCase()=="INPUT"&&el.type.toLowerCase()=="submit"){
-for(var e=0;e<_20.length;e++){
-if(_20[e].tag=="FORM"){
+for(var e=0;e<_22.length;e++){
+if(_22[e].tag=="FORM"){
 return true;
 }
 }
 }
 return false;
-},keypress:function(el,_23,_24){
+},keypress:function(el,_25,_26){
 if(el.nodeName.toUpperCase()!="INPUT"){
 return false;
 }
-var res=typeof Prototype!="undefined"?(_23.keyCode==13):(_23.charCode==13);
+var res=typeof Prototype!="undefined"?(_25.keyCode==13):(_25.charCode==13);
 if(res){
-for(var e=0;e<_24.length;e++){
-if(_24[e].tag=="FORM"){
+for(var e=0;e<_26.length;e++){
+if(_26[e].tag=="FORM"){
 return true;
 }
 }
@@ -1271,7 +1294,7 @@ return false;
 }};
 },change_for_ie:function(){
 this.add_to_delegator(null,"click");
-this.end_filters={click:function(el,_28){
+this.end_filters={click:function(el,_2a){
 if(typeof el.selectedIndex=="undefined"||el.nodeName.toUpperCase()!="SELECT"){
 return false;
 }
@@ -1288,8 +1311,8 @@ return true;
 }
 }};
 },change_for_webkit:function(){
-this.controller.add_register_action(this,document.documentElement,"change");
-this.end_filters={change:function(el,_2b){
+this.add_to_delegator(null,"change");
+this.end_filters={change:function(el,_2d){
 if(typeof el.value=="undefined"){
 return false;
 }
@@ -1299,69 +1322,69 @@ return el.value!=old;
 }};
 },context_for_opera:function(){
 this.add_to_delegator(null,"click");
-this.end_filters={click:function(el,_2e){
-return _2e.shiftKey;
+this.end_filters={click:function(el,_30){
+return _30.shiftKey;
 }};
 },regexp_patterns:{tag:/^\s*(\*|[\w\-]+)(\b|$)?/,id:/^#([\w\-\*]+)(\b|$)/,className:/^\.([\w\-\*]+)(\b|$)/},selector_order:function(){
 if(this.order){
 return this.order;
 }
-var _2f=this._selector.split(/\s+/);
-var _30=this.regexp_patterns;
-var _31=[];
-for(var i=0;i<_2f.length;i++){
-var v={},r,p=_2f[i];
-for(var _36 in _30){
-if(_30.hasOwnProperty(_36)){
-if((r=p.match(_30[_36]))){
-if(_36=="tag"){
-v[_36]=r[1].toUpperCase();
+var _31=this._selector.split(/\s+/);
+var _32=this.regexp_patterns;
+var _33=[];
+for(var i=0;i<_31.length;i++){
+var v={},r,p=_31[i];
+for(var _38 in _32){
+if(_32.hasOwnProperty(_38)){
+if((r=p.match(_32[_38]))){
+if(_38=="tag"){
+v[_38]=r[1].toUpperCase();
 }else{
-v[_36]=r[1];
+v[_38]=r[1];
 }
 p=p.replace(r[0],"");
 }
 }
 }
-_31.push(v);
+_33.push(v);
 }
-this.order=_31;
+this.order=_33;
 return this.order;
-},match:function(el,_38,_39){
-if(this.filters&&!this.filters[_38.type](el,_38,_39)){
+},match:function(el,_3a,_3b){
+if(this.filters&&!this.filters[_3a.type](el,_3a,_3b)){
 return null;
 }
-var _3a=0;
-for(var n=0;n<_39.length;n++){
-var _3c=_39[n],_3d=this.selector_order()[_3a],_3e=true;
-for(var _3f in _3d){
-if(!_3d.hasOwnProperty(_3f)||_3f=="element"){
+var _3c=0;
+for(var n=0;n<_3b.length;n++){
+var _3e=_3b[n],_3f=this.selector_order()[_3c],_40=true;
+for(var _41 in _3f){
+if(!_3f.hasOwnProperty(_41)||_41=="element"){
 continue;
 }
-if(_3d[_3f]&&_3f=="className"){
-if(!MVC.Array.include(_3c.className.split(" "),_3d[_3f])){
-_3e=false;
+if(_3f[_41]&&_41=="className"){
+if(!MVC.Array.include(_3e.className.split(" "),_3f[_41])){
+_40=false;
 }
 }else{
-if(_3d[_3f]&&_3c[_3f]!=_3d[_3f]){
-_3e=false;
+if(_3f[_41]&&_3e[_41]!=_3f[_41]){
+_40=false;
 }
 }
 }
-if(_3e){
-_3a++;
-if(_3a>=this.selector_order().length){
-if(this.end_filters&&!this.end_filters[_38.type](el,_38)){
+if(_40){
+_3c++;
+if(_3c>=this.selector_order().length){
+if(this.end_filters&&!this.end_filters[_3a.type](el,_3a)){
 return null;
 }
-return {node:_3c.element,order:n,delegation_event:this};
+return {node:_3e.element,order:n,delegation_event:this};
 }
 }
 }
 return null;
 }};
 ;
-include.set_path('../../jmvc/plugins/controller/view');
+include.set_path('jmvc/plugins/controller/view');
 MVC.Controller.prototype.render=function(_1){
 var _2,_3=MVC.RENDER_TO,_4;
 var _5=this.Class.className;
@@ -1388,15 +1411,15 @@ var _b=_b+".ejs";
 return _b;
 };
 if(_1.plugin){
-_4="jmvc/plugins/"+_1.plugin;
+_4="../jmvc/plugins/"+_1.plugin;
 }
 if(_1.action){
-var _c="views/"+_a(_1.action);
+var _c="../views/"+_a(_1.action);
 }else{
 if(_1.partial){
-var _c="views/"+_a(_1.partial);
+var _c="../views/"+_a(_1.partial);
 }else{
-var _c="views/"+_5+"/"+_6.replace(/\.|#/g,"").replace(/ /g,"_")+".ejs";
+var _c="../views/"+_5+"/"+_6.replace(/\.|#/g,"").replace(/ /g,"_")+".ejs";
 }
 }
 var _d=this;
@@ -1407,7 +1430,7 @@ _d[_e]=_1.locals[_e];
 }
 var _f;
 if(!_4){
-_f=new MVC.View({url:_c});
+_f=new MVC.View({url:new MVC.File(_c).join_from(this.Class._path)});
 }else{
 try{
 var _f=new MVC.View({url:MVC.View.get(_4)?_4:_c});
@@ -1453,11 +1476,33 @@ MVC.$E.insert(_11,opt);
 return _2;
 };
 ;
-include.set_path('../../jmvc/plugins/dom/element');
-include("vector");
+include.set_path('jmvc/plugins/dom/element');
+include.plugins("lang/vector");
 include("element");
 ;
-include.set_path('../../jmvc/plugins/dom/element');
+include.set_path('jmvc/plugins/lang/vector');
+include.plugins("lang","dom/event");
+include("vector");
+;
+include.set_path('jmvc/plugins/lang');
+if(typeof Prototype!="undefined"){
+include({path:"prototype_helpers.js",shrink_variables:false});
+}else{
+if(typeof jQuery!="undefined"){
+include({path:"jquery_helpers.js",shrink_variables:false});
+}else{
+include({path:"standard_helpers.js",shrink_variables:false});
+}
+}
+;
+include.set_path('jmvc/plugins/dom/event');
+if(typeof Prototype=="undefined"){
+include("standard");
+}else{
+include("prototype_event");
+}
+;
+include.set_path('jmvc/plugins/lang/vector');
 MVC.Vector=function(){
 this.update(MVC.Array.from(arguments));
 };
@@ -1506,7 +1551,7 @@ MVC.Event.pointer=function(_f){
 return new MVC.Vector(_f.pageX||(_f.clientX+(document.documentElement.scrollLeft||document.body.scrollLeft)),_f.pageY||(_f.clientY+(document.documentElement.scrollTop||document.body.scrollTop)));
 };
 ;
-include.set_path('../../jmvc/plugins/dom/element');
+include.set_path('jmvc/plugins/dom/element');
 MVC.Element=function(_1){
 if(typeof _1=="string"){
 _1=document.getElementById(_1);
@@ -1656,76 +1701,81 @@ _33+=_31.scrollLeft||0;
 _31=_31.parentNode;
 }while(_31);
 return new MVC.Vector(_33,_32);
-},is_parent:function(_34,_35){
-if(typeof _35=="string"){
-_35=MVC.$E(_35);
-}
-if(!_35.parentNode||_35==_34){
-return false;
-}
-if(_35.parentNode==_34){
-return true;
-}
-return MVC.Element.is_parent(_35.parentNode,_34);
-},has:function(_36,b){
+},has:function(_34,b){
 if(typeof b=="string"){
 b=MVC.$E(b);
 }
-return _36.contains?_36!=b&&_36.contains(b):!!(_36.compareDocumentPosition(b)&16);
-},update:function(_38,_39){
-_38=MVC.$E(_38);
-var _3a=_38.tagName.toUpperCase();
-if((!MVC.Browser.IE&&!MVC.Browser.Opera)||!(_3a in MVC.$E._insertionTranslations.tags)){
-_38.innerHTML=_39;
+return _34.contains?_34!=b&&_34.contains(b):!!(_34.compareDocumentPosition(b)&16);
+},update:function(_36,_37){
+_36=MVC.$E(_36);
+var _38=_36.tagName.toUpperCase();
+if((!MVC.Browser.IE&&!MVC.Browser.Opera)||!(_38 in MVC.$E._insertionTranslations.tags)){
+_36.innerHTML=_37;
 }else{
-var _3b;
-while((_3b=_38.childNodes[0])){
-_38.removeChild(_3b);
+var _39;
+while((_39=_36.childNodes[0])){
+_36.removeChild(_39);
 }
-var _3c=MVC.$E._getContentFromAnonymousElement(_3a,_39);
-for(var c=0;c<_3c.length;c++){
-_38.appendChild(_3c[c]);
+var _3a=MVC.$E._getContentFromAnonymousElement(_38,_37);
+for(var c=0;c<_3a.length;c++){
+_36.appendChild(_3a[c]);
 }
 }
-return _38;
-},remove:function(_3e){
-return _3e.parentNode.removeChild(_3e);
-},dimensions:function(_3f){
-var _40=_3f.style.display;
-if(_40!="none"&&_40!=null){
-return new MVC.Vector(_3f.offsetWidth,_3f.offsetHeight);
+return _36;
+},remove:function(_3c){
+return _3c.parentNode.removeChild(_3c);
+},dimensions:function(_3d){
+var _3e=_3d.style.display;
+if(_3e!="none"&&_3e!=null){
+return new MVC.Vector(_3d.offsetWidth,_3d.offsetHeight);
 }
-var els=_3f.style;
-var _42=els.visibility;
-var _43=els.position;
-var _44=els.display;
+var els=_3d.style;
+var _40=els.visibility;
+var _41=els.position;
+var _42=els.display;
 els.visibility="hidden";
 els.position="absolute";
 els.display="block";
-var _45=_3f.clientWidth;
-var _46=_3f.clientHeight;
-els.display=_44;
-els.position=_43;
-els.visibility=_42;
-return new MVC.Vector(_45,_46);
+var _43=_3d.clientWidth;
+var _44=_3d.clientHeight;
+els.display=_42;
+els.position=_41;
+els.visibility=_40;
+return new MVC.Vector(_43,_44);
+},add_class:function(_45,_46){
+var cns=_45.className.split(/\s+/);
+if(MVC.Array.include(cns,_46)){
+return;
+}
+cns.push(_46);
+_45.className=cns.join(" ");
+},remove_class:function(_48,_49){
+var cns=_48.className.split(/\s+/);
+var _4b=[];
+for(var i=0;i<cns.length;i++){
+if(cns[i]!=_49){
+_4b.push(cns[i]);
+}
+}
+_48.className=_4b.join(" ");
 }});
 MVC.Element.extend=function(el){
 for(var f in MVC.Element){
 if(!MVC.Element.hasOwnProperty(f)){
 continue;
 }
-var _49=MVC.Element[f];
-if(typeof _49=="function"){
+var _4f=MVC.Element[f];
+if(typeof _4f=="function"){
 if(f[0]!="_"){
-MVC.Element._extend(_49,f,el);
+MVC.Element._extend(_4f,f,el);
 }
 }
 }
 el._mvcextend=true;
 return el;
 };
-MVC.Element._extend=function(f,_4b,el){
-el[_4b]=function(){
+MVC.Element._extend=function(f,_51,el){
+el[_51]=function(){
 var arg=MVC.Array.from(arguments);
 arg.unshift(el);
 return f.apply(el,arg);
@@ -1736,7 +1786,7 @@ if(!MVC._no_conflict){
 $E=MVC.$E;
 }
 ;
-include.set_path('../../jmvc/plugins/controller/scaffold');
+include.set_path('jmvc/plugins/controller/scaffold');
 MVC.Controller.scaffold=function(){
 if(!this.className){
 return;
@@ -1757,17 +1807,18 @@ this.scaffold_view_helper=window[_1+"ViewHelper"];
 }
 };
 MVC.Controller.scaffold.functions={load:function(_3){
-if(!MVC.$E(this.controller_name)){
+if(!MVC.$E(this.Class.className)){
 var _4=document.createElement("div");
-_4.id=this.controller_name;
+_4.id=this.Class.className;
 document.body.appendChild(_4);
 }
 this.Class.scaffold_model.find("all",{},this.continue_to("list"));
 },list:function(_5){
 this.singular_name=this.Class.singular_name;
-this[this.controller_name]=_5;
+this[this.Class.className]=_5;
+this.controller_name=this.Class.className;
 this.objects=_5;
-this.render({to:this.controller_name,plugin:"controller/scaffold/display",action:this.controller_name});
+this.render({to:this.Class.className,plugin:"controller/scaffold/display",action:this.Class.className});
 },"# form submit":function(_6){
 _6.event.kill();
 this.Class.scaffold_model.create(_6.form_params()[this.Class.singular_name],this.continue_to("created"));
@@ -1777,7 +1828,7 @@ _7.View().show_errors();
 }else{
 this.Class.scaffold_model.View().clear();
 _7.View().clear_errors();
-this[this.controller_name]=[_7];
+this[this.Class.className]=[_7];
 this.objects=[_7];
 this.singular_name=this.Class.singular_name;
 this.render({bottom:"recipe_list",plugin:"controller/scaffold/list",action:"list"});
@@ -1807,11 +1858,11 @@ this[this.Class.singular_name].View().destroy();
 }
 }};
 ;
-include.set_path('../../jmvc/plugins/view/helpers');
+include.set_path('jmvc/plugins/view/helpers');
 include.plugins("view");
 include("view_helpers");
 ;
-include.set_path('../../jmvc/plugins/view');
+include.set_path('jmvc/plugins/view');
 include.plugins("lang");
 include("view");
 if(include.get_env()=="development"){
@@ -1821,40 +1872,176 @@ if(MVC.Controller){
 include.plugins("controller/view");
 }
 ;
-include.set_path('../../jmvc/plugins/lang');
-if(typeof Prototype!="undefined"){
-include({path:"prototype_helpers.js",shrink_variables:false});
-}else{
-if(typeof jQuery!="undefined"){
-include({path:"jquery_helpers.js",shrink_variables:false});
-}else{
-include({path:"standard_helpers.js",shrink_variables:false});
-}
-}
-;
-include.set_path('../../jmvc/plugins/controller/view');
+include.set_path('jmvc/plugins/controller/view');
 include.plugins("view","controller");
 include("controller_view");
 ;
-include.set_path('../../jmvc/plugins/controller');
-include.plugins("lang","lang/inflector","dom/event","lang/class");
+include.set_path('jmvc/plugins/controller');
+include.plugins("lang","lang/inflector","dom/event","lang/class","lang/openajax");
 include("delegator","controller");
 if(MVC.View){
 include.plugins("controller/view");
 }
 ;
-include.set_path('../../jmvc/plugins/lang/inflector');
+include.set_path('jmvc/plugins/lang/inflector');
 include.plugins("lang");
 include("inflector");
 ;
-include.set_path('../../jmvc/plugins/dom/event');
-if(typeof Prototype=="undefined"){
-include("standard");
-}else{
-include("prototype_event");
+include.set_path('jmvc/plugins/lang/openajax');
+if(!window["OpenAjax"]){
+OpenAjax=new function(){
+var t=true;
+var f=false;
+var g=window;
+var _4="org.openajax.hub.";
+var h={};
+this.hub=h;
+h.implementer="http://openajax.org";
+h.implVersion="1.0";
+h.specVersion="1.0";
+h.implExtraData={};
+var _6={};
+h.libraries=_6;
+h.registerLibrary=function(_7,_8,_9,_a){
+_6[_7]={prefix:_7,namespaceURI:_8,version:_9,extraData:_a};
+this.publish(_4+"registerLibrary",_6[_7]);
+};
+h.unregisterLibrary=function(_b){
+this.publish(_4+"unregisterLibrary",_6[_b]);
+delete _6[_b];
+};
+h._subscriptions={c:{},s:[]};
+h._cleanup=[];
+h._subIndex=0;
+h._pubDepth=0;
+h.subscribe=function(_c,_d,_e,_f,_10){
+if(!_e){
+_e=window;
 }
+var _11=_c+"."+this._subIndex;
+var sub={scope:_e,cb:_d,fcb:_10,data:_f,sid:this._subIndex++,hdl:_11};
+var _13=_c.split(".");
+this._subscribe(this._subscriptions,_13,0,sub);
+return _11;
+};
+h.publish=function(_14,_15){
+var _16=_14.split(".");
+this._pubDepth++;
+this._publish(this._subscriptions,_16,0,_14,_15);
+this._pubDepth--;
+if((this._cleanup.length>0)&&(this._pubDepth==0)){
+for(var i=0;i<this._cleanup.length;i++){
+this.unsubscribe(this._cleanup[i].hdl);
+}
+delete (this._cleanup);
+this._cleanup=[];
+}
+};
+h.unsubscribe=function(sub){
+var _19=sub.split(".");
+var sid=_19.pop();
+this._unsubscribe(this._subscriptions,_19,0,sid);
+};
+h._subscribe=function(_1b,_1c,_1d,sub){
+var _1f=_1c[_1d];
+if(_1d==_1c.length){
+_1b.s.push(sub);
+}else{
+if(typeof _1b.c=="undefined"){
+_1b.c={};
+}
+if(typeof _1b.c[_1f]=="undefined"){
+_1b.c[_1f]={c:{},s:[]};
+this._subscribe(_1b.c[_1f],_1c,_1d+1,sub);
+}else{
+this._subscribe(_1b.c[_1f],_1c,_1d+1,sub);
+}
+}
+};
+h._publish=function(_20,_21,_22,_23,msg,pcb,_26){
+if(typeof _20!="undefined"){
+var _27;
+if(_22==_21.length){
+_27=_20;
+}else{
+this._publish(_20.c[_21[_22]],_21,_22+1,_23,msg,pcb,_26);
+this._publish(_20.c["*"],_21,_22+1,_23,msg,pcb,_26);
+_27=_20.c["**"];
+}
+if(typeof _27!="undefined"){
+var _28=_27.s;
+var max=_28.length;
+for(var i=0;i<max;i++){
+if(_28[i].cb){
+var sc=_28[i].scope;
+var cb=_28[i].cb;
+var fcb=_28[i].fcb;
+var d=_28[i].data;
+var sid=_28[i].sid;
+var _30=_28[i].cid;
+if(typeof cb=="string"){
+cb=sc[cb];
+}
+if(typeof fcb=="string"){
+fcb=sc[fcb];
+}
+if((!fcb)||(fcb.call(sc,_23,msg,d))){
+if((!pcb)||(pcb(_23,msg,_26,_30))){
+cb.call(sc,_23,msg,d,sid);
+}
+}
+}
+}
+}
+}
+};
+h._unsubscribe=function(_31,_32,_33,sid){
+if(typeof _31!="undefined"){
+if(_33<_32.length){
+var _35=_31.c[_32[_33]];
+this._unsubscribe(_35,_32,_33+1,sid);
+if(_35.s.length==0){
+for(var x in _35.c){
+return;
+}
+delete _31.c[_32[_33]];
+}
+return;
+}else{
+var _37=_31.s;
+var max=_37.length;
+for(var i=0;i<max;i++){
+if(sid==_37[i].sid){
+if(this._pubDepth>0){
+_37[i].cb=null;
+this._cleanup.push(_37[i]);
+}else{
+_37.splice(i,1);
+}
+return;
+}
+}
+}
+}
+};
+h.reinit=function(){
+for(var lib in OpenAjax.hub.libraries){
+delete OpenAjax.hub.libraries[lib];
+}
+OpenAjax.hub.registerLibrary("OpenAjax","http://openajax.org/hub","1.0",{});
+delete OpenAjax._subscriptions;
+OpenAjax._subscriptions={c:{},s:[]};
+delete OpenAjax._cleanup;
+OpenAjax._cleanup=[];
+OpenAjax._subIndex=0;
+OpenAjax._pubDepth=0;
+};
+};
+OpenAjax.hub.registerLibrary("OpenAjax","http://openajax.org/hub","1.0",{});
+}
+OpenAjax.hub.registerLibrary("JavaScriptMVC","http://JavaScriptMVC.com","1.5",{});
 ;
-include.set_path('../../jmvc/plugins/view/helpers');
+include.set_path('jmvc/plugins/view/helpers');
 MVC.Object.extend(MVC.View.Helpers.prototype,{check_box_tag:function(_1,_2,_3,_4){
 _3=_3||{};
 if(_4){
@@ -2041,47 +2228,47 @@ return MVC.View.Helpers.get_data(el);
 };
 })();
 ;
-include.set_path('../../jmvc/plugins/controller/comet');
+include.set_path('jmvc/plugins/controller/comet');
 include.plugins("io/comet");
 include("comet_controller");
 ;
-include.set_path('../../jmvc/plugins/controller/comet');
+include.set_path('jmvc/plugins/controller/comet');
 MVC.CometController=MVC.Controller.extend({init:function(){
-},run:function(){
-var _1=new this();
-_1.run();
-},kill:function(){
+},run:function(_1){
 var _2=new this();
-_2.kill();
-},convert:function(_3){
-return _3;
-},set_wait_time:function(_4){
-this._wait_time=_4*1000;
+_2.run(_1);
+},kill:function(){
+var _3=new this();
+_3.kill();
+},convert:function(_4){
+return _4;
+},set_wait_time:function(_5){
+this._wait_time=_5*1000;
 if(this._comet){
 this._comet.poll_now();
 }
 },_wait_time:0,wait_time:function(){
 return this._wait_time;
-},dispatch:function(_5){
-var _6=this.convert(_5);
-for(var _7 in _5){
-if(_7=="responseText"){
+},dispatch:function(_6){
+var _7=this.convert(_6);
+for(var _8 in _6){
+if(_8=="responseText"){
 continue;
 }
-var _8=_5[_7];
-for(var _9 in _8){
-var _a=_8[_9];
-if(this.models_map[_7]!=null){
-if(this.models_map[_7]!=false){
-_a=this.models_map[_7].create_many_as_existing(_a);
+var _9=_6[_8];
+for(var _a in _9){
+var _b=_9[_a];
+if(this.models_map[_8]!=null){
+if(this.models_map[_8]!=false){
+_b=this.models_map[_8].create_many_as_existing(_b);
 }
 }else{
-if(MVC.Model.models[_7.toLowerCase()]){
-_a=MVC.Model.models[_7.toLowerCase()].create_many_as_existing(_a);
+if(MVC.Model.models[_8.toLowerCase()]){
+_b=MVC.Model.models[_8.toLowerCase()].create_many_as_existing(_b);
 }
 }
-var _b=this.controller_map[_7]?this.controller_map[_7]:MVC.String.pluralize(_7).toLowerCase();
-MVC.Controller.dispatch(_b,_9,_a);
+var _c=this.controller_map[_8]?this.controller_map[_8]:MVC.String.pluralize(_8).toLowerCase();
+MVC.Controller.publish(_c+"."+_a,{data:_b});
 }
 }
 },controller_map:{},error_mode:false},{run:function(){
@@ -2091,8 +2278,8 @@ this.Class._comet=new MVC.Comet((this.Class.domain?this.Class.domain:"")+"/"+thi
 },failure:function(){
 this.error_mode=true;
 this.run();
-},success:function(_c){
-this.Class.dispatch(_c);
+},success:function(_d){
+this.Class.dispatch(_d);
 },complete:function(){
 if(this.error_mode&&this.restore_from_failure){
 this.restore_from_failure();
@@ -2104,31 +2291,184 @@ this.Class._comet.kill();
 }
 }});
 ;
-include.set_path('../../jmvc/plugins/controller/dragdrop');
-include.plugins("controller","dom/element","dom/query","dom/position");
+include.set_path('jmvc/plugins/controller/dragdrop');
+include.plugins("controller","dom/element","dom/query","dom/position","dom/animate");
 include("drag","drop");
 ;
-include.set_path('../../jmvc/plugins/dom/position');
+include.set_path('jmvc/plugins/dom/position');
 MVC.Position={prepare:function(){
+var _1=this.deltaX,_2=this.deltaY;
 this.deltaX=window.pageXOffset||document.documentElement.scrollLeft||document.body.scrollLeft||0;
 this.deltaY=window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop||0;
-},within:function(_1,x,y){
+this._static=((_1-this.deltaX)==0)&&((_2-this.deltaY)==0);
+return this._static;
+},within:function(_3,x,y){
 if(this.includeScrollOffsets){
-return this.withinIncludingScrolloffsets(_1,x,y);
+return this.withinIncludingScrolloffsets(_3,x,y);
 }
 this.xcomp=x;
 this.ycomp=y;
-this.offset=MVC.Element.cumulative_offset(_1);
-return (y>=this.offset[1]&&y<this.offset[1]+_1.offsetHeight&&x>=this.offset[0]&&x<this.offset[0]+_1.offsetWidth);
-},withinIncludingScrolloffsets:function(_4,x,y){
-var _7=MVC.Element.cumulative_scroll_offset(_4);
-this.xcomp=x+_7[0]-this.deltaX;
-this.ycomp=y+_7[1]-this.deltaY;
-this.offset=MVC.Element.cumulative_offset(_4);
-return (this.ycomp>=this.offset[1]&&this.ycomp<this.offset[1]+_4.offsetHeight&&this.xcomp>=this.offset[0]&&this.xcomp<this.offset[0]+_4.offsetWidth);
+this.offset=MVC.Element.cumulative_offset(_3);
+return (y>=this.offset[1]&&y<this.offset[1]+_3.offsetHeight&&x>=this.offset[0]&&x<this.offset[0]+_3.offsetWidth);
+},withinIncludingScrolloffsets:function(_6,x,y,_9){
+_9=_9||{};
+var _a=this._static&&_9._cache&&_9._cumulative_scroll_offset&&_9._cumulative_offset;
+if(!_a){
+_9._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_6);
+_9._cumulative_offset=MVC.Element.cumulative_offset(_6);
+}
+var _b=x+_9._cumulative_scroll_offset[0]-this.deltaX;
+var _c=y+_9._cumulative_scroll_offset[1]-this.deltaY;
+return this.within_box(_b,_c,_9._cumulative_offset[0],_9._cumulative_offset[1],_6.offsetWidth,_6.offsetHeight);
+},withinBoxIncludingScrollingOffsets:function(_d,_e,_f,_10,_11,_12){
+_12=_12||{};
+var _13=this._static&&_12._cache&&_12._cumulative_scroll_offset&&_12._cumulative_offset;
+if(!_13){
+_12._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_d);
+_12._cumulative_offset=MVC.Element.cumulative_offset(_d);
+}
+var ex=_12._cumulative_offset[0];
+var ey=_12._cumulative_offset[1];
+var ew=_d.clientWidth,eh=_d.clientHeight;
+return !((ey>_f+_11)||(ey+eh<_f)||(ex>_e+_10)||(ex+ew<_e));
+},within_box:function(x,y,_1a,top,_1c,_1d){
+return (y>=top&&y<top+_1d&&x>=_1a&&x<_1a+_1c);
+},event_position_relative_to_element:function(_1e,_1f,_20){
+_20=_20||{};
+var _21=this._static&&_20._cache&&_20._cumulative_scroll_offset&&_20._cumulative_offset;
+if(!_21){
+_20._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_1e);
+_20._cumulative_offset=MVC.Element.cumulative_offset(_1e);
+}
+var _22=MVC.Event.pointer(_1f);
+var _23=_22.x()+_20._cumulative_scroll_offset[0]-this.deltaX;
+var _24=_22.y()+_20._cumulative_scroll_offset[1]-this.deltaY;
+return new MVC.Vector(_23-_20._cumulative_offset[0],_24-_20._cumulative_offset[1]);
+},window_dimensions:function(){
+var de=document.documentElement,st=window.pageYOffset?window.pageYOffset:de.scrollTop,sl=window.pageXOffset?window.pageXOffset:de.scrollLeft;
+var wh=window.innerHeight?window.innerHeight:de.clientHeight,ww=window.innerWidth?window.innerWidth:de.clientWidth;
+if(wh==0){
+wh=document.body.clientHeight;
+ww=document.body.clientWidth;
+}
+return {window_height:wh,window_width:ww,document_height:MVC.Browser.IE?document.body.offsetHeight:de.offsetHeight,document_width:MVC.Browser.IE?document.body.offsetWidth:de.offsetWidth,scroll_left:sl,scroll_top:st,window_right:sl+ww,window_bottom:st+wh};
 }};
 ;
-include.set_path('../../jmvc/plugins/controller/dragdrop');
+include.set_path('jmvc/plugins/dom/animate');
+include.plugins("dom/element","lang/timer");
+include("animate");
+;
+include.set_path('jmvc/plugins/lang/timer');
+MVC.Timer=function(_1){
+_1=_1||{};
+this.time=_1.time||500;
+this.from=_1.from||0;
+this.to=_1.to||1;
+this.interval=_1.interval||1;
+this.update_callback=_1.onUpdate||function(){
+};
+this.complete_callback=_1.onComplete||function(){
+};
+this.distance=this.to-this.from;
+if(_1.easing){
+this.easing=typeof _1.easing=="string"?MVC.Timer.easings[_1.easing]:_1.easing;
+}else{
+this.easing=MVC.Timer.easings.swing;
+}
+};
+MVC.Timer.prototype={start:function(){
+this.start_time=new Date();
+this.timer=setInterval(MVC.Function.bind(this.next_step,this),this.interval);
+},kill:function(){
+clearInterval(this.timer);
+},next_step:function(){
+var _2=new Date();
+var _3=_2-this.start_time;
+var _4;
+if(_3>=this.time){
+_4=this.to;
+this.update_callback(_4);
+this.complete_callback(_4);
+this.kill();
+}else{
+var _5=_3/this.time;
+_4=this.easing(_5,_3,this.from,this.distance);
+this.update_callback(_4);
+}
+}};
+MVC.Timer.easings={linear:function(p,n,_8,_9){
+return _8+_9*p;
+},swing:function(p,n,_c,_d){
+return ((-Math.cos(p*Math.PI)/2)+0.5)*_d+_c;
+}};
+;
+include.set_path('jmvc/plugins/dom/animate');
+MVC.Animate=function(_1,_2,_3,_4,_5){
+_5=_5||function(){
+};
+var _6={};
+var _7;
+for(var _8 in _2){
+_7=_2[_8];
+_6[_8]=new MVC.Animate.Value(_1,_8,_7);
+}
+this.timer=new MVC.Timer({from:0,to:1,time:_3,onUpdate:function(_9){
+for(var _a in _6){
+_1.style[_a]=_6[_a].get(_9);
+}
+},onComplete:function(){
+for(var _b in _6){
+_1.style[_b]=_6[_b].last();
+}
+_5(_1);
+}});
+this.timer.start();
+};
+MVC.Animate.prototype={get_starting_value:function(_c){
+var _d=_c.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/),_e=e.cur(true)||0;
+if(_d){
+var _f=parseFloat(_d[2]),_10=_d[3]||"px";
+if(_10!="px"){
+self.style[name]=(_f||1)+_10;
+_e=((_f||1)/e.cur(true))*_e;
+self.style[name]=_e+_10;
+}
+if(_d[1]){
+_f=((_d[1]=="-="?-1:1)*_f)+_e;
+}
+e.custom(_e,_f,_10);
+}else{
+e.custom(_e,_c,"");
+}
+}};
+MVC.Animate.Value=function(_11,_12,end){
+this.style=_12;
+this.start=parseFloat(MVC.Element.get_style(_11,_12))||0;
+var _14=end.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/);
+if(_14){
+this.end=parseFloat(_14[2]);
+this.unit=_14[3]||"px";
+if(this.unit!="px"){
+_11.style[name]=(end||1)+unit;
+this.start=((end||1)/MVC.Element.get_style(_11,_12))*start;
+_11.style[name]=start+unit;
+}
+if(_14[1]){
+this.end=((_14[1]=="-="?-1:1)*this.end)+this.start;
+}
+}else{
+this.end=end;
+this.unit="px";
+}
+this.distance=this.end-this.start;
+};
+MVC.Animate.Value.prototype={get:function(_15){
+return (this.start+_15*this.distance)+this.unit;
+},last:function(){
+return (this.end)+this.unit;
+}};
+;
+include.set_path('jmvc/plugins/controller/dragdrop');
 MVC.Controller.DragAction=MVC.Controller.DelegateAction.extend({match:new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")},{init:function(_1,f,_3){
 this.action=_1;
 this.func=f;
@@ -2136,171 +2476,224 @@ this.controller=_3;
 this.css_and_event();
 var _4=this.selector();
 if(MVC.Draggable.selectors[_4]){
-MVC.Draggable.selectors[_4].events[this.event_type]=_1;
+MVC.Draggable.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
 return;
 }
-MVC.Draggable.selectors[_4]=new MVC.Delegator(this.selector(),"mousedown",function(_5){
-for(var _6 in MVC.Draggable.selectors[_4].events){
-if(MVC.Draggable.selectors[_4].events.hasOwnProperty(_6)){
-_5[_6]=MVC.Controller.dispatch_closure(_3.className,MVC.Draggable.selectors[_4].events[_6]);
-}
-}
+MVC.Draggable.selectors[_4]=new MVC.Delegator(_4,"mousedown",MVC.Function.bind(this.mousedown,this));
+MVC.Draggable.selectors[_4].callbacks={};
+MVC.Draggable.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
+},mousedown:function(_5){
+MVC.Object.extend(_5,MVC.Draggable.selectors[this.selector()].callbacks);
 MVC.Draggable.current=new MVC.Draggable(_5);
-});
-MVC.Draggable.selectors[_4].events={};
-MVC.Draggable.selectors[_4].events[this.event_type]=_1;
+_5.event.kill();
+return false;
 }});
-MVC.Draggable=function(_7){
-this.element=_7.element;
+MVC.Draggable=function(_6){
+this.element=_6.element;
 this.moved=false;
-this.keep_dragging=true;
-this.mouse_position_on_element=MVC.Event.pointer(_7.event).minus(MVC.Element.cumulative_offset(_7.element));
-this.dragstart=_7.dragstart||function(){
+this._cancelled=false;
+this.mouse_position_on_element=MVC.Event.pointer(_6.event).minus(MVC.Element.cumulative_offset(_6.element));
+this.dragstart=_6.dragstart||MVC.Draggable.k;
+this.dragend=_6.dragend||MVC.Draggable.k;
+this.dragging=_6.dragging||MVC.Draggable.k;
 };
-this.dragend=_7.dragend||function(){
+MVC.Draggable.k=function(){
 };
-this.dragging=_7.dragging||function(){
-};
-};
-MVC.Draggable.prototype={start:function(_8){
-MVC.Element.make_positioned(this.element);
-this.element.style.zIndex=1000;
+MVC.Draggable.prototype={start:function(_7){
 this.moved=true;
-this.keep_dragging=this.dragstart({element:this.element,event:_8});
+this.drag_element=this.element;
+var _8=new MVC.Controller.DragParams({event:_7,element:this.element,drag_element:this.drag_element,drag_action:this});
+this.dragstart(_8);
+if(this._cancelled==true){
+return;
+}
+this.drag_element=_8.drag_element;
+MVC.Element.make_positioned(this.drag_element);
+this.start_position=MVC.Element.cumulative_offset(this.drag_element);
+this.drag_element.style.zIndex=1000;
 MVC.Droppables.compile();
 },currentDelta:function(){
-return new MVC.Vector(parseInt(MVC.Element.get_style(this.element,"left")||"0"),parseInt(MVC.Element.get_style(this.element,"top")||"0"));
+return new MVC.Vector(parseInt(MVC.Element.get_style(this.drag_element,"left")||"0"),parseInt(MVC.Element.get_style(this.drag_element,"top")||"0"));
 },draw:function(_9,_a){
-if(!this.moved||!this.keep_dragging){
+if(!this.moved){
 this.start(_a);
 }
-if(!this.keep_dragging){
+if(this._cancelled){
 return;
 }
 MVC.Position.prepare();
-var _b=MVC.Element.cumulative_offset(this.element).minus(this.currentDelta());
+var _b=MVC.Element.cumulative_offset(this.drag_element).minus(this.currentDelta());
 var p=_9.minus(_b).minus(this.mouse_position_on_element);
-var s=this.element.style;
+var s=this.drag_element.style;
 s.top=p.top()+"px";
 s.left=p.left()+"px";
-MVC.Droppables.show(_9,this.element,_a);
-this.dragging({element:this.element,event:_a});
+var _e=new MVC.Controller.DragParams({event:_a,element:this.element,drag_action:this,drag_element:this.drag_element});
+this.dragging(_e);
+MVC.Droppables.show(_9,this,_a);
+},end:function(_f){
+var _10={element:this.element,event:_f,drag_element:this.drag_element,drag_action:this};
+this.dragend(new MVC.Controller.DragParams(_10));
+MVC.Droppables.fire(_f,this);
+if(this._revert){
+new MVC.Animate(this.drag_element,{top:this.start_position.top(),left:this.start_position.left()},null,null,MVC.Function.bind(this.cleanup,this));
+}else{
+if(this.ghosted_element&&this.element.parentNode){
+MVC.Element.remove(this.element);
+}
+if(this.drag_element!=this.element){
+this.drag_element.style.display="none";
+}
+}
+},cleanup:function(){
+if(this.drag_element!=this.element){
+this.drag_element.style.display="none";
+}
 }};
 MVC.Draggable.selectors={};
 MVC.Draggable.current=null;
-MVC.Event.observe(document,"mousemove",function(_e){
+MVC.Event.observe(document,"mousemove",function(_11){
 if(!MVC.Draggable.current){
 return;
 }
-MVC.Draggable.current.draw(MVC.Event.pointer(_e),_e);
+MVC.Delegator.add_kill_event(_11);
+_11.kill();
+MVC.Draggable.current.draw(MVC.Event.pointer(_11),_11);
+return false;
 });
-MVC.Event.observe(document,"mouseup",function(_f){
-if(MVC.Draggable.current){
-MVC.Draggable.current.dragend({element:MVC.Draggable.current.element,event:_f});
-MVC.Droppables.fire(_f,MVC.Draggable.current.element);
+MVC.Event.observe(document,"mouseup",function(_12){
+MVC.Delegator.add_kill_event(_12);
+if(MVC.Draggable.current&&MVC.Draggable.current.moved){
+MVC.Draggable.current.end(_12);
+MVC.Droppables.clear();
 }
 MVC.Draggable.current=null;
 });
+MVC.Controller.DragParams=MVC.Controller.Params;
+MVC.Controller.DragParams.prototype=new MVC.Controller.Params();
+MVC.Object.extend(MVC.Controller.DragParams.prototype,{cancel_drag:function(){
+this.drag_action._cancelled=true;
+this.drag_action.end(this.event);
+MVC.Droppables.clear();
+MVC.Draggable.current=null;
+},ghost:function(_13){
+var _14=this.element.cloneNode(true);
+MVC.Element.insert(this.element,{after:_14});
+this.drag_element=_14;
+},representitive:function(_15,_16,_17){
+MVC.Position.prepare();
+this._offsetX=_16||0;
+this._offsetY=_17||0;
+var p=MVC.Event.pointer(this.event);
+this.drag_element=MVC.$E(_15);
+var s=this.drag_element.style;
+s.top=(p.top()-_17)+"px";
+s.left=(p.left()-_16)+"px";
+s.display="";
+this.drag_action.mouse_position_on_element=new MVC.Vector(_16,_17);
+},revert:function(){
+this.drag_action._revert=true;
+}});
 ;
-include.set_path('../../jmvc/plugins/controller/dragdrop');
-MVC.Controller.DropAction=MVC.Controller.DelegateAction.extend({match:new RegExp("(.*?)\\s?(dragover|dropped|dragout)$")},{init:function(_1,f,_3){
+include.set_path('jmvc/plugins/controller/dragdrop');
+MVC.Controller.DropAction=MVC.Controller.DelegateAction.extend({match:new RegExp("(.*?)\\s?(dropover|dropped|dropout|dropadd|dropmove)$")},{init:function(_1,f,_3){
 this.action=_1;
 this.func=f;
 this.controller=_3;
 this.css_and_event();
 var _4=this.selector();
-if(MVC.Droppables.selectors[_4]){
-MVC.Droppables.selectors[_4][this.event_type]=MVC.Controller.dispatch_closure(_3.className,_1);
-return;
-}
+if(!MVC.Droppables.selectors[_4]){
 MVC.Droppables.selectors[_4]={};
-MVC.Droppables.selectors[_4][this.event_type]=MVC.Controller.dispatch_closure(_3.className,_1);
+}
+MVC.Droppables.selectors[_4][this.event_type]=_3.dispatch_closure(_1);
 }});
-MVC.Droppables={drops:[],selectors:{},remove:function(_5){
-this.drops=this.drops.reject(function(d){
-return d.element==$(_5);
-});
-},add:function(_7){
-_7=MVC.$E(_7);
-var _8=MVC.Object.extend({},arguments[1]||{});
-MVC.Element.make_positioned(_7);
-_8.element=_7;
-this.drops.push(_8);
-},findDeepestChild:function(_9){
-var _a=_9[0];
-for(i=1;i<_9.length;++i){
-if(MVC.Element.is_parent(_9[i].element,_a.element)){
-_a=_9[i];
+MVC.Droppable=MVC.Controller.Params;
+MVC.Droppable.prototype=new MVC.Controller.Params();
+MVC.Object.extend(MVC.Droppable.prototype,{cache_position:function(){
+this._cache=true;
+},cancel:function(){
+this._cancel=true;
+}});
+MVC.Droppables={drops:[],selectors:{},add:function(_5,_6){
+_5=MVC.$E(_5);
+_6.element=_5;
+var _7=new MVC.Droppable(_6);
+if(_7.dropadd){
+_7.dropadd(_7);
+}
+if(!_7._canceled){
+MVC.Element.make_positioned(_5);
+this.drops.push(_7);
+}
+},findDeepestChild:function(_8){
+if(_8.length==0){
+return null;
+}
+var _9=_8[0];
+for(i=1;i<_8.length;++i){
+if(MVC.Element.has(_8[i].element,_9.element)){
+_9=_8[i];
 }
 }
-return _a;
-},isContained:function(_b,_c){
-var _d=_b.parentNode;
-for(var c=0;i<_c._containers.length;i++){
-if(_d==_c._containers[c]){
-return _c._containers[c];
-}
-}
-},isAffected:function(_f,_10,_11){
-return ((_11.element!=_10)&&((!_11._containers)||this.isContained(_10,_11))&&MVC.Position.withinIncludingScrolloffsets(_11.element,_f[0],_f[1]));
-},deactivate:function(_12,_13,_14){
+return _9;
+},isAffected:function(_a,_b,_c){
+return ((_c.element!=_b)&&MVC.Position.withinIncludingScrolloffsets(_c.element,_a[0],_a[1],_c));
+},deactivate:function(_d,_e,_f){
 this.last_active=null;
-if(_12.dragout){
-_12.dragout({element:_12.element,drag_element:_13,event:_14});
+if(_d.dropout){
+_d.dropout({element:_d.element,drag:_e,event:_f});
 }
-},activate:function(_15,_16,_17){
-this.last_active=_15;
-if(_15.dragover){
-_15.dragover({element:_15.element,drag_element:_16,event:_17});
+},activate:function(_10,_11,_12){
+this.last_active=_10;
+if(_10.dropover){
+_10.dropover({element:_10.element,drag:_11,event:_12});
 }
-},show:function(_18,_19,_1a){
+},dropmove:function(_13,_14,_15){
+if(_13.dropmove){
+_13.dropmove({element:_13.element,drag:_14,event:_15});
+}
+},show:function(_16,_17,_18){
+var _19=_17.drag_element;
 if(!this.drops.length){
 return;
 }
-var _1b,_1c=[];
+var _1a,_1b=[];
 for(var d=0;d<this.drops.length;d++){
-if(MVC.Droppables.isAffected(_18,_19,this.drops[d])){
-_1c.push(this.drops[d]);
+if(MVC.Droppables.isAffected(_16,_19,this.drops[d])){
+_1b.push(this.drops[d]);
 }
 }
-if(_1c.length>0){
-_1b=MVC.Droppables.findDeepestChild(_1c);
+_1a=MVC.Droppables.findDeepestChild(_1b);
+if(this.last_active&&this.last_active!=_1a){
+this.deactivate(this.last_active,_17,_18);
 }
-if(this.last_active&&this.last_active!=_1b){
-this.deactivate(this.last_active,_19,_1a);
+if(_1a&&_1a!=this.last_active){
+this.activate(_1a,_17,_18);
 }
-if(_1b){
-MVC.Position.within(_1b.element,_18[0],_18[1]);
-if(_1b!=this.last_active){
-MVC.Droppables.activate(_1b,_19,_1a);
+if(_1a&&this.last_active){
+this.dropmove(_1a,_17,_18);
 }
-}
-},fire:function(_1e,_1f){
+},fire:function(_1d,_1e){
 if(!this.last_active){
 return;
 }
 MVC.Position.prepare();
-if(this.isAffected(MVC.Event.pointer(_1e),_1f,this.last_active)){
-if(this.last_active.dropped){
-this.last_active.dropped({dropped_element:_1f,event:_1e,element:this.last_active.element});
+if(this.isAffected(MVC.Event.pointer(_1d),_1e.drag_element,this.last_active)&&this.last_active.dropped){
+this.last_active.dropped({drag:_1e,event:_1d,element:this.last_active.element});
 return true;
 }
-}
-},reset:function(){
-if(this.last_active){
-this.deactivate(this.last_active);
-}
 },compile:function(){
-var _20=[];
-for(var _21 in MVC.Droppables.selectors){
-var _22=_20.concat(MVC.Query(_21));
-for(var e=0;e<_22.length;e++){
-MVC.Droppables.add(_22[e],MVC.Droppables.selectors[_21]);
+var _1f=[];
+for(var _20 in MVC.Droppables.selectors){
+var _21=_1f.concat(MVC.Query(_20));
+for(var e=0;e<_21.length;e++){
+MVC.Droppables.add(_21[e],MVC.Droppables.selectors[_20]);
 }
 }
+},clear:function(){
+this.drops=[];
 }};
 ;
-include.set_path('../../jmvc/plugins/dom/query');
+include.set_path('jmvc/plugins/dom/query');
 if(typeof Prototype!="undefined"){
 MVC.Query=$$;
 MVC.Query.descendant=function(_1,_2){
@@ -2310,7 +2703,7 @@ return _1.getElementsBySelector(_2);
 include("standard");
 }
 ;
-include.set_path('../../jmvc/plugins/dom/query');
+include.set_path('jmvc/plugins/dom/query');
 MVC.Query=function(){
 var _1="2.0.3";
 cssQuery.uniqueIds=true;
@@ -2593,14 +2986,14 @@ if(!MVC._no_conflict){
 Query=MVC.Query;
 }
 ;
-include.set_path('../../jmvc/plugins/io/comet');
+include.set_path('jmvc/plugins/io/comet');
 include.plugins("dom/event");
 include("comet");
 if(MVC.Console){
 include("debug");
 }
 ;
-include.set_path('../../jmvc/plugins/io/comet');
+include.set_path('jmvc/plugins/io/comet');
 MVC.Comet=function(_1,_2){
 this.url=_1;
 this.options=_2||{};
@@ -2672,11 +3065,11 @@ if(!MVC._no_conflict&&typeof Comet=="undefined"){
 Comet=MVC.Comet;
 }
 ;
-include.set_path('../../jmvc/plugins/io/jsonp');
+include.set_path('jmvc/plugins/io/jsonp');
 include.plugins("lang");
 include("jsonp");
 ;
-include.set_path('../../jmvc/plugins/io/jsonp');
+include.set_path('jmvc/plugins/io/jsonp');
 MVC.JsonP=function(_1,_2){
 this.url=_1;
 this.options=_2||{};
@@ -2752,11 +3145,11 @@ _11.parentNode.removeChild(_11);
 }};
 MVC.JsonP._cbs={};
 ;
-include.set_path('../../jmvc/plugins/io/window_name');
+include.set_path('jmvc/plugins/io/window_name');
 include.plugins("lang");
 include("window_name");
 ;
-include.set_path('../../jmvc/plugins/io/window_name');
+include.set_path('jmvc/plugins/io/window_name');
 MVC.WindowName=function(_1,_2){
 this.url=_1;
 this.params=_2||{};
@@ -2798,28 +3191,25 @@ if(!this.state){
 this.state=1;
 this.frame.contentWindow.location=this.domain_page;
 }
-try{
 if(this.state<2){
 this.get_data();
-}
-}
-catch(e){
 }
 },send:function(){
 this.domain=window.location.protocol+"//"+window.location.hostname;
 this.domain_page=this.domain+"/blank.html"+"#"+this.frameNum;
-this.frameName=window.location+this.domain_page;
+this.frameName=this.domain_page;
 this.frame_container=document.body;
+this.doc=document;
 if(MVC.Browser.Gecko&&![].reduce){
 this.protectFF2();
 }
-var _5=this.frame=document.createElement(MVC.Browser.IE?"<iframe name=\""+frameName+"\" onload=\"MVC.WindowName["+this.frameNum+"]()\">":"iframe");
+var _5=this.frame=document.createElement(MVC.Browser.IE?"<iframe name=\""+this.frameName+"\" onload=\"MVC.WindowName["+this.frameNum+"]()\">":"iframe");
 MVC.WindowName.styleFrame(this.frame);
 this.outerFrame=this.outerFrame||this.frame;
 this.outerFrame.style.display="none";
 this.state=0;
 var _6=this;
-MVC.WindowName[this.frameName]=this.frame.onload=MVC.Function.bind(this.onload,this);
+MVC.WindowName[this.frameNum]=this.frame.onload=MVC.Function.bind(this.onload,this);
 _5.name=this.frameName;
 if(this.params.method.match(/GET/i)){
 this.url+=(MVC.String.include(this.url,"?")?"&":"?")+MVC.Object.to_query_string(this.params.parameters);
@@ -2840,7 +3230,7 @@ for(var _8 in this.params.parameters){
 var _9=this.params.parameters[_8];
 _9=_9 instanceof Array?_9:[_9];
 for(j=0;j<_9.length;j++){
-var _a=doc.createElement("input");
+var _a=this.doc.createElement("input");
 _a.type="hidden";
 _a.name=_8;
 _a.value=_9[j];
@@ -2865,18 +3255,18 @@ MVC.WindowName.styleFrame(this.outerFrame);
 this.outerFrame.style.display="none";
 this.frame_container.appendChild(this.outerFrame);
 var _b=this.outerFrame.contentWindow;
-doc=_b.document;
-doc.write("<html><body margin='0px'><iframe style='width:100%;height:100%;border:0px' name='protectedFrame'></iframe></body></html>");
-doc.close();
+this.doc=_b.document;
+this.doc.write("<html><body margin='0px'><iframe style='width:100%;height:100%;border:0px' name='protectedFrame'></iframe></body></html>");
+this.doc.close();
 var _c=_b[0];
 _b.__defineGetter__(0,function(){
 });
 _b.__defineGetter__("protectedFrame",function(){
 });
-doc=_c.document;
-doc.write("<html><body margin='0px'></body></html>");
-doc.close();
-this.frame_container=doc.body;
+this.doc=_c.document;
+this.doc.write("<html><body margin='0px'></body></html>");
+this.doc.close();
+this.frame_container=this.doc.body;
 }};
 MVC.WindowName.styleFrame=function(_d){
 _d.style.width="100%";
@@ -2887,10 +3277,10 @@ if(!MVC._no_conflict&&typeof WindowName=="undefined"){
 WindowName=MVC.WindowName;
 }
 ;
-include.set_path('../../jmvc/plugins/io/xdoc');
+include.set_path('jmvc/plugins/io/xdoc');
 include("xdoc");
 ;
-include.set_path('../../jmvc/plugins/io/xdoc');
+include.set_path('jmvc/plugins/io/xdoc');
 if(MVC.Browser.Opera){
 MVC.XDoc=function(_1,_2){
 this.url=_1;
@@ -2965,7 +3355,7 @@ alert("XDoc should not be called");
 };
 }
 ;
-include.set_path('../../jmvc/plugins/lang/date');
+include.set_path('jmvc/plugins/lang/date');
 (function(){
 var _1=Date.parse;
 MVC.Native.extend("Date",{add_days:function(_2,_3){
@@ -3011,11 +3401,11 @@ return _1(_e);
 }});
 })();
 ;
-include.set_path('../../jmvc/plugins/lang/json');
+include.set_path('jmvc/plugins/lang/json');
 include.plugins("lang");
 include("json");
 ;
-include.set_path('../../jmvc/plugins/lang/json');
+include.set_path('jmvc/plugins/lang/json');
 MVC.Object.extend(MVC.Number,{to_json:function(_1){
 return isFinite(_1)?_1.toString():"null";
 }});
@@ -3082,25 +3472,25 @@ _10.push(MVC.String.to_json(_11)+": "+_12);
 return "{"+_10.join(", ")+"}";
 };
 ;
-include.set_path('../../jmvc/plugins/model');
-include.plugins("lang/class");
+include.set_path('jmvc/plugins/model');
+include.plugins("lang/class","lang/openajax");
 include("simple_store");
 include("model");
 ;
-include.set_path('../../jmvc/plugins/model');
+include.set_path('jmvc/plugins/model');
 MVC.SimpleStore=MVC.Class.extend({init:function(_1){
 this._data={};
 this.storing_class=_1;
-},find_one:function(id,_3){
+},find_one:function(id){
 return this._data[id];
-},create:function(_4){
-var id=_4.id;
-this._data[id]=_4;
+},create:function(_3){
+var id=_3[_3.Class.id];
+this._data[id]=_3;
 },destroy:function(id){
 delete this._data[id];
 }});
 ;
-include.set_path('../../jmvc/plugins/model');
+include.set_path('jmvc/plugins/model');
 MVC.Model=MVC.Class.extend({store_type:MVC.SimpleStore,init:function(){
 if(!this.className){
 return;
@@ -3112,7 +3502,7 @@ if(!_2){
 _2={};
 }
 if(typeof _2=="function"){
-callback=_2;
+_3=_2;
 _2={};
 }
 if(id=="all"){
@@ -3132,6 +3522,7 @@ _4=_4.attributes();
 }
 var _5=new this(_4);
 _5.is_new_record=this.new_record_func;
+OpenAjax.hub.publish(this.className+".create.as_existing",{data:_5});
 return _5;
 },create_many_as_existing:function(_6){
 if(!_6){
@@ -3152,157 +3543,157 @@ this._associations.push(arguments[i]);
 for(var i=0;i<arguments.length;i++){
 this._associations.push(arguments[i]);
 }
-},_associations:[],from_html:function(_b){
-var el=MVC.$E(_b);
-var _d=window[MVC.String.classize(el.getAttribute("type"))];
-if(!_d){
-return null;
+},_associations:[],element_id_to_id:function(_b){
+var re=new RegExp(this.className+"_","i");
+return _b.replace(re,"");
+},find_by_element:function(el){
+var re=new RegExp(this.className+"_","i");
+return this.store.find_one(el.id.replace(re,""));
+},add_attribute:function(_f,_10){
+if(!this.attributes[_f]){
+this.attributes[_f]=_10;
 }
-var _e={};
-_e[_d.id]=this.element_id_to_id(el.id);
-return _d.create_as_existing(_e);
-},element_id_to_id:function(_f){
-var re=new RegExp(this.className+"_","");
-return _f.replace(re,"");
-},add_attribute:function(_11,_12){
-if(!this.attributes[_11]){
-this.attributes[_11]=_12;
+if(!this.default_attributes[_f]){
+this.default_attributes[_f]=null;
 }
-},attributes:{},_clean_callbacks:function(_13){
-if(!_13){
+},attributes:{},default_attributes:{},_clean_callbacks:function(_11){
+if(!_11){
 if(this.asynchronous){
 throw "You must supply a callback!";
 }else{
 return null;
 }
 }
-if(typeof _13=="function"){
-return {onSuccess:_13,onError:_13};
+if(typeof _11=="function"){
+return {onSuccess:_11,onFailure:_11};
 }
-if(!_13.onSuccess&&!_13.onComplete){
+if(!_11.onSuccess&&!_11.onComplete){
 throw "You must supply a positive callback!";
 }
-if(!_13.onSuccess){
-_13.onSuccess=_13.onComplete;
+if(!_11.onSuccess){
+_11.onSuccess=_11.onComplete;
 }
-if(!_13.onError&&_13.onComplete){
-_13.onError=_13.onComplete;
+if(!_11.onFailure&&_11.onComplete){
+_11.onFailure=_11.onComplete;
+}
+return _11;
+},models:{}},{init:function(_12){
+this.errors=[];
+this.set_attributes(this.Class.default_attributes||{});
+this.set_attributes(_12);
+},set_attributes:function(_13){
+for(var key in _13){
+if(_13.hasOwnProperty(key)){
+this._setAttribute(key,_13[key]);
+}
 }
 return _13;
-},models:{}},{init:function(_14){
-this.errors=[];
-this.set_attributes(this.Class._attributes||{});
-this.set_attributes(_14);
-},setup:function(){
-},set_attributes:function(_15){
-for(var key in _15){
-if(_15.hasOwnProperty(key)){
-this._setAttribute(key,_15[key]);
-}
-}
-return _15;
-},update_attributes:function(_17,_18){
-this.set_attributes(_17);
-return this.save(_18);
+},update_attributes:function(_15,_16){
+this.set_attributes(_15);
+return this.save(_16);
 },valid:function(){
 return this.errors.length==0;
 },validate:function(){
-},_setAttribute:function(_19,_1a){
-if(MVC.Array.include(this.Class._associations,_19)){
-this._setAssociation(_19,_1a);
+},_setAttribute:function(_17,_18){
+if(MVC.Array.include(this.Class._associations,_17)){
+this._setAssociation(_17,_18);
 }else{
-this._setProperty(_19,_1a);
+this._setProperty(_17,_18);
 }
-},_setProperty:function(_1b,_1c){
-var old=this[_1b];
-this[_1b]=MVC.Array.include(["created_at","updated_at"],_1b)?MVC.Date.parse(_1c):_1c;
-if(_1b==this.Class.id&&this.Class.store){
+},_setProperty:function(_19,_1a){
+var old=this[_19];
+this[_19]=MVC.Array.include(["created_at","updated_at"],_19)?MVC.Date.parse(_1a):_1a;
+if(_19==this.Class.id&&this.Class.store){
 if(!old){
 this.Class.store.create(this);
 }else{
-if(old!=this[_1b]){
+if(old!=this[_19]){
 this.Class.store.destroy(old);
 this.Class.store.create(this);
 }
 }
 }
-this.Class.add_attribute(_1b,MVC.Object.guess_type(_1c));
-},_setAssociation:function(_1e,_1f){
-this[_1e]=function(){
-if(!MVC.String.is_singular(_1e)){
-_1e=MVC.String.singularize(_1e);
+this.Class.add_attribute(_19,MVC.Object.guess_type(_1a));
+},_setAssociation:function(_1c,_1d){
+this[_1c]=function(){
+if(!MVC.String.is_singular(_1c)){
+_1c=MVC.String.singularize(_1c);
 }
-var _20=window[MVC.String.classize(_1e)];
-if(!_20){
-return _1f;
+var _1e=window[MVC.String.classize(_1c)];
+if(!_1e){
+return _1d;
 }
-return _20.create_many_as_existing(_1f);
+return _1e.create_many_as_existing(_1d);
 };
 },attributes:function(){
-var _21={};
+var _1f={};
 var cas=this.Class.attributes;
-for(var _23 in cas){
-if(cas.hasOwnProperty(_23)){
-_21[_23]=this[_23];
+for(var _21 in cas){
+if(cas.hasOwnProperty(_21)){
+_1f[_21]=this[_21];
 }
 }
-return _21;
+return _1f;
 },is_new_record:function(){
 return true;
-},save:function(_24){
-var _25;
+},save:function(_22){
+var _23;
 this.errors=[];
 this.validate();
 if(!this.valid()){
 return false;
 }
-_25=this.is_new_record()?this.Class.create(this.attributes(),_24):this.Class.update(this[this.Class.id],this.attributes(),_24);
+_23=this.is_new_record()?this.Class.create(this.attributes(),_22):this.Class.update(this[this.Class.id],this.attributes(),_22);
 this.is_new_record=this.Class.new_record_func;
 return true;
-},destroy:function(_26){
-this.Class.destroy(this[this.Class.id],_26);
+},destroy:function(_24){
+this.Class.destroy(this[this.Class.id],_24);
 this.Class.store.destroy(this[this.Class.id]);
-},add_errors:function(_27){
-if(_27){
-this.errors=this.errors.concat(_27);
+},add_errors:function(_25){
+if(_25){
+this.errors=this.errors.concat(_25);
 }
-},_resetAttributes:function(_28){
+},_resetAttributes:function(_26){
 this._clear();
 },_clear:function(){
-var cas=this.Class.attributes;
-for(var _2a in cas){
-if(cas.hasOwnProperty(_2a)){
-this[_2a]=null;
+var cas=this.Class.default_attributes;
+for(var _28 in cas){
+if(cas.hasOwnProperty(_28)){
+this[_28]=null;
 }
 }
+},element_id:function(){
+return this.Class.className+"_"+this[this.Class.id];
+},element:function(){
+return MVC.$E(this.element_id());
 }});
-MVC.Object.guess_type=function(_2b){
-if(typeof _2b!="string"){
-if(_2b==null){
-return typeof _2b;
+MVC.Object.guess_type=function(_29){
+if(typeof _29!="string"){
+if(_29==null){
+return typeof _29;
 }
-if(_2b.constructor==Date){
+if(_29.constructor==Date){
 return "date";
 }
-if(_2b.constructor==Array){
+if(_29.constructor==Array){
 return "array";
 }
-return typeof _2b;
+return typeof _29;
 }
-if(_2b=="true"||_2b=="false"){
+if(_29=="true"||_29=="false"){
 return "boolean";
 }
-if(!isNaN(_2b)){
+if(!isNaN(_29)){
 return "number";
 }
-return typeof _2b;
+return typeof _29;
 };
 ;
-include.set_path('../../jmvc/plugins/model/ajax');
+include.set_path('jmvc/plugins/model/ajax');
 include.plugins("model","io/ajax");
 include("ajax_model");
 ;
-include.set_path('../../jmvc/plugins/io/ajax');
+include.set_path('jmvc/plugins/io/ajax');
 include.plugins("lang");
 if(typeof jQuery!="undefined"){
 include("jquery_ajax");
@@ -3313,11 +3704,11 @@ include("prototype_ajax");
 include("ajax");
 }
 }
-if(MVC.Console){
+if(MVC.Console||MVC.use_fixtures){
 include("debug");
 }
 ;
-include.set_path('../../jmvc/plugins/model/ajax');
+include.set_path('jmvc/plugins/model/ajax');
 MVC.AjaxModel=MVC.Model.extend({transport:MVC.Ajax,request:function(){
 },_matching:/(\w+?)_?(get|post|delete|update|)_success$/,init:function(){
 if(!this.className){
@@ -3335,7 +3726,7 @@ this._super();
 },_default_options:function(_5,_6,_7,_8){
 var _9={};
 this._add_default_callback(_9,"success",_6,_5,_7,_8);
-this._add_default_callback(_9,"error",_6,_5,_7,_8);
+this._add_default_callback(_9,"failure",_6,_5,_7,_8);
 return _9;
 },_add_default_callback:function(_a,_b,_c,_d,_e,_f){
 var _10="on"+MVC.String.capitalize(_b);
@@ -3370,7 +3761,7 @@ var _1f={method:_19};
 var _20=false;
 this.request=function(url,_22,_23){
 _20=true;
-_22=_22||_1b;
+_22=typeof _22!="undefined"?_22:_1b;
 _23=_23||_1f;
 var _24=MVC.Array.from(arguments).splice(2,arguments.length-2);
 if(typeof url!="string"){
@@ -3422,11 +3813,11 @@ if(!MVC._no_conflict&&typeof AjaxModel=="undefined"){
 AjaxModel=MVC.AjaxModel;
 }
 ;
-include.set_path('../../jmvc/plugins/model/cookie');
+include.set_path('jmvc/plugins/model/cookie');
 include.plugins("model","lang/json");
 include("cookie_model");
 ;
-include.set_path('../../jmvc/plugins/model/cookie');
+include.set_path('jmvc/plugins/model/cookie');
 MVC.CookieModel=MVC.Model.extend({init:function(){
 this._working=null;
 this._super();
@@ -3520,11 +3911,11 @@ this.destroy_cookie(this.className);
 return true;
 }},{});
 ;
-include.set_path('../../jmvc/plugins/model/jsonp');
+include.set_path('jmvc/plugins/model/jsonp');
 include.plugins("model","lang/date","io/jsonp");
 include("remote_model");
 ;
-include.set_path('../../jmvc/plugins/model/jsonp');
+include.set_path('jmvc/plugins/model/jsonp');
 MVC.JsonPModel=MVC.Model.extend({error_timeout:4000,init:function(){
 if(!this.className){
 return;
@@ -3540,7 +3931,7 @@ this._super();
 },find_all:function(_1,_2){
 var _3=this._clean_callbacks(_2);
 var _4=_3.onSuccess;
-var _5=_3.onError;
+var _5=_3.onFailure;
 var n=parseInt(Math.random()*100000);
 var _7=this.find_url?this.find_url+"?":this.domain+"/"+this.plural_controller_name+".json?";
 if(!_4){
@@ -3642,11 +4033,11 @@ _26[_28]=_29;
 return {send:_25,postpone:_26,send_in_parts:_27};
 },random:parseInt(Math.random()*1000000)},{});
 ;
-include.set_path('../../jmvc/plugins/model/rest_json');
+include.set_path('jmvc/plugins/model/rest_json');
 include.plugins("model/ajax","lang/date");
 include("json_rest_model");
 ;
-include.set_path('../../jmvc/plugins/model/rest_json');
+include.set_path('jmvc/plugins/model/rest_json');
 MVC.JSONRestModel=MVC.AjaxModel.extend({init:function(){
 if(!this.className){
 return;
@@ -3717,17 +4108,17 @@ _17.add_errors(_18);
 return _17;
 },destroy_delete_url:function(id){
 return "/"+this.plural_name+"/"+id+".xml";
-},destroy_delete_error:function(){
+},destroy_delete_failure:function(){
 return false;
 },destroy_delete_success:function(_1a){
 return _1a.status==200;
 }},{});
 ;
-include.set_path('../../jmvc/plugins/model/rest_xml');
+include.set_path('jmvc/plugins/model/rest_xml');
 include.plugins("model/ajax","lang/date");
 include("ObjTree","xml_rest_model");
 ;
-include.set_path('../../jmvc/plugins/model/rest_xml');
+include.set_path('jmvc/plugins/model/rest_xml');
 if(typeof (XML)=="undefined"){
 XML=function(){
 };
@@ -4011,7 +4402,7 @@ XML.ObjTree.prototype.xml_escape=function(_33){
 return String(_33).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 };
 ;
-include.set_path('../../jmvc/plugins/model/rest_xml');
+include.set_path('jmvc/plugins/model/rest_xml');
 MVC.Tree=new XML.ObjTree();
 MVC.Tree.attr_prefix="@";
 MVC.XMLRestModel=MVC.AjaxModel.extend({init:function(){
@@ -4021,224 +4412,236 @@ return;
 this.plural_name=MVC.String.pluralize(this.className);
 this.singular_name=this.className;
 this._super();
+},find_one_get_url:function(_1){
+return "/"+this.plural_name+"/"+_1.id+".xml";
+},find_one_get_success:function(_2,_3){
+var _4=MVC.Tree.parseXML(_2.responseText);
+var _5=_4[this.singular_name];
+var _6=this.create_as_existing(this._attributesFromTree(_5));
+return _6;
 },find_all_get_url:function(){
 return "/"+this.plural_name+".xml";
-},find_all_get_success:function(_1){
-var _2=MVC.Tree.parseXML(_1.responseText);
-for(var _3 in _2){
-if(_3.match(/-/)&&typeof _2[_3]=="object"){
-_2[_3.replace(/-/,"_")]=_2[_3];
-delete _2[_3];
+},find_all_get_success:function(_7){
+var _8=MVC.Tree.parseXML(_7.responseText);
+for(var _9 in _8){
+if(_9.match(/-/)&&typeof _8[_9]=="object"){
+_8[_9.replace(/-/,"_")]=_8[_9];
+delete _8[_9];
 }
 }
-for(var _3 in _2){
-if(typeof _2[_3]=="object"){
-for(var _4 in _2[_3]){
-if(_4.match(/-/)&&typeof _2[_3][_4]=="object"){
-_2[_3][_4.replace(/-/,"_")]=_2[_3][_4];
-delete _2[_3][_4];
+for(var _9 in _8){
+if(typeof _8[_9]=="object"){
+for(var _a in _8[_9]){
+if(_a.match(/-/)&&typeof _8[_9][_a]=="object"){
+_8[_9][_a.replace(/-/,"_")]=_8[_9][_a];
+delete _8[_9][_a];
 }
 }
 }
 }
-if(!_2[this.plural_name]){
+if(!_8[this.plural_name]){
 return [];
 }
-if(!(_2[this.plural_name][this.singular_name] instanceof Array)){
-_2[this.plural_name][this.singular_name]=[_2[this.plural_name][this.singular_name]];
+if(!(_8[this.plural_name][this.singular_name] instanceof Array)){
+_8[this.plural_name][this.singular_name]=[_8[this.plural_name][this.singular_name]];
 }
 collection=[];
-var _5=_2[this.plural_name][this.singular_name];
-for(var i=0;i<_5.length;i++){
-collection.push(this.create_as_existing(this._attributesFromTree(_5[i])));
+var _b=_8[this.plural_name][this.singular_name];
+for(var i=0;i<_b.length;i++){
+collection.push(this.create_as_existing(this._attributesFromTree(_b[i])));
 }
 return collection;
-},create_request:function(_7){
-var _8=new this(_7);
-_8.validate();
-if(!_8.valid()){
-return _8;
+},create_post_url:function(){
+return "/"+this.plural_name+".xml";
+},create_request:function(_d,_e){
+var _f=new this(_d);
+_f.validate();
+if(!_f.valid()){
+return _f;
 }
-var _9={};
-_9[this.singular_name]=_7;
-this.request("/"+this.plural_name+".xml",_9,{method:"post"},_8);
-return _8;
-},create_success:function(_a,_b,_c){
-if(/\w+/.test(_a.responseText)){
-var _d=_c._errorsFromXML(_a.responseText);
-if(_d){
-_c.add_errors(_d);
+var _10={};
+_10[this.singular_name]=_d;
+var url=typeof this.create_post_url=="function"?this.create_post_url():this.create_post_url;
+this.request(url,_10,{method:"post"},_f);
+return _f;
+},create_success:function(_12,_13,_14){
+if(/\w+/.test(_12.responseText)){
+var _15=_14._errorsFromXML(_12.responseText);
+if(_15){
+_14.add_errors(_15);
 }else{
-var _e;
-var _f=MVC.Tree.parseXML(_a.responseText);
-if(_f&&_f[this.singular_name]){
-_e=this._attributesFromTree(_f[this.singular_name]);
-}
-if(_e){
-_c._resetAttributes(_e);
-}
-}
-}
-if(_c.is_new_record()&&_a.status==201){
-var id=this.get_id(_a);
-if(!isNaN(id)){
-_c._setProperty("id",id);
-}
-}
-return _c;
-},update_request:function(id,_12){
-delete _12.id;
-var _13={};
-_13[this.singular_name]=_12;
-var _14=this.create_as_existing(_12);
-_14.id=id;
-_14.validate();
-if(!_14.valid()){
-return _14;
-}
-this.request("/"+this.plural_name+"/"+id+".xml",_13,{method:"put"},_14);
-},update_success:function(_15,_16,_17){
-if(/\w+/.test(_15.responseText)){
-var _18=_17._errorsFromXML(_15.responseText);
-if(_18){
-_17.add_errors(_18);
-}else{
-var _19;
-var doc=MVC.Tree.parseXML(_15.responseText);
+var _16;
+var doc=MVC.Tree.parseXML(_12.responseText);
 if(doc&&doc[this.singular_name]){
-_19=this._attributesFromTree(doc[this.singular_name]);
+_16=this._attributesFromTree(doc[this.singular_name]);
 }
-if(_19){
-_17._resetAttributes(_19);
+if(_16){
+_14._resetAttributes(_16);
 }
 }
 }
-return _17;
+if(_14.is_new_record()&&_12.status==201){
+var id=this.get_id(_12);
+if(!isNaN(id)){
+_14._setProperty("id",id);
+}
+}
+return _14;
+},update_put_url:function(id){
+return "/"+this.plural_name+"/"+id+".xml";
+},update_request:function(id,_1b,_1c){
+delete _1b.id;
+var _1d={};
+_1d[this.singular_name]=_1b;
+var _1e=this.create_as_existing(_1b);
+_1e.id=id;
+_1e.validate();
+if(!_1e.valid()){
+return _1e;
+}
+this.request(this.update_put_url(id),_1d,{method:"put"},_1e);
+},update_success:function(_1f,_20,_21){
+if(/\w+/.test(_1f.responseText)){
+var _22=_21._errorsFromXML(_1f.responseText);
+if(_22){
+_21.add_errors(_22);
+}else{
+var _23;
+var doc=MVC.Tree.parseXML(_1f.responseText);
+if(doc&&doc[this.singular_name]){
+_23=this._attributesFromTree(doc[this.singular_name]);
+}
+if(_23){
+_21._resetAttributes(_23);
+}
+}
+}
+return _21;
 },destroy_delete_url:function(id){
 return "/"+this.plural_name+"/"+id+".xml";
-},destroy_delete_error:function(){
+},destroy_delete_failure:function(){
 return false;
-},destroy_delete_success:function(_1c){
-return _1c.status==200;
-},elementHasMany:function(_1d){
-if(!_1d){
+},destroy_delete_success:function(_26){
+return _26.status==200;
+},elementHasMany:function(_27){
+if(!_27){
 return false;
 }
 var i=0;
-var _1f=null;
-var _20=false;
-for(var val in _1d){
-if(_1d.hasOwnProperty(val)){
+var _29=null;
+var _2a=false;
+for(var val in _27){
+if(_27.hasOwnProperty(val)){
 if(i==0){
-_1f=val;
+_29=val;
 }
 i+=1;
 }
 }
-return (_1d[_1f]&&typeof (_1d[_1f])=="object"&&_1d[_1f].length!=null&&i==1);
-},_attributesFromTree:function(_22){
-var _23={};
-for(var _24 in _22){
-if(!_22.hasOwnProperty(_24)){
+return (_27[_29]&&typeof (_27[_29])=="object"&&_27[_29].length!=null&&i==1);
+},_attributesFromTree:function(_2c){
+var _2d={};
+for(var _2e in _2c){
+if(!_2c.hasOwnProperty(_2e)){
 continue;
 }
-var _25=_22[_24];
-if(_22[_24]&&_22[_24]["@type"]){
-if(_22[_24]["#text"]){
-_25=_22[_24]["#text"];
+var _2f=_2c[_2e];
+if(_2c[_2e]&&_2c[_2e]["@type"]){
+if(_2c[_2e]["#text"]){
+_2f=_2c[_2e]["#text"];
 }else{
-_25=undefined;
+_2f=undefined;
 }
 }
-if(!_25){
+if(!_2f){
 var a={};
 }else{
-if(typeof (_25)=="string"){
-if(_22[_24]["@type"]=="integer"){
-var num=parseInt(_25);
+if(typeof (_2f)=="string"){
+if(_2c[_2e]["@type"]=="integer"){
+var num=parseInt(_2f);
 if(!isNaN(num)){
-_25=num;
+_2f=num;
 }
 }else{
-if(_22[_24]["@type"]=="boolean"){
-_25=(_25=="true");
+if(_2c[_2e]["@type"]=="boolean"){
+_2f=(_2f=="true");
 }else{
-if(_22[_24]["@type"]=="datetime"){
-var _28=MVC.Date.parse(_25);
-if(!isNaN(_28)){
-_25=_28;
+if(_2c[_2e]["@type"]=="datetime"){
+var _32=MVC.Date.parse(_2f);
+if(!isNaN(_32)){
+_2f=_32;
 }
 }
 }
 }
 }else{
-var _29=_25;
+var _33=_2f;
 var i=0;
-var _2b=null;
-var _2c=false;
-for(var val in _29){
-if(_29.hasOwnProperty(val)){
+var _35=null;
+var _36=false;
+for(var val in _33){
+if(_33.hasOwnProperty(val)){
 if(i==0){
-_2b=val;
+_35=val;
 }
 i+=1;
 }
 }
-if(_29[_2b]&&typeof (_29[_2b])=="object"&&i==1){
+if(_33[_35]&&typeof (_33[_35])=="object"&&i==1){
 alert("has_many");
-var _25=[];
-var _2e=_24;
-var _2f=MVC.String.classize(_2b);
-if(!(_22[_2e][_2b].length>0)){
-_22[_2e][_2b]=[_22[_2e][_2b]];
+var _2f=[];
+var _38=_2e;
+var _39=MVC.String.classize(_35);
+if(!(_2c[_38][_35].length>0)){
+_2c[_38][_35]=[_2c[_38][_35]];
 }
-_22[_2e][_2b].each(MVC.Function.bind(function(_30){
-if(eval("typeof("+_2f+")")=="undefined"){
-MVC.Resource.model(_2f,{prefix:this._prefix,singular:_2b,plural:_2e,format:this._format});
+_2c[_38][_35].each(MVC.Function.bind(function(_3a){
+if(eval("typeof("+_39+")")=="undefined"){
+MVC.Resource.model(_39,{prefix:this._prefix,singular:_35,plural:_38,format:this._format});
 }
-var _31=eval(_2f+".create_as_existing(this._attributesFromTree(single))");
-_25.push(_31);
+var _3b=eval(_39+".create_as_existing(this._attributesFromTree(single))");
+_2f.push(_3b);
 },this));
 }else{
-_2b=_24;
-var _2f=MVC.String.classize(_2b);
-if(eval("typeof("+_2f+")")!="undefined"){
-_25=eval(_2f+".create_as_existing(this._attributesFromTree(value))");
+_35=_2e;
+var _39=MVC.String.classize(_35);
+if(eval("typeof("+_39+")")!="undefined"){
+_2f=eval(_39+".create_as_existing(this._attributesFromTree(value))");
 }else{
-_25=null;
+_2f=null;
 }
 }
 }
 }
-attribute=_24.replace(/-/g,"_");
-_23[attribute]=_25;
+attribute=_2e.replace(/-/g,"_");
+_2d[attribute]=_2f;
 }
-return _23;
+return _2d;
 }},{_errorsFromXML:function(xml){
 if(!xml){
 return false;
 }
 var doc=MVC.Tree.parseXML(xml);
 if(doc&&doc.errors){
-var _34=[];
+var _3e=[];
 if(typeof (doc.errors.error)=="string"){
 doc.errors.error=[doc.errors.error];
 }
 for(var i=0;i<doc.errors.error.length;i++){
-var _36=doc.errors.error[i];
-var _37=_36.match(/(\w+) (.*)/);
-_34.push([_37[1].toLowerCase(),_37[2].toLowerCase()]);
+var _40=doc.errors.error[i];
+var _41=_40.match(/(\w+) (.*)/);
+_3e.push([_41[1].toLowerCase(),_41[2].toLowerCase()]);
 }
-return _34;
+return _3e;
 }else{
 return false;
 }
 }});
 ;
-include.set_path('../../jmvc/plugins/model/view_helper');
+include.set_path('jmvc/plugins/model/view_helper');
 include("model_view_helper");
 ;
-include.set_path('../../jmvc/plugins/model/view_helper');
+include.set_path('jmvc/plugins/model/view_helper');
 MVC.ModelViewHelper=MVC.Class.extend({init:function(){
 if(!this.className){
 return;
@@ -4425,8 +4828,8 @@ var id=_34.id.match(_35)[1];
 return _33.store.find_one(id);
 };
 ;
-include.set_path('../../jmvc/plugins/test');
-include.plugins("lang","dom/query");
+include.set_path('jmvc/plugins/test');
+include.plugins("lang","dom/query","lang/class","lang/openajax");
 if(!window._rhino){
 include.plugins("debug");
 }else{
@@ -4434,10 +4837,9 @@ MVC.Console={log:function(_1){
 print(_1);
 }};
 }
-include.plugins("lang/class");
 include("test","runner","assertions","unit","functional","controller","synthetic_events");
 ;
-include.set_path('../../jmvc/plugins/test');
+include.set_path('jmvc/plugins/test');
 MVC.Tests={};
 MVC.Test=MVC.Class.extend({init:function(_1,_2,_3){
 this.type=_3||"unit";
@@ -4458,9 +4860,7 @@ this.Assertions=MVC.Test.Assertions.extend(this.helpers());
 this.passes=0;
 this.failures=0;
 MVC.Tests[this.name]=this;
-if(!window._rhino){
-this.updateElements(this);
-}
+OpenAjax.hub.publish("jmvc.test.created",this);
 },fail:function(){
 this.failures++;
 },helpers:function(){
@@ -4478,6 +4878,7 @@ this.working_test=0;
 this.callback=_7;
 this.passes=0;
 this.failures=0;
+OpenAjax.hub.publish("jmvc.test.test.start",this);
 this.run_next();
 },run_helper:function(_8){
 var a=new this.Assertions(this);
@@ -4488,11 +4889,7 @@ this.working_test++;
 this.run_test(this.test_names[this.working_test-1]);
 }else{
 if(this.working_test!=null){
-if(!window._rhino){
-MVC.Console.window.update_test(this);
-}else{
-MVCOptions.update_test(this);
-}
+OpenAjax.hub.publish("jmvc.test.test.complete",this);
 this.working_test=null;
 if(this.callback){
 this.callback();
@@ -4505,48 +4902,11 @@ var _b=this;
 setTimeout(function(){
 this.assertions=new _b.Assertions(_b,_a);
 },0);
-},prepare_page:function(_c){
-MVC.Console.window.document.getElementById(_c+"_explanation").style.display="none";
-MVC.Console.window.document.getElementById(_c+"_test_runner").style.display="block";
-},updateElements:function(_d){
-if(_d.type=="unit"){
-this.prepare_page("unit");
-}else{
-this.prepare_page("functional");
-}
-var _e=MVC.Console.window.document.getElementById(_d.type+"_tests");
-var _f="<h3><img alt='run' src='playwhite.png' onclick='find_and_run(\""+_d.name+"\")'/>"+_d.name+" <span id='"+_d.name+"_results'></span></h3>";
-_f+="<div class='table_container'><table cellspacing='0px'><thead><tr><th>tests</th><th>result</th></tr></thead><tbody>";
-for(var t in _d.tests){
-if(!_d.tests.hasOwnProperty(t)){
-continue;
-}
-if(t.indexOf("test")!=0){
-continue;
-}
-var _11=t.substring(5);
-_f+="<tr class=\"step\" id=\"step_"+_d.name+"_"+t+"\">"+"<td class='name'>"+"<a href='javascript: void(0);' onclick='find_and_run(\""+_d.name+"\",\""+t+"\")'>"+_11+"</a></td>"+"<td class=\"result\">&nbsp;</td></tr>";
-}
-_f+="</tbody></table></div>";
-if(this.added_helpers){
-_f+="<div class='helpers'>Helpers: ";
-var _12=[];
-for(var h in _d.added_helpers){
-if(_d.added_helpers.hasOwnProperty(h)){
-_12.push("<a href='javascript: void(0)' onclick='run_helper(\""+_d.name+"\",\""+h+"\")'>"+h+"</a>");
-}
-}
-_f+=_12.join(", ")+"</div>";
-}
-var t=MVC.Console.window.document.createElement("div");
-t.className="test";
-t.innerHTML=_f;
-_e.appendChild(t);
 }});
 Function.prototype.curry=function(){
-var fn=this,_15=Array.prototype.slice.call(arguments);
+var fn=this,_d=Array.prototype.slice.call(arguments);
 return function(){
-return fn.apply(this,_15.concat(Array.prototype.slice.call(arguments)));
+return fn.apply(this,_d.concat(Array.prototype.slice.call(arguments)));
 };
 };
 if(MVC.Console&&MVC.Console.window){
@@ -4554,18 +4914,18 @@ MVC.Console.window.get_tests=function(){
 return MVC.Tests;
 };
 }
-MVC.Test.inspect=function(_16){
+MVC.Test.inspect=function(_e){
 try{
-if(_16===undefined){
+if(_e===undefined){
 return "undefined";
 }
-if(_16===null){
+if(_e===null){
 return "null";
 }
-if(_16.length!=null&&typeof _16!="string"){
+if(_e.length!=null&&typeof _e!="string"){
 return "[ ... ]";
 }
-return _16.inspect?_16.inspect():_16.toString();
+return _e.inspect?_e.inspect():_e.toString();
 }
 catch(e){
 if(e instanceof RangeError){
@@ -4575,29 +4935,27 @@ throw e;
 }
 };
 MVC.Test.loaded_files={};
-MVC.Included.unit_tests=[];
-MVC.Included.functional_tests=[];
 include.unit_tests=function(){
 for(var i=0;i<arguments.length;i++){
 MVC.Console.log("Trying to load: test/unit/"+arguments[i]+"_test.js");
 }
 include.app(function(i){
-return "../test/unit/"+i+"_test";
-},MVC.Included.unit_tests).apply(null,arguments);
+return "../../test/unit/"+i+"_test";
+}).apply(null,arguments);
 };
 include.functional_tests=function(){
 for(var i=0;i<arguments.length;i++){
 MVC.Console.log("Trying to load: test/functional/"+arguments[i]+"_test.js");
 }
 include.app(function(i){
-return "../test/functional/"+i+"_test";
-},MVC.Included.functional_tests).apply(null,arguments);
+return "../../test/functional/"+i+"_test";
+}).apply(null,arguments);
 };
 if(!MVC._no_conflict){
 Test=MVC.Test;
 }
 ;
-include.set_path('../../jmvc/plugins/test');
+include.set_path('jmvc/plugins/test');
 MVC.Test.Runner=function(_1,_2,_3){
 var _4;
 _1.run=function(_5){
@@ -4629,7 +4987,7 @@ _1._callback=null;
 };
 };
 ;
-include.set_path('../../jmvc/plugins/test');
+include.set_path('jmvc/plugins/test');
 MVC.Test.Assertions=MVC.Class.extend({init:function(_1,_2){
 this.assertions=0;
 this.failures=0;
@@ -4642,9 +5000,7 @@ return;
 this._delays=0;
 this._test_name=_2;
 this._last_called=_2;
-if(!window._rhino){
-MVC.Console.window.running(this._test,this._test_name);
-}
+OpenAjax.hub.publish("jmvc.test.running",this);
 if(this.setup){
 this._setup();
 }else{
@@ -4789,11 +5145,7 @@ this.teardown();
 if(this._do_blur_back){
 this._blur_back();
 }
-if(!window._rhino){
-MVC.Console.window.update(this._test,this._test_name,this);
-}else{
-MVCOptions.report(this);
-}
+OpenAjax.hub.publish("jmvc.test.assertions.update",this);
 this.failures==0&&this.errors==0?this._test.pass():this._test.fail();
 this._test.run_next();
 }
@@ -4801,7 +5153,7 @@ this._test.run_next();
 MVC.Browser.Gecko?window.blur():MVC.Console.window.focus();
 }});
 ;
-include.set_path('../../jmvc/plugins/test');
+include.set_path('jmvc/plugins/test');
 MVC.Test.Unit=MVC.Test.extend({init:function(_1,_2){
 this._super(_1,_2,"unit");
 MVC.Test.Unit.tests.push(this);
@@ -4814,14 +5166,10 @@ if(this.tests[_3].failures==0){
 this.passes++;
 }
 },done:function(){
-if(!window._rhino){
-MVC.Console.window.document.getElementById("unit_result").innerHTML="("+this.passes+"/"+this.tests.length+")"+(this.passes==this.tests.length?" Wow!":"");
-}else{
-MVCOptions.unit_results(this);
-}
+OpenAjax.hub.publish("jmvc.test.unit.complete",this);
 }});
 ;
-include.set_path('../../jmvc/plugins/test');
+include.set_path('jmvc/plugins/test');
 MVC.Test.Functional=MVC.Test.extend({init:function(_1,_2){
 this._super(_1,_2,"functional");
 MVC.Test.Functional.tests.push(this);
@@ -4864,7 +5212,7 @@ this.passes++;
 MVC.Console.window.document.getElementById("functional_result").innerHTML="("+this.passes+"/"+this.tests.length+")"+(this.passes==this.tests.length?" Wow!":"");
 }});
 ;
-include.set_path('../../jmvc/plugins/test');
+include.set_path('jmvc/plugins/test');
 MVC.Test.Controller=MVC.Test.Functional.extend({init:function(_1,_2){
 var _3=MVC.String.classize(_1);
 var _4=_3+"Controller";
@@ -4893,7 +5241,7 @@ this.added_helpers[_a]=_5[_a];
 return _5;
 }});
 ;
-include.set_path('../../jmvc/plugins/test');
+include.set_path('jmvc/plugins/test');
 MVC.SyntheticEvent=function(_1,_2){
 this.type=_1;
 this.options=_2||{};
@@ -5233,22 +5581,72 @@ _44.top=_40;
 return _44;
 };
 ;
-include.set_path('../../jmvc/rhino');
-if(typeof load!="undefined"){
-load("jmvc/rhino/doc/class.js");
-load("jmvc/rhino/doc/d_pair.js");
-load("jmvc/rhino/doc/d_function.js");
-load("jmvc/rhino/doc/d_class.js");
-load("jmvc/rhino/doc/d_constructor.js");
-load("jmvc/rhino/doc/d_file.js");
-load("jmvc/rhino/doc/d_application.js");
-load("jmvc/rhino/doc/d_other.js");
-}else{
-include("doc/class","doc/d_pair","doc/d_function","doc/d_class","doc/d_constructor","doc/d_other","doc/d_file","doc/d_application");
+include.set_path('jmvc/plugins/controller/stateful');
+include.plugins("controller");
+include("stateful_controller");
+;
+include.set_path('jmvc/plugins/controller/stateful');
+MVC.StatefulController=MVC.Controller.extend({init:function(){
+this._super();
+if(!this.className){
+return;
 }
+if(MVC.String.is_singular(this.className)){
+throw "Only plural names for stateful controller!";
+}
+},event_closure:function(_1,_2){
+return MVC.Function.bind(function(_3){
+var _4=new MVC.Controller.Params({event:_3,action:_1});
+for(var _5 in this.instances){
+var _6=this.instances[_5];
+_6.params=_4;
+_6.action_name=_1;
+this._dispatch_action(_6,_1,_4);
+}
+},this);
+},subscribe_closure:function(_7){
+return MVC.Function.bind(function(_8){
+var _9=new MVC.Controller.Params({action:_7});
+for(var _a in this.instances){
+var _b=this.instances[_a];
+_b.params=_9;
+_b.action_name=_7;
+this._dispatch_action(_b,_7,_9);
+}
+},this);
+},_get_instance:function(_c,_d){
+var ce=_d.class_element();
+var _f=this.instances[ce.id];
+if(!_f){
+var re=new RegExp(this.className+"_","");
+_d.id=ce.id.replace(re,"");
+_f=new controller(_d);
+}
+return _f;
+},instances:{},destroy_by_element:function(_11){
+if(!_11.id){
+throw "element must have an id to remove the instance";
+}
+this.instances[_11.id].destroy();
+}},{init:function(_12){
+_12=_12||{};
+this.id=(_12.id||MVC.get_random(10));
+this.element_id=this.Class.className+"_"+this.id;
+this.Class.instances[this.element_id]=this;
+this.action_name="init";
+},create_element:function(tag){
+var _14=document.createElement(tag||"div");
+_14.id=this.element_id;
+_14.className=this.Class.singularName;
+return _14;
+},destroy:function(){
+delete this.Class.instances[this.element_id];
+var _15=MVC.$E(this.element_id);
+if(_15&&_15.parentNode){
+_15.parentNode.removeChild(_15);
+}
+delete this;
+}});
 ;
-include.set_path('../../jmvc');
-include.set_path(MVC.apps_root);
-MVC.user_initialize_function();
-;
+include.next_function();
 include.end_of_production();
