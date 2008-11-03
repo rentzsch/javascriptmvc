@@ -24,7 +24,8 @@ MVC.Test.Controller = MVC.Test.Functional.extend({
 			var event_type = actions[action_name].event_type;
 			var cleaned_name = actions[action_name].css_selector.replace(/\.|#/g, '')+' '+event_type;
 			var helper_name = cleaned_name.replace(/(\w*)/g, function(m,part){ return MVC.String.capitalize(part)}).replace(/ /g, '');
-			helpers[helper_name] = helpers[MVC.String.capitalize(event_type)].curry(actions[action_name].css_selector);
+			if(helpers[MVC.String.capitalize(event_type)])
+				helpers[helper_name] = helpers[MVC.String.capitalize(event_type)].curry(actions[action_name].css_selector);
 			this.added_helpers[helper_name] = helpers[helper_name];
 		}
 		return helpers;
