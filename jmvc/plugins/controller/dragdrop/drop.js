@@ -1,16 +1,22 @@
 /**
  * Allows actions to handle being dropped on.  Adds the following actions:<br/>
- * dropadd    -> Called when drops are added, when a drag starts
- * dropover -> Called when a drag is over a drop
- * dropout    -> Called when a drag is moved out of a drop area
- * dropped    -> Called when a drag is dropped on the drop
- * dropmove   -> Called as an element moves over a drop
+ * dropadd    -> Called when drops are added, when a drag starts<br/>
+ * dropover -> Called when a drag is over a drop<br/>
+ * dropout    -> Called when a drag is moved out of a drop area<br/>
+ * dropped    -> Called when a drag is dropped on the drop<br/>
+ * dropmove   -> Called as an element moves over a drop<br/>
  */
 MVC.Controller.DropAction = MVC.Controller.DelegateAction.extend({
     match: new RegExp("(.*?)\\s?(dropover|dropped|dropout|dropadd|dropmove)$")
 },
 /* @prototype */
 {    
+    /**
+     * 
+     * @param {Object} action
+     * @param {Object} f
+     * @param {Object} controller
+     */
     init: function(action, f, controller){
         this.action = action;
         this.func = f;
@@ -23,10 +29,18 @@ MVC.Controller.DropAction = MVC.Controller.DelegateAction.extend({
         MVC.Droppables.selectors[selector][this.event_type] = controller.dispatch_closure(action); 
     }
 });
-MVC.Droppable = MVC.Controller.Params
+/**
+ * @constructor MVC.Controller.DropParams
+ * Drop actions are called with DropParams
+ * @init
+ * Same functionality as [MVC.Controller.Params]
+ */
+MVC.Controller.DropParams = MVC.Controller.Params
 
-MVC.Droppable.prototype = new MVC.Controller.Params();
-MVC.Object.extend(MVC.Droppable.prototype, {
+MVC.Controller.DropParams.prototype = new MVC.Controller.Params();
+MVC.Object.extend(MVC.Controller.DropParams.prototype, 
+/* @prototype */
+{
     /**
      * Caches positions of draggable elements.  Call in dropadd
      */
@@ -40,8 +54,13 @@ MVC.Object.extend(MVC.Droppable.prototype, {
         this._cancel = true;
     }
 })
-
-MVC.Droppables = {
+/**
+ * @class MVC.Droppables
+ * A collection of all the drop elements.
+ */
+MVC.Droppables = 
+/* @static */
+{
 	drops: [],
 	selectors: {},
 	/**
@@ -53,7 +72,7 @@ MVC.Droppables = {
 		element = MVC.$E(element);
 		
 		functions.element = element;
-		var droppable = new MVC.Droppable(functions);
+		var droppable = new MVC.Controller.DropParams(functions);
 		if(droppable.dropadd) droppable.dropadd(droppable);
 		if(!droppable._canceled){
 		    MVC.Element.make_positioned(element);
@@ -65,7 +84,7 @@ MVC.Droppables = {
 	* For a list of affected drops, finds the one that is deepest in
 	* the dom.
 	* @param {Object} drops
-	* @return {MVC.Droppable} deepest
+	* @return {MVC.Controller.DropParams} deepest
 	*/
 	findDeepestChild: function(drops) {
 		//return right away if there are no drops

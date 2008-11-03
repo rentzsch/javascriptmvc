@@ -105,7 +105,7 @@ MVC.Doc.Pair = MVC.Class.extend(
             par = par.parent;
         }
         if(par){
-            MVC.Doc.objects[this.full_name()] = par.url()+"#"+this.full_name();
+            MVC.Doc.objects[this.full_name()] = par.url()+(this.url ? "" : "#"+this.full_name() );
         }
         
     },

@@ -7,8 +7,14 @@
 MVC.Controller.DragAction = MVC.Controller.DelegateAction.extend({
     match: new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")
 },
-//Prototype functions
+/* @prototype */
 {    
+    /**
+     * 
+     * @param {Object} action
+     * @param {Object} f
+     * @param {Object} controller
+     */
     init: function(action, f, controller){
 		//can't use init, so set default members
         this.action = action;
@@ -41,12 +47,15 @@ MVC.Controller.DragAction = MVC.Controller.DelegateAction.extend({
 	}
 });
 /**
+ * @constructor
  * A draggable object, created on mouse down.  This basically preps a possible drag.
  * Start is called on the first mouse move after the mouse down.  This is to prevent drag from
  * being called on a normal click.
  * This function should do as little as possible.  Start should do more work because we are actually
  * dragging at that point.
- * @param {Object} params a mousedown event, the element it is on, and dragstart, dragend, and dragging
+ * @init
+ * Takes a mousedown even params
+ * @param {MVC.Controller.Params} params a mousedown event, the element it is on, and dragstart, dragend, and dragging
  */
 MVC.Draggable = function(params){
     this.element = params.element; 		//the element that has been clicked on
@@ -63,10 +72,14 @@ MVC.Draggable = function(params){
     this.dragend = params.dragend || MVC.Draggable.k;
     this.dragging = params.dragging || MVC.Draggable.k;
 };
+/* @static */
+MVC.Draggable.
+/* */
+k = function(){};
 
-MVC.Draggable.k = function(){};
-
-MVC.Draggable.prototype = {
+MVC.Draggable.prototype = 
+/* @prototype */
+{
     /**
      * Called the first time we start dragging.
      * This will call drag start with MVC.Controller.DragParams
@@ -208,11 +221,18 @@ MVC.Event.observe(document, 'mouseup', function(event){
     MVC.Draggable.current = null;
 });
 
-//Assume passed, element, event, and drag_action
+/**
+ * @constructor MVC.Controller.DragParams
+ * Drag actions are called with DragParams
+ * @init
+ * Same functionality as [MVC.Controller.Params]
+ */
 MVC.Controller.DragParams = MVC.Controller.Params
 
 MVC.Controller.DragParams.prototype = new MVC.Controller.Params();
-MVC.Object.extend(MVC.Controller.DragParams.prototype, {
+MVC.Object.extend(MVC.Controller.DragParams.prototype, 
+/* @prototype */
+{
 	/**
 	 * Stops drag from running.
 	 */

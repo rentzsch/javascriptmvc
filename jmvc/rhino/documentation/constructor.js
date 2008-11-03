@@ -92,9 +92,9 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
      * @param {String} line the first line that has @init
      */
     init_add: function(line){
-            var parts = line.match(/\s?@init (.*)/);
-            if(!parts){
-                this.init_description = "";
+            var parts = line.match(/\s?@init(.*)?/);
+            if(!parts || !parts[1]){
+                this.init_description = " ";
                 return true;
             } 
             this.init_description = parts.pop();
@@ -145,7 +145,27 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
             }
             return n+"("+res.join(", ")+") -> "+this.ret.type;
     },
+    cleaned_comment : function(){
+        return MVC.Doc.link_content(this.real_comment);
+    },
     url : function(){
         return this.name+".html";
+    },
+    comment_setup_complete : function(){
+        if(!this.name){
+            print("Error! No name defined for \n-----------------------")
+            print(this.comment)
+            print('-----------------------')
+        } else if(!this.init_description){
+            print("Error! No init_description defined for "+this.name+"\n-----------------------")
+            print(this.comment)
+            print('-----------------------')
+        }
+    },
+    constructor_add: function(line){
+        var m = line.match(/^@\w+ ([\w\.]+)/)
+        if(m){
+            this.name = m[1];
+        }
     }
 });

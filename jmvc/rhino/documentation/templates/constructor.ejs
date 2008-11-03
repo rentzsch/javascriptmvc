@@ -1,10 +1,10 @@
 <div><h1><%= name%> <label>API</label></h1>
 <div id='shortcuts'><%= get_quicklinks()%></div>
-<div class='group'><%= real_comment %></div>
+<div class='group'><%= MVC.Doc.link_content(this.real_comment) %></div>
 <div class='method'>
      <h3 id="<%= this.full_name()%>"><%= name%></h3>
          <pre class='signiture'><code><%= this.signiture()%><code></pre>
-                <p><%=this.init_description %></p>
+                <p><%= MVC.Doc.link_content( this.init_description ) %></p>
  <% var ordered = this.ordered_params() 
   	for(var n = 0; n < ordered.length; n++){   
        var param = ordered[n]; %>  
