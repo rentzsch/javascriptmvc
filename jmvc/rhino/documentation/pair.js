@@ -59,14 +59,17 @@ MVC.Doc.Pair = MVC.Class.extend(
      * @param {Object} b
      */
     sort_by_full_name : function(a, b){
-       
-       if(a.full_name.toLowerCase() == b.full_name.toLowerCase()) return 0;
-       return a.full_name.toLowerCase() > b.full_name.toLowerCase() ? 1: -1;
+       var af = a.full_name ? a.full_name.toLowerCase() : a.full_name
+       var bf = b.full_name ? b.full_name.toLowerCase() : a.full_name
+       if(af == bf) return 0;
+       return af > bf ? 1: -1;
     },
     sort_by_name : function(a, b){
+       var af = a.name ? a.name.toLowerCase() : a.name
+       var bf = b.name ? b.name.toLowerCase() : a.name
        
-       if(a.name.toLowerCase() == b.name.toLowerCase()) return 0;
-       return a.name.toLowerCase() > b.name.toLowerCase() ? 1: -1;
+       if(af == bf) return 0;
+       return af > bf ? 1: -1;
     },
     /**
      * Loads a template to use to render different doc types.
