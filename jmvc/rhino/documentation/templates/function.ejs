@@ -11,14 +11,14 @@
        var param = ordered[n]; %>  
       <div class='param <% param.optional ? "optional" : ""%>'>
           <label><%= param.name%></label>
-          <code>{<%=(param.optional ? '' : '') +""+param.type %>}</code> - <%= param.description %>
+          <code>{<%=(param.optional ? '' : '') +""+MVC.Doc.link(param.type) %>}</code> - <%= param.description %>
       </div>
  <% } %>
 
  <% if(this.ret.type != "undefined") {%>
      <div class='return'>
          <label>returns</label> 
-         <code>{<%=this.ret.type%>}</code> - <%= this.ret.description%>
+         <code>{<%=MVC.Doc.link(this.ret.type)%>}</code> - <%= this.ret.description%>
      </div>
  <% } %>               
 </div>

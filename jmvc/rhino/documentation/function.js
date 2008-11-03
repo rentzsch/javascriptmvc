@@ -5,6 +5,23 @@
  * <pre>
  * myFuncOne : function(param1, param2){}  //or
  * myFuncTwo = function(param1, param2){} </pre>
+ * 
+ * <h3>Directives</h3>
+ * Use the following directives to document a function.
+<pre>@function <i>function_name</i>                  -> Forces a function
+@param {<i>optional:type</i>} <i>param_name</i> <i>Description</i>     -> Describes a parameter
+@return {<i>type</i>} <i>Description</i>               -> Describes the return value
+</pre>
+ * Add <i>optional:</i> for optional params.
+ * <h3>Example</h3>
+<pre>
+/* Adds, Mr. or Ms. before someone's name
+* * @param {String} name the persons name
+* * @param {optional:Boolean} gender true if a man, false if female.  Defaults to true.
+* * @return {String} returns the appropriate honorific before the person's name.
+* *| 
+ honorific = function(name, gender){
+</pre>
  */
 MVC.Doc.Function = MVC.Doc.Pair.extend('function',
 /* @static */
@@ -27,13 +44,14 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         
     },
     /**
-     * Goes throw the comments.  Searches them for lines starting with @<i>directive</i>.
+     * Goes through the comment line by line.  Searches for lines starting with a <i>@directive</i>.
      * If a line with a directive is found, it sees if the instance has a function that matches
      * <i>directive</i>_add exists.  If it does, <i>directive</i>_add is called on that object.
      * If following lines do not have a directive, the <i>directive</i>_add_more function is called
      * on the instance
      * <br/>
-     * Initial comments are added to real_comment.
+     * Initial comments are added to real_comment.<br>
+     * This function is shared by Class and Constructor.
      */
     comment_setup: function(){
         var i = 0;
@@ -47,7 +65,10 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
             var match = line.match(/^[\s*]?@(\w+)/)
             if(match){
                 var fname = (match[1]+'_add').toLowerCase();
-                if(! this[fname]) continue;
+                if(! this[fname]) {
+                    this.real_comment+= line+"\n"
+                    continue;
+                }
                 last_data = this[fname](line);
                 if(last_data) last = match[1].toLowerCase(); else last = null;
             }
@@ -87,8 +108,11 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
      * @param {Object} line
      */
     return_add: function(line){
-        var parts = line.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s+?(.*)?/);
+        
+        var parts = line.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s*(.*)?/);
+        
         if(!parts) return;
+
         var description = parts.pop() || "";
         var type = parts.pop();
         this.ret = {description: description, type: type};

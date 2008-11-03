@@ -1,33 +1,38 @@
 /**
- * Hey o [MVC.Doc.Constructor.prototype.init | Constructor's init]
+ * Documents a 'Class'.  A class is typically a collection of static and prototype functions.
+ * MVC Doc can automatically detect classes created with MVC.Class.  However, you can make anything
+ * a class with the <b>@class <i>ClassName</i></b> directive.
  */
 MVC.Doc.Class = MVC.Doc.Pair.extend('class',
+/* @Static */
 {
     code_match: /([\w\.]+)\s*=\s*([\w\.]+?).extend\(/,
     starts_scope: true,
     listing: [],
-    create_index : function(){
-        var res = '<html><head><link rel="stylesheet" href="../style.css" type="text/css">'+
-            '<title>Classes</title></head><body>'
-        res += '<h1>Classes <label>LIST</label></h1>'
-        for(var i = 0; i < this.listing.length; i++){
-            var name = this.listing[i].name;
-            res += "<a href='"+name+".html'>"+name+"</a> "
-        }
-        res +="</body></html>"
-        MVCOptions.save('docs/classes/index.html', res)
-    },
+    /**
+     * Loads the class view.
+     */
     init : function(){
         this._super();
         var ejs = "jmvc/rhino/documentation/templates/file.ejs"
         this._file_view = new View({text: readFile(ejs), name: ejs });
     }
 },
+/* @Prototype */
 {
+    /**
+     * Called when a new class comment is encountered.
+     * @param {String} comment the comment text
+     * @param {String} code the first line of source following the comment
+     * @param {MVC.Doc.Pair} scope where the class was created, typically the file
+     */
     init: function(comment, code, scope ){
         this._super(comment, code, scope);
         this.Class.listing.push(this);
     },
+    /**
+     * Verifies the class was created successfully.
+     */
     comment_setup_complete : function(){
         if(!this.name){
             print("Error! No name defined for \n-----------------------")
@@ -35,6 +40,10 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
             print('-----------------------')
         }  
     },
+    /**
+     * Adds this class to the file it was created in.
+     * @param {MVC.Doc.Pair} scope
+     */
     add_parent : function(scope){
         //always go back to the file:
         while(scope.Class.className != 'file') scope = scope.parent;
@@ -53,8 +62,12 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
             this.name = m[1];
         }
     },
-    toFile : function(summary){
-        this.summary = summary
+    /**
+     * Renders this class to a file.
+     * @param {String} left_side The left side content / list of all documented classes & constructors.
+     */
+    toFile : function(left_side){
+        this.summary = left_side
         try{
             var res = this.Class._file_view.render(this)
             MVCOptions.save('docs/classes/'+this.name+".html", res)
@@ -62,8 +75,10 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
             print("Unable to generate class for "+this.name+" !")
             print("  Error: "+e)
         }
-        
     },
+    /**
+     * Creates links to functions and attributes in this class.
+     */
     get_quicklinks : function(){
         var inside = this.linker().sort(MVC.Doc.Pair.sort_by_full_name);
         var result = [];
@@ -74,9 +89,16 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         return result.join(", ")
         
     },
+    /**
+     * Returns a comment that has been cleaned.
+     */
     cleaned_comment : function(){
         return MVC.Doc.link_content(this.real_comment);
     },
+    /**
+     * Returns the url for this page
+     * @return {String}
+     */
     url : function(){
         return this.name+".html";
     }

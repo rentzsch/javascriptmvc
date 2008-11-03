@@ -260,6 +260,12 @@ font-weight: bold;
     font-size: 10pt;
     border-bottom: solid 1px #D5E7B3;
 }
+.param code a {
+    text-decoration: none; color: blue;
+}
+.param code a:hover {
+    text-decoration: underline;
+}
 .optional code {
     border-bottom: none;
     font-size: 10pt;

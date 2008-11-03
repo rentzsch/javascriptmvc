@@ -31,7 +31,6 @@
  *   }
  * }</pre>
  * 
- * [MVC.Doc.Class | MVC.Doc.Class]
  */
 MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
 /* @Static */

@@ -75,13 +75,17 @@ MVC.render_to = function(file, ejs, data){
  * load('jmvc/rhino/documentation/setup.js'); 
  * //pass file locations, and a name to a new Doc.Application
  * new MVC.Doc.Application(['file1.js','folder/file2.js'], "MyApp");</pre>
+ * 
  */
 MVC.Doc = 
 /* @Static */
 {    
     render_to: function(file, ejs, data){
-        var v = new View({text: readFile(ejs), name: ejs });
-        MVCOptions.save(file,  v.render(data)  );
+        MVCOptions.save(file,  this.render(ejs, data) );
+    },
+    render : function(ejs, data){
+         var v = new View({text: readFile(ejs), name: ejs });
+        return v.render(data)
     },
     /**
      * Replaces content in brackets [] with a link to source.
@@ -99,6 +103,14 @@ MVC.Doc =
         })
     },
     /**
+     * Will replace with a link to a class or function if appropriate.
+     * @param {Object} content
+     */
+    link : function(content){
+        var url = MVC.Doc.objects[content];
+        return url ? "<a href='"+url+"'>"+content+"</a>" : content;
+    },
+    /**
      * A map of the full name of all the objects the application creates and the url to 
      * the documentation for them.
      */
@@ -107,9 +119,9 @@ MVC.Doc =
 
 /**
  * @constructor
- * abc
+ * Creates documentation for an application
  * @init
- * asfda
+ * Generates documentation from the passed in files.
  * @param {Array} total An array of path names or objects with a path and text.
  * @param {Object} app_name The application name.
  */
@@ -133,9 +145,15 @@ MVC.Doc.Application = function(total, app_name){
 }
 
 
-MVC.Doc.Application.prototype = {
+MVC.Doc.Application.prototype = 
+/* @prototype */
+{
+    /**
+     * Creates the documentation files.
+     */
     generate : function(){
-        var summary = this.summary();
+         this.all_sorted = MVC.Doc.Class.listing.concat( MVC.Doc.Constructor.listing ).sort( MVC.Doc.Pair.sort_by_name )
+        var summary = this.left_side();
         
         //make classes
         for(var i = 0; i < MVC.Doc.Class.listing.length; i++){
@@ -147,28 +165,29 @@ MVC.Doc.Application.prototype = {
         for(var i = 0; i < MVC.Doc.Constructor.listing.length; i++){
             MVC.Doc.Constructor.listing[i].toFile(summary);
         }
-
+        
         this.summary_page(summary)
     },
-    summary: function(){
-
-        var res = "<h3>Documentation</h3><ul>"
-
-        var things = MVC.Doc.Class.listing.concat( MVC.Doc.Constructor.listing ).sort( MVC.Doc.Pair.sort_by_name );
-
-        for(var i = 0; i < things.length; i++){
-            var name = things[i].name;
-            res += "<li><a href='../classes/"+name+".html'>"+name+"</a></li>"
-        }
-        return res + "</ul>"
-
+    /**
+     * @return {string} The left side bar.
+     */
+    left_side: function(){
+        return MVC.Doc.render("jmvc/rhino/documentation/templates/left_side.ejs" , this)
     },
+    /**
+     * Creates a page for all classes and constructors
+     * @param {String} summary the left hand side.
+     */
     summary_page : function(summary){
         MVC.Doc.render_to('docs/'+this.name+".html","jmvc/rhino/documentation/templates/summary.ejs" , this)
 
     },
     
-    
+    /**
+     * Only shows five folders in a path.
+     * @param {String} path a file path to convert
+     * @return {String}
+     */
     clean_path : function(path){
         return path;
         var parts = path.split("/")
