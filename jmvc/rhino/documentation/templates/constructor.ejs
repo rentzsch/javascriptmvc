@@ -1,6 +1,13 @@
 <div><h1><%= name%> <label>API</label></h1>
 <div id='shortcuts'><%= get_quicklinks()%></div>
+<%if(this.inherits){%>
+    <div class='inherits'>Inherits: <%= MVC.Doc.link(this.inherits) %></div>
+<%}%>
+<%if(this.author){%>
+    <div class='author'>Author: <%= MVC.Doc.link(this.author) %></div>
+<%}%>
 <div class='group'><%= MVC.Doc.link_content(this.real_comment) %></div>
+
 <div class='method'>
      <h3 id="<%= this.full_name()%>"><%= name%></h3>
          <pre class='signiture'><code><%= this.signiture()%><code></pre>
@@ -10,7 +17,7 @@
        var param = ordered[n]; %>  
       <div class='param <% param.optional ? "optional" : ""%>'>
           <label><%= param.name%></label>
-          <code>{<%=(param.optional ? '' : '') +""+param.type %>}</code> - <%= param.description %>
+          <code>{<%=(param.optional ? '' : '') +""+MVC.Doc.link(param.type) %>}</code> - <%= param.description %>
       </div>
   <% } %>
 </div> 

@@ -1,5 +1,13 @@
 <div><h1><%= name%> <label>API</label></h1>
+
 <div id='shortcuts'><%= get_quicklinks()%></div>
+<%if(this.inherits){%>
+    <div class='inherits'>Inherits: <%= MVC.Doc.link(this.inherits) %></div>
+<%}%>
+<%if(this.author){%>
+    <div class='author'>Author: <%= this.author %></div>
+<%}%>
 <div class='group'><%= this.cleaned_comment() %></div>
+
 <%= make(children)%>
 </div>

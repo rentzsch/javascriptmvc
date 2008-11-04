@@ -32,7 +32,10 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
 {
     code_setup: function(){
         var parts = this.Class.code_match(this.code);
-        this.name = parts[1];
+        if(!parts){
+            parts = this.code.match(/\s*function\s+([\w\.\$]+)\s*\(([^\)]*)/)
+        }
+        this.name = parts[1].replace(/^this\./,"");
         this.params = {};
         this.ret = {type: 'undefined',description: ""}
         var params = parts[2].match(/\w+/);

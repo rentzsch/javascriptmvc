@@ -107,6 +107,18 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
     init_add_more: function(line){
         this.init_description +="\n"+ line;
     },
+    inherits_add: function(line){
+        var m = line.match(/^\s*@\w+ ([\w\.]+)/)
+        if(m){
+            this.inherits = m[1];
+        }
+    },
+    author_add: function(line){
+        var m = line.match(/^\s*@author\s*(.*)/)
+        if(m){
+            this.author = m[1];
+        }
+    },
     toFile : function(summary){
         this.summary = summary
         //try{

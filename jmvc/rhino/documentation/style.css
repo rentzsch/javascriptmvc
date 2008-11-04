@@ -24,7 +24,10 @@ a.home_link { color:Blue;text-decoration:underline; }
 .footnote { margin-bottom:0px;color:#666666;font-size:11px; }
 .disclaimer a { color:blue; }
 
-
+.inherits, .author {
+    margin: 10px 40px 10px 40px;
+    font-size: 10px;
+}
 form, p, ol {font-size: 11pt; margin: 0px 40px 20px 40px; padding:0px;}
 ol {margin-left: 60px;}
 ol li {margin-bottom: 10px;}
