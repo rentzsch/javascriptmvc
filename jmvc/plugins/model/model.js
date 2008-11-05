@@ -180,7 +180,16 @@ MVC.Model = MVC.Class.extend(
         else
           this._setProperty(attribute, value);
     },
+    /**
+     * Checks if there is a set_<i>property</i> value.  If it returns true, lets it handle; otherwise
+     * saves it.
+     * @param {Object} property
+     * @param {Object} value
+     */
     _setProperty : function(property, value) {  
+        if(this["set_"+property] && ! this["set_"+property](value) ){
+            return;
+        }
         //add to cache, this should probably check that the id isn't changing.  If it does, should update the cache
         var old = this[property]
         
