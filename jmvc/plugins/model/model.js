@@ -127,7 +127,11 @@ MVC.Model = MVC.Class.extend(
         if(!callbacks.onFailure && callbacks.onComplete) callbacks.onFailure = callbacks.onComplete;
 		return callbacks;
     },
-    models : {}
+    models : {},
+    callback : function(fname){
+        var f = this[fname];
+        return MVC.Function.bind(f, this);
+    }
 },
 /* @Prototype*/
 {   
