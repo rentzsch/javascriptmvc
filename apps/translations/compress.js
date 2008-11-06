@@ -6,7 +6,7 @@ MVCOptions = {
         var compressed = MVCOptions.collect_and_compress(total);
         MVCOptions.save('apps/translations/production.js', compressed);
         print("Compressed to 'apps/translations/production.js'.");
-        var app = new MVCObject.DApplication(total, "translations");
+        var app = new MVC.Doc.Application(total, "translations");
         app.generate();
         print("Generated docs.");
     }

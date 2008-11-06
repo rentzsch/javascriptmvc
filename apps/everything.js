@@ -10,7 +10,7 @@ include.plugins(
 
 MVC.load_doc = true;
 
-//include('../jmvc/rhino/documentation/setup');
+include('../jmvc/rhino/documentation/setup');
 
 include(function(){
   //include.models();

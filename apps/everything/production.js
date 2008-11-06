@@ -2,6 +2,7 @@ include.set_path('apps');
 include.resources();
 include.plugins("core","controller/comet","controller/dragdrop","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/rest_xml","model/view_helper","test","controller/stateful");
 MVC.load_doc=true;
+include("../jmvc/rhino/documentation/setup");
 include(function(){
 });
 ;
@@ -2606,9 +2607,9 @@ MVC.Droppables.selectors[_4]={};
 }
 MVC.Droppables.selectors[_4][this.event_type]=_3.dispatch_closure(_1);
 }});
-MVC.Droppable=MVC.Controller.Params;
-MVC.Droppable.prototype=new MVC.Controller.Params();
-MVC.Object.extend(MVC.Droppable.prototype,{cache_position:function(){
+MVC.Controller.DropParams=MVC.Controller.Params;
+MVC.Controller.DropParams.prototype=new MVC.Controller.Params();
+MVC.Object.extend(MVC.Controller.DropParams.prototype,{cache_position:function(){
 this._cache=true;
 },cancel:function(){
 this._cancel=true;
@@ -2616,7 +2617,7 @@ this._cancel=true;
 MVC.Droppables={drops:[],selectors:{},add:function(_5,_6){
 _5=MVC.$E(_5);
 _6.element=_5;
-var _7=new MVC.Droppable(_6);
+var _7=new MVC.Controller.DropParams(_6);
 if(_7.dropadd){
 _7.dropadd(_7);
 }
@@ -5646,6 +5647,541 @@ if(_15&&_15.parentNode){
 _15.parentNode.removeChild(_15);
 }
 delete this;
+}});
+;
+include.set_path('jmvc/rhino/documentation');
+if(typeof load!="undefined"&&!MVC.load_doc){
+load("jmvc/plugins/lang/standard_helpers.js");
+load("jmvc/plugins/view/view.js");
+load("jmvc/plugins/lang/class/setup.js");
+load("jmvc/rhino/documentation/application.js");
+load("jmvc/rhino/documentation/pair.js");
+load("jmvc/rhino/documentation/function.js");
+load("jmvc/rhino/documentation/class.js");
+load("jmvc/rhino/documentation/constructor.js");
+load("jmvc/rhino/documentation/file.js");
+load("jmvc/rhino/documentation/add.js");
+load("jmvc/rhino/documentation/static.js");
+load("jmvc/rhino/documentation/prototype.js");
+load("jmvc/rhino/documentation/attribute.js");
+}else{
+include.plugins("view","lang/class");
+include("application","pair","function","class","constructor","file","add","static","prototype","attribute");
+}
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.render_to=function(_1,_2,_3){
+var v=new View({text:readFile(_2),name:_2});
+MVCOptions.save(_1,v.render(_3));
+};
+MVC.Doc={render_to:function(_5,_6,_7){
+MVCOptions.save(_5,this.render(_6,_7));
+},render:function(_8,_9){
+var v=new View({text:readFile(_8),name:_8});
+return v.render(_9);
+},link_content:function(_b){
+return _b.replace(/\[\s*([^\|\]\s]*)\s*\|?\s*([^\]]*)\s*\]/g,function(_c,_d,_e){
+var _f=MVC.Doc.objects[_d];
+if(!_e){
+_e=_d.replace(/\.prototype|\.static/);
+}
+return _f?"<a href='"+_f+"'>"+_e+"</a>":_c;
+});
+},link:function(_10){
+var url=MVC.Doc.objects[_10];
+return url?"<a href='"+url+"'>"+_10+"</a>":_10;
+},objects:{}};
+MVC.Doc.Application=function(_12,_13){
+this.name=_13;
+this.total=_12;
+this.files=[];
+for(var s=0;s<_12.length;s++){
+script=_12[s];
+if(typeof script=="string"){
+script=_12[s]={path:script,text:readFile(script)};
+}
+if(typeof script!="function"&&!script.process){
+this.files.push(new MVC.Doc.File(_12[s]));
+}
+}
+};
+MVC.Doc.Application.prototype={generate:function(){
+this.all_sorted=MVC.Doc.Class.listing.concat(MVC.Doc.Constructor.listing).sort(MVC.Doc.Pair.sort_by_name);
+var _15=this.left_side();
+for(var i=0;i<MVC.Doc.Class.listing.length;i++){
+MVC.Doc.Class.listing[i].toFile(_15);
+}
+for(var i=0;i<MVC.Doc.Constructor.listing.length;i++){
+MVC.Doc.Constructor.listing[i].toFile(_15);
+}
+this.summary_page(_15);
+},left_side:function(){
+return MVC.Doc.render("jmvc/rhino/documentation/templates/left_side.ejs",this);
+},summary_page:function(_17){
+MVC.Doc.render_to("docs/"+this.name+".html","jmvc/rhino/documentation/templates/summary.ejs",this);
+},clean_path:function(_18){
+return _18;
+var _19=_18.split("/");
+if(_19.length>5){
+_19=_19.slice(_19.length-5);
+}
+return _19.join("/");
+}};
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.Pair=MVC.Class.extend({code_match:function(){
+return null;
+},classes:[],extended:function(_1){
+if(_1.className){
+this.classes.push(_1);
+}
+},create:function(_2,_3,_4){
+var _5=_2.match(/^@(\w+)/),_6;
+if(!(_6=this.has_type(_5?_5[1]:null))){
+_6=this.guess_type(_3);
+}
+if(!_6){
+return null;
+}
+return new _6(_2,_3,_4);
+},has_type:function(_7){
+if(!_7){
+return null;
+}
+for(var i=0;i<this.classes.length;i++){
+if(this.classes[i].className.toLowerCase()==_7.toLowerCase()){
+return this.classes[i];
+}
+}
+return null;
+},guess_type:function(_9){
+for(var i=0;i<this.classes.length;i++){
+if(this.classes[i].code_match(_9)){
+return this.classes[i];
+}
+}
+return null;
+},starts_scope:false,sort_by_full_name:function(a,b){
+var af=a.full_name?a.full_name.toLowerCase():a.full_name;
+var bf=b.full_name?b.full_name.toLowerCase():a.full_name;
+if(af==bf){
+return 0;
+}
+return af>bf?1:-1;
+},sort_by_name:function(a,b){
+var af=a.name?a.name.toLowerCase():a.name;
+var bf=b.name?b.name.toLowerCase():a.name;
+if(af==bf){
+return 0;
+}
+return af>bf?1:-1;
+},init:function(){
+if(this.className){
+var ejs="jmvc/rhino/documentation/templates/"+this.className+".ejs";
+this._view=new View({text:readFile(ejs),name:ejs});
+}
+}},{init:function(_14,_15,_16){
+this.children=[];
+this.comment=_14;
+this.code=_15;
+this.add_parent(_16);
+if(this.Class.code_match(this.code)){
+this.code_setup();
+}
+this.comment_setup();
+var par=this;
+while(par&&!par.url){
+par=par.parent;
+}
+if(par){
+MVC.Doc.objects[this.full_name()]=par.url()+(this.url?"":"#"+this.full_name());
+}
+},add:function(_18){
+this.children.push(_18);
+},add_parent:function(_19){
+this.parent=_19;
+this.parent.add(this);
+},scope:function(){
+return this.Class.starts_scope?this:this.parent;
+},code_setup:function(){
+},comment_setup:function(){
+},toHTML:function(){
+return this.Class._view.render(this);
+},full_name:function(){
+var par=this.parent.full_name();
+return (par?par+".":"")+this.name;
+},make:function(arr){
+var res=["<div>"];
+for(var c=0;c<arr.length;c++){
+var _1e=arr[c];
+res.push(_1e.toHTML());
+}
+res.push("</div>");
+return res.join("");
+},linker:function(){
+var _1f=[{name:this.name,full_name:this.full_name()}];
+if(this.children){
+for(var c=0;c<this.children.length;c++){
+var _21=this.children[c].linker();
+if(_21){
+_1f=_1f.concat(_21);
+}
+}
+}
+return _1f;
+},ordered_params:function(){
+var arr=[];
+for(var n in this.params){
+var _24=this.params[n];
+arr[_24.order]=_24;
+}
+return arr;
+},plugin_add:function(_25){
+this.plugin=_25.match(/@plugin ([^ ]+)/)[1];
+}});
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.Function=MVC.Doc.Pair.extend("function",{code_match:/([\w\.\$]+)\s*[:=]\s*function\(([^\)]*)/},{code_setup:function(){
+var _1=this.Class.code_match(this.code);
+if(!_1){
+_1=this.code.match(/\s*function\s+([\w\.\$]+)\s*\(([^\)]*)/);
+}
+this.name=_1[1].replace(/^this\./,"");
+this.params={};
+this.ret={type:"undefined",description:""};
+var _2=_1[2].match(/\w+/);
+if(!_2){
+return;
+}
+for(var i=0;i<_2.length;i++){
+this.params[_2[i]]={description:"",type:"",optional:false,order:i,name:_2[i]};
+}
+},comment_setup:function(){
+var i=0;
+var _5=this.comment.split("\n");
+this.real_comment="";
+if(!this.params){
+this.params={};
+}
+if(!this.ret){
+this.ret={type:"undefined",description:""};
+}
+var _6,_7;
+for(var l=0;l<_5.length;l++){
+var _9=_5[l];
+var _a=_9.match(/^[\s*]?@(\w+)/);
+if(_a){
+var _b=(_a[1]+"_add").toLowerCase();
+if(!this[_b]){
+this.real_comment+=_9+"\n";
+continue;
+}
+_7=this[_b](_9);
+if(_7){
+_6=_a[1].toLowerCase();
+}else{
+_6=null;
+}
+}else{
+if(!_9.match(/^constructor/i)&&!_6){
+this.real_comment+=_9+"\n";
+}else{
+if(_6&&this[_6+"_add_more"]){
+this[_6+"_add_more"](_9,_7);
+}
+}
+}
+}
+if(this.comment_setup_complete){
+this.comment_setup_complete();
+}
+},param_add_more:function(_c,_d){
+if(_d){
+_d.description+="\n"+_c;
+}
+},param_add:function(_e){
+var _f=_e.match(/\s*@param\s+(?:\{(?:(optional):)?([\w\.\/]+)\})?\s+([\w\.]+) ?(.*)?/);
+if(!_f){
+return;
+}
+var _10=_f.pop();
+var n=_f.pop();
+var _12=this.params[n]?this.params[n]:this.params[n]={order:this.ordered_params().length};
+_12.description=_10||"";
+_12.name=n;
+_12.type=_f.pop()||"";
+_12.optional=_f.pop()?true:false;
+return this.params[n];
+},return_add:function(_13){
+var _14=_13.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s*(.*)?/);
+if(!_14){
+return;
+}
+var _15=_14.pop()||"";
+var _16=_14.pop();
+this.ret={description:_15,type:_16};
+return this.ret;
+},function_add:function(_17){
+var m=_17.match(/^@\w+\s+([\w\.\$]+)/);
+if(m){
+this.name=m[1];
+}
+},signiture:function(){
+var res=[];
+var _1a=this.ordered_params();
+for(var n=0;n<_1a.length;n++){
+var _1c=_1a[n];
+res.push(_1c.name);
+}
+var n=this.name;
+return n+"("+res.join(", ")+") -> "+this.ret.type;
+}});
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.Class=MVC.Doc.Pair.extend("class",{code_match:/([\w\.]+)\s*=\s*([\w\.]+?).extend\(/,starts_scope:true,listing:[],init:function(){
+this._super();
+var _1="jmvc/rhino/documentation/templates/file.ejs";
+this._file_view=new View({text:readFile(_1),name:_1});
+}},{init:function(_2,_3,_4){
+this._super(_2,_3,_4);
+this.Class.listing.push(this);
+},comment_setup_complete:function(){
+if(!this.name){
+print("Error! No name defined for \n-----------------------");
+print(this.comment);
+print("-----------------------");
+}
+},add_parent:function(_5){
+while(_5.Class.className!="file"){
+_5=_5.parent;
+}
+this.parent=_5;
+this.parent.add(this);
+},code_setup:function(){
+var _6=this.code.match(this.Class.code_match);
+this.name=_6[1];
+this.inherits=_6[2];
+},comment_setup:MVC.Doc.Function.prototype.comment_setup,class_add:function(_7){
+var m=_7.match(/^@\w+ ([\w\.]+)/);
+if(m){
+this.name=m[1];
+}
+},inherits_add:function(_9){
+var m=_9.match(/^\s*@\w+ ([\w\.]+)/);
+if(m){
+this.inherits=m[1];
+}
+},author_add:function(_b){
+var m=_b.match(/^\s*@author\s*(.*)/);
+if(m){
+this.author=m[1];
+}
+},toFile:function(_d){
+this.summary=_d;
+try{
+var _e=this.Class._file_view.render(this);
+MVCOptions.save("docs/classes/"+this.name+".html",_e);
+}
+catch(e){
+print("Unable to generate class for "+this.name+" !");
+print("  Error: "+e);
+}
+},get_quicklinks:function(){
+var _f=this.linker().sort(MVC.Doc.Pair.sort_by_full_name);
+var _10=[];
+for(var i=0;i<_f.length;i++){
+var _12=_f[i];
+_10.push("<a href='#"+_12.full_name+"'>"+_12.name+"</a>");
+}
+return _10.join(", ");
+},cleaned_comment:function(){
+return MVC.Doc.link_content(this.real_comment);
+},url:function(){
+return this.name+".html";
+}});
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.Constructor=MVC.Doc.Pair.extend("constructor",{code_match:/([\w\.]+)\s*[:=]\s*function\(([^\)]*)/,starts_scope:true,listing:[],create_index:function(){
+var _1="<html><head><link rel=\"stylesheet\" href=\"../style.css\" type=\"text/css\" />"+"<title>Constructors</title></head><body>";
+_1+="<h1>Constructors <label>LIST</label></h1>";
+for(var i=0;i<this.listing.length;i++){
+var _3=this.listing[i].name;
+_1+="<a href='"+_3+".html'>"+_3+"</a> ";
+}
+_1+="</body></html>";
+MVCOptions.save("docs/constructors/index2.html",_1);
+},init:function(){
+this._super();
+var _4="jmvc/rhino/documentation/templates/file.ejs";
+this._file_view=new View({text:readFile(_4),name:_4});
+}},{init:function(_5,_6,_7){
+this._super(_5,_6,_7);
+this.Class.listing.push(this);
+},add_parent:function(_8){
+while(_8.Class.className!="file"){
+_8=_8.parent;
+}
+this.parent=_8;
+this.parent.add(this);
+},code_setup:MVC.Doc.Function.prototype.code_setup,comment_setup:MVC.Doc.Function.prototype.comment_setup,return_add:MVC.Doc.Function.prototype.return_add,param_add:MVC.Doc.Function.prototype.param_add,param_add_more:MVC.Doc.Function.prototype.param_add_more,init_add:function(_9){
+var _a=_9.match(/\s?@init(.*)?/);
+if(!_a||!_a[1]){
+this.init_description=" ";
+return true;
+}
+this.init_description=_a.pop();
+return this.init_description;
+},init_add_more:function(_b){
+this.init_description+="\n"+_b;
+},inherits_add:function(_c){
+var m=_c.match(/^\s*@\w+ ([\w\.]+)/);
+if(m){
+this.inherits=m[1];
+}
+},author_add:function(_e){
+var m=_e.match(/^\s*@author\s*(.*)/);
+if(m){
+this.author=m[1];
+}
+},toFile:function(_10){
+this.summary=_10;
+var res=this.Class._file_view.render(this);
+MVCOptions.save("docs/classes/"+this.name+".html",res);
+},get_quicklinks:function(){
+var _12=this.linker().sort(MVC.Doc.Pair.sort_by_full_name);
+var _13=[];
+for(var i=0;i<_12.length;i++){
+var _15=_12[i];
+_13.push("<a href='#"+_15.full_name+"'>"+_15.name+"</a>");
+}
+return _13.join(", ");
+},signiture:function(){
+var res=[];
+for(var n in this.params){
+res.push(n);
+}
+var n=this.name;
+if(this.ret.type=="undefined"){
+n="new "+n;
+this.ret.type=this.name.toLowerCase();
+}
+return n+"("+res.join(", ")+") -> "+this.ret.type;
+},cleaned_comment:function(){
+return MVC.Doc.link_content(this.real_comment);
+},url:function(){
+return this.name+".html";
+},comment_setup_complete:function(){
+if(!this.name){
+print("Error! No name defined for \n-----------------------");
+print(this.comment);
+print("-----------------------");
+}else{
+if(!this.init_description){
+print("Error! No init_description defined for "+this.name+"\n-----------------------");
+print(this.comment);
+print("-----------------------");
+}
+}
+},constructor_add:function(_18){
+var m=_18.match(/^@\w+ ([\w\.]+)/);
+if(m){
+this.name=m[1];
+}
+}});
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.File=MVC.Doc.Pair.extend("file",{group:new RegExp("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/[^\\w\\{\\(\\[/]*[^\\n]*)","g"),splitter:new RegExp("(?:/\\*+((?:[^*]|(?:\\*+[^*/]))*)\\*+/[^\\w\\{\\(\\[]*([^\\r\\n]*))")},{init:function(_1){
+this.children=[];
+this.name=_1.path;
+this.src=_1.text;
+print("   "+this.name);
+this.generate();
+},generate:function(){
+var _2=this.src.match(this.Class.group);
+var _3=this;
+if(!_2){
+return;
+}
+for(var i=0;i<_2.length;i++){
+var _5=_2[i].match(this.Class.splitter);
+var _6=_5[1].replace(/^[^\w@]*/,"").replace(/\r?\n(\s*\*+)?/g,"\n");
+var _7=_5[2];
+var _8=MVC.Doc.Pair.create(_6,_7,_3);
+if(_8){
+_3=_8.scope();
+}
+}
+},clean_comment:function(_9){
+return _9.replace(/\/\*|\*\//,"").replace(/\r?\n\s*\*?\s*/g,"\n");
+},full_name:function(){
+return "";
+}});
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.Add=MVC.Doc.Pair.extend("add",{comment_setup:MVC.Doc.Function.prototype.comment_setup,add_add:function(_1){
+var m=_1.match(/^@add\s+([\w\.]+)\s+([\w\.]+)?/i);
+if(m){
+this.sub_scope=m.pop().toLowerCase();
+this.scope_name=m.pop();
+}
+},scope:function(){
+var _3=MVC.Doc.Class;
+var _4;
+for(var l=0;l<_3.listing.length;l++){
+if(_3.listing[l].name==this.scope_name){
+_4=_3.listing[l];
+break;
+}
+}
+if(!_4){
+var _3=MVC.Doc.Constructor;
+for(var l=0;l<_3.listing.length;l++){
+if(_3.listing[l].name==this.scope_name){
+_4=_3.listing[l];
+break;
+}
+}
+}
+if(!_4){
+return this;
+}
+if(this.sub_scope){
+var _6=_4.children;
+var _7;
+for(var i=0;i<_6.length;i++){
+if(_6[i].Class.className.toLowerCase()==this.sub_scope.toLowerCase()){
+_7=_6[i];
+break;
+}
+}
+if(_7){
+return _7;
+}
+}
+return _4;
+},toHTML:function(){
+return "";
+},linker:function(){
+}});
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.Static=MVC.Doc.Pair.extend("static",{starts_scope:true},{add_parent:function(_1){
+var _2=_1.Class.className;
+this.parent=_2=="class"||_2=="constructor"?_1:_1.parent;
+if(_2!="file"&&this.parent){
+this.parent.add(this);
+}
+},name:"static"});
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.Prototype=MVC.Doc.Static.extend("prototype",{name:"prototype"});
+;
+include.set_path('jmvc/rhino/documentation');
+MVC.Doc.Attribute=MVC.Doc.Pair.extend("attribute",{code_match:function(_1){
+return _1.match(/(\w+)\s*[:=]\s*/)&&!_1.match(/(\w+)\s*[:=]\s*function\(([^\)]*)/);
+}},{code_setup:function(){
+var _2=this.code.match(/(\w+)\s*[:=]\s*/);
+this.name=_2[1];
 }});
 ;
 include.next_function();
