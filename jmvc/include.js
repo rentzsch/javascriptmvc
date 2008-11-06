@@ -347,12 +347,6 @@ var add_defaults = function(inc){
 MVC.Object.extend(include,
 /* @Static */
 {
-	is_included: function(path){
-    	for(var i = 0; i < includes.length; i++) if(includes[i].absolute == path) return true;
-    	for(var i = 0; i < current_includes.length; i++) if(current_includes[i].absolute == path) return true;
-    	for(var i = 0; i < total.length; i++) if(total[i].absolute == path) return true;
-    	return false;
-    },
 	//Adds defaults to an included parameter
     add_defaults : function(inc){
     	if(typeof inc == 'string') 
@@ -415,7 +409,9 @@ MVC.Object.extend(include,
                 newInclude();
             }
             include.functions.push(adjusted); //add to the list of functions
+
             current_includes.unshift(  adjusted ); //add to the front
+            
             return;
         }
         
@@ -430,10 +426,25 @@ MVC.Object.extend(include,
 		newInclude.absolute = pf.relative() ? pf.join_from(include.get_absolute_path(), true) : newInclude.path;
 		newInclude.start = new MVC.File(newInclude.path).dir();
         
-        //add to the current list of includes if it hasn't already been included
-        if(! include.is_included(newInclude.absolute))
-		    current_includes.unshift(  newInclude );
+        //now we should check if it has already been included or added earlier in this file
+        if(include.should_add(newInclude.absolute)){
+            //but the file could still be in the list of includes but we need it earlier, so remove it and add it here
+            for(var i = 0; i < includes.length; i++){
+                if(includes[i].absolute == newInclude.absolute){
+                    includes.splice(i,1);
+                    break;
+                }
+            } 
+            current_includes.unshift(  newInclude );
+        }else{
+           
+        }
 	},
+    should_add : function(path){
+        for(var i = 0; i < total.length; i++) if(total[i].absolute == path) return false;
+    	for(var i = 0; i < current_includes.length; i++) if(current_includes[i].absolute == path) return false;
+        return true;
+    },
     /**
      * Includes something if it has been included or not.
      */
@@ -456,6 +467,7 @@ MVC.Object.extend(include,
     // Called after every file is loaded.  Gets the next file and includes it.
 	end: function(src){
         // add includes that were just added to the end of the list
+        
         includes = includes.concat(current_includes);
 		
         // take the last one
@@ -493,6 +505,7 @@ MVC.Object.extend(include,
                 print("   "+parts.join("/"));
                 latest.text = include.request(MVC.root.join(latest.path));
             }
+
     		latest.ignore ? insert() : insert(latest.path);
         }
 	},
