@@ -1,4 +1,5 @@
 include.unit_tests(
+    'engine',
     'helpers', 
     'inflector',
     'element',

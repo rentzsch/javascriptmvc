@@ -22,7 +22,7 @@ if(location.href.indexOf('prototype') != -1){
 	document.getElementById('noproto_el').style.backgroundColor = '#ddffdd';
 }
 
-
+include.engines('testing');
 include.plugins('io/ajax','controller','view','dom/element','model','lang/timer');
 
 
