@@ -718,7 +718,7 @@ if(MVC.script_options){
 		}
     }
 	if(!MVC.Browser.Opera) insert();
-    include.opera();
+    include.opera();//for opera
 }
 if(MVC.Browser.Opera) 
     setTimeout(function(){ if(!include.opera_called && !options.dont_load_production){ alert("You forgot include.opera().")}}, 10000);
