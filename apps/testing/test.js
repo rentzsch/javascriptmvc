@@ -8,7 +8,8 @@ include.unit_tests(
     'controller_view',
     'vector',
     'timer',
-    'model'
+    'model',
+    'translation'
 );
 
 include.functional_tests();

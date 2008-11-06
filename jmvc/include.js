@@ -609,6 +609,10 @@ MVC.Object.extend(include,
     	script.src= src;
     	script.charset= encode;
     	head().appendChild(script);
+    },
+    write : function(src, encode){
+        encode = encode || "UTF-8";
+        document.write('<script type="text/javascript" src="'+src+'" encode="+encode+"></script>');
     }
 });
 /**

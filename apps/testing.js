@@ -23,7 +23,7 @@ if(location.href.indexOf('prototype') != -1){
 }
 
 include.engines('testing');
-include.plugins('io/ajax','controller','view','dom/element','model','lang/timer');
+include.plugins('io/ajax','controller','view','dom/element','model','lang/timer','view/translation');
 
 
 
@@ -31,5 +31,6 @@ include.plugins('io/ajax','controller','view','dom/element','model','lang/timer'
 include(function(){ //runs after prior includes are loaded
   include.models('todo');
   include.controllers('controllertest');
+  include.translation("spanish");
   //include.views();
 });
