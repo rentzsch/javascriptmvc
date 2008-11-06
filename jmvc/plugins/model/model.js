@@ -52,7 +52,7 @@ MVC.Model = MVC.Class.extend(
         var inst = new this(attributes);
         inst.is_new_record = this.new_record_func;
         
-        OpenAjax.hub.publish(this.className + ".create.as_existing", {data: inst});
+        this.publish("create.as_existing", {data: inst});
         
         //if(MVC.Controller) MVC.Controller.publish(this.className + ":create_as_existing", );
         return inst;
@@ -131,6 +131,14 @@ MVC.Model = MVC.Class.extend(
     callback : function(fname){
         var f = this[fname];
         return MVC.Function.bind(f, this);
+    },
+    /**
+     * Publishes to open ajax hub.  Always adds the className.event
+     * @param {Object} event
+     * @param {Object} data
+     */
+    publish : function(event, data){
+        OpenAjax.hub.publish(this.className + "."+event, {data: data});
     }
 },
 /* @Prototype*/
@@ -290,6 +298,14 @@ MVC.Model = MVC.Class.extend(
      */
     element : function(){
         return MVC.$E(this.element_id());;
+    },
+    /**
+     * Publishes to open ajax hub
+     * @param {String} event
+     * @param {optional:Object} data if missing, uses the instance
+     */
+    publish : function(event, data){
+        this.Class.publish(event, data||this);
     }
 });
 

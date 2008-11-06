@@ -71,7 +71,13 @@ MVC.Object.to_query_string.worker = function(obj,name){
                     MVC.Number.to_padded_string(value.getUTCMinutes(),2) + ':' +
                     MVC.Number.to_padded_string(value.getUTCSeconds(),2);
             }
-			if(typeof value != 'object'){
+			if(value instanceof Array && value.length){
+				var newer_name = encodeURIComponent(name ? name+'['+thing+']' : thing) ;
+                for(var i = 0; i < value.length; i++){
+                    var nice_val = encodeURIComponent(value[i].toString());
+                    parts2.push( newer_name+'='+nice_val )  ;
+                }
+            }else if(typeof value != 'object'){
 				var nice_val = encodeURIComponent(value.toString());
 				var newer_name = encodeURIComponent(name ? name+'['+thing+']' : thing) ;
 				parts2.push( newer_name+'='+nice_val )  ;

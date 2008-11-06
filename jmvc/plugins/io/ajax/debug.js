@@ -13,9 +13,9 @@
 		    var testurl = url;
             testurl = testurl.replace(/%2F/g,"~").replace(/%20/g,"_");
 
-            if(options.parameters) 
+            if(options.parameters && options.method == "get") 
                 testurl += (MVC.String.include(testurl,'?') ? '&' : '?') + MVC.Object.to_query_string(options.parameters)
-            
+            delete options.parameters
             
             var match = testurl.match(/^(?:https?:\/\/[^\/]*)?\/?([^\?]*)\??(.*)?/);
 			var left = match[1];

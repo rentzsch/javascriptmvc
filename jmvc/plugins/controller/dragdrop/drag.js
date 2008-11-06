@@ -224,6 +224,7 @@ MVC.Event.observe(document, 'mouseup', function(event){
 /**
  * @constructor MVC.Controller.DragParams
  * Drag actions are called with DragParams
+ * @inherits MVC.Controller.Params
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
