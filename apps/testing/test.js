@@ -1,4 +1,5 @@
 include.unit_tests(
+    'file',
     'engine',
     'helpers', 
     'inflector',
