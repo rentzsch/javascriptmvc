@@ -389,9 +389,9 @@ MVC.Controller.Params.prototype = {
 		return this.controller.singularName;
 	},
     element_instance : function(){
-        var model, matcher, className = this._className();
-        if(! (model=MVC.Model.models[className])  ) throw "No model for the "+ className+ " controller!";
-        matcher = new RegExp("^"+className+"_(.*)$");
+        var model, matcher, modelName = this.controller.modelName || this._className();
+        if(! (model=MVC.Model.models[modelName])  ) throw "No model for the "+ modelName+ " controller!";
+        matcher = new RegExp("^"+modelName+"_(.*)$");
         var id = this.class_element().id.match(matcher)[1];
 	    return model.store.find_one(id);
     }
