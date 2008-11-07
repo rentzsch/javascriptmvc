@@ -31,9 +31,9 @@ MVC.Controller = MVC.Class.extend(
                 }
             }
 	    }
-        this.modelName = MVC.String.classize(
-            MVC.String.is_singular(this.className) ? this.className : MVC.String.singularize(this.className)
-        );
+        if(!this.modelName)
+            this.modelName = MVC.String.is_singular(this.className) ? this.className : MVC.String.singularize(this.className)
+
         //load tests
         if(include.get_env() == 'test'){
             var path = MVC.root.join('test/functional/'+this.className+'_controller_test.js');
@@ -117,7 +117,11 @@ MVC.Controller = MVC.Class.extend(
             if (controller.prototype[action]) return controller;
         }
         return null;
-     }
+     },
+     /**
+      * The name of the model this controller can uses for functions like element_instance
+      */
+     modelName: null
 },
 /* @Prototype*/
 {
@@ -389,8 +393,8 @@ MVC.Controller.Params.prototype = {
 		return this.controller.singularName;
 	},
     element_instance : function(){
-        var model, matcher, modelName = this.controller.modelName || this._className();
-        if(! (model=MVC.Model.models[modelName])  ) throw "No model for the "+ modelName+ " controller!";
+        var model, matcher, modelName = this.modelName;
+        if(! (model=MVC.Model.models[modelName])  ) throw "No model for the "+ this.controller.className+ " controller!";
         matcher = new RegExp("^"+modelName+"_(.*)$");
         var id = this.class_element().id.match(matcher)[1];
 	    return model.store.find_one(id);
