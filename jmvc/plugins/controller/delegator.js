@@ -62,7 +62,7 @@ MVC.Object.extend(MVC.Delegator,
         var match;
 		for(var m = 0; m < matches.length; m++){
             match = matches[m];
-            ret_value = match.delegation_event._func( {event: event, element: match.node} ) && ret_value;
+            ret_value = match.delegation_event._func( {event: event, element: MVC.$E(match.node)} ) && ret_value;
 			if(event.is_killed()) return false;
 		}
 	},

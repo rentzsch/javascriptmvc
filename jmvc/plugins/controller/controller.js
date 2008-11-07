@@ -378,7 +378,7 @@ MVC.Controller.Params.prototype = {
 			start = start.parentNode;
 			if(start == document) return null;
 		}
-		return start;
+		return MVC.$E(start);
 	},
     /*
      * Returns if the event happened directly on the element in the params.

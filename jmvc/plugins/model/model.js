@@ -138,7 +138,7 @@ MVC.Model = MVC.Class.extend(
      * @param {Object} data
      */
     publish : function(event, data){
-        OpenAjax.hub.publish(this.className + "."+event, {data: data});
+        OpenAjax.hub.publish(this.className + "."+event, data);
     }
 },
 /* @Prototype*/
