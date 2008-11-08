@@ -1,7 +1,7 @@
 /**
  * needs to define which areas have a lasso
  */
-MVC.Controller.DragAction = MVC.Controller.DelegateAction.extend({
+MVC.Controller.Action.Lasso = MVC.Controller.EventAction.extend({
     match: new RegExp("(.*?)\\s?(lassostart|lassoend|lassomove)$")
 },
 //Prototype functions

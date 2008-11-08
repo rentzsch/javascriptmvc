@@ -6,7 +6,7 @@
  * dropped    -> Called when a drag is dropped on the drop
  * dropmove   -> Called as an element moves over a drop
  */
-MVC.Controller.SelectableAction = MVC.Controller.DelegateAction.extend({
+MVC.Controller.SelectableAction = MVC.Controller.EventAction.extend({
     match: new RegExp("(.*?)\\s?(selectover|selected|selectout|selectadd|selectmove)$")
 },
 /* @prototype */
