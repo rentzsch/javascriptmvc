@@ -4,29 +4,102 @@ MVC.Object.is_number = function(o){
 };
 
 /* 
- * Controllers respond to events such as mouseovers, clicks, and form submits. 
- * They do this by naming functions, 
- * also called actions, with combination css selector and event handlers.
- * 
- * <h2>Example</h2>
+ * Controllers respond to events. If something happens in your application, be it a click, or
+ * a [MVC.Model Model] being updated, a controller should respond to it.
+ * <h3>Example</h3>
  * <pre><span class='comment'>//Instead of:</span>
 $('.tasks').click(function(e){ ... })
 <span class='comment'>//do this</span>
 TasksController = MVC.Controller.extend('tasks',{
   click: function(params){...}
 })</pre>
- * 
+
  * <h2>Actions</h2>
- * Actions that 
+ * To respond to events, controllers simply name their event handling functions to match
+ * an [MVC.Controller.Action Action].  
+ *
+ * In the previous example, TasksController's click action is matched by the [MVC.Controller.Action.Event Event] Action. 
+ * Event matches functions that are combination of CSS selector and event name.  Here's another example:
+ * <pre>TasksController = MVC.Controller.extend('tasks',{
+  ".delete mouseover": function(params){...}
+})</pre>
+ * <h3>Types of Actions</h3>
+ * There are many types of Actions.  By default, Controller will match [MVC.Controller.Action.Event Event] and
+ * [MVC.Controller.Action.Subscribe Subscribe] actions.  To match other actions, include their plugins.
  * 
- * Controller can handle almost all standard events including:
- * change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
- * mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, focus, blur, load, unload.
+<table>
+	<tr>
+        <th>Action</th><th>Format</th><th>Description</th>
+    </tr>
+    <tbody  style="font-size: 10px;">
+    <tr>
+        <td>[MVC.Controller.Action.Event Event]</td>
+        <td>[CSS] [change|click|...]</td>
+        <td>Matches standard DOM events</td>
+    </tr>
+    <tr>
+        <td>[MVC.Controller.Action.Subscribe Subscribe]</td>
+        <td>[OpenAjax.hub event] subscribe</td>
+        <td>Subscribes this action to OpenAjax hub.</td>
+    </tr>
+    <tr>
+        <td>[MVC.Controller.Action.Drag Drag]</td>
+        <td>[CSS] [dragstart|dragging|...]</td>
+        <td>Matches events on a dragged object</td>
+    </tr>
+    <tr>
+        <td>[MVC.Controller.Action.Drop Drop]</td>
+        <td>[CSS] [dropadd|dropover|...]</td>
+        <td>Matches events on a droppable object</td>
+    </tr>
+    <tr>
+        <td>[MVC.Controller.Action.EnterLeave EnterLeave]</td>
+        <td>[CSS] [mouseenter|mouseleave.]</td>
+        <td>Similar to mouseover, mouseout, but handles nested elements.</td>
+    </tr>
+    <tr>
+        <td>[MVC.Controller.Action.Hover Hover]</td>
+        <td>[CSS] [hoverenter|hoverleave.]</td>
+        <td>Similar to mouseenter, but only gets called if the user stops on an element.</td>
+    </tr>
+    <tr>
+        <td>[MVC.Controller.Action.Lasso Lasso]</td>
+        <td>[CSS] [lassostart|...]</td>
+        <td>Allows you to lasso elements.</td>
+    </tr>
+    <tr>
+        <td>[MVC.Controller.Action.Selectable Selectable]</td>
+        <td>[CSS] [selectadd|...]</td>
+        <td>Matches events on elements that can be selected by the lasso.</td>
+    </tr>
+    </tbody>
+</table>
  * 
- * With aditional plugins, you can also 
+ * <h2>Naming Controllers</h2>
+ * Controllers use their name to limit the DOM they act upon.  Depending if the controller name is 
+ * plural, singular or main, it changes which elements it responds to.
+ * <h3>Singular Controllers</h3>
+ * Singluar controllers respond to events in or on an element with an id that matches the controller name.
+<pre>//matches &lt;div id="file_manager"&gt;&lt;/div&gt;
+FileManagerController = MVC.Controller.extend('file_manager')</pre>
+ * <h3>Plural Controllers</h3>
+ * Plural controllers respond to events in or on elements with classNames that match the singular 
+ * controller name.
+<pre>//matches &lt;div class="task"&gt;&lt;/div&gt;
+TasksController = MVC.Controller.extend('tasks')</pre>
+ * If you want to match events on an element with the id, add '#' to the start of your action.  For example:
+<preTasksController = MVC.Controller.extend('tasks',{
+  click : function(){ .. }     //matches &lt;div class="task"&gt;&lt;/div&gt;
+  "# click" : function(){ .. } //matches &lt;div id="tasks"&gt;&lt;/div&gt;
+})</pre>
+ * <h3>Main Controllers</h3>
+ * Controllers with the name 'main' can match events anywhere in the DOM.  
  * 
- * <h2>OpenAjax Events</h2>
- * 
+ * <h2>Params</h2>
+ * Controller actions get called with an instance of [MVC.Controller.Params].  Params
+ * provide aditional functionality based on the param data.  Killing events is a good example.
+ * Some actions get called with classes that inherit from MVC.Controller.Params.
+ * Check your action's params for the data that gets passed to your event handling functions.
  */
 MVC.Controller = MVC.Class.extend(
 /* @Static*/
@@ -173,6 +246,12 @@ MVC.Controller = MVC.Class.extend(
 			this[action].apply(this, arguments);
 		}, this);
 	},
+    /**
+     * Calls an action after some delay
+     * @param {Object} delay
+     * @param {Object} action_name
+     * @param {Object} params
+     */
     delay: function(delay, action_name, params){
 		if(typeof this[action_name] != 'function'){ throw 'There is no action named '+action_name+'. ';}
 		
@@ -180,6 +259,11 @@ MVC.Controller = MVC.Class.extend(
 			this.Class._dispatch_action(this, action_name ,  params )
 		}, this), delay );
     },
+    /**
+     * Publishes an action to OpenAjax.hub
+     * @param {Object} message
+     * @param {Object} params
+     */
     publish: function(message, params){
         this.Class.publish(message,params);
     }

@@ -1,8 +1,8 @@
 /**
- * StatefulController provides state for controller instances.  
- * Read the <a href="http://javascriptmvc.com/wiki/index.php?title=StatefulController_Overview">overview page</a> for a good description of how to use StatefulController.
+ * Controller.Stateful provides state for controller instances.  
+ * Read the <a href="http://javascriptmvc.com/wiki/index.php?title=Controller.Stateful_Overview">overview page</a> for a good description of how to use Controller.Stateful.
  */
-MVC.StatefulController = MVC.Controller.extend(
+MVC.Controller.Stateful = MVC.Controller.extend(
 /* @Static*/
 {
     /*

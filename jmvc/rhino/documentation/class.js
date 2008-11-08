@@ -107,7 +107,7 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
      * Returns a comment that has been cleaned.
      */
     cleaned_comment : function(){
-        return MVC.Doc.link_content(this.real_comment);
+        return MVC.Doc.link_content(this.real_comment).replace(/\n\s*\n/g,"<br/><br/>");
     },
     /**
      * Returns the url for this page

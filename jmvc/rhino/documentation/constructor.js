@@ -158,7 +158,7 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
             return n+"("+res.join(", ")+") -> "+this.ret.type;
     },
     cleaned_comment : function(){
-        return MVC.Doc.link_content(this.real_comment);
+        return MVC.Doc.link_content(this.real_comment).replace(/\n\s*\n/g,"<br/><br/>");
     },
     url : function(){
         return this.name+".html";

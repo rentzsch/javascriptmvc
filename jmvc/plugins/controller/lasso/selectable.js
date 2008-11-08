@@ -1,12 +1,12 @@
 /**
  * Allows actions to handle being dropped on.  Adds the following actions:<br/>
- * dropadd    -> Called when selectables are added, when a drag starts
- * dropover -> Called when a drag is over a drop
- * dropout    -> Called when a drag is moved out of a drop area
- * dropped    -> Called when a drag is dropped on the drop
- * dropmove   -> Called as an element moves over a drop
+ * selectadd    -> Called when selectables are added, when a drag starts
+ * selectover -> Called when a drag is over a drop
+ * selectout    -> Called when a drag is moved out of a drop area
+ * selected    -> Called when a drag is dropped on the drop
+ * selectmove   -> Called as an element moves over a drop
  */
-MVC.Controller.SelectableAction = MVC.Controller.Action.Event.extend({
+MVC.Controller.Action.Selectable = MVC.Controller.Action.Event.extend({
     match: new RegExp("(.*?)\\s?(selectover|selected|selectout|selectadd|selectmove)$")
 },
 /* @prototype */
