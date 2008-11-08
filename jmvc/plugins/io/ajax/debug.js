@@ -25,7 +25,8 @@
 				left += '/';
 				right = match[2].replace(/\#|&/g,'-').replace(/\//g, '~')+right;
 			}
-			right = right+MVC.Ajax.add_url(left+right);
+            if(!options.repeat_fixture)
+			    right = right+MVC.Ajax.add_url(left+right);
 			if(include.get_env() != 'test' && MVC.Console)
                 MVC.Console.log('Requesting "'+url+'".  As a fixture it would be:\n    "test/fixtures/'+left+right);
 
