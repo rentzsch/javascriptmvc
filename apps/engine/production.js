@@ -1323,7 +1323,7 @@ MVC.Controller = MVC.Class.extend(
     controllers : {},
     actions: [],
     publish: function(message, params){
-        var subscribers = MVC.Controller.SubscribeAction.events[message];
+        var subscribers = MVC.Controller.Action.Subscribe.events[message];
         if(!subscribers) return;
         for(var i =0 ; i < subscribers.length; i++){
             subscribers[i](params);
@@ -1388,7 +1388,7 @@ MVC.Controller.Action = MVC.Class.extend(
         this.controller = controller;
     }
 });
-MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
+MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
 /* @Static*/
 {
     match: new RegExp("(.*?)\\s?(subscribe)$"),
@@ -1414,7 +1414,7 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
 /*
  * Default EventDelegation based actions
  */
-MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
+MVC.Controller.Action.Event = MVC.Controller.Action.extend({
 /* @Static*/
     match: new RegExp("(.*?)\\s?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
     /*
@@ -2305,7 +2305,7 @@ render = function(options) {
 		return result;
 
 };
-//MVC.StatefulController.prototype.render = MVC.Controller.prototype.render; // this needs to go;
+//MVC.Controller.Stateful.prototype.render = MVC.Controller.prototype.render; // this needs to go;
 include.next_function();
 include.set_path('engines/modalmvc/controllers');
 

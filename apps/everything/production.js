@@ -1,6 +1,6 @@
 include.set_path('apps');
 include.resources();
-include.plugins("core","controller/comet","controller/dragdrop","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/rest_xml","model/view_helper","test","controller/stateful");
+include.plugins("core","controller/comet","controller/dragdrop","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/window_name","model/rest_xml","test","controller/stateful","controller/hover","controller/lasso");
 MVC.load_doc=true;
 include("../jmvc/rhino/documentation/setup");
 include(function(){
@@ -94,12 +94,20 @@ var _1a=obj[_19];
 if(_1a&&_1a.constructor===Date){
 _1a=_1a.getUTCFullYear()+"-"+MVC.Number.to_padded_string(_1a.getUTCMonth()+1,2)+"-"+MVC.Number.to_padded_string(_1a.getUTCDate(),2)+" "+MVC.Number.to_padded_string(_1a.getUTCHours(),2)+":"+MVC.Number.to_padded_string(_1a.getUTCMinutes(),2)+":"+MVC.Number.to_padded_string(_1a.getUTCSeconds(),2);
 }
+if(_1a instanceof Array&&_1a.length){
+var _1b=encodeURIComponent(_17?_17+"["+_19+"]":_19);
+for(var i=0;i<_1a.length;i++){
+var _1d=encodeURIComponent(_1a[i].toString());
+_18.push(_1b+"="+_1d);
+}
+}else{
 if(typeof _1a!="object"){
-var _1b=encodeURIComponent(_1a.toString());
-var _1c=encodeURIComponent(_17?_17+"["+_19+"]":_19);
-_18.push(_1c+"="+_1b);
+var _1d=encodeURIComponent(_1a.toString());
+var _1b=encodeURIComponent(_17?_17+"["+_19+"]":_19);
+_18.push(_1b+"="+_1d);
 }else{
 _18=_18.concat(MVC.Object.to_query_string.worker(_1a,_17?_17+"["+_19+"]":_19));
+}
 }
 }
 }
@@ -107,57 +115,57 @@ return _18;
 };
 MVC.Native.extend("String",{capitalize:function(s){
 return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();
-},include:function(s,_1f){
-return s.indexOf(_1f)>-1;
-},ends_with:function(s,_21){
-var d=s.length-_21.length;
-return d>=0&&s.lastIndexOf(_21)===d;
+},include:function(s,_20){
+return s.indexOf(_20)>-1;
+},ends_with:function(s,_22){
+var d=s.length-_22.length;
+return d>=0&&s.lastIndexOf(_22)===d;
 },camelize:function(s){
-var _24=s.split(/_|-/);
-for(var i=1;i<_24.length;i++){
-_24[i]=MVC.String.capitalize(_24[i]);
+var _25=s.split(/_|-/);
+for(var i=1;i<_25.length;i++){
+_25[i]=MVC.String.capitalize(_25[i]);
 }
-return _24.join("");
+return _25.join("");
 },classize:function(s){
-var _27=s.split(/_|-/);
-for(var i=0;i<_27.length;i++){
-_27[i]=MVC.String.capitalize(_27[i]);
+var _28=s.split(/_|-/);
+for(var i=0;i<_28.length;i++){
+_28[i]=MVC.String.capitalize(_28[i]);
 }
-return _27.join("");
+return _28.join("");
 },strip:MVC.String.strip});
-MVC.Native.extend("Array",{include:function(a,_2a){
+MVC.Native.extend("Array",{include:function(a,_2b){
 for(var i=0;i<a.length;i++){
-if(a[i]==_2a){
+if(a[i]==_2b){
 return true;
 }
 }
 return false;
-},from:function(_2c){
-if(!_2c){
+},from:function(_2d){
+if(!_2d){
 return [];
 }
-var _2d=[];
-for(var i=0,_2f=_2c.length;i<_2f;i++){
-_2d.push(_2c[i]);
+var _2e=[];
+for(var i=0,_30=_2d.length;i<_30;i++){
+_2e.push(_2d[i]);
 }
-return _2d;
+return _2e;
 }});
 MVC.Native.extend("Function",{bind:function(f){
-var _31=MVC.Array.from(arguments);
-_31.shift();
-_31.shift();
-var _32=f,_33=arguments[1];
+var _32=MVC.Array.from(arguments);
+_32.shift();
+_32.shift();
+var _33=f,_34=arguments[1];
 return function(){
-return _32.apply(_33,_31.concat(MVC.Array.from(arguments)));
+return _33.apply(_34,_32.concat(MVC.Array.from(arguments)));
 };
 },params:MVC.Function.params});
-MVC.Native.extend("Number",{to_padded_string:function(n,len,_36){
-var _37=n.toString(_36||10);
-var ret="",_39=len-_37.length;
-for(var i=0;i<_39;i++){
+MVC.Native.extend("Number",{to_padded_string:function(n,len,_37){
+var _38=n.toString(_37||10);
+var ret="",_3a=len-_38.length;
+for(var i=0;i<_3a;i++){
 ret+="0";
 }
-return ret+_37;
+return ret+_38;
 }});
 ;
 include.set_path('jmvc/plugins/lang/inflector');
@@ -908,7 +916,9 @@ this.actions[_4]=new _3(_4,_2,this);
 }
 }
 }
-this.modelName=MVC.String.classize(MVC.String.is_singular(this.className)?this.className:MVC.String.singularize(this.className));
+if(!this.modelName){
+this.modelName=MVC.String.is_singular(this.className)?this.className:MVC.String.singularize(this.className);
+}
 if(include.get_env()=="test"){
 var _6=MVC.root.join("test/functional/"+this.className+"_controller_test.js");
 var _7=include.check_exists(_6);
@@ -975,7 +985,7 @@ return _20;
 }
 }
 return null;
-}},{continue_to:function(_21){
+},modelName:null},{continue_to:function(_21){
 if(!_21){
 _21=this.action_name+"ing";
 }
@@ -1005,7 +1015,7 @@ this.action=_27;
 this.func=f;
 this.controller=_29;
 }});
-MVC.Controller.SubscribeAction=MVC.Controller.Action.extend({match:new RegExp("(.*?)\\s?(subscribe)$"),matches:function(_2a){
+MVC.Controller.Action.Subscribe=MVC.Controller.Action.extend({match:new RegExp("(.*?)\\s?(subscribe)$"),matches:function(_2a){
 return this.match.exec(_2a);
 }},{init:function(_2b,f,_2d){
 this._super(_2b,f,_2d);
@@ -1015,7 +1025,7 @@ OpenAjax.hub.subscribe(this.message_name,this.controller.subscribe_closure(_2b))
 this.parts=this.action.match(this.Class.match);
 this.message_name=this.parts[1];
 }});
-MVC.Controller.DelegateAction=MVC.Controller.Action.extend({match:new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),matches:function(_2e){
+MVC.Controller.Action.Event=MVC.Controller.Action.extend({match:new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),matches:function(_2e){
 return this.match.exec(_2e);
 }},{init:function(_2f,f,_31){
 this._super(_2f,f,_31);
@@ -1134,15 +1144,15 @@ if(_43==document){
 return null;
 }
 }
-return _43;
+return MVC.$E(_43);
 },is_event_on_element:function(){
 return this.event.target==this.element;
 },_className:function(){
 return this.controller.singularName;
 },element_instance:function(){
-var _45,_46,_47=this._className();
+var _45,_46,_47=this.modelName;
 if(!(_45=MVC.Model.models[_47])){
-throw "No model for the "+_47+" controller!";
+throw "No model for the "+this.controller.className+" controller!";
 }
 _46=new RegExp("^"+_47+"_(.*)$");
 var id=this.class_element().id.match(_46)[1];
@@ -1200,7 +1210,7 @@ _c.sort(MVC.Delegator.sort_by_order);
 var _12;
 for(var m=0;m<_c.length;m++){
 _12=_c[m];
-_b=_12.delegation_event._func({event:_8,element:_12.node})&&_b;
+_b=_12.delegation_event._func({event:_8,element:MVC.$E(_12.node)})&&_b;
 if(_8.is_killed()){
 return false;
 }
@@ -1859,6 +1869,196 @@ this[this.Class.singular_name].View().destroy();
 }
 }};
 ;
+include.set_path('jmvc/plugins/model/view_helper');
+include("model_view_helper");
+;
+include.set_path('jmvc/plugins/model/view_helper');
+MVC.ModelViewHelper=MVC.Class.extend({init:function(){
+if(!this.className){
+return;
+}
+var _1;
+if(!this.className){
+return;
+}
+if(!(_1=this.modelClass=window[MVC.String.classize(this.className)])){
+throw "ModelViewHelpers can't find class "+this.className;
+}
+var _2=this;
+this.modelClass.View=function(){
+return _2;
+};
+this.modelClass.prototype.View=function(){
+return new _2(this);
+};
+if(this.modelClass.attributes){
+this._view=new MVC.View.Helpers({});
+var _3;
+for(var _4 in this.modelClass.attributes){
+if(!this.modelClass.attributes.hasOwnProperty(_4)||typeof this.modelClass.attributes[_4]!="string"){
+continue;
+}
+this.add_helper(_4);
+}
+}
+},form_helper:function(_5){
+if(!this.helpers[_5]+"_field"){
+this.add_helper(_5);
+}
+var f=this.helpers[_5+"_field"];
+var _7=MVC.Array.from(arguments);
+_7.shift();
+return f.apply(this._view,_7);
+},add_helper:function(_8){
+var h=this._helper(_8);
+this.helpers[_8+"_field"]=h;
+},helpers:{},_helper:function(_a){
+var _b=this._view_helper(_a);
+var _c=this;
+var _d=this.modelClass.className+"["+_a+"]";
+var id=this.modelClass.className+"_"+_a;
+return function(){
+var _f=MVC.Array.from(arguments);
+_f.unshift(_d);
+_f[2]=_f[2]||{};
+_f[2].id=id;
+return _b.apply(_c._view,_f);
+};
+},_view_helper:function(_10){
+switch(this.modelClass.attributes[_10].toLowerCase()){
+case "boolean":
+return this._view.check_box_tag;
+case "text":
+return this._view.text_area_tag;
+default:
+return this._view.text_field_tag;
+}
+},clear:function(){
+var _11=this.modelClass.className,el;
+for(var _13 in this.modelClass.attributes){
+if((el=MVC.$E(_11+"_"+_13))){
+el.value="";
+}
+}
+},from_html:function(_14){
+var el=MVC.$E(_14);
+var _16=this.modelClass?this.modelClass:window[MVC.String.classize(el.getAttribute("type"))];
+if(!_16){
+return null;
+}
+var _17={};
+_17[_16.id]=this.element_id_to_id(el.id);
+return _16.create_as_existing(_17);
+},element_id_to_id:function(_18){
+var re=new RegExp(this.className+"_","");
+return _18.replace(re,"");
+}},{init:function(_1a){
+this._inst=_1a;
+this._className=this._inst.Class.className;
+this._Class=this._inst.Class;
+},id:function(){
+return this._inst[this._inst.Class.id];
+},element:function(){
+if(this._element){
+return this._element;
+}
+this._element=MVC.$E(this.element_id());
+if(this._element){
+return this._element;
+}
+},create_element:function(){
+this._element=document.createElement("div");
+this._element.id=this.element_id();
+this._element.className=this._className;
+this._element.setAttribute("type",this._className);
+return this._element;
+},element_id:function(){
+return this._className+"_"+this._inst[this._inst.Class.id];
+},show_errors:function(){
+var err=MVC.$E(this._className+"_error");
+var err=err||MVC.$E(this._className+"_error");
+var _1c=[];
+for(var i=0;i<this._inst.errors.length;i++){
+var _1e=this._inst.errors[i];
+var el=MVC.$E(this._className+"_"+_1e[0]);
+if(el){
+el.className="error";
+var _20=MVC.$E(this._className+"_"+_1e[0]+"_error");
+if(_20){
+_20.innerHTML=_1e[1];
+}
+}else{
+_1c.push(_1e[0]+" is "+_1e[1]);
+}
+}
+if(_1c.length>0){
+if(err){
+err.innerHTML=_1c.join(", ");
+}else{
+alert(_1c.join(", "));
+}
+}
+},clear_errors:function(){
+var p;
+var cn=this._className;
+for(var _23 in this._Class.attributes){
+if(this._Class.attributes.hasOwnProperty(_23)){
+var el=MVC.$E(cn+"_"+p);
+if(el){
+el.className=el.className.replace(/(^|\\s+)error(\\s+|$)/," ");
+}
+var _25=MVC.$E(cn+"_"+_23+"_error");
+if(_25){
+_25.innerHTML="&nbsp;";
+}
+}
+}
+var _26=MVC.$E(cn+"_error");
+if(_26){
+_26.innerHTML="";
+}
+},edit:function(_27){
+var _28=MVC.Array.from(arguments);
+var _29=this._className+"["+_27+"]";
+_28.shift();
+_28.unshift({id:this.edit_id(_27)});
+_28.unshift(this._inst[_27]);
+_28.unshift(_29);
+var _2a=this.Class._view_helper(_27);
+return _2a.apply(this.Class._view,_28);
+},edit_values:function(){
+var _2b={};
+var cn=this._className,p,el;
+for(var _2f in this._Class.attributes){
+if(this._Class.attributes.hasOwnProperty(_2f)){
+el=MVC.$E(this.edit_id(_2f));
+}
+if(el){
+_2b[_2f]=el.value;
+}
+}
+return _2b;
+},edit_id:function(_30){
+return this._className+"_"+this._inst.id+"_"+_30+"_edit";
+},destroy:function(){
+var el=this.element();
+el.parentNode.removeChild(el);
+}});
+MVC.Controller.Params.prototype.object_data=function(){
+var _32=this._className(),_33,_34=this.element,_35=new RegExp("^"+_32+"_(.*)$");
+if(!(_33=MVC.Model.models[_32])){
+return;
+}
+while(_34&&_34.parentNode&&!_34.id.match(_35)){
+_34=_34.parentNode;
+}
+if(!_34){
+return null;
+}
+var id=_34.id.match(_35)[1];
+return _33.store.find_one(id);
+};
+;
 include.set_path('jmvc/plugins/view/helpers');
 include.plugins("view");
 include("view_helpers");
@@ -2233,8 +2433,87 @@ include.set_path('jmvc/plugins/controller/comet');
 include.plugins("io/comet");
 include("comet_controller");
 ;
+include.set_path('jmvc/plugins/io/comet');
+include.plugins("dom/event");
+include("comet");
+if(MVC.Console){
+include("debug");
+}
+;
+include.set_path('jmvc/plugins/io/comet');
+MVC.Comet=function(_1,_2){
+this.url=_1;
+this.options=_2||{};
+this.options.wait_time=this.options.wait_time||0;
+this.onSuccess=_2.onSuccess;
+this.onComplete=_2.onComplete;
+this.onFailure=_2.onFailure;
+delete this.options.onSuccess;
+delete this.options.onComplete;
+this.options.onComplete=MVC.Function.bind(this.callback,this);
+var _3=false;
+var _4=true;
+this.kill=function(){
+_3=true;
+};
+this.poll_now=MVC.Function.bind(function(){
+if(this.is_polling()){
+return;
+}
+clearTimeout(this.timeout);
+this.options.polling();
+MVC.Comet.connection=new this.transport(this.url,this.options);
+},this);
+this.options.is_killed=function(){
+return _3;
+};
+this.options.waiting_to_poll=function(){
+_4=false;
+};
+this.options.polling=function(){
+_4=true;
+};
+this.is_polling=function(){
+return _4;
+};
+this.transport=this.options.transport||MVC.Comet.transport;
+MVC.Comet.connection=new this.transport(_1,this.options);
+};
+MVC.Comet.transport=MVC.Ajax;
+MVC.Comet.prototype={callback:function(_5){
+this.options.waiting_to_poll();
+if(this.options.is_killed()){
+return;
+}
+if(this.onSuccess&&_5.responseText!=""&&this.onSuccess(_5)==false){
+return false;
+}
+if(this.onComplete){
+if(this.onComplete(_5)==false){
+return false;
+}
+}
+var _6=this.url;
+var _7=this.options;
+var _5=this.transport;
+var _8=typeof _7.wait_time=="function"?_7.wait_time():_7.wait_time;
+this.timeout=setTimeout(MVC.Function.bind(function(){
+_7.polling();
+MVC.Comet.connection=new _5(_6,_7);
+},this),_8);
+}};
+MVC.Event.observe(window,"unload",function(){
+MVC.Comet.send=false;
+if(MVC.Comet.connection&&MVC.Comet.connection.transport&&MVC.Comet.transport.className&&MVC.Comet.transport.className=="Ajax"){
+MVC.Comet.connection.transport.abort();
+}
+});
+if(!MVC._no_conflict&&typeof Comet=="undefined"){
+Comet=MVC.Comet;
+}
+;
 include.set_path('jmvc/plugins/controller/comet');
-MVC.CometController=MVC.Controller.extend({init:function(){
+MVC.Controller.Comet=MVC.Controller.extend({init:function(){
 },run:function(_1){
 var _2=new this();
 _2.run(_1);
@@ -2295,404 +2574,6 @@ this.Class._comet.kill();
 include.set_path('jmvc/plugins/controller/dragdrop');
 include.plugins("controller","dom/element","dom/query","dom/position","dom/animate");
 include("drag","drop");
-;
-include.set_path('jmvc/plugins/dom/position');
-MVC.Position={prepare:function(){
-var _1=this.deltaX,_2=this.deltaY;
-this.deltaX=window.pageXOffset||document.documentElement.scrollLeft||document.body.scrollLeft||0;
-this.deltaY=window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop||0;
-this._static=((_1-this.deltaX)==0)&&((_2-this.deltaY)==0);
-return this._static;
-},within:function(_3,x,y){
-if(this.includeScrollOffsets){
-return this.withinIncludingScrolloffsets(_3,x,y);
-}
-this.xcomp=x;
-this.ycomp=y;
-this.offset=MVC.Element.cumulative_offset(_3);
-return (y>=this.offset[1]&&y<this.offset[1]+_3.offsetHeight&&x>=this.offset[0]&&x<this.offset[0]+_3.offsetWidth);
-},withinIncludingScrolloffsets:function(_6,x,y,_9){
-_9=_9||{};
-var _a=this._static&&_9._cache&&_9._cumulative_scroll_offset&&_9._cumulative_offset;
-if(!_a){
-_9._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_6);
-_9._cumulative_offset=MVC.Element.cumulative_offset(_6);
-}
-var _b=x+_9._cumulative_scroll_offset[0]-this.deltaX;
-var _c=y+_9._cumulative_scroll_offset[1]-this.deltaY;
-return this.within_box(_b,_c,_9._cumulative_offset[0],_9._cumulative_offset[1],_6.offsetWidth,_6.offsetHeight);
-},withinBoxIncludingScrollingOffsets:function(_d,_e,_f,_10,_11,_12){
-_12=_12||{};
-var _13=this._static&&_12._cache&&_12._cumulative_scroll_offset&&_12._cumulative_offset;
-if(!_13){
-_12._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_d);
-_12._cumulative_offset=MVC.Element.cumulative_offset(_d);
-}
-var ex=_12._cumulative_offset[0];
-var ey=_12._cumulative_offset[1];
-var ew=_d.clientWidth,eh=_d.clientHeight;
-return !((ey>_f+_11)||(ey+eh<_f)||(ex>_e+_10)||(ex+ew<_e));
-},within_box:function(x,y,_1a,top,_1c,_1d){
-return (y>=top&&y<top+_1d&&x>=_1a&&x<_1a+_1c);
-},event_position_relative_to_element:function(_1e,_1f,_20){
-_20=_20||{};
-var _21=this._static&&_20._cache&&_20._cumulative_scroll_offset&&_20._cumulative_offset;
-if(!_21){
-_20._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_1e);
-_20._cumulative_offset=MVC.Element.cumulative_offset(_1e);
-}
-var _22=MVC.Event.pointer(_1f);
-var _23=_22.x()+_20._cumulative_scroll_offset[0]-this.deltaX;
-var _24=_22.y()+_20._cumulative_scroll_offset[1]-this.deltaY;
-return new MVC.Vector(_23-_20._cumulative_offset[0],_24-_20._cumulative_offset[1]);
-},window_dimensions:function(){
-var de=document.documentElement,st=window.pageYOffset?window.pageYOffset:de.scrollTop,sl=window.pageXOffset?window.pageXOffset:de.scrollLeft;
-var wh=window.innerHeight?window.innerHeight:de.clientHeight,ww=window.innerWidth?window.innerWidth:de.clientWidth;
-if(wh==0){
-wh=document.body.clientHeight;
-ww=document.body.clientWidth;
-}
-return {window_height:wh,window_width:ww,document_height:MVC.Browser.IE?document.body.offsetHeight:de.offsetHeight,document_width:MVC.Browser.IE?document.body.offsetWidth:de.offsetWidth,scroll_left:sl,scroll_top:st,window_right:sl+ww,window_bottom:st+wh};
-}};
-;
-include.set_path('jmvc/plugins/dom/animate');
-include.plugins("dom/element","lang/timer");
-include("animate");
-;
-include.set_path('jmvc/plugins/lang/timer');
-MVC.Timer=function(_1){
-_1=_1||{};
-this.time=_1.time||500;
-this.from=_1.from||0;
-this.to=_1.to||1;
-this.interval=_1.interval||1;
-this.update_callback=_1.onUpdate||function(){
-};
-this.complete_callback=_1.onComplete||function(){
-};
-this.distance=this.to-this.from;
-if(_1.easing){
-this.easing=typeof _1.easing=="string"?MVC.Timer.easings[_1.easing]:_1.easing;
-}else{
-this.easing=MVC.Timer.easings.swing;
-}
-};
-MVC.Timer.prototype={start:function(){
-this.start_time=new Date();
-this.timer=setInterval(MVC.Function.bind(this.next_step,this),this.interval);
-},kill:function(){
-clearInterval(this.timer);
-},next_step:function(){
-var _2=new Date();
-var _3=_2-this.start_time;
-var _4;
-if(_3>=this.time){
-_4=this.to;
-this.update_callback(_4);
-this.complete_callback(_4);
-this.kill();
-}else{
-var _5=_3/this.time;
-_4=this.easing(_5,_3,this.from,this.distance);
-this.update_callback(_4);
-}
-}};
-MVC.Timer.easings={linear:function(p,n,_8,_9){
-return _8+_9*p;
-},swing:function(p,n,_c,_d){
-return ((-Math.cos(p*Math.PI)/2)+0.5)*_d+_c;
-}};
-;
-include.set_path('jmvc/plugins/dom/animate');
-MVC.Animate=function(_1,_2,_3,_4,_5){
-_5=_5||function(){
-};
-var _6={};
-var _7;
-for(var _8 in _2){
-_7=_2[_8];
-_6[_8]=new MVC.Animate.Value(_1,_8,_7);
-}
-this.timer=new MVC.Timer({from:0,to:1,time:_3,onUpdate:function(_9){
-for(var _a in _6){
-_1.style[_a]=_6[_a].get(_9);
-}
-},onComplete:function(){
-for(var _b in _6){
-_1.style[_b]=_6[_b].last();
-}
-_5(_1);
-}});
-this.timer.start();
-};
-MVC.Animate.prototype={get_starting_value:function(_c){
-var _d=_c.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/),_e=e.cur(true)||0;
-if(_d){
-var _f=parseFloat(_d[2]),_10=_d[3]||"px";
-if(_10!="px"){
-self.style[name]=(_f||1)+_10;
-_e=((_f||1)/e.cur(true))*_e;
-self.style[name]=_e+_10;
-}
-if(_d[1]){
-_f=((_d[1]=="-="?-1:1)*_f)+_e;
-}
-e.custom(_e,_f,_10);
-}else{
-e.custom(_e,_c,"");
-}
-}};
-MVC.Animate.Value=function(_11,_12,end){
-this.style=_12;
-this.start=parseFloat(MVC.Element.get_style(_11,_12))||0;
-var _14=end.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/);
-if(_14){
-this.end=parseFloat(_14[2]);
-this.unit=_14[3]||"px";
-if(this.unit!="px"){
-_11.style[name]=(end||1)+unit;
-this.start=((end||1)/MVC.Element.get_style(_11,_12))*start;
-_11.style[name]=start+unit;
-}
-if(_14[1]){
-this.end=((_14[1]=="-="?-1:1)*this.end)+this.start;
-}
-}else{
-this.end=end;
-this.unit="px";
-}
-this.distance=this.end-this.start;
-};
-MVC.Animate.Value.prototype={get:function(_15){
-return (this.start+_15*this.distance)+this.unit;
-},last:function(){
-return (this.end)+this.unit;
-}};
-;
-include.set_path('jmvc/plugins/controller/dragdrop');
-MVC.Controller.DragAction=MVC.Controller.DelegateAction.extend({match:new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")},{init:function(_1,f,_3){
-this.action=_1;
-this.func=f;
-this.controller=_3;
-this.css_and_event();
-var _4=this.selector();
-if(MVC.Draggable.selectors[_4]){
-MVC.Draggable.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
-return;
-}
-MVC.Draggable.selectors[_4]=new MVC.Delegator(_4,"mousedown",MVC.Function.bind(this.mousedown,this));
-MVC.Draggable.selectors[_4].callbacks={};
-MVC.Draggable.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
-},mousedown:function(_5){
-MVC.Object.extend(_5,MVC.Draggable.selectors[this.selector()].callbacks);
-MVC.Draggable.current=new MVC.Draggable(_5);
-_5.event.kill();
-return false;
-}});
-MVC.Draggable=function(_6){
-this.element=_6.element;
-this.moved=false;
-this._cancelled=false;
-this.mouse_position_on_element=MVC.Event.pointer(_6.event).minus(MVC.Element.cumulative_offset(_6.element));
-this.dragstart=_6.dragstart||MVC.Draggable.k;
-this.dragend=_6.dragend||MVC.Draggable.k;
-this.dragging=_6.dragging||MVC.Draggable.k;
-};
-MVC.Draggable.k=function(){
-};
-MVC.Draggable.prototype={start:function(_7){
-this.moved=true;
-this.drag_element=this.element;
-var _8=new MVC.Controller.DragParams({event:_7,element:this.element,drag_element:this.drag_element,drag_action:this});
-this.dragstart(_8);
-if(this._cancelled==true){
-return;
-}
-this.drag_element=_8.drag_element;
-MVC.Element.make_positioned(this.drag_element);
-this.start_position=MVC.Element.cumulative_offset(this.drag_element);
-this.drag_element.style.zIndex=1000;
-MVC.Droppables.compile();
-},currentDelta:function(){
-return new MVC.Vector(parseInt(MVC.Element.get_style(this.drag_element,"left")||"0"),parseInt(MVC.Element.get_style(this.drag_element,"top")||"0"));
-},draw:function(_9,_a){
-if(!this.moved){
-this.start(_a);
-}
-if(this._cancelled){
-return;
-}
-MVC.Position.prepare();
-var _b=MVC.Element.cumulative_offset(this.drag_element).minus(this.currentDelta());
-var p=_9.minus(_b).minus(this.mouse_position_on_element);
-var s=this.drag_element.style;
-s.top=p.top()+"px";
-s.left=p.left()+"px";
-var _e=new MVC.Controller.DragParams({event:_a,element:this.element,drag_action:this,drag_element:this.drag_element});
-this.dragging(_e);
-MVC.Droppables.show(_9,this,_a);
-},end:function(_f){
-var _10={element:this.element,event:_f,drag_element:this.drag_element,drag_action:this};
-this.dragend(new MVC.Controller.DragParams(_10));
-MVC.Droppables.fire(_f,this);
-if(this._revert){
-new MVC.Animate(this.drag_element,{top:this.start_position.top(),left:this.start_position.left()},null,null,MVC.Function.bind(this.cleanup,this));
-}else{
-if(this.ghosted_element&&this.element.parentNode){
-MVC.Element.remove(this.element);
-}
-if(this.drag_element!=this.element){
-this.drag_element.style.display="none";
-}
-}
-},cleanup:function(){
-if(this.drag_element!=this.element){
-this.drag_element.style.display="none";
-}
-}};
-MVC.Draggable.selectors={};
-MVC.Draggable.current=null;
-MVC.Event.observe(document,"mousemove",function(_11){
-if(!MVC.Draggable.current){
-return;
-}
-MVC.Delegator.add_kill_event(_11);
-_11.kill();
-MVC.Draggable.current.draw(MVC.Event.pointer(_11),_11);
-return false;
-});
-MVC.Event.observe(document,"mouseup",function(_12){
-MVC.Delegator.add_kill_event(_12);
-if(MVC.Draggable.current&&MVC.Draggable.current.moved){
-MVC.Draggable.current.end(_12);
-MVC.Droppables.clear();
-}
-MVC.Draggable.current=null;
-});
-MVC.Controller.DragParams=MVC.Controller.Params;
-MVC.Controller.DragParams.prototype=new MVC.Controller.Params();
-MVC.Object.extend(MVC.Controller.DragParams.prototype,{cancel_drag:function(){
-this.drag_action._cancelled=true;
-this.drag_action.end(this.event);
-MVC.Droppables.clear();
-MVC.Draggable.current=null;
-},ghost:function(_13){
-var _14=this.element.cloneNode(true);
-MVC.Element.insert(this.element,{after:_14});
-this.drag_element=_14;
-},representitive:function(_15,_16,_17){
-MVC.Position.prepare();
-this._offsetX=_16||0;
-this._offsetY=_17||0;
-var p=MVC.Event.pointer(this.event);
-this.drag_element=MVC.$E(_15);
-var s=this.drag_element.style;
-s.top=(p.top()-_17)+"px";
-s.left=(p.left()-_16)+"px";
-s.display="";
-this.drag_action.mouse_position_on_element=new MVC.Vector(_16,_17);
-},revert:function(){
-this.drag_action._revert=true;
-}});
-;
-include.set_path('jmvc/plugins/controller/dragdrop');
-MVC.Controller.DropAction=MVC.Controller.DelegateAction.extend({match:new RegExp("(.*?)\\s?(dropover|dropped|dropout|dropadd|dropmove)$")},{init:function(_1,f,_3){
-this.action=_1;
-this.func=f;
-this.controller=_3;
-this.css_and_event();
-var _4=this.selector();
-if(!MVC.Droppables.selectors[_4]){
-MVC.Droppables.selectors[_4]={};
-}
-MVC.Droppables.selectors[_4][this.event_type]=_3.dispatch_closure(_1);
-}});
-MVC.Controller.DropParams=MVC.Controller.Params;
-MVC.Controller.DropParams.prototype=new MVC.Controller.Params();
-MVC.Object.extend(MVC.Controller.DropParams.prototype,{cache_position:function(){
-this._cache=true;
-},cancel:function(){
-this._cancel=true;
-}});
-MVC.Droppables={drops:[],selectors:{},add:function(_5,_6){
-_5=MVC.$E(_5);
-_6.element=_5;
-var _7=new MVC.Controller.DropParams(_6);
-if(_7.dropadd){
-_7.dropadd(_7);
-}
-if(!_7._canceled){
-MVC.Element.make_positioned(_5);
-this.drops.push(_7);
-}
-},findDeepestChild:function(_8){
-if(_8.length==0){
-return null;
-}
-var _9=_8[0];
-for(i=1;i<_8.length;++i){
-if(MVC.Element.has(_8[i].element,_9.element)){
-_9=_8[i];
-}
-}
-return _9;
-},isAffected:function(_a,_b,_c){
-return ((_c.element!=_b)&&MVC.Position.withinIncludingScrolloffsets(_c.element,_a[0],_a[1],_c));
-},deactivate:function(_d,_e,_f){
-this.last_active=null;
-if(_d.dropout){
-_d.dropout({element:_d.element,drag:_e,event:_f});
-}
-},activate:function(_10,_11,_12){
-this.last_active=_10;
-if(_10.dropover){
-_10.dropover({element:_10.element,drag:_11,event:_12});
-}
-},dropmove:function(_13,_14,_15){
-if(_13.dropmove){
-_13.dropmove({element:_13.element,drag:_14,event:_15});
-}
-},show:function(_16,_17,_18){
-var _19=_17.drag_element;
-if(!this.drops.length){
-return;
-}
-var _1a,_1b=[];
-for(var d=0;d<this.drops.length;d++){
-if(MVC.Droppables.isAffected(_16,_19,this.drops[d])){
-_1b.push(this.drops[d]);
-}
-}
-_1a=MVC.Droppables.findDeepestChild(_1b);
-if(this.last_active&&this.last_active!=_1a){
-this.deactivate(this.last_active,_17,_18);
-}
-if(_1a&&_1a!=this.last_active){
-this.activate(_1a,_17,_18);
-}
-if(_1a&&this.last_active){
-this.dropmove(_1a,_17,_18);
-}
-},fire:function(_1d,_1e){
-if(!this.last_active){
-return;
-}
-MVC.Position.prepare();
-if(this.isAffected(MVC.Event.pointer(_1d),_1e.drag_element,this.last_active)&&this.last_active.dropped){
-this.last_active.dropped({drag:_1e,event:_1d,element:this.last_active.element});
-return true;
-}
-},compile:function(){
-var _1f=[];
-for(var _20 in MVC.Droppables.selectors){
-var _21=_1f.concat(MVC.Query(_20));
-for(var e=0;e<_21.length;e++){
-MVC.Droppables.add(_21[e],MVC.Droppables.selectors[_20]);
-}
-}
-},clear:function(){
-this.drops=[];
-}};
 ;
 include.set_path('jmvc/plugins/dom/query');
 if(typeof Prototype!="undefined"){
@@ -2987,84 +2868,403 @@ if(!MVC._no_conflict){
 Query=MVC.Query;
 }
 ;
-include.set_path('jmvc/plugins/io/comet');
-include.plugins("dom/event");
-include("comet");
-if(MVC.Console){
-include("debug");
+include.set_path('jmvc/plugins/dom/position');
+MVC.Position={prepare:function(){
+var _1=this.deltaX,_2=this.deltaY;
+this.deltaX=window.pageXOffset||document.documentElement.scrollLeft||document.body.scrollLeft||0;
+this.deltaY=window.pageYOffset||document.documentElement.scrollTop||document.body.scrollTop||0;
+this._static=((_1-this.deltaX)==0)&&((_2-this.deltaY)==0);
+return this._static;
+},within:function(_3,x,y){
+if(this.includeScrollOffsets){
+return this.withinIncludingScrolloffsets(_3,x,y);
 }
-;
-include.set_path('jmvc/plugins/io/comet');
-MVC.Comet=function(_1,_2){
-this.url=_1;
-this.options=_2||{};
-this.options.wait_time=this.options.wait_time||0;
-this.onSuccess=_2.onSuccess;
-this.onComplete=_2.onComplete;
-this.onFailure=_2.onFailure;
-delete this.options.onSuccess;
-delete this.options.onComplete;
-this.options.onComplete=MVC.Function.bind(this.callback,this);
-var _3=false;
-var _4=true;
-this.kill=function(){
-_3=true;
-};
-this.poll_now=MVC.Function.bind(function(){
-if(this.is_polling()){
-return;
+this.xcomp=x;
+this.ycomp=y;
+this.offset=MVC.Element.cumulative_offset(_3);
+return (y>=this.offset[1]&&y<this.offset[1]+_3.offsetHeight&&x>=this.offset[0]&&x<this.offset[0]+_3.offsetWidth);
+},withinIncludingScrolloffsets:function(_6,x,y,_9){
+_9=_9||{};
+var _a=this._static&&_9._cache&&_9._cumulative_scroll_offset&&_9._cumulative_offset;
+if(!_a){
+_9._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_6);
+_9._cumulative_offset=MVC.Element.cumulative_offset(_6);
 }
-clearTimeout(this.timeout);
-this.options.polling();
-MVC.Comet.connection=new this.transport(this.url,this.options);
-},this);
-this.options.is_killed=function(){
-return _3;
-};
-this.options.waiting_to_poll=function(){
-_4=false;
-};
-this.options.polling=function(){
-_4=true;
-};
-this.is_polling=function(){
-return _4;
-};
-this.transport=this.options.transport||MVC.Comet.transport;
-MVC.Comet.connection=new this.transport(_1,this.options);
-};
-MVC.Comet.transport=MVC.Ajax;
-MVC.Comet.prototype={callback:function(_5){
-this.options.waiting_to_poll();
-if(this.options.is_killed()){
-return;
+var _b=x+_9._cumulative_scroll_offset[0]-this.deltaX;
+var _c=y+_9._cumulative_scroll_offset[1]-this.deltaY;
+return this.within_box(_b,_c,_9._cumulative_offset[0],_9._cumulative_offset[1],_6.offsetWidth,_6.offsetHeight);
+},withinBoxIncludingScrollingOffsets:function(_d,_e,_f,_10,_11,_12){
+_12=_12||{};
+var _13=this._static&&_12._cache&&_12._cumulative_scroll_offset&&_12._cumulative_offset;
+if(!_13){
+_12._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_d);
+_12._cumulative_offset=MVC.Element.cumulative_offset(_d);
 }
-if(this.onSuccess&&_5.responseText!=""&&this.onSuccess(_5)==false){
-return false;
+var ex=_12._cumulative_offset[0];
+var ey=_12._cumulative_offset[1];
+var ew=_d.clientWidth,eh=_d.clientHeight;
+return !((ey>_f+_11)||(ey+eh<_f)||(ex>_e+_10)||(ex+ew<_e));
+},within_box:function(x,y,_1a,top,_1c,_1d){
+return (y>=top&&y<top+_1d&&x>=_1a&&x<_1a+_1c);
+},event_position_relative_to_element:function(_1e,_1f,_20){
+_20=_20||{};
+var _21=this._static&&_20._cache&&_20._cumulative_scroll_offset&&_20._cumulative_offset;
+if(!_21){
+_20._cumulative_scroll_offset=MVC.Element.cumulative_scroll_offset(_1e);
+_20._cumulative_offset=MVC.Element.cumulative_offset(_1e);
 }
-if(this.onComplete){
-if(this.onComplete(_5)==false){
-return false;
+var _22=MVC.Event.pointer(_1f);
+var _23=_22.x()+_20._cumulative_scroll_offset[0]-this.deltaX;
+var _24=_22.y()+_20._cumulative_scroll_offset[1]-this.deltaY;
+return new MVC.Vector(_23-_20._cumulative_offset[0],_24-_20._cumulative_offset[1]);
+},window_dimensions:function(){
+var de=document.documentElement,st=window.pageYOffset?window.pageYOffset:de.scrollTop,sl=window.pageXOffset?window.pageXOffset:de.scrollLeft;
+var wh=window.innerHeight?window.innerHeight:de.clientHeight,ww=window.innerWidth?window.innerWidth:de.clientWidth;
+if(wh==0){
+wh=document.body.clientHeight;
+ww=document.body.clientWidth;
 }
-}
-var _6=this.url;
-var _7=this.options;
-var _5=this.transport;
-var _8=typeof _7.wait_time=="function"?_7.wait_time():_7.wait_time;
-this.timeout=setTimeout(MVC.Function.bind(function(){
-_7.polling();
-MVC.Comet.connection=new _5(_6,_7);
-},this),_8);
+return {window_height:wh,window_width:ww,document_height:MVC.Browser.IE?document.body.offsetHeight:de.offsetHeight,document_width:MVC.Browser.IE?document.body.offsetWidth:de.offsetWidth,scroll_left:sl,scroll_top:st,window_right:sl+ww,window_bottom:st+wh};
 }};
-MVC.Event.observe(window,"unload",function(){
-MVC.Comet.send=false;
-if(MVC.Comet.connection&&MVC.Comet.connection.transport&&MVC.Comet.transport.className&&MVC.Comet.transport.className=="Ajax"){
-MVC.Comet.connection.transport.abort();
+;
+include.set_path('jmvc/plugins/dom/animate');
+include.plugins("dom/element","lang/timer");
+include("animate");
+;
+include.set_path('jmvc/plugins/lang/timer');
+MVC.Timer=function(_1){
+_1=_1||{};
+this.time=_1.time||500;
+this.from=_1.from||0;
+this.to=_1.to||1;
+this.interval=_1.interval||1;
+this.update_callback=_1.onUpdate||function(){
+};
+this.complete_callback=_1.onComplete||function(){
+};
+this.distance=this.to-this.from;
+if(_1.easing){
+this.easing=typeof _1.easing=="string"?MVC.Timer.easings[_1.easing]:_1.easing;
+}else{
+this.easing=MVC.Timer.easings.swing;
 }
+};
+MVC.Timer.prototype={start:function(){
+this.start_time=new Date();
+this.timer=setInterval(MVC.Function.bind(this.next_step,this),this.interval);
+},kill:function(){
+clearInterval(this.timer);
+},next_step:function(){
+var _2=new Date();
+var _3=_2-this.start_time;
+var _4;
+if(_3>=this.time){
+_4=this.to;
+this.update_callback(_4);
+this.complete_callback(_4);
+this.kill();
+}else{
+var _5=_3/this.time;
+_4=this.easing(_5,_3,this.from,this.distance);
+this.update_callback(_4);
+}
+}};
+MVC.Timer.easings={linear:function(p,n,_8,_9){
+return _8+_9*p;
+},swing:function(p,n,_c,_d){
+return ((-Math.cos(p*Math.PI)/2)+0.5)*_d+_c;
+}};
+;
+include.set_path('jmvc/plugins/dom/animate');
+MVC.Animate=function(_1,_2,_3,_4,_5){
+_5=_5||function(){
+};
+var _6={};
+var _7;
+for(var _8 in _2){
+_7=_2[_8];
+_6[_8]=new MVC.Animate.Value(_1,_8,_7);
+}
+this.timer=new MVC.Timer({from:0,to:1,time:_3,onUpdate:function(_9){
+for(var _a in _6){
+_1.style[_a]=_6[_a].get(_9);
+}
+},onComplete:function(){
+for(var _b in _6){
+_1.style[_b]=_6[_b].last();
+}
+_5(_1);
+}});
+this.timer.start();
+};
+MVC.Animate.prototype={get_starting_value:function(_c){
+var _d=_c.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/),_e=e.cur(true)||0;
+if(_d){
+var _f=parseFloat(_d[2]),_10=_d[3]||"px";
+if(_10!="px"){
+self.style[name]=(_f||1)+_10;
+_e=((_f||1)/e.cur(true))*_e;
+self.style[name]=_e+_10;
+}
+if(_d[1]){
+_f=((_d[1]=="-="?-1:1)*_f)+_e;
+}
+e.custom(_e,_f,_10);
+}else{
+e.custom(_e,_c,"");
+}
+}};
+MVC.Animate.Value=function(_11,_12,end){
+this.style=_12;
+this.start=parseFloat(MVC.Element.get_style(_11,_12))||0;
+var _14=end.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/);
+if(_14){
+this.end=parseFloat(_14[2]);
+this.unit=_14[3]||"px";
+if(this.unit!="px"){
+_11.style[name]=(end||1)+unit;
+this.start=((end||1)/MVC.Element.get_style(_11,_12))*start;
+_11.style[name]=start+unit;
+}
+if(_14[1]){
+this.end=((_14[1]=="-="?-1:1)*this.end)+this.start;
+}
+}else{
+this.end=end;
+this.unit="px";
+}
+this.distance=this.end-this.start;
+};
+MVC.Animate.Value.prototype={get:function(_15){
+return (this.start+_15*this.distance)+this.unit;
+},last:function(){
+return (this.end)+this.unit;
+}};
+;
+include.set_path('jmvc/plugins/controller/dragdrop');
+MVC.Controller.Action.Drag=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")},{init:function(_1,f,_3){
+this.action=_1;
+this.func=f;
+this.controller=_3;
+this.css_and_event();
+var _4=this.selector();
+if(MVC.Draggable.selectors[_4]){
+MVC.Draggable.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
+return;
+}
+MVC.Draggable.selectors[_4]=new MVC.Delegator(_4,"mousedown",MVC.Function.bind(this.mousedown,this));
+MVC.Draggable.selectors[_4].callbacks={};
+MVC.Draggable.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
+},mousedown:function(_5){
+MVC.Object.extend(_5,MVC.Draggable.selectors[this.selector()].callbacks);
+MVC.Draggable.current=new MVC.Draggable(_5);
+_5.event.kill();
+return false;
+}});
+MVC.Draggable=function(_6){
+this.element=_6.element;
+this.moved=false;
+this._cancelled=false;
+this.mouse_position_on_element=MVC.Event.pointer(_6.event).minus(MVC.Element.cumulative_offset(_6.element));
+this.dragstart=_6.dragstart||MVC.Draggable.k;
+this.dragend=_6.dragend||MVC.Draggable.k;
+this.dragging=_6.dragging||MVC.Draggable.k;
+};
+MVC.Draggable.k=function(){
+};
+MVC.Draggable.prototype={start:function(_7){
+this.moved=true;
+this.drag_element=this.element;
+var _8=new MVC.Controller.Params.Drag({event:_7,element:this.element,drag_element:this.drag_element,drag_action:this});
+this.dragstart(_8);
+if(this._cancelled==true){
+return;
+}
+this.drag_element=_8.drag_element;
+MVC.Element.make_positioned(this.drag_element);
+this.start_position=MVC.Element.cumulative_offset(this.drag_element);
+this.drag_element.style.zIndex=1000;
+MVC.Droppables.compile();
+},currentDelta:function(){
+return new MVC.Vector(parseInt(MVC.Element.get_style(this.drag_element,"left")||"0"),parseInt(MVC.Element.get_style(this.drag_element,"top")||"0"));
+},draw:function(_9,_a){
+if(!this.moved){
+this.start(_a);
+}
+if(this._cancelled){
+return;
+}
+MVC.Position.prepare();
+var _b=MVC.Element.cumulative_offset(this.drag_element).minus(this.currentDelta());
+var p=_9.minus(_b).minus(this.mouse_position_on_element);
+var s=this.drag_element.style;
+s.top=p.top()+"px";
+s.left=p.left()+"px";
+var _e=new MVC.Controller.Params.Drag({event:_a,element:this.element,drag_action:this,drag_element:this.drag_element});
+this.dragging(_e);
+MVC.Droppables.show(_9,this,_a);
+},end:function(_f){
+var _10={element:this.element,event:_f,drag_element:this.drag_element,drag_action:this};
+this.dragend(new MVC.Controller.Params.Drag(_10));
+MVC.Droppables.fire(_f,this);
+if(this._revert){
+new MVC.Animate(this.drag_element,{top:this.start_position.top(),left:this.start_position.left()},null,null,MVC.Function.bind(this.cleanup,this));
+}else{
+if(this.ghosted_element&&this.element.parentNode){
+MVC.Element.remove(this.element);
+}
+if(this.drag_element!=this.element){
+this.drag_element.style.display="none";
+}
+}
+},cleanup:function(){
+if(this.drag_element!=this.element){
+this.drag_element.style.display="none";
+}
+}};
+MVC.Draggable.selectors={};
+MVC.Draggable.current=null;
+MVC.Event.observe(document,"mousemove",function(_11){
+if(!MVC.Draggable.current){
+return;
+}
+MVC.Delegator.add_kill_event(_11);
+_11.kill();
+MVC.Draggable.current.draw(MVC.Event.pointer(_11),_11);
+return false;
 });
-if(!MVC._no_conflict&&typeof Comet=="undefined"){
-Comet=MVC.Comet;
+MVC.Event.observe(document,"mouseup",function(_12){
+MVC.Delegator.add_kill_event(_12);
+if(MVC.Draggable.current&&MVC.Draggable.current.moved){
+MVC.Draggable.current.end(_12);
+MVC.Droppables.clear();
 }
+MVC.Draggable.current=null;
+});
+MVC.Controller.Params.Drag=MVC.Controller.Params;
+MVC.Controller.Params.Drag.prototype=new MVC.Controller.Params();
+MVC.Object.extend(MVC.Controller.Params.Drag.prototype,{cancel_drag:function(){
+this.drag_action._cancelled=true;
+this.drag_action.end(this.event);
+MVC.Droppables.clear();
+MVC.Draggable.current=null;
+},ghost:function(_13){
+var _14=this.element.cloneNode(true);
+MVC.Element.insert(this.element,{after:_14});
+this.drag_element=_14;
+},representitive:function(_15,_16,_17){
+MVC.Position.prepare();
+this._offsetX=_16||0;
+this._offsetY=_17||0;
+var p=MVC.Event.pointer(this.event);
+this.drag_element=MVC.$E(_15);
+var s=this.drag_element.style;
+s.top=(p.top()-_17)+"px";
+s.left=(p.left()-_16)+"px";
+s.display="";
+this.drag_action.mouse_position_on_element=new MVC.Vector(_16,_17);
+},revert:function(){
+this.drag_action._revert=true;
+}});
+;
+include.set_path('jmvc/plugins/controller/dragdrop');
+MVC.Controller.Action.Drop=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(dropover|dropped|dropout|dropadd|dropmove)$")},{init:function(_1,f,_3){
+this.action=_1;
+this.func=f;
+this.controller=_3;
+this.css_and_event();
+var _4=this.selector();
+if(!MVC.Droppables.selectors[_4]){
+MVC.Droppables.selectors[_4]={};
+}
+MVC.Droppables.selectors[_4][this.event_type]=_3.dispatch_closure(_1);
+}});
+MVC.Controller.Params.Drop=MVC.Controller.Params;
+MVC.Controller.Params.Drop.prototype=new MVC.Controller.Params();
+MVC.Object.extend(MVC.Controller.Params.Drop.prototype,{cache_position:function(){
+this._cache=true;
+},cancel:function(){
+this._cancel=true;
+}});
+MVC.Droppables={drops:[],selectors:{},add:function(_5,_6){
+_5=MVC.$E(_5);
+_6.element=_5;
+var _7=new MVC.Controller.Params.Drop(_6);
+if(_7.dropadd){
+_7.dropadd(_7);
+}
+if(!_7._canceled){
+MVC.Element.make_positioned(_5);
+this.drops.push(_7);
+}
+},findDeepestChild:function(_8){
+if(_8.length==0){
+return null;
+}
+var _9=_8[0];
+for(i=1;i<_8.length;++i){
+if(MVC.Element.has(_8[i].element,_9.element)){
+_9=_8[i];
+}
+}
+return _9;
+},isAffected:function(_a,_b,_c){
+return ((_c.element!=_b)&&MVC.Position.withinIncludingScrolloffsets(_c.element,_a[0],_a[1],_c));
+},deactivate:function(_d,_e,_f){
+this.last_active=null;
+if(_d.dropout){
+_d.dropout({element:_d.element,drag:_e,event:_f});
+}
+},activate:function(_10,_11,_12){
+this.last_active=_10;
+if(_10.dropover){
+_10.dropover({element:_10.element,drag:_11,event:_12});
+}
+},dropmove:function(_13,_14,_15){
+if(_13.dropmove){
+_13.dropmove({element:_13.element,drag:_14,event:_15});
+}
+},show:function(_16,_17,_18){
+var _19=_17.drag_element;
+if(!this.drops.length){
+return;
+}
+var _1a,_1b=[];
+for(var d=0;d<this.drops.length;d++){
+if(MVC.Droppables.isAffected(_16,_19,this.drops[d])){
+_1b.push(this.drops[d]);
+}
+}
+_1a=MVC.Droppables.findDeepestChild(_1b);
+if(this.last_active&&this.last_active!=_1a){
+this.deactivate(this.last_active,_17,_18);
+}
+if(_1a&&_1a!=this.last_active){
+this.activate(_1a,_17,_18);
+}
+if(_1a&&this.last_active){
+this.dropmove(_1a,_17,_18);
+}
+},fire:function(_1d,_1e){
+if(!this.last_active){
+return;
+}
+MVC.Position.prepare();
+if(this.isAffected(MVC.Event.pointer(_1d),_1e.drag_element,this.last_active)&&this.last_active.dropped){
+this.last_active.dropped({drag:_1e,event:_1d,element:this.last_active.element});
+return true;
+}
+},compile:function(){
+var _1f=[];
+for(var _20 in MVC.Droppables.selectors){
+var _21=_1f.concat(MVC.Query(_20));
+for(var e=0;e<_21.length;e++){
+MVC.Droppables.add(_21[e],MVC.Droppables.selectors[_20]);
+}
+}
+},clear:function(){
+this.drops=[];
+}};
 ;
 include.set_path('jmvc/plugins/io/jsonp');
 include.plugins("lang");
@@ -3523,7 +3723,7 @@ _4=_4.attributes();
 }
 var _5=new this(_4);
 _5.is_new_record=this.new_record_func;
-OpenAjax.hub.publish(this.className+".create.as_existing",{data:_5});
+this.publish("create.as_existing",{data:_5});
 return _5;
 },create_many_as_existing:function(_6){
 if(!_6){
@@ -3578,117 +3778,130 @@ if(!_11.onFailure&&_11.onComplete){
 _11.onFailure=_11.onComplete;
 }
 return _11;
-},models:{}},{init:function(_12){
+},models:{},callback:function(_12){
+var f=this[_12];
+return MVC.Function.bind(f,this);
+},publish:function(_14,_15){
+OpenAjax.hub.publish(this.className+"."+_14,_15);
+}},{init:function(_16){
 this.errors=[];
 this.set_attributes(this.Class.default_attributes||{});
-this.set_attributes(_12);
-},set_attributes:function(_13){
-for(var key in _13){
-if(_13.hasOwnProperty(key)){
-this._setAttribute(key,_13[key]);
+this.set_attributes(_16);
+},set_attributes:function(_17){
+for(var key in _17){
+if(_17.hasOwnProperty(key)){
+this._setAttribute(key,_17[key]);
 }
 }
-return _13;
-},update_attributes:function(_15,_16){
-this.set_attributes(_15);
-return this.save(_16);
+return _17;
+},update_attributes:function(_19,_1a){
+this.set_attributes(_19);
+return this.save(_1a);
 },valid:function(){
 return this.errors.length==0;
 },validate:function(){
-},_setAttribute:function(_17,_18){
-if(MVC.Array.include(this.Class._associations,_17)){
-this._setAssociation(_17,_18);
+},_setAttribute:function(_1b,_1c){
+if(MVC.Array.include(this.Class._associations,_1b)){
+this._setAssociation(_1b,_1c);
 }else{
-this._setProperty(_17,_18);
+this._setProperty(_1b,_1c);
 }
-},_setProperty:function(_19,_1a){
-var old=this[_19];
-this[_19]=MVC.Array.include(["created_at","updated_at"],_19)?MVC.Date.parse(_1a):_1a;
-if(_19==this.Class.id&&this.Class.store){
+},_setProperty:function(_1d,_1e){
+if(this["set_"+_1d]&&!this["set_"+_1d](_1e)){
+return;
+}
+var old=this[_1d];
+this[_1d]=MVC.Array.include(["created_at","updated_at"],_1d)?MVC.Date.parse(_1e):_1e;
+if(_1d==this.Class.id&&this.Class.store){
 if(!old){
 this.Class.store.create(this);
 }else{
-if(old!=this[_19]){
+if(old!=this[_1d]){
 this.Class.store.destroy(old);
 this.Class.store.create(this);
 }
 }
 }
-this.Class.add_attribute(_19,MVC.Object.guess_type(_1a));
-},_setAssociation:function(_1c,_1d){
-this[_1c]=function(){
-if(!MVC.String.is_singular(_1c)){
-_1c=MVC.String.singularize(_1c);
+this.Class.add_attribute(_1d,MVC.Object.guess_type(_1e));
+},_setAssociation:function(_20,_21){
+this[_20]=function(){
+if(!MVC.String.is_singular(_20)){
+_20=MVC.String.singularize(_20);
 }
-var _1e=window[MVC.String.classize(_1c)];
-if(!_1e){
-return _1d;
+var _22=window[MVC.String.classize(_20)];
+if(!_22){
+return _21;
 }
-return _1e.create_many_as_existing(_1d);
+return _22.create_many_as_existing(_21);
 };
 },attributes:function(){
-var _1f={};
+var _23={};
 var cas=this.Class.attributes;
-for(var _21 in cas){
-if(cas.hasOwnProperty(_21)){
-_1f[_21]=this[_21];
+for(var _25 in cas){
+if(cas.hasOwnProperty(_25)){
+_23[_25]=this[_25];
 }
 }
-return _1f;
+return _23;
 },is_new_record:function(){
 return true;
-},save:function(_22){
-var _23;
+},save:function(_26){
+var _27;
 this.errors=[];
 this.validate();
 if(!this.valid()){
 return false;
 }
-_23=this.is_new_record()?this.Class.create(this.attributes(),_22):this.Class.update(this[this.Class.id],this.attributes(),_22);
+_27=this.is_new_record()?this.Class.create(this.attributes(),_26):this.Class.update(this[this.Class.id],this.attributes(),_26);
 this.is_new_record=this.Class.new_record_func;
 return true;
-},destroy:function(_24){
-this.Class.destroy(this[this.Class.id],_24);
+},destroy:function(_28){
+this.Class.destroy(this[this.Class.id],_28);
 this.Class.store.destroy(this[this.Class.id]);
-},add_errors:function(_25){
-if(_25){
-this.errors=this.errors.concat(_25);
+},add_errors:function(_29){
+if(_29){
+this.errors=this.errors.concat(_29);
 }
-},_resetAttributes:function(_26){
+},_resetAttributes:function(_2a){
 this._clear();
 },_clear:function(){
 var cas=this.Class.default_attributes;
-for(var _28 in cas){
-if(cas.hasOwnProperty(_28)){
-this[_28]=null;
+for(var _2c in cas){
+if(cas.hasOwnProperty(_2c)){
+this[_2c]=null;
 }
 }
 },element_id:function(){
 return this.Class.className+"_"+this[this.Class.id];
 },element:function(){
 return MVC.$E(this.element_id());
+},publish:function(_2d,_2e){
+this.Class.publish(_2d,_2e||this);
 }});
-MVC.Object.guess_type=function(_29){
-if(typeof _29!="string"){
-if(_29==null){
-return typeof _29;
+MVC.Object.guess_type=function(_2f){
+if(typeof _2f!="string"){
+if(_2f==null){
+return typeof _2f;
 }
-if(_29.constructor==Date){
+if(_2f.constructor==Date){
 return "date";
 }
-if(_29.constructor==Array){
+if(_2f.constructor==Array){
 return "array";
 }
-return typeof _29;
+return typeof _2f;
 }
-if(_29=="true"||_29=="false"){
+if(_2f=="true"||_2f=="false"){
 return "boolean";
 }
-if(!isNaN(_29)){
+if(!isNaN(_2f)){
 return "number";
 }
-return typeof _29;
+return typeof _2f;
 };
+if(!MVC._no_conflict&&typeof Model=="undefined"){
+Model=MVC.Model;
+}
 ;
 include.set_path('jmvc/plugins/model/ajax');
 include.plugins("model","io/ajax");
@@ -3710,7 +3923,7 @@ include("debug");
 }
 ;
 include.set_path('jmvc/plugins/model/ajax');
-MVC.AjaxModel=MVC.Model.extend({transport:MVC.Ajax,request:function(){
+MVC.Model.Ajax=MVC.Model.extend({transport:MVC.Ajax,request:function(){
 },_matching:/(\w+?)_?(get|post|delete|update|)_success$/,init:function(){
 if(!this.className){
 return;
@@ -3809,9 +4022,11 @@ return parseInt(_2e[1]);
 }
 }
 return null;
+},json_from_string:function(_2f){
+return eval("("+_2f+")");
 }},{});
-if(!MVC._no_conflict&&typeof AjaxModel=="undefined"){
-AjaxModel=MVC.AjaxModel;
+if(!MVC._no_conflict&&typeof Model.Ajax=="undefined"){
+Model.Ajax=MVC.Model.Ajax;
 }
 ;
 include.set_path('jmvc/plugins/model/cookie');
@@ -3819,7 +4034,7 @@ include.plugins("model","lang/json");
 include("cookie_model");
 ;
 include.set_path('jmvc/plugins/model/cookie');
-MVC.CookieModel=MVC.Model.extend({init:function(){
+MVC.Model.Cookie=MVC.Model.extend({init:function(){
 this._working=null;
 this._super();
 },days:null,find_one:function(_1){
@@ -3917,7 +4132,7 @@ include.plugins("model","lang/date","io/jsonp");
 include("remote_model");
 ;
 include.set_path('jmvc/plugins/model/jsonp');
-MVC.JsonPModel=MVC.Model.extend({error_timeout:4000,init:function(){
+MVC.Model.JsonP=MVC.Model.extend({error_timeout:4000,init:function(){
 if(!this.className){
 return;
 }
@@ -4039,81 +4254,127 @@ include.plugins("model/ajax","lang/date");
 include("json_rest_model");
 ;
 include.set_path('jmvc/plugins/model/rest_json');
-MVC.JSONRestModel=MVC.AjaxModel.extend({init:function(){
+MVC.Model.JSONRest=MVC.Model.Ajax.extend({init:function(){
 if(!this.className){
 return;
 }
 this.plural_name=MVC.String.pluralize(this.className);
 this.singular_name=this.className;
 this._super();
-},json_from_string:function(_1){
-return eval(_1);
 },find_all_get_url:function(){
 return "/"+this.plural_name+".json";
-},find_all_get_success:function(_2){
-var _3=this.json_from_string(_2.responseText);
-return this.convert_response_into_instances(_3);
-},convert_response_into_instances:function(_4){
-var _5=[];
-for(var i=0;i<_4.length;i++){
-var _7=_4[i];
-var _8=this.create_as_existing(_7.attributes);
-if(_7.errors){
-_8.add_errors(_7.errors);
+},find_all_get_success:function(_1){
+var _2=this.json_from_string(_1.responseText);
+return this.convert_response_into_instances(_2);
+},convert_response_into_instances:function(_3){
+var _4=[];
+for(var i=0;i<_3.length;i++){
+var _6=_3[i];
+var _7=this.create_as_existing(_6.attributes);
+if(_6.errors){
+_7.add_errors(_6.errors);
 }
-_5.push(_8);
+_4.push(_7);
 }
-return _5;
-},create_request:function(_9){
-var _a=new this(_9);
-_a.validate();
-if(!_a.valid()){
-return _a;
+return _4;
+},create_request:function(_8){
+var _9=new this(_8);
+_9.validate();
+if(!_9.valid()){
+return _9;
 }
-var _b={};
-_b[this.singular_name]=_9;
-this.request("/"+this.plural_name+".json",_b,{method:"post"},_a);
-return _a;
-},create_success:function(_c,_d,_e){
-if(/\w+/.test(_c.responseText)){
-var _f=this.json_from_string(_c.responseText);
-if(_f){
-_e.add_errors(_f);
+var _a={};
+_a[this.singular_name]=_8;
+this.request("/"+this.plural_name+".json",_a,{method:"post"},_9);
+return _9;
+},create_success:function(_b,_c,_d){
+if(/\w+/.test(_b.responseText)){
+var _e=this.json_from_string(_b.responseText);
+if(_e){
+_d.add_errors(_e);
 }
 }
-if(_e.is_new_record()&&_c.status==201){
-var id=this.get_id(_c);
+if(_d.is_new_record()&&_b.status==201){
+var id=this.get_id(_b);
 if(!isNaN(id)){
-_e._setProperty("id",id);
+_d._setProperty("id",id);
 }
 }
-return _e;
-},update_request:function(id,_12){
-delete _12.id;
-var _13={};
-_13[this.singular_name]=_12;
-var _14=this.create_as_existing(_12);
-_14.id=id;
-_14.validate();
-if(!_14.valid()){
-return _14;
+return _d;
+},update_request:function(id,_11){
+delete _11.id;
+var _12={};
+_12[this.singular_name]=_11;
+var _13=this.create_as_existing(_11);
+_13.id=id;
+_13.validate();
+if(!_13.valid()){
+return _13;
 }
-this.request("/"+this.plural_name+"/"+id+".json",_13,{method:"put"},_14);
-},update_success:function(_15,_16,_17){
-if(/\w+/.test(_15.responseText)){
-var _18=this.json_from_string(_15.responseText);
-if(_18){
-_17.add_errors(_18);
+this.request("/"+this.plural_name+"/"+id+".json",_12,{method:"put"},_13);
+},update_success:function(_14,_15,_16){
+if(/\w+/.test(_14.responseText)){
+var _17=this.json_from_string(_14.responseText);
+if(_17){
+_16.add_errors(_17);
 }
 }
-return _17;
+return _16;
 },destroy_delete_url:function(id){
 return "/"+this.plural_name+"/"+id+".xml";
 },destroy_delete_failure:function(){
 return false;
-},destroy_delete_success:function(_1a){
-return _1a.status==200;
+},destroy_delete_success:function(_19){
+return _19.status==200;
 }},{});
+;
+include.set_path('jmvc/plugins/model/window_name');
+include.plugins("model","lang/date","io/window_name");
+include("window_name_model");
+;
+include.set_path('jmvc/plugins/model/window_name');
+MVC.Model.WindowName=MVC.Model.extend({init:function(){
+if(!this.className){
+return;
+}
+if(!this.domain){
+throw ("a domain must be provided for remote model");
+}
+if(!this.controller_name){
+this.controller_name=this.className;
+}
+this.plural_controller_name=MVC.String.pluralize(this.controller_name);
+this._super();
+},find_all:function(_1,_2){
+var _3=this._clean_callbacks(_2);
+var _4=_3.onSuccess;
+var _5=_3.onFailure;
+var _6=this.find_url?this.find_url+"?":this.domain+"/"+this.plural_controller_name+".html?";
+if(!_4){
+_4=(function(){
+});
+}
+new MVC.WindowName(_6,{parameters:_1,onFailure:_2.onFailure,onComplete:MVC.Function.bind(function(_7){
+eval("var callback_params = "+_7);
+var _8=this.create_many_as_existing(callback_params);
+_4(_8);
+},this),method:"get"});
+},create:function(_9,_a){
+var _b=this._clean_callbacks(_a);
+var _c=_b.onSuccess;
+this.add_standard_params(_9,"create");
+var _d=this,_e=this.className,_f=this.create_url?this.create_url+"?":this.domain+"/"+this.plural_controller_name+".html?";
+if(!_c){
+_c=(function(){
+});
+}
+_9["_method"]="POST";
+new MVC.WindowName(_f,{parameters:_9,onComplete:MVC.Function.bind(this.single_create_callback(_c),this),onFailure:_c.onFailure,method:"post"});
+},add_standard_params:function(_10,_11){
+if(!_10.referer){
+_10.referer=window.location.href;
+}
+},domain:null},{});
 ;
 include.set_path('jmvc/plugins/model/rest_xml');
 include.plugins("model/ajax","lang/date");
@@ -4406,7 +4667,7 @@ return String(_33).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;
 include.set_path('jmvc/plugins/model/rest_xml');
 MVC.Tree=new XML.ObjTree();
 MVC.Tree.attr_prefix="@";
-MVC.XMLRestModel=MVC.AjaxModel.extend({init:function(){
+MVC.Model.XMLRest=MVC.Model.Ajax.extend({init:function(){
 if(!this.className){
 return;
 }
@@ -4638,196 +4899,6 @@ return _3e;
 return false;
 }
 }});
-;
-include.set_path('jmvc/plugins/model/view_helper');
-include("model_view_helper");
-;
-include.set_path('jmvc/plugins/model/view_helper');
-MVC.ModelViewHelper=MVC.Class.extend({init:function(){
-if(!this.className){
-return;
-}
-var _1;
-if(!this.className){
-return;
-}
-if(!(_1=this.modelClass=window[MVC.String.classize(this.className)])){
-throw "ModelViewHelpers can't find class "+this.className;
-}
-var _2=this;
-this.modelClass.View=function(){
-return _2;
-};
-this.modelClass.prototype.View=function(){
-return new _2(this);
-};
-if(this.modelClass.attributes){
-this._view=new MVC.View.Helpers({});
-var _3;
-for(var _4 in this.modelClass.attributes){
-if(!this.modelClass.attributes.hasOwnProperty(_4)||typeof this.modelClass.attributes[_4]!="string"){
-continue;
-}
-this.add_helper(_4);
-}
-}
-},form_helper:function(_5){
-if(!this.helpers[_5]+"_field"){
-this.add_helper(_5);
-}
-var f=this.helpers[_5+"_field"];
-var _7=MVC.Array.from(arguments);
-_7.shift();
-return f.apply(this._view,_7);
-},add_helper:function(_8){
-var h=this._helper(_8);
-this.helpers[_8+"_field"]=h;
-},helpers:{},_helper:function(_a){
-var _b=this._view_helper(_a);
-var _c=this;
-var _d=this.modelClass.className+"["+_a+"]";
-var id=this.modelClass.className+"_"+_a;
-return function(){
-var _f=MVC.Array.from(arguments);
-_f.unshift(_d);
-_f[2]=_f[2]||{};
-_f[2].id=id;
-return _b.apply(_c._view,_f);
-};
-},_view_helper:function(_10){
-switch(this.modelClass.attributes[_10].toLowerCase()){
-case "boolean":
-return this._view.check_box_tag;
-case "text":
-return this._view.text_area_tag;
-default:
-return this._view.text_field_tag;
-}
-},clear:function(){
-var _11=this.modelClass.className,el;
-for(var _13 in this.modelClass.attributes){
-if((el=MVC.$E(_11+"_"+_13))){
-el.value="";
-}
-}
-},from_html:function(_14){
-var el=MVC.$E(_14);
-var _16=this.modelClass?this.modelClass:window[MVC.String.classize(el.getAttribute("type"))];
-if(!_16){
-return null;
-}
-var _17={};
-_17[_16.id]=this.element_id_to_id(el.id);
-return _16.create_as_existing(_17);
-},element_id_to_id:function(_18){
-var re=new RegExp(this.className+"_","");
-return _18.replace(re,"");
-}},{init:function(_1a){
-this._inst=_1a;
-this._className=this._inst.Class.className;
-this._Class=this._inst.Class;
-},id:function(){
-return this._inst[this._inst.Class.id];
-},element:function(){
-if(this._element){
-return this._element;
-}
-this._element=MVC.$E(this.element_id());
-if(this._element){
-return this._element;
-}
-},create_element:function(){
-this._element=document.createElement("div");
-this._element.id=this.element_id();
-this._element.className=this._className;
-this._element.setAttribute("type",this._className);
-return this._element;
-},element_id:function(){
-return this._className+"_"+this._inst[this._inst.Class.id];
-},show_errors:function(){
-var err=MVC.$E(this._className+"_error");
-var err=err||MVC.$E(this._className+"_error");
-var _1c=[];
-for(var i=0;i<this._inst.errors.length;i++){
-var _1e=this._inst.errors[i];
-var el=MVC.$E(this._className+"_"+_1e[0]);
-if(el){
-el.className="error";
-var _20=MVC.$E(this._className+"_"+_1e[0]+"_error");
-if(_20){
-_20.innerHTML=_1e[1];
-}
-}else{
-_1c.push(_1e[0]+" is "+_1e[1]);
-}
-}
-if(_1c.length>0){
-if(err){
-err.innerHTML=_1c.join(", ");
-}else{
-alert(_1c.join(", "));
-}
-}
-},clear_errors:function(){
-var p;
-var cn=this._className;
-for(var _23 in this._Class.attributes){
-if(this._Class.attributes.hasOwnProperty(_23)){
-var el=MVC.$E(cn+"_"+p);
-if(el){
-el.className=el.className.replace(/(^|\\s+)error(\\s+|$)/," ");
-}
-var _25=MVC.$E(cn+"_"+_23+"_error");
-if(_25){
-_25.innerHTML="&nbsp;";
-}
-}
-}
-var _26=MVC.$E(cn+"_error");
-if(_26){
-_26.innerHTML="";
-}
-},edit:function(_27){
-var _28=MVC.Array.from(arguments);
-var _29=this._className+"["+_27+"]";
-_28.shift();
-_28.unshift({id:this.edit_id(_27)});
-_28.unshift(this._inst[_27]);
-_28.unshift(_29);
-var _2a=this.Class._view_helper(_27);
-return _2a.apply(this.Class._view,_28);
-},edit_values:function(){
-var _2b={};
-var cn=this._className,p,el;
-for(var _2f in this._Class.attributes){
-if(this._Class.attributes.hasOwnProperty(_2f)){
-el=MVC.$E(this.edit_id(_2f));
-}
-if(el){
-_2b[_2f]=el.value;
-}
-}
-return _2b;
-},edit_id:function(_30){
-return this._className+"_"+this._inst.id+"_"+_30+"_edit";
-},destroy:function(){
-var el=this.element();
-el.parentNode.removeChild(el);
-}});
-MVC.Controller.Params.prototype.object_data=function(){
-var _32=this._className(),_33,_34=this.element,_35=new RegExp("^"+_32+"_(.*)$");
-if(!(_33=MVC.Model.models[_32])){
-return;
-}
-while(_34&&_34.parentNode&&!_34.id.match(_35)){
-_34=_34.parentNode;
-}
-if(!_34){
-return null;
-}
-var id=_34.id.match(_35)[1];
-return _33.store.find_one(id);
-};
 ;
 include.set_path('jmvc/plugins/test');
 include.plugins("lang","dom/query","lang/class","lang/openajax");
@@ -5236,7 +5307,9 @@ var _9=_6[_7].css_selector.replace(/\.|#/g,"")+" "+_8;
 var _a=_9.replace(/(\w*)/g,function(m,_c){
 return MVC.String.capitalize(_c);
 }).replace(/ /g,"");
+if(_5[MVC.String.capitalize(_8)]){
 _5[_a]=_5[MVC.String.capitalize(_8)].curry(_6[_7].css_selector);
+}
 this.added_helpers[_a]=_5[_a];
 }
 return _5;
@@ -5587,7 +5660,7 @@ include.plugins("controller");
 include("stateful_controller");
 ;
 include.set_path('jmvc/plugins/controller/stateful');
-MVC.StatefulController=MVC.Controller.extend({init:function(){
+MVC.Controller.Stateful=MVC.Controller.extend({init:function(){
 this._super();
 if(!this.className){
 return;
@@ -5648,6 +5721,301 @@ _15.parentNode.removeChild(_15);
 }
 delete this;
 }});
+;
+include.set_path('jmvc/plugins/controller/hover');
+include.plugins("controller","lang/vector","dom/element");
+include("hover");
+;
+include.set_path('jmvc/plugins/controller/hover');
+MVC.Controller.Action.EnterLeave=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(mouseenter|mouseleave)$")},{init:function(_1,f,_3){
+this.action=_1;
+this.func=f;
+this.controller=_3;
+this.css_and_event();
+var _4=this.selector();
+this[this.event_type]();
+},mouseenter:function(){
+new MVC.Delegator(this.selector(),"mouseover",MVC.Function.bind(function(_5){
+var _6=_5.event.relatedTarget;
+if(_5.element==_6||MVC.$E(_5.element).has(_6)){
+return true;
+}
+this.func(_5);
+},this));
+},mouseleave:function(){
+new MVC.Delegator(this.selector(),"mouseout",MVC.Function.bind(function(_7){
+var _8=_7.event.relatedTarget;
+if(_7.element==_8||MVC.$E(_7.element).has(_8)){
+return true;
+}
+this.func(_7);
+},this));
+}});
+MVC.Controller.Action.Hover=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(hoverenter|hoverleave)$"),sensitivity:6,interval:100,hovers:{}},{init:function(_9,f,_b){
+this.action=_9;
+this.func=_b.dispatch_closure(_9);
+this.controller=_b;
+this.css_and_event();
+var _c=this.selector();
+if(!this.Class.hovers[this.selector()]){
+this.Class.hovers[this.selector()]={};
+new MVC.Delegator(this.selector(),"mouseover",MVC.Function.bind(this.mouseover,this));
+new MVC.Delegator(this.selector(),"mouseout",MVC.Function.bind(this.mouseout,this));
+}
+this.Class.hovers[this.selector()][this.event_type]=this;
+},hoverenter:function(_d){
+var _e=this.Class.hovers[this.selector()]["hoverenter"];
+if(_e){
+_e.func(_d);
+}
+},hoverleave:function(_f){
+var _10=this.Class.hovers[this.selector()]["hoverleave"];
+if(_10){
+_10.func(_f);
+}
+},check:function(){
+var _11=this.starting_position.minus(this.current_position);
+var _12=Math.abs(_11.x())+Math.abs(_11.y());
+if(_12<this.Class.sensitivity){
+this.called=true;
+this.hoverenter({element:this.element,mouseover_event:this.mouseover_event});
+MVC.Event.stop_observing(this.element,"mousemove",this.mousemove);
+}else{
+this.current_position=this.starting_position;
+this.timer=setTimeout(MVC.Function.bind(this.check,this),this.Class.interval);
+}
+},mouseover:function(_13){
+var _14=_13.event.relatedTarget;
+if(_13.element==_14||MVC.$E(_13.element).has(_14)){
+return true;
+}
+this.called=false;
+this.starting_position=MVC.Event.pointer(_13.event);
+this.element=_13.element;
+this.mouseover_event=_13.event;
+this.mousemove=MVC.Function.bind(function(_15){
+this.mousemove_event=_15;
+this.current_position=MVC.Event.pointer(_15);
+},this);
+MVC.Event.observe(_13.element,"mousemove",this.mousemove);
+this.timer=setTimeout(MVC.Function.bind(this.check,this),this.Class.interval);
+},mouseout:function(_16){
+var _17=_16.event.relatedTarget;
+if(_16.element==_17||MVC.$E(_16.element).has(_17)){
+return true;
+}
+clearTimeout(this.timer);
+MVC.Event.stop_observing(_16.element,"mousemove",this.mousemove);
+if(this.called){
+this.hoverleave({element:this.element,event:_16.event});
+}
+}});
+;
+include.set_path('jmvc/plugins/controller/lasso');
+include.plugins("controller","dom/element","dom/query","dom/position");
+include("lasso","selectable");
+;
+include.set_path('jmvc/plugins/controller/lasso');
+MVC.Controller.Action.Lasso=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(lassostart|lassoend|lassomove)$")},{init:function(_1,f,_3){
+this.action=_1;
+this.func=f;
+this.controller=_3;
+this.css_and_event();
+var _4=this.selector();
+if(MVC.Lasso.selectors[_4]){
+MVC.Lasso.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
+return;
+}
+MVC.Lasso.selectors[_4]=new MVC.Delegator(_4,"mousedown",MVC.Function.bind(this.mousedown,this));
+MVC.Lasso.selectors[_4].callbacks={};
+MVC.Lasso.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
+},mousedown:function(_5){
+MVC.Object.extend(_5,MVC.Lasso.selectors[this.selector()].callbacks);
+MVC.Lasso.current=new MVC.Lasso(_5);
+_5.event.kill();
+return false;
+}});
+MVC.Lasso=function(_6){
+this.element=_6.element;
+this.moved=false;
+this._cancelled=false;
+this.lassostart=_6.lassostart||MVC.Lasso.k;
+this.lassoend=_6.lassoend||MVC.Lasso.k;
+this.lassomove=_6.lassomove||MVC.Lasso.k;
+};
+MVC.Lasso.k=function(){
+};
+MVC.Lasso.prototype={style_element:function(){
+var s=this.lasso_element.style;
+s.position="absolute";
+s.border="dotted 1px Gray";
+s.zIndex=1000;
+},position_lasso:function(_8){
+var _9=MVC.Event.pointer(_8);
+this.top=_9.top()<this.start_position.top()?_9.top():this.start_position.top();
+this.left=_9.left()<this.start_position.left()?_9.left():this.start_position.left();
+this.height=Math.abs(_9.top()-this.start_position.top());
+this.width=Math.abs(_9.left()-this.start_position.left());
+var s=this.lasso_element.style;
+s.top=this.top+"px";
+s.left=this.left+"px";
+s.width=this.width+"px";
+s.height=this.height+"px";
+},start:function(_b){
+this.moved=true;
+this.lasso_element=document.createElement("div");
+document.body.appendChild(this.lasso_element);
+this.style_element();
+MVC.Element.make_positioned(this.lasso_element);
+this.start_position=MVC.Event.pointer(_b);
+var _c={event:_b,element:this.element,lasso_element:this.lasso_element,lasso_action:this};
+this.lassostart(_c);
+MVC.Selectables.compile();
+},currentDelta:function(){
+return new MVC.Vector(parseInt(MVC.Element.get_style(this.lasso_element,"left")||"0"),parseInt(MVC.Element.get_style(this.lasso_element,"top")||"0"));
+},draw:function(_d,_e){
+if(!this.moved){
+this.start(_e);
+}
+if(this._cancelled){
+return;
+}
+MVC.Position.prepare();
+this.position_lasso(_e);
+var _f={event:_e,element:this.element,lasso_action:this,lasso_element:this.lasso_element};
+this.lassomove(_f);
+MVC.Selectables.show(_d,this,_e);
+},end:function(_10){
+var _11={element:this.element,event:_10,lasso_element:this.lasso_element,lasso_action:this};
+this.lassoend(_11);
+document.body.removeChild(this.lasso_element);
+},cleanup:function(){
+if(this.drag_element!=this.element){
+this.drag_element.style.display="none";
+}
+},contains:function(_12){
+return MVC.Position.withinBoxIncludingScrollingOffsets(_12.element,this.left,this.top,this.width,this.height,_12);
+}};
+MVC.Lasso.selectors={};
+MVC.Lasso.current=null;
+MVC.Event.observe(document,"mousemove",function(_13){
+if(!MVC.Lasso.current){
+return;
+}
+MVC.Delegator.add_kill_event(_13);
+_13.kill();
+MVC.Lasso.current.draw(MVC.Event.pointer(_13),_13);
+return false;
+});
+MVC.Event.observe(document,"mouseup",function(_14){
+MVC.Delegator.add_kill_event(_14);
+if(MVC.Lasso.current&&MVC.Lasso.current.moved){
+MVC.Lasso.current.end(_14);
+MVC.Selectables.fire(_14,MVC.Lasso.current);
+MVC.Selectables.clear();
+}
+MVC.Lasso.current=null;
+});
+;
+include.set_path('jmvc/plugins/controller/lasso');
+MVC.Controller.Action.Selectable=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(selectover|selected|selectout|selectadd|selectmove)$")},{init:function(_1,f,_3){
+this.action=_1;
+this.func=f;
+this.controller=_3;
+this.css_and_event();
+var _4=this.selector();
+if(!MVC.Selectables.selectors[_4]){
+MVC.Selectables.selectors[_4]={};
+}
+MVC.Selectables.selectors[_4][this.event_type]=_3.dispatch_closure(_1);
+}});
+MVC.Selectable=MVC.Controller.Params;
+MVC.Selectable.prototype=new MVC.Controller.Params();
+MVC.Object.extend(MVC.Selectable.prototype,{cache_position:function(){
+this._cache=true;
+},cancel:function(){
+this._cancel=true;
+}});
+MVC.Selectables={selectables:[],selectors:{},add:function(_5,_6){
+_5=MVC.$E(_5);
+_6=MVC.Object.extend({selectover:MVC.Lasso.k,selected:MVC.Lasso.k,selectout:MVC.Lasso.k,selectadd:MVC.Lasso.k,selectmove:MVC.Lasso.k},_6);
+_6.element=_5;
+_6._is_selected=false;
+var _7=new MVC.Selectable(_6);
+if(_7.selectadd){
+_7.selectadd(_7);
+}
+if(!_7._canceled){
+MVC.Element.make_positioned(_5);
+this.selectables.push(_7);
+}
+},findDeepestChild:function(_8){
+if(_8.length==0){
+return null;
+}
+var _9=_8[0];
+for(i=1;i<_8.length;++i){
+if(MVC.Element.has(_8[i].element,_9.element)){
+_9=_8[i];
+}
+}
+return _9;
+},isAffected:function(_a,_b){
+return (_a.contains(_b));
+},deactivate:function(_c,_d,_e){
+this.last_active=null;
+if(_c.dropout){
+_c.dropout({element:_c.element,drag:_d,event:_e});
+}
+},activate:function(_f,_10,_11){
+this.last_active=_f;
+if(_f.dropover){
+_f.dropover({element:_f.element,drag:_10,event:_11});
+}
+},dropmove:function(_12,_13,_14){
+if(_12.dropmove){
+_12.dropmove({element:_12.element,drag:_13,event:_14});
+}
+},show:function(_15,_16,_17){
+if(!this.selectables.length){
+return;
+}
+var _18,_19=[];
+for(var d=0;d<this.selectables.length;d++){
+var _1b=this.selectables[d];
+var ef=MVC.Selectables.isAffected(_16,this.selectables[d]);
+if(ef&&!_1b._is_selected){
+_1b.selectover({element:_1b.element});
+_1b._is_selected=true;
+}
+if(ef){
+_1b.selectmove({element:_1b.element});
+}
+if(!ef&&_1b._is_selected){
+_1b._is_selected=false;
+_1b.selectout({element:_1b.element});
+}
+}
+},fire:function(_1d,_1e){
+MVC.Position.prepare();
+for(var d=0;d<this.selectables.length;d++){
+var _20=this.selectables[d];
+var ef=MVC.Selectables.isAffected(_1e,this.selectables[d]);
+if(ef){
+_20.selected({element:_20.element,event:_1d});
+}
+}
+},compile:function(){
+var _22=[];
+for(var _23 in MVC.Selectables.selectors){
+var _24=_22.concat(MVC.Query(_23));
+for(var e=0;e<_24.length;e++){
+MVC.Selectables.add(_24[e],MVC.Selectables.selectors[_23]);
+}
+}
+},clear:function(){
+this.selectables=[];
+}};
 ;
 include.set_path('jmvc/rhino/documentation');
 if(typeof load!="undefined"&&!MVC.load_doc){
@@ -5995,7 +6363,7 @@ _10.push("<a href='#"+_12.full_name+"'>"+_12.name+"</a>");
 }
 return _10.join(", ");
 },cleaned_comment:function(){
-return MVC.Doc.link_content(this.real_comment);
+return MVC.Doc.link_content(this.real_comment).replace(/\n\s*\n/g,"<br/><br/>");
 },url:function(){
 return this.name+".html";
 }});
@@ -6067,7 +6435,7 @@ this.ret.type=this.name.toLowerCase();
 }
 return n+"("+res.join(", ")+") -> "+this.ret.type;
 },cleaned_comment:function(){
-return MVC.Doc.link_content(this.real_comment);
+return MVC.Doc.link_content(this.real_comment).replace(/\n\s*\n/g,"<br/><br/>");
 },url:function(){
 return this.name+".html";
 },comment_setup_complete:function(){
