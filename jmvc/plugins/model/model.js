@@ -322,3 +322,7 @@ MVC.Object.guess_type = function(object){
     if(!isNaN(object)) return 'number'
     return typeof object;
 }
+
+if(!MVC._no_conflict && typeof Model == 'undefined'){
+	Model = MVC.Model;
+}

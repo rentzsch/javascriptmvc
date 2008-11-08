@@ -1,4 +1,4 @@
-MVC.Controller.CompoundAction = MVC.Controller.DelegateAction.extend({
+MVC.Controller.CompoundAction = MVC.Controller.EventAction.extend({
     match: new RegExp("(.*?)\\s?(mouseenter|mouseleave)$")
 },
 //Prototype functions
@@ -37,7 +37,7 @@ MVC.Controller.CompoundAction = MVC.Controller.DelegateAction.extend({
 /**
  * provides hoverover,hoverout,hoverenter,hoverleave
  */
-MVC.Controller.Hover = MVC.Controller.DelegateAction.extend({
+MVC.Controller.Hover = MVC.Controller.EventAction.extend({
     match: new RegExp("(.*?)\\s?(hoverenter|hoverleave)$"),
     /**
      * 

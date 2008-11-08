@@ -3,9 +3,30 @@ MVC.Object.is_number = function(o){
     return o &&(  typeof o == 'number' || ( typeof o == 'string' && !isNaN(o) ) );
 };
 
-/* Controllers respond to events such as mouseovers, clicks, and form submits. 
+/* 
+ * Controllers respond to events such as mouseovers, clicks, and form submits. 
  * They do this by naming functions, 
  * also called actions, with combination css selector and event handlers.
+ * 
+ * <h2>Example</h2>
+ * <pre><span class='comment'>//Instead of:</span>
+$('.tasks').click(function(e){ ... })
+<span class='comment'>//do this</span>
+TasksController = MVC.Controller.extend('tasks',{
+  click: function(params){...}
+})</pre>
+ * 
+ * <h2>Actions</h2>
+ * Actions that 
+ * 
+ * Controller can handle almost all standard events including:
+ * change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
+ * mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, focus, blur, load, unload.
+ * 
+ * With aditional plugins, you can also 
+ * 
+ * <h2>OpenAjax Events</h2>
+ * 
  */
 MVC.Controller = MVC.Class.extend(
 /* @Static*/
@@ -102,7 +123,7 @@ MVC.Controller = MVC.Class.extend(
     controllers : {},
     actions: [],
     publish: function(message, params){
-        //var subscribers = MVC.Controller.SubscribeAction.events[message];
+        //var subscribers = MVC.Controller.Action.Subscribe.events[message];
         //if(!subscribers) return;
         //for(var i =0 ; i < subscribers.length; i++){
         //    subscribers[i](params);
@@ -119,7 +140,7 @@ MVC.Controller = MVC.Class.extend(
         return null;
      },
      /**
-      * The name of the model this controller can uses for functions like element_instance
+      * The name of the model this controller can uses for param functions like element_instance
       */
      modelName: null
 },
@@ -181,7 +202,10 @@ MVC.Controller.Action = MVC.Class.extend(
         this.controller = controller;
     }
 });
-MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
+/**
+ * Subscribes to an OpenAjax.hub event.
+ */
+MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
 /* @Static*/
 {
     match: new RegExp("(.*?)\\s?(subscribe)$"),
@@ -205,9 +229,9 @@ MVC.Controller.SubscribeAction = MVC.Controller.Action.extend(
     }
 })
 /*
- * Default EventDelegation based actions
+ * Default event delegation based actions
  */
-MVC.Controller.DelegateAction = MVC.Controller.Action.extend({
+MVC.Controller.EventAction = MVC.Controller.Action.extend({
 /* @Static*/
     match: new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
     /*

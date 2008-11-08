@@ -1,4 +1,7 @@
-MVC.WindowNameModel = MVC.Model.extend(
+/**
+ * Uses window.name as a cross domain transport
+ */
+MVC.Model.WindowName = MVC.Model.extend(
 {
     init: function(){
         if(!this.className) return;

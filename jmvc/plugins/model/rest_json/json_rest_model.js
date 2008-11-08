@@ -28,7 +28,7 @@
  *            id: 1}  } </pre>
  * 
  */
-MVC.JSONRestModel = MVC.AjaxModel.extend(
+MVC.Model.JSONRest = MVC.Model.Ajax.extend(
 /* @Static*/
 {
     init: function(){
@@ -36,14 +36,6 @@ MVC.JSONRestModel = MVC.AjaxModel.extend(
         this.plural_name = MVC.String.pluralize(this.className);
         this.singular_name =  this.className;
         this._super();
-    },
-    /**
-     * overwrite this function if you don't want to eval js
-     * @param {Object} json_string json string
-     * @return {Object} json converted to data
-     */
-    json_from_string : function(json_string){
-        return eval(json_string); //
     },
     /**
      * Returns the URL for find all requests

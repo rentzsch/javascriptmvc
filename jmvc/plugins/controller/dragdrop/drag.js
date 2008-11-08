@@ -4,7 +4,7 @@
  *  dragging -> called everytime someone moves the drag<br/>
  *  dragend -> when someone lets go of a dragable object
  */
-MVC.Controller.DragAction = MVC.Controller.DelegateAction.extend({
+MVC.Controller.Action.Drag = MVC.Controller.EventAction.extend({
     match: new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")
 },
 /* @prototype */

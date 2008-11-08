@@ -1,11 +1,11 @@
 /**
- * AjaxModel makes it easy to write models that handle the request / reponse cycle of most
+ * Model.Ajax makes it easy to write models that handle the request / reponse cycle of most
  * Ajax driven applications.  It helps you escape transporting callbacks.</br>
  * It uses convention to tie function names to resouces/ urls.  This is best shown with an example:
  * First, lets say we wanted an FTP model to be able to requests data from /ftp/dir.  We could create that
  * model like this:
  * 
-<pre>Ftp = MVC.AjaxModel.extend('ftp',
+<pre>Ftp = MVC.Model.Ajax.extend('ftp',
 {
    dir_get_success: function(transport){
        return transport.responseText;
@@ -24,10 +24,10 @@ There are a few things to notice here.
     to post.</li>
 </ul>
 
-AjaxModel allows you to expand on this pattern in several ways:
+Model.Ajax allows you to expand on this pattern in several ways:
 <h3>Changing the request path</h3>
 If /ftp/dir was actually ftp_directory, you can change the directory name by adding the following:
-<pre>Ftp = MVC.AjaxModel.extend('ftp',
+<pre>Ftp = MVC.Model.Ajax.extend('ftp',
 {
    dir_get_url: '/ftp_directory'
    dir_get_success: function(transport){
@@ -63,7 +63,7 @@ Example:
 
 <h3>Respond to errors</h3>
 Finally, you can respond to Transport errors in the same way you respond to success:
-<pre>Ftp = MVC.AjaxModel.extend('ftp',
+<pre>Ftp = MVC.Model.Ajax.extend('ftp',
 {
    dir_get_success: function(transport){
        return transport.responseText;
@@ -75,7 +75,7 @@ Finally, you can respond to Transport errors in the same way you respond to succ
 
  * 
  */
-MVC.AjaxModel = MVC.Model.extend(
+MVC.Model.Ajax = MVC.Model.extend(
 /* @Static*/
 {
     transport: MVC.Ajax,
@@ -208,6 +208,14 @@ MVC.AjaxModel = MVC.Model.extend(
 		  if(mtcs) return parseInt(mtcs[1]);
         }
         return null;
+    },    
+    /**
+     * overwrite this function if you don't want to eval js
+     * @param {Object} json_string json string
+     * @return {Object} json converted to data
+     */
+    json_from_string : function(json_string){
+        return eval('('+json_string+')'); //
     }
     
 },
@@ -215,6 +223,6 @@ MVC.AjaxModel = MVC.Model.extend(
 {}
 );
 
-if(!MVC._no_conflict && typeof AjaxModel == 'undefined'){
-	AjaxModel = MVC.AjaxModel;
+if(!MVC._no_conflict && typeof Model.Ajax == 'undefined'){
+	Model.Ajax = MVC.Model.Ajax;
 }

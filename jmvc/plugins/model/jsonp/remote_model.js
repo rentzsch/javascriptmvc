@@ -1,4 +1,7 @@
-MVC.JsonPModel = MVC.Model.extend(
+/**
+ * Model for connecting to resources with JSONP
+ */
+MVC.Model.JsonP = MVC.Model.extend(
 {
     error_timeout: 4000,
     init: function(){

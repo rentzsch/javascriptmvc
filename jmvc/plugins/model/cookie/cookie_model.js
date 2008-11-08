@@ -1,4 +1,7 @@
-MVC.CookieModel = MVC.Model.extend(
+/**
+ * A model for Cookies
+ */
+MVC.Model.Cookie = MVC.Model.extend(
 //Class functions
 {
     init : function(){

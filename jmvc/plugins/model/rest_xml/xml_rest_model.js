@@ -1,7 +1,10 @@
 MVC.Tree = new XML.ObjTree();
 MVC.Tree.attr_prefix = "@";
-
-MVC.XMLRestModel = MVC.AjaxModel.extend(
+/**
+ * To create a new XMLRest:
+ * <pre>Todo = Model.XMLRest.extend('todos')</pre>
+ */
+MVC.Model.XMLRest = MVC.Model.Ajax.extend(
 {
     init: function(){
         if(!this.className) return;
