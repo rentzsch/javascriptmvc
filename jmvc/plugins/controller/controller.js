@@ -231,7 +231,7 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
 /*
  * Default event delegation based actions
  */
-MVC.Controller.EventAction = MVC.Controller.Action.extend({
+MVC.Controller.Action.Event = MVC.Controller.Action.extend({
 /* @Static*/
     match: new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
     /*

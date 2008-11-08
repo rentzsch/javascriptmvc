@@ -1,7 +1,7 @@
 /**
  * needs to define which areas have a lasso
  */
-MVC.Controller.Action.Lasso = MVC.Controller.EventAction.extend({
+MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend({
     match: new RegExp("(.*?)\\s?(lassostart|lassoend|lassomove)$")
 },
 //Prototype functions

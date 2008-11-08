@@ -6,7 +6,7 @@
  * dropped    -> Called when a drag is dropped on the drop<br/>
  * dropmove   -> Called as an element moves over a drop<br/>
  */
-MVC.Controller.DropAction = MVC.Controller.EventAction.extend({
+MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend({
     match: new RegExp("(.*?)\\s?(dropover|dropped|dropout|dropadd|dropmove)$")
 },
 /* @prototype */
@@ -30,15 +30,15 @@ MVC.Controller.DropAction = MVC.Controller.EventAction.extend({
     }
 });
 /**
- * @constructor MVC.Controller.DropParams
- * Drop actions are called with DropParams
+ * @constructor MVC.Controller.Params.Drop
+ * Drop actions are called with Params.Drop
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
-MVC.Controller.DropParams = MVC.Controller.Params
+MVC.Controller.Params.Drop = MVC.Controller.Params
 
-MVC.Controller.DropParams.prototype = new MVC.Controller.Params();
-MVC.Object.extend(MVC.Controller.DropParams.prototype, 
+MVC.Controller.Params.Drop.prototype = new MVC.Controller.Params();
+MVC.Object.extend(MVC.Controller.Params.Drop.prototype, 
 /* @prototype */
 {
     /**
@@ -72,7 +72,7 @@ MVC.Droppables =
 		element = MVC.$E(element);
 		
 		functions.element = element;
-		var droppable = new MVC.Controller.DropParams(functions);
+		var droppable = new MVC.Controller.Params.Drop(functions);
 		if(droppable.dropadd) droppable.dropadd(droppable);
 		if(!droppable._canceled){
 		    MVC.Element.make_positioned(element);
@@ -84,7 +84,7 @@ MVC.Droppables =
 	* For a list of affected drops, finds the one that is deepest in
 	* the dom.
 	* @param {Object} drops
-	* @return {MVC.Controller.DropParams} deepest
+	* @return {MVC.Controller.Params.Drop} deepest
 	*/
 	findDeepestChild: function(drops) {
 		//return right away if there are no drops

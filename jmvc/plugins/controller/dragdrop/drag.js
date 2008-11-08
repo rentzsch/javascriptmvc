@@ -4,7 +4,7 @@
  *  dragging -> called everytime someone moves the drag<br/>
  *  dragend -> when someone lets go of a dragable object
  */
-MVC.Controller.Action.Drag = MVC.Controller.EventAction.extend({
+MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend({
     match: new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")
 },
 /* @prototype */
@@ -82,7 +82,7 @@ MVC.Draggable.prototype =
 {
     /**
      * Called the first time we start dragging.
-     * This will call drag start with MVC.Controller.DragParams
+     * This will call drag start with MVC.Controller.Params.Drag
      * @param {Object} event
      */
 	start: function(event){
@@ -91,7 +91,7 @@ MVC.Draggable.prototype =
         									//what has been dragged
 		
 		//Call the Controller's drag start if they have one.
-		var params = new MVC.Controller.DragParams({
+		var params = new MVC.Controller.Params.Drag({
             event: event,
             element: this.element,
             drag_element: this.drag_element,
@@ -147,7 +147,7 @@ MVC.Draggable.prototype =
         s.left =  p.left()+"px";		
         
 		//Call back to dragging
-        var params = new MVC.Controller.DragParams(
+        var params = new MVC.Controller.Params.Drag(
 				{ event: event, 
 				  element: this.element, 
 				  drag_action: this, 
@@ -167,7 +167,7 @@ MVC.Draggable.prototype =
 							event: event, 
 							drag_element: this.drag_element, 
 							drag_action: this };
-        this.dragend(new MVC.Controller.DragParams(drag_data));
+        this.dragend(new MVC.Controller.Params.Drag(drag_data));
         
 		//tell droppables a drop has happened
 		MVC.Droppables.fire(event, this);
@@ -222,16 +222,16 @@ MVC.Event.observe(document, 'mouseup', function(event){
 });
 
 /**
- * @constructor MVC.Controller.DragParams
- * Drag actions are called with DragParams
+ * @constructor MVC.Controller.Params.Drag
+ * Drag actions are called with Params.Drag
  * @inherits MVC.Controller.Params
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
-MVC.Controller.DragParams = MVC.Controller.Params
+MVC.Controller.Params.Drag = MVC.Controller.Params
 
-MVC.Controller.DragParams.prototype = new MVC.Controller.Params();
-MVC.Object.extend(MVC.Controller.DragParams.prototype, 
+MVC.Controller.Params.Drag.prototype = new MVC.Controller.Params();
+MVC.Object.extend(MVC.Controller.Params.Drag.prototype, 
 /* @prototype */
 {
 	/**
