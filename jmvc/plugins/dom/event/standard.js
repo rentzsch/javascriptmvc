@@ -23,10 +23,10 @@ if(document.addEventListener) {
  * 
  * 
  * <h3>Example</h3>
-
 The following calls checkForm on the form element with id 'signinForm' being submitted.
-
-<pre class='top'>Event.observe($('signinForm'), 'submit', checkForm);</pre>
+@code_start
+Event.observe($('signinForm'), 'submit', checkForm);
+@code_end
  * 
  */
   MVC.Event=

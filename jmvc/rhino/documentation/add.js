@@ -1,9 +1,10 @@
 /**
  * Used to set scope to add to classes or methods in another file.
  * Examples:
- * <pre>
+ * @code_start no-highlight
  * /* @add MVC.String Static *|         adds to MVC.String's static methods
- * /* @add MVC.Controller Prototype *|  adds to MVC.Controller's prototype methods</pre>
+ * /* @add MVC.Controller Prototype *|  adds to MVC.Controller's prototype methods
+ * @code_end
  * It's important to note that add must be in its own comment block.
  */
 MVC.Doc.Add = MVC.Doc.Pair.extend('add',

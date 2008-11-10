@@ -5,20 +5,20 @@
  
  <h3 id="<%= this.full_name()%>"><%=this.name%></h4>
  <pre class='signiture'><code><%= this.signiture()%><code></pre>
- <p><%= this.real_comment%></p>
+ <p><%= MVC.Doc.link_content(this.real_comment)%></p>
  <% var ordered = this.ordered_params() 
   	for(var n = 0; n < ordered.length; n++){   
        var param = ordered[n]; %>  
       <div class='param <% param.optional ? "optional" : ""%>'>
           <label><%= param.name%></label>
-          <code>{<%=(param.optional ? '' : '') +""+MVC.Doc.link(param.type) %>}</code> - <%= param.description %>
+          <code>{<%=(param.optional ? '' : '') +""+MVC.Doc.link(param.type) %>}</code> - <%= MVC.Doc.link_content(param.description) %>
       </div>
  <% } %>
 
  <% if(this.ret.type != "undefined") {%>
      <div class='return'>
          <label>returns</label> 
-         <code>{<%=MVC.Doc.link(this.ret.type)%>}</code> - <%= this.ret.description%>
+         <code>{<%=MVC.Doc.link(this.ret.type)%>}</code> - <%= MVC.Doc.link_content(this.ret.description)%>
      </div>
  <% } %>               
 </div>

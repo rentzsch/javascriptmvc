@@ -5,20 +5,26 @@
  *    dispatching the response to other controllers for handling.
  *    </br>
 By default, comet controller queries the url of its className.  For example:
-<pre>JabbifyController = Controller.Comet.extend('jabbify',{},{})</pre>
+@code_start
+JabbifyController = Controller.Comet.extend('jabbify',{},{})
+@code_end
 connects to /jabbify
 <br/>
 Comet controller expects data of the format:
-<pre>{ClassName1: 
+@code_start javascript
+{ClassName1: 
     {action1: [data1, data2 ...], 
      action2: [ ....], 
      ...
     }
  ClassName2: { .... }
-}</pre>
+}
+@code_end
   If possible, Controller.Comet tries to create new instances of data, and dispatch to a matching 
   controller action.  For example:
-<pre>{Todo: {create: [{name: 'wash dishes'}]}}</pre>
+@code_start
+{Todo: {create: [{name: 'wash dishes'}]}}
+@code_end
 Will create a new Todo instance and call TodosController::create with that instance.
 </pre>
 */

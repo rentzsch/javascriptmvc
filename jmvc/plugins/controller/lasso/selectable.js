@@ -1,16 +1,71 @@
 /**
- * Allows actions to handle being dropped on.  Adds the following actions:<br/>
- * selectadd    -> Called when selectables are added, when a drag starts
- * selectover -> Called when a drag is over a drop
- * selectout    -> Called when a drag is moved out of a drop area
- * selected    -> Called when a drag is dropped on the drop
- * selectmove   -> Called as an element moves over a drop
+ * Selectable and [MVC.Controller.Action.Lasso Lasso] let users select elements by dragging a box across 
+ * an element.  To use the lasso, you must have a lasso action on the element you want to drag in, and
+ * selectable elements.
+ * 
+ * You can use one of the following event names to:
+<table class='options'>
+    <tr><th>Event</th><th>Description</th></tr>
+    <tr>
+        <td>selectadd</td>
+        <td>Called when a selectable is added to the list of selectables.</td>
+    </tr>
+    <tr>
+        <td>selectmove</td>
+        <td>Called when the lasso mouse moves over the selectable</td>
+    </tr>
+    <tr>
+        <td>selectover</td>
+        <td>Called when the lasso moves onto a selectable</td>
+    </tr>
+    <tr>
+        <td>selectout</td>
+        <td>Called when the lasso moves out of a selectable</td>
+    </tr>
+    <tr>
+        <td>selected</td>
+        <td>Calls when the selectable is released on selected elements</td>
+    </tr>
+</table>
+
+For more information on how Selectables work read [MVC.Selectable] and [MVC.Selectables]
+ * <h3>Example</h3>
+@code_start
+TasksController = MVC.Controller.extend('tasks',{
+    '# lassostart' : function(){}, //allows lassing in element w/ id = tasks
+    selectadd : function(params){
+      params.cache_position();
+    },
+    selectover : function(params){
+      params.element.style.backgroundColor = "red"
+    },
+    selectout : function(params){
+      params.element.style.backgroundColor = ""
+    },
+    selected : function(params){
+      params.element.style.backgroundColor = "green"
+    }
+})
+@code_end
+ * <h3>Install</h3>
+ * <pre>include.plugins('controller/lasso')</pre>
  */
-MVC.Controller.Action.Selectable = MVC.Controller.Action.Event.extend({
+MVC.Controller.Action.Selectable = MVC.Controller.Action.Event.extend(
+/* @static */
+{
+    /**
+     * matches "(.*?)\\s?(selectover|selected|selectout|selectadd|selectmove)$"
+     */
     match: new RegExp("(.*?)\\s?(selectover|selected|selectout|selectadd|selectmove)$")
 },
 /* @prototype */
 {    
+    /**
+     * 
+     * @param {Object} action
+     * @param {Object} f
+     * @param {Object} controller
+     */
     init: function(action, f, controller){
         this.action = action;
         this.func = f;
@@ -23,10 +78,18 @@ MVC.Controller.Action.Selectable = MVC.Controller.Action.Event.extend({
         MVC.Selectables.selectors[selector][this.event_type] = controller.dispatch_closure(action); 
     }
 });
+/**
+ * @constructor MVC.Selectable
+ * @inherits MVC.Controller.Params
+ * @hide
+ * @init abc
+ */
 MVC.Selectable = MVC.Controller.Params
 
 MVC.Selectable.prototype = new MVC.Controller.Params();
-MVC.Object.extend(MVC.Selectable.prototype, {
+MVC.Object.extend(MVC.Selectable.prototype, 
+/* @prototype */
+{
     /**
      * Caches positions of draggable elements.  Call in dropadd
      */
@@ -40,7 +103,10 @@ MVC.Object.extend(MVC.Selectable.prototype, {
         this._cancel = true;
     }
 })
-
+/**
+ * @class MVC.Selectables
+ * @hide
+ */
 MVC.Selectables = {
 	selectables: [],
 	selectors: {},

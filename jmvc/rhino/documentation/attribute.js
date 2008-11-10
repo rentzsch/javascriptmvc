@@ -1,9 +1,11 @@
 /**
  * Documents an attribute.  Example:
- * <pre>MVC.Object.extend(Person, {
- *    <span class='comment'>/* Number of People *|</span>
+ * @code_start
+ * MVC.Object.extend(Person, {
+ *    /* Number of People *|
  *    count: 0
- * })</pre>
+ * })
+ * @code_end
  */
 MVC.Doc.Attribute = MVC.Doc.Pair.extend('attribute',
  /* @prototype */

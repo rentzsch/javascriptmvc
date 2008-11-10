@@ -2,14 +2,19 @@
  * Model for accessing JSON rest resources.<br/>
  * 
  * To create a new JSONModel:
- * <pre>Todo = JSONRestModel.extend('todos')</pre>
+ * @code_start
+ * Todo = JSONRestModel.extend('todos')
+ * @code_end
  * 
  * To change the find url:
- * <pre>Todo = JSONRestModel.extend('todos',{
+ * @code_start
+ * Todo = JSONRestModel.extend('todos',{
  *   find_all_get_url: "application/todos.json"
- *},{})</pre>
+ *},{})
+ * @code_end
  * Examples of how data should be returned to use JSONModel
- * <pre>/recipes.json should return 
+ * @code_start
+ * // /recipes.json should return 
  *    [ 
  *       {attributes: 
  *           {title: "Chicken Soup", id: "48", 
@@ -21,11 +26,12 @@
  *            id: 1}  } 
  *     ]
  *     
-/recipes/1.json should return
+ * // /recipes/1.json should return
  *     {attributes: 
  *           {title: "Chicken Soup", id: "48", 
  *            instructions: "Call Mom!\nBring chicken",
- *            id: 1}  } </pre>
+ *            id: 1}  } 
+ * @code_end
  * 
  */
 MVC.Model.JSONRest = MVC.Model.Ajax.extend(

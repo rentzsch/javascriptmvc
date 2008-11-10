@@ -1,12 +1,42 @@
 /**
- * Allows actions to handle being dropped on.  Adds the following actions:<br/>
- * dropadd    -> Called when drops are added, when a drag starts<br/>
- * dropover -> Called when a drag is over a drop<br/>
- * dropout    -> Called when a drag is moved out of a drop area<br/>
- * dropped    -> Called when a drag is dropped on the drop<br/>
- * dropmove   -> Called as an element moves over a drop<br/>
+ * Adds droppable element to controller actions by adding the following events:
+<table class='options'>
+    <tr><th>Event</th><th>Description</th></tr>
+    <tr>
+        <td>dropadd</td>
+        <td>Called when drops are added to the list of drops.  This happens when a drag starts.</td>
+    </tr>
+    <tr>
+        <td>dropover</td>
+        <td>Called when a drag moves over a drop element</td>
+    </tr>
+    <tr>
+        <td>dropout</td>
+        <td>Called when a drag is moved out of a drop element</td>
+    </tr>
+    <tr>
+        <td>dropmove</td>
+        <td>Called as an element moves over a drop element</td>
+    </tr>
+    <tr>
+        <td>dropped</td>
+        <td>Called when a drag is dropped on the drop element</td>
+    </tr>
+</table>
+
+Drop actions are called with [MVC.Controller.Params.Drop].  Use Params.Drop to adjust drop functionality
+ * and cache drop points.  For more information on how Drops work read [MVC.Droppables]
+ * <h3>Install</h3>
+@code_start
+include.plugins('controller/dragdrop')
+@code_end
  */
-MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend({
+MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
+/* @static */
+{
+    /**
+     * matches "(.*?)\\s?(dropover|dropped|dropout|dropadd|dropmove)$"
+     */
     match: new RegExp("(.*?)\\s?(dropover|dropped|dropout|dropadd|dropmove)$")
 },
 /* @prototype */
@@ -31,7 +61,10 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend({
 });
 /**
  * @constructor MVC.Controller.Params.Drop
- * Drop actions are called with Params.Drop
+ * [MVC.Controller.Action.Drop Drop actions] are called with Params.Drop.  
+ * The most important param function is cache_position.  If your drop elements are not
+ * changing position after dragstart, use cache_position for large performance improvements.
+ * 
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
@@ -42,7 +75,10 @@ MVC.Object.extend(MVC.Controller.Params.Drop.prototype,
 /* @prototype */
 {
     /**
-     * Caches positions of draggable elements.  Call in dropadd
+     * Caches positions of draggable elements.  This should be called in dropadd.  For example:
+     * @code_start
+     * dropadd : function(params){ params.cache_position() }
+     * @code_end
      */
 	cache_position: function(){
         this._cache = true;
@@ -56,6 +92,7 @@ MVC.Object.extend(MVC.Controller.Params.Drop.prototype,
 })
 /**
  * @class MVC.Droppables
+ * @hide
  * A collection of all the drop elements.
  */
 MVC.Droppables = 

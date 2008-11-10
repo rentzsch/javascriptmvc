@@ -7,22 +7,25 @@ MVC.Object.is_number = function(o){
  * Controllers respond to events. If something happens in your application, be it a click, or
  * a [MVC.Model Model] being updated, a controller should respond to it.
  * <h3>Example</h3>
- * <pre><span class='comment'>//Instead of:</span>
+@code_start
+//Instead of:
 $('.tasks').click(function(e){ ... })
-<span class='comment'>//do this</span>
+//do this
 TasksController = MVC.Controller.extend('tasks',{
   click: function(params){...}
-})</pre>
-
+})
+@code_end
  * <h2>Actions</h2>
  * To respond to events, controllers simply name their event handling functions to match
  * an [MVC.Controller.Action Action].  
  *
  * In the previous example, TasksController's click action is matched by the [MVC.Controller.Action.Event Event] Action. 
  * Event matches functions that are combination of CSS selector and event name.  Here's another example:
- * <pre>TasksController = MVC.Controller.extend('tasks',{
-  ".delete mouseover": function(params){...}
-})</pre>
+@code_start
+TasksController = MVC.Controller.extend('tasks',{
+  ".delete mouseover": function(params){ ... }
+})
+@code_end
  * <h3>Types of Actions</h3>
  * There are many types of Actions.  By default, Controller will match [MVC.Controller.Action.Event Event] and
  * [MVC.Controller.Action.Subscribe Subscribe] actions.  To match other actions, include their plugins.
@@ -80,18 +83,24 @@ TasksController = MVC.Controller.extend('tasks',{
  * plural, singular or main, it changes which elements it responds to.
  * <h3>Singular Controllers</h3>
  * Singluar controllers respond to events in or on an element with an id that matches the controller name.
-<pre>//matches &lt;div id="file_manager"&gt;&lt;/div&gt;
-FileManagerController = MVC.Controller.extend('file_manager')</pre>
+@code_start
+//matches &lt;div id="file_manager"&gt;&lt;/div&gt;
+FileManagerController = MVC.Controller.extend('file_manager')
+@code_end
  * <h3>Plural Controllers</h3>
  * Plural controllers respond to events in or on elements with classNames that match the singular 
  * controller name.
-<pre>//matches &lt;div class="task"&gt;&lt;/div&gt;
-TasksController = MVC.Controller.extend('tasks')</pre>
+@code_start
+//matches &lt;div class="task"&gt;&lt;/div&gt;
+TasksController = MVC.Controller.extend('tasks')
+@code_end
  * If you want to match events on an element with the id, add '#' to the start of your action.  For example:
-<preTasksController = MVC.Controller.extend('tasks',{
+@code_start
+TasksController = MVC.Controller.extend('tasks',{
   click : function(){ .. }     //matches &lt;div class="task"&gt;&lt;/div&gt;
   "# click" : function(){ .. } //matches &lt;div id="tasks"&gt;&lt;/div&gt;
-})</pre>
+})
+@code_end
  * <h3>Main Controllers</h3>
  * Controllers with the name 'main' can match events anywhere in the DOM.  
  * 
@@ -225,16 +234,18 @@ MVC.Controller = MVC.Class.extend(
      * The callback is called on the same controller instance that created the callback. 
      * This allows you to easily pass objects between request and response without resorting to closures. 
      * Example:
-<pre><code>Controller('todos',{
+@code_start
+Controller('todos',{
    "a click" : function(params){ 
       this.element = params.element;
 	  this.element.innerHTML = 'deleting ...';
-	  new Ajax.Request('delete', {onComplete: <span class="magic">this.continue_to('deleted')</span>}
+	  new Ajax.Request('delete', {onComplete: this.continue_to('deleted')}
    },
    deleted : function(response){
       this.element.parentNode.removeChild(this.element);
    }
-});</code></pre>
+});
+@code_end
      * @param {String} action Name of prototype function you want called
      * @return {Function} function that when called, directs to another controller function
      */
@@ -272,15 +283,36 @@ MVC.Controller = MVC.Class.extend(
 
 
 /*
- * Genaric base action.  This must provide a matches base function.
+ * MVC.Controller.Action is and abstract base class.
+ * Controller Action classes are used to match controller prototype functions. 
+ * Inheriting classes must provide a static matches function.
+ * 
+ * When a new controller is created, it iterates through its prototype functions and tests
+ * each action if it matches.  If there is a match, the controller creates a new action.
+ * 
+ * The action is responsible to callback the function when appropriate.  It typically uses
+ * dispatch_closure to call functions appropriately.  
  */
 MVC.Controller.Action = MVC.Class.extend(
+/* @Static */
 {
+    /**
+     * If the class has provided a matches function, adds this class to the list of 
+     * controller actions.
+     */
     init: function(){
         if(this.matches) MVC.Controller.actions.push(this);
     }
-},{
-    init: function(action, f, controller){
+},
+/* @Prototype */
+{
+    /**
+     * Called with prototype functions that match this action.
+     * @param {String} action
+     * @param {Function} f
+     * @param {MVC.Controller} controller
+     */
+    init: function(action_name, f, controller){
         this.action = action;
         this.func = f;
         this.controller = controller;
@@ -288,25 +320,44 @@ MVC.Controller.Action = MVC.Class.extend(
 });
 /**
  * Subscribes to an OpenAjax.hub event.
+ * <h3>Example</h3>
+@code_start javascript
+TasksController = MVC.Controller.extend('tasks',
+{
+  "task.create subscribe" : function(params){
+     var published_data = params.data; //published data always in params.data
+  }
+});
+@code_end
  */
 MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
 /* @Static*/
 {
+    
     match: new RegExp("(.*?)\\s?(subscribe)$"),
+    /**
+     * Matches "(.*?)\\s?(subscribe)$"
+     * @param {String} action_name
+     */
     matches: function(action_name){
         return this.match.exec(action_name);
     }
 },
 /* @Prototype*/
 {
+    /**
+     * @param {Object} action
+     * @param {Object} f
+     * @param {Object} controller
+     */
     init: function(action, f, controller){
         this._super(action, f, controller);
         this.message();
         OpenAjax.hub.subscribe(this.message_name, this.controller.subscribe_closure(action ) );
-        //if(!this.Class.events[this.message_name]) this.Class.events[this.message_name] = [];
-        //var cb = this.controller.subscribe_closure(action );
-        //this.Class.events[this.message_name].push(cb);
     },
+    /**
+     * Gets the message name from the action name.
+     */
     message: function(){
         this.parts = this.action.match(this.Class.match);
         this.message_name = this.parts[1];
@@ -315,8 +366,13 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
 /*
  * Default event delegation based actions
  */
-MVC.Controller.Action.Event = MVC.Controller.Action.extend({
+MVC.Controller.Action.Event = MVC.Controller.Action.extend(
 /* @Static*/
+{
+    /**
+     * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, focus, blur, load, unload
+     * @param {Object} action_name
+     */
     match: new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
     /*
      * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
@@ -401,7 +457,8 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend({
  * Instances of Controller.Params are passed to Event based actions.
  * 
  * <h3>Example</h3>
- * <pre><code>MVC.Controller.extend('todos', {
+@code_start
+MVC.Controller.extend('todos', {
    mouseover : function(params){ 
       <span class="magic">params</span>.element.style.backgroundColor = 'Red';
    },
@@ -412,7 +469,8 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend({
    "img click" : function(params){
    	  <span class="magic">params</span>.class_element().parentNode.removeSibiling(params.class_element());
    }
-})</code></pre>
+})
+@code_end
  * @init Creates a new Controller.Params object.
  * @param {Object} params An object you want to pass to a controller
  */
@@ -500,6 +558,14 @@ MVC.Controller.Params.prototype = {
 	_className : function(){
 		return this.controller.singularName;
 	},
+    /**
+     * Returns the model instance associated with dom this action acted on.  
+     * It finds the class_element, then looks if it has an id that matches
+     * <i>modelName</i>_<i>instanceId</i>.  It uses instanceID to look
+     * up the instnace in the model's [MVC.Store store].
+     * If you change the controller's [MVC.Controller.static.modelName modelName]
+     * it will use a different model to look up the data.
+     */
     element_instance : function(){
         var model, matcher, modelName = this.controller.modelName;
         if(! (model=MVC.Model.models[modelName])  ) throw "No model for the "+ this.controller.className+ " controller!";

@@ -7,6 +7,7 @@ if(typeof load != 'undefined' && ! MVC.load_doc){
     
     load('jmvc/rhino/documentation/application.js');
     load('jmvc/rhino/documentation/pair.js');
+    load('jmvc/rhino/documentation/directives.js');
     load('jmvc/rhino/documentation/function.js');
     load('jmvc/rhino/documentation/class.js');
     load('jmvc/rhino/documentation/constructor.js');
@@ -21,6 +22,7 @@ if(typeof load != 'undefined' && ! MVC.load_doc){
     include(
         'application',
         'pair',
+        'directives',
         'function',
         'class',
         'constructor',

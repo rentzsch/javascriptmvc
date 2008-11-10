@@ -9,13 +9,15 @@
  * all Element functions that have their first argument as element are added to the element.
  * 
  * <h3>Examples</h3>
- * <pre><code>Element('element_id') -> HTMLElement
-$E('element_id') -> HTMLElement
+@code_start
+Element('element_id') //-> HTMLElement
+$E('element_id') //-> HTMLElement
 
-$E('element_id').next() -> HTMLElement
-Element.next('element_id') -> HTMLElement
+$E('element_id').next() //-> HTMLElement
+Element.next('element_id') //-> HTMLElement
 
-$E('element_id').insert({after: '&lt;p&gt;inserted text&lt;/p&gt;'})</code></pre>
+$E('element_id').insert({after: '&lt;p&gt;inserted text&lt;/p&gt;'})
+@code_end
  * @init the HTML Element for the given id with functions in Element.
  * @param {String/HTMLElement} element Either an HTMLElement or a string describing the element's id.
  * @return {HTMLElement} the HTML Element for the given id with functions in Element.

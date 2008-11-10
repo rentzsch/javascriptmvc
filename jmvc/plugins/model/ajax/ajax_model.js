@@ -5,15 +5,19 @@
  * First, lets say we wanted an FTP model to be able to requests data from /ftp/dir.  We could create that
  * model like this:
  * 
-<pre>Ftp = MVC.Model.Ajax.extend('ftp',
+@code_start
+Ftp = MVC.Model.Ajax.extend('ftp',
 {
    dir_get_success: function(transport){
        return transport.responseText;
    }
-},{})</pre>
+},{})
+@code_end
 You could make a request to /ftp/dir like this:
-<pre>callback = function(data){alert(data)};
-Ftp.dir({path: "/"}, callback)</pre>
+@code_start
+callback = function(data){alert(data)};
+Ftp.dir({path: "/"}, callback)
+@code_end
 
 There are a few things to notice here.
 <ul>
@@ -27,43 +31,50 @@ There are a few things to notice here.
 Model.Ajax allows you to expand on this pattern in several ways:
 <h3>Changing the request path</h3>
 If /ftp/dir was actually ftp_directory, you can change the directory name by adding the following:
-<pre>Ftp = MVC.Model.Ajax.extend('ftp',
+@code_start
+Ftp = MVC.Model.Ajax.extend('ftp',
 {
    dir_get_url: '/ftp_directory'
    dir_get_success: function(transport){
        return transport.responseText;
    }
-},{})</pre>
+},{})
+@code_end
 dir_get_url could also be a function that dynamically returns the url.  For example,
-<pre>...
+@code_start
+...
    dir_get_url: function(params){
        return "/ftp/dir/"+encodeURIComponent(params.path)
    }
-...</pre>
+...
+@code_end
    would return "/ftp/dir/%2F" for Ftp.dir({path: "/"}, callback)
 
 <h3>Customizing and validating the request</h3>
 You can completely customize the request by making a function like X_request.  Where X matches one of your success functions.
 The following example validates that params must include a path.
-<pre>...
+@code_start
+...
    dir_get_request: function(params){
        if(!params.path) throw "Path does not exist!"
    }
-...</pre>
+...
+@code_end
 In a request function, you can also completely customize the request with the temporary this.request function.
 Example:
-<pre>...
+@code_start
+...
    dir_get_request: function(params){
        if(!params.path) throw "Path does not exist!"
        this.request("/ftp/dir/"+encodeURIComponent(params.path)+".json")
    }
-...</pre>
-
-
+...
+@code_end
 
 <h3>Respond to errors</h3>
 Finally, you can respond to Transport errors in the same way you respond to success:
-<pre>Ftp = MVC.Model.Ajax.extend('ftp',
+@code_start
+Ftp = MVC.Model.Ajax.extend('ftp',
 {
    dir_get_success: function(transport){
        return transport.responseText;
@@ -71,9 +82,8 @@ Finally, you can respond to Transport errors in the same way you respond to succ
    dir_get_failure: function(transport){
        return "error data"
    }
-},{})</pre>
-
- * 
+},{})
+@code_end
  */
 MVC.Model.Ajax = MVC.Model.extend(
 /* @Static*/

@@ -169,7 +169,8 @@ pre.top {
 .bracket {font-size: 22px; width:20px;}
 .string, #data div span  {color: Gray;}
 .clear {clear:both;}
-.key {color: #800080; }
+.keyword {color: #800080; }
+.params {color: blue;}
 .magic {background-color: #fff7d7;}
 .console { color: blue;}
 .this {color: rgb(0,0,192);}

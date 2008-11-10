@@ -2,7 +2,9 @@
  * @constructor
  * A vector class
  * @init creates a new vector instance from the arguments.  Example:
- * <pre>new MVC.Vector(1,2)</pre>
+ * @code_start
+ * new MVC.Vector(1,2)
+ * @code_end
  * 
  */
 
@@ -27,8 +29,10 @@ MVC.Vector.prototype =
     },
     /**
      * Adds two vectors together.  Example:
-     * <pre>new Vector(1,2).plus(2,3) -> &lt;3,5>
-     * new Vector(3,5).plus(new Vector(4,5)) -> &lt;7,10>
+     * @code_start
+     * new Vector(1,2).plus(2,3) //-> &lt;3,5>
+     * new Vector(3,5).plus(new Vector(4,5)) //-> &lt;7,10>
+     * @code_end
      * @return {MVC.Vector}
      */
     plus: function(){

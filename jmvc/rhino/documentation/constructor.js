@@ -5,13 +5,13 @@
  * A constructor can be described by putting @constructor as the first declaritive.
  * To describe the construction function, write that after init.  Example:
  * 
- * <pre>
- * <div class='comment'>/* @constructor
+ * @code_start
+ * /* @constructor
  *  * Person represents a human with a name 
  *  * @init 
  *  * You must pass in a name.
  *  * @params {String} name A person's name
- *  *|</div>
+ *  *|
  * Person = function(name){
  *    this.name = name
  *    Person.count ++;
@@ -29,7 +29,8 @@
  *   fancy_name : function(){
  *      return "Mrs. "+this.name;
  *   }
- * }</pre>
+ * }
+ * @code_end
  * 
  */
 MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
@@ -50,6 +51,13 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
         MVCOptions.save('docs/constructors/index2.html', res)
     },
     init : function(){
+        this.add(
+                MVC.Doc.Directive.Init, 
+                MVC.Doc.Directive.Param, 
+                MVC.Doc.Directive.Inherits,
+                MVC.Doc.Directive.Author,
+                MVC.Doc.Directive.Return,
+                MVC.Doc.Directive.Hide, MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd);
         this._super();
         var ejs = "jmvc/rhino/documentation/templates/file.ejs"
         this._file_view = new View({text: readFile(ejs), name: ejs });
@@ -74,51 +82,6 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
     },
     code_setup: MVC.Doc.Function.prototype.code_setup,
     comment_setup: MVC.Doc.Function.prototype.comment_setup,
-    return_add: MVC.Doc.Function.prototype.return_add,
-    /**
-     * @function param_add
-     * Adds @param data to the constructor function
-     * @param {String} line
-     */
-    param_add: MVC.Doc.Function.prototype.param_add,
-    /**
-     * @function param_add_more
-     * Adds data on lines following a @param to the previous @param
-     * @param {String} line
-     */
-    param_add_more: MVC.Doc.Function.prototype.param_add_more,
-    /**
-     * Adds the @init data to the constructor.  Adds to init_description.
-     * @param {String} line the first line that has @init
-     */
-    init_add: function(line){
-            var parts = line.match(/\s?@init(.*)?/);
-            if(!parts || !parts[1]){
-                this.init_description = " ";
-                return true;
-            } 
-            this.init_description = parts.pop();
-            return this.init_description;
-    },
-    /**
-     * Adds lines called after a @param to the init_description
-     * @param {Object} line
-     */
-    init_add_more: function(line){
-        this.init_description +="\n"+ line;
-    },
-    inherits_add: function(line){
-        var m = line.match(/^\s*@\w+ ([\w\.]+)/)
-        if(m){
-            this.inherits = m[1];
-        }
-    },
-    author_add: function(line){
-        var m = line.match(/^\s*@author\s*(.*)/)
-        if(m){
-            this.author = m[1];
-        }
-    },
     toFile : function(summary){
         this.summary = summary
         //try{

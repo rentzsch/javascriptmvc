@@ -10,11 +10,13 @@ MVC.Test.Functional = MVC.Test.extend(
 {
 	/**
 	 * Creates a new functional test case. A test case is a collection of test functions and helpers.
-	 * <pre><code>new MVC.Test.Functional('TestCaseName',{
+@code_start
+new MVC.Test.Functional('TestCaseName',{
   test_some_clicks : function(){
     this.Click('#button')
   }
-})</code></pre>
+})
+@code_end
 	 * @param {String} name The unique name of the test. Make sure no two tests have the same name.
 	 * @param {Object} tests An object with test functions. Functions that begin with test_ will be run as tests. Functions that don't begin with test are converted to helper functions. Do not name helper functions the same name as the test provided helpers and assertions such as assert or assertEqual as your functions will override these functions.
 	 */
@@ -27,7 +29,9 @@ MVC.Test.Functional = MVC.Test.extend(
 		/**
 		 * @function Action
 		 * Creates a syntetic event on a HTMLElement.
-		 * <pre><code>this.Action('click','.todo',3) <span class="comment">//calls a click on the third element with class '.todo'</span></code></pre>
+		 * @code_start
+		 * this.Action('click','.todo',3) //calls a click on the third element with class '.todo'
+		 * @code_end
 		 * @param {String} event_type A lowercase event type. One of ['change', 'click', 'contextmenu', 'dblclick', 'keyup', 'keydown', 'keypress','mousedown', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'submit', 'focus', 'blur','drag', 'write'].
 		 * @param {String/HTMLElement} selector An HTMLElement or a CSS selector.
 		 * @param {Number/Object} options If a number is provided, it uses it to select that number from the array of elements returned by doing a CSSQuery with selector. If an object is provided, it passes those options to the SyntheticEvent for creation. If nothing is provided, the number defaults to 0.
@@ -251,7 +255,8 @@ MVC.Test.Functional.events = [
 /**
  * @function Drag
  * Creates events that simulate a drag motion across the browser. The drag events are comprised of a mousedown from the from location, equal spaced mousemoves to the to location, and a mouseup at the to location. Drag is by default syncronous, but can be made asyncronous by providing a duration option.
- * <pre><code>test_drag_to_trash : function(){
+@code_start
+test_drag_to_trash : function(){
   this.Drag('#/drag_handle', 
     {
       from: '/drag_handle',
@@ -262,7 +267,8 @@ MVC.Test.Functional.events = [
 },
 make_sure_drag_worked : function(){
   this.assertNull(document.getElementById('/drag_handle'));
-}</code></pre>
+}
+@code_end
  * @param {String/HTMLElement} selector_or_element
  * @param {Object} options A hash with the following properties:
  * <table class="options">
@@ -319,10 +325,12 @@ make_sure_drag_worked : function(){
 /**
  * @function Write
  * Creates events that simulate writing into an input element. If a callback option is used in the second parameter, the event is asynchronous. Otherwise, it is synchronous.
- * <pre><code><span class="comment">// syntax 1: synchronous version</span>
-<span class="this">this</span>.Write(input_params.element, <span class="string">'Brian'</span>);
-<span class="comment">// syntax 2: asynchronous version</span>
-<span class="this">this</span>.Write(input_params.element, {<span class="attribute">text</span>: <span class="string">'Brian'</span>, <span class="attribute">callback</span>: this.next_callback()});</code></pre>
+@code_start
+// syntax 1: synchronous version</span>
+this.Write(input_params.element, 'Brian');
+// syntax 2: asynchronous version
+this.Write(input_params.element, {text: 'Brian', callback: this.next_callback()});
+@code_end
  * @param {String/HTMLElement} selector_or_element
  * @param {Object/String} options_or_string If a string is passed, it is the text written in the passed input element. If a hash is passed it, it expects the following parameters:
  * <table class="options">

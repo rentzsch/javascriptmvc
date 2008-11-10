@@ -13,7 +13,7 @@
 MVC.Model = MVC.Class.extend(
 /* @Static*/
 {
-	store_type: MVC.SimpleStore,
+	store_type: MVC.Store,
     /**
      * Finds objects in this class
      * @param {Object} id the id of a object

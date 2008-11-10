@@ -31,7 +31,13 @@ MVC.Controller.prototype.
 						<td>If present, a HTMLElement or element ID whose text will be replaced by the render.
 						</td>
 					</tr>
-					
+					<tr>
+						<td>before, after, top, bottom</td>
+						<td>null</td>
+						<td>If present, the content will be placed relative to 
+						the HTMLElement or element ID.  The dom/element plugin is required for this functionality.
+						</td>
+					</tr>
 				</tbody></table>
  */
 render = function(options) {

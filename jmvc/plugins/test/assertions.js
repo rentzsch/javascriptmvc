@@ -1,10 +1,12 @@
 /**
  * Assertions run test functions, provide helpers, and record the results of the tests.
  * <h3>Example</h3>
- * <pre><code>this.assert_equal("Tiger", this.name, "Tiger was expected");
+@code_start
+this.assert_equal("Tiger", this.name, "Tiger was expected");
 this.assert_not_null(this.title, "Title was null");
 this.assert_null(this.obj, "Expected to be null");
-this.assert(x_value > 200);</code></pre>
+this.assert(x_value > 200);
+@code_end
  */
 MVC.Test.Assertions =  MVC.Class.extend(
 /* @Prototype*/
@@ -56,7 +58,8 @@ MVC.Test.Assertions =  MVC.Class.extend(
 	},
     /**
      * Asserts the expression exists in the same way that if(expression) does. If the expression doesn't exist reports the error.
-     * <pre><code>new MVC.Test.Unit('TestCase Name',{
+@code_start
+new MVC.Test.Unit('TestCase Name',{
   test_some_asserts : function(){
     this.assert(true)      //passes
     this.assert({})        //passes
@@ -69,7 +72,8 @@ MVC.Test.Assertions =  MVC.Class.extend(
     this.assert(undefined, 
          "Something was expected.") //fails
   }
-)</code></pre>
+)
+@code_end
      * @param {Object} expression expression to be evaluated
      * @param {optional:String} message An optional message. A default is provided if the message isn't present.
      */
@@ -81,7 +85,8 @@ MVC.Test.Assertions =  MVC.Class.extend(
 	},
     /**
      * Uses the double equals (==) to determine if two values are equal. This means that type coercion may occur. For example 5 == '5'.
-     * <pre><code>new MVC.Test.Unit('TestCase Name',{
+@code_start
+new MVC.Test.Unit('TestCase Name',{
   test_some_asserts : function(){
     this.assert_equal(7,7)      //passes
 	this.assert_equal(7,'7')    //passes
@@ -90,7 +95,8 @@ MVC.Test.Assertions =  MVC.Class.extend(
     this.assert_equal("Tiger", this.name, "Tiger was expected");
     this.assert_equal(6,7)      //fails
   }
-)</code></pre>
+)
+@code_end
      * @param {Object} expected the expected value
      * @param {Object} actual The variable to check for or the value being checked
      * @param {optional:String} message An optional message. A default is provided if the message isn't present.
@@ -104,7 +110,9 @@ MVC.Test.Assertions =  MVC.Class.extend(
   	},
     /**
      * Passes if the given object == null. Fails otherwise.
-     * <pre><code>this.assert_null(this.obj, "Expected to be null");</code></pre>
+     * @code_start
+     * this.assert_null(this.obj, "Expected to be null");
+     * @code_end
      * @param {Object} obj The object to check for null
      * @param {optional:String} message An optional message. A default is provided if the message isn't present.
      */
@@ -116,7 +124,9 @@ MVC.Test.Assertions =  MVC.Class.extend(
 	},
     /**
      * Passes if the expression is false, fails if it is true
-     * <pre><code>this.assert_not(x_value == 200);</code></pre>
+     * @code_start
+     * this.assert_not(x_value == 200);
+     * @code_end
      * @param {Object} expression An expression
      * @param {optional:String} message An optional message. A default is provided if the message isn't present.
      */
@@ -128,7 +138,9 @@ MVC.Test.Assertions =  MVC.Class.extend(
 	},
     /**
      * Passes if object is != null, fails otherwise
-     * <pre><code>this.assert_not_null(obj);</code></pre>
+     * @code_start
+     * this.assert_not_null(obj);
+     * @code_end
      * @param {Object} object The object to check for null
      * param {optional:String} message An optional message. A default is provided if the message isn't present.
      */
@@ -211,13 +223,15 @@ MVC.Test.Assertions =  MVC.Class.extend(
      * Calls the next function in the array after a certain delay. Used at the end 
      * of a test function after an asynchronous 
      * event has been initiated, such as an Ajax call or an animation.
-     * <pre><code><span class="attribute">test_open_directory</span>: <span class="key">function</span>(){
-   <span class="comment">// call the next function after a delay of 2 seconds</span>
-   <span class="this">this</span>.next(<span class="this">this</span>.DirectoryDblclick(2), 2, 'verify_open');
+@code_start
+test_open_directory: function(){
+   // call the next function after a delay of 2 seconds
+   this.next(this.DirectoryDblclick(2), 2, 'verify_open');
 },
-<span class="attribute">verify_open</span>: <span class="key">function</span>(){
-   <span class="this">this</span>.assert_equal(5, params.element.childNodes.length);
-}</code></pre>
+verify_open: function(){
+   this.assert_equal(5, params.element.childNodes.length);
+}
+@code_start
      * @param {optional:Object} params Optional parameters. If provided, this is passed into the function specified by fname as its parameter.
      * @param {optional:Number} delay An optional delay, after which the specified function is called. The default is 0.5 seconds.
      * @param {optional:String} fname An optional function name. If none is give, defaults to the name of the function sequentially next in the array of test functions.
@@ -230,13 +244,15 @@ MVC.Test.Assertions =  MVC.Class.extend(
     /**
      * Calls the next function in the array after a certain delay. Used in conjunction with asynchronous functions that use callback functions, 
      * such as an Ajax call or the Drag event.
-     * <pre><code><span class="attribute">test_drag</span>: <span class="key">function</span>(){
-    <span class="this">this</span>.Drag($E(<span class="string">'draggable'</span>),{<span class="attribute">from</span>: <span class="string">'pointA'</span>, <span class="attribute">to</span>: <span class="string">'pointB'</span>, 
-        <span class="attribute">duration</span>: 2, <span class="attribute">callback</span>: <span class="key">this</span>.next_callback(<span class="string">'done_dragging', 3</span>)})
+@code_start
+test_drag: function(){
+    this.Drag($E('draggable'),{from: 'pointA', to: 'pointB', 
+        duration: 2, callback: this.next_callback('done_dragging', 3)})
 }, 
-<span class="attribute">done_dragging</span> : <span class="key">function</span>(){
-    <span class="this">this</span>.assert_equal(1, $E(<span class="string">'pointB'</span>).next().childNodes.length);
-}</code></pre>
+done_dragging : function(){
+    this.assert_equal(1, $E('pointB').next().childNodes.length);
+}
+@code_end
      * @param {Object} fname An optional function name. If none is give, defaults to the name of the function sequentially next in the array of test functions.
      * @param {Object} delay An optional delay, after which the specified function is called. The default is 0.5 seconds.
      * @return {Function} the function used for callbacks

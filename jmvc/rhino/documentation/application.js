@@ -32,32 +32,33 @@ MVC.render_to = function(file, ejs, data){
  * 
  * <h3>Example</h3>
  * The following documents a Person constructor.
- * <pre><span class='comment'> /* @constructor
+ * @code_start
+ * /* @constructor
  *  * Person represents a human with a name.  Read about the 
  *  * animal class [Animal | here].
  *  * @init 
  *  * You must pass in a name.
  *  * @params {String} name A person's name
- *  *|</span>
+ *  *|
  * Person = function(name){
  *    this.name = name
  *    Person.count ++;
  * }
- * <span class='comment'>/* @Static *|</span>
+ * /* @Static *|
  * MVC.Object.extend(Person, {
- *    <span class='comment'>/* Number of People *|</span>
+ *    /* Number of People *|
  *    count: 0
  * })
- * <span class='comment'>/* @Prototype *|</span>
+ * /* @Prototype *|
  * Person.prototype = {
- *   <span class='comment'>/* Returns a formal name 
+ *   /* Returns a formal name 
  *    * @return {String} the name with "Mrs." added
- *    *|</span>
+ *    *|
  *   fancy_name : function(){
  *      return "Mrs. "+this.name;
  *   }
- * }</pre>
- * 
+ * }
+ * @code_end
  * There are a few things to notice:
  * <ul>
  *     <li>The example closes comments with <i>*|</i>.  You should close them with / instead of |.</li>
@@ -70,12 +71,12 @@ MVC.render_to = function(file, ejs, data){
  * The docs will be put in your docs folder.
  * <h3>Using without JavaScriptMVC</h3>
  * This process will be made easier in the future.  But you have to create a js file that looks like this:
- * <pre>
+ * @code_start
  * //loads doc source
  * load('jmvc/rhino/documentation/setup.js'); 
  * //pass file locations, and a name to a new Doc.Application
- * new MVC.Doc.Application(['file1.js','folder/file2.js'], "MyApp");</pre>
- * 
+ * new MVC.Doc.Application(['file1.js','folder/file2.js'], "MyApp");
+ * @code_end
  */
 MVC.Doc = 
 /* @Static */

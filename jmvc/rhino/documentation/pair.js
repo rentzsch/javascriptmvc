@@ -79,6 +79,18 @@ MVC.Doc.Pair = MVC.Class.extend(
              var ejs = "jmvc/rhino/documentation/templates/"+this.className+".ejs"
              this._view = new View({text: readFile(ejs), name: ejs });
         }
+    },
+    add : function(){
+        var args = MVC.Array.from(arguments)   
+        for(var i = 0; i < args.length; i++){
+            this._add(args[i]);
+        }
+    },
+    _add : function(directive){
+        var start = directive.className+"_"
+        this.prototype[start+"add"] = directive.prototype.add
+        if(directive.prototype.add_more)
+            this.prototype[start+"add_more"] = directive.prototype.add_more
     }
 },
 /* @Prototype */

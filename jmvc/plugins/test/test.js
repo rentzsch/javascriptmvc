@@ -13,7 +13,7 @@ MVC.Test = MVC.Class.extend(
     /**
      * Creates a new test case. A test case is a collection of test functions and helpers.
      * 
-     * <pre><code>new MVC.Test('TestCaseName',{
+     * @code_start new MVC.Test('TestCaseName',{
   test_some_asserts : function(){
     var value = this.my_helper('hello world')
     this.assert(value)      //passes
@@ -21,7 +21,8 @@ MVC.Test = MVC.Class.extend(
   my_helper : function(value){
     return value == 'hello world'
   }
-}, 'unit')</code></pre>
+}, 'unit')
+@code_end
      * @param {Object} name the unique name of the test. Make sure no two tests have the same name.
      * @param {Object} tests An object with test functions. Functions that begin with test_ will be run as tests. Functions that don't begin with test are converted to helper functions. Do not name helper functions the same name as the test provided helpers and assertions such as assert or assertEqual as your functions will override these functions.
      * @param {Object} type The type of test ('unit', 'functional').

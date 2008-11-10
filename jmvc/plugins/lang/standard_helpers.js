@@ -98,7 +98,7 @@ MVC.Native.extend('String',
 {
     /*
      * Capitalizes a string
-     * @param {String} string the string to be lowercased.
+     * @param {String} s the string to be lowercased.
      * @return {String} a string with the first character capitalized, and everything else lowercased
      */
 	capitalize : function(s) {
@@ -115,7 +115,7 @@ MVC.Native.extend('String',
 	},
     /**
      * Returns if string ends with another string
-     * @param {String} string String that is being scanned
+     * @param {String} s String that is being scanned
      * @param {String} pattern What the string might end with
      * @return {Boolean} true if the string ends wtih pattern, false if otherwise
      */
@@ -125,10 +125,11 @@ MVC.Native.extend('String',
 	},
     /**
      * Capitalizes a string from something undercored. Examples:
-     * <pre>
-     *     MVC.String.camelize("one_two") -> "oneTwo"
-     *     "three-four".camelize() -> threeFour</pre>
-     * @param {String} string
+     * @code_start
+     * MVC.String.camelize("one_two") //-> "oneTwo"
+     * "three-four".camelize() //-> threeFour
+     * @code_end
+     * @param {String} s
      * @return {String} a the camelized string
      */
 	camelize: function(s){
@@ -139,7 +140,7 @@ MVC.Native.extend('String',
 	},
     /**
      * Like camelize, but the first part is also capitalized
-     * @param {Object} s
+     * @param {String} s
      * @return {String}
      */
 	classize: function(s){
@@ -150,7 +151,7 @@ MVC.Native.extend('String',
 	},
     /*
      * @function strip
-     * @param {String} string returns a string with leading and trailing whitespace removed.
+     * @param {String} s returns a string with leading and trailing whitespace removed.
      */
 	strip : MVC.String.strip
 });

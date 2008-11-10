@@ -14,7 +14,13 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
      * Loads the class view.
      */
     init : function(){
+        this.add(MVC.Doc.Directive.Inherits, 
+        MVC.Doc.Directive.Author,
+        MVC.Doc.Directive.Hide,
+        MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd)
+        
         this._super();
+        
         var ejs = "jmvc/rhino/documentation/templates/file.ejs"
         this._file_view = new View({text: readFile(ejs), name: ejs });
     }
@@ -62,18 +68,6 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         var m = line.match(/^@\w+ ([\w\.]+)/)
         if(m){
             this.name = m[1];
-        }
-    },
-    inherits_add: function(line){
-        var m = line.match(/^\s*@\w+ ([\w\.]+)/)
-        if(m){
-            this.inherits = m[1];
-        }
-    },
-    author_add: function(line){
-        var m = line.match(/^\s*@author\s*(.*)/)
-        if(m){
-            this.author = m[1];
         }
     },
     /**

@@ -1,19 +1,51 @@
 /**
- * Alows actions with the following events:<br/>
- * 	dragstart -> called when the drag is first moved<br/>
- *  dragging -> called everytime someone moves the drag<br/>
- *  dragend -> when someone lets go of a dragable object
+ * Adds drag functionality to controller actions with the following events:
+<ul>
+    <li><b>dragstart</b> - called when a drag is first moved.</li>
+    <li><b>dragging</b> -  called everytime the drag moves</li>
+    <li><b>dragend</b> - called when someone releases a dragable object (mouseup)</li>
+</ul>
+ * Drags actions are called with [MVC.Controller.Params.Drag].  Use the drag params to change the behavior
+ * of the drag.
+ * 
+ * For more information on how Drag works read [MVC.Draggable].
+ * <h3>Install</h3>
+@code_start
+include.plugins('controller/dragdrop')
+@code_end
+ * <h3>Example</h3>
+@code_start
+TasksController = MVC.Controller.extend('tasks',{
+  ".handle dragstart" : function(params){
+      //set something else to be dragged instead of this object
+      params.representitive(MVC.$E('dragitem'), 15, 15);
+      params.revert();
+  },
+  ".handle dragging" : function(params){
+  
+  },
+  ".handle dragend" : function(params){
+  
+  }
+}
+@code_end
  */
-MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend({
+MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
+/* @static */
+{
+    /**
+     * Matches "(.*?)\\s?(dragstart|dragend|dragging)$"
+     */
     match: new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")
 },
 /* @prototype */
 {    
     /**
-     * 
-     * @param {Object} action
-     * @param {Object} f
-     * @param {Object} controller
+     * Attaches a delegated mousedown function to the css selector for this action.  Saves additional actions
+     * in callbacks.
+     * @param {String} action_name the name of the function
+     * @param {Function} f the function itself
+     * @param {MVC.Controller} controller the controller this action belongs to
      */
     init: function(action, f, controller){
 		//can't use init, so set default members
@@ -48,6 +80,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend({
 });
 /**
  * @constructor
+ * @hide
  * A draggable object, created on mouse down.  This basically preps a possible drag.
  * Start is called on the first mouse move after the mouse down.  This is to prevent drag from
  * being called on a normal click.
@@ -223,7 +256,38 @@ MVC.Event.observe(document, 'mouseup', function(event){
 
 /**
  * @constructor MVC.Controller.Params.Drag
- * Drag actions are called with Params.Drag
+ * [MVC.Controller.Action.Drag Drag] actions are called with Params.Drag.  Use Params.Drag to
+ * alter drag functionality including:
+ * <ul>
+ *     <li>Stop Dragging</li>
+ *     <li>Ghost drag</li>
+ *     <li>Change the drag element</li>
+ *     <li>Revert the drag element</li>
+ * </ul>
+ * Drag actions are also called with the following attributes:
+<table class='options'>
+    <tr><th>Attribute</th><th>Description</th></tr>
+    <tr>
+        <td>drag_action</td>
+        <td>[MVC.Draggable] object that represents this drag</td>
+    </tr>
+    <tr>
+        <td>drag_element</td>
+        <td>The element that is actually being dragged</td>
+    </tr>
+    <tr>
+        <td>element</td>
+        <td>The element that represents the action</td>
+    </tr>
+    <tr>
+        <td>event</td>
+        <td>On dragstart+dragging, this is a mousemove event. On dragend, it is a mouseup.</td>
+    </tr>
+</table>
+   <h3>Adding to drag params</h3>
+   You might want to add your own functionality to draggable items.  Adding to 
+   MVC.Controller.Params.Drag.prototype will make those functions always available.
+   
  * @inherits MVC.Controller.Params
  * @init
  * Same functionality as [MVC.Controller.Params]
@@ -245,7 +309,7 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
     },
 	/**
 	 * Clones an element and uses it as the representitive element.
-	 * @param {Object} callback
+	 * @param {Function} callback
 	 */
     ghost: function(callback) {
         // create a ghost by cloning the source element and attach the clone to the dom after the source element
@@ -257,9 +321,9 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
     },
 	/**
 	 * Use a representitive element, instead of the drag_element.
-	 * @param {HTMLElement} element
-	 * @param {Number} offsetX
-	 * @param {Number} offsetY
+	 * @param {HTMLElement} element the element you want to actually drag
+	 * @param {Number} offsetX the x position where you want your mouse on the object
+	 * @param {Number} offsetY the y position where you want your mouse on the object
 	 */
     representitive : function( element, offsetX, offsetY ){
         MVC.Position.prepare();

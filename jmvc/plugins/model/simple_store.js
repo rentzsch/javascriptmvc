@@ -1,19 +1,41 @@
 // provides very simple storage
-// var store = new MVC.SimpleStore();
+// var store = new MVC.Store();
 // when its being extended, it should make a new simplestore
-MVC.SimpleStore = MVC.Class.extend({
-	init: function(klass){
+
+/**
+ * Provides simple storage for elements.  Replace this store with Gears!
+ */
+MVC.Store = MVC.Class.extend(
+/* @prototype */
+{
+	/**
+	 * 
+	 * @param {Object} klass
+	 */
+    init: function(klass){
 		this._data = {};
         this.storing_class = klass;
 	},
-	find_one: function(id){
+	/**
+	 * 
+	 * @param {Object} id
+	 */
+    find_one: function(id){
 		return this._data[id];
 	},
-	create: function(obj){
+	/**
+	 * 
+	 * @param {Object} obj
+	 */
+    create: function(obj){
 		var id = obj[obj.Class.id];
 		this._data[id] = obj;
 	},
-	destroy: function(id){
+	/**
+	 * 
+	 * @param {Object} id
+	 */
+    destroy: function(id){
 		delete this._data[id];
 	}
 });

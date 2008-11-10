@@ -1,11 +1,46 @@
 /**
- * needs to define which areas have a lasso
+ * Lasso and [MVC.Controller.Action.Selectable Selectables] let users select elements by dragging a box across 
+ * an element.  To use the lasso, you must have a lasso action on the element you want to drag in.
+ * 
+ * You can use one of the following event names to start a lasso:
+<table class='options'>
+    <tr><th>Event</th><th>Description</th></tr>
+    <tr>
+        <td>lassostart</td>
+        <td>Called when a lasso drag starts.</td>
+    </tr>
+    <tr>
+        <td>lassomove</td>
+        <td>Called with every lasso move.</td>
+    </tr>
+    <tr>
+        <td>lassoend</td>
+        <td>Called when the lasso is released.</td>
+    </tr>
+</table>
+ * 
+ * For more information on how Lasso works read [MVC.Lasso]
+ * <h3>Install</h3>
+@code_start
+include.plugins('controller/lasso')
+@code_end
  */
-MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend({
+MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
+/* @static */
+{
+    /**
+     * Matches "(.*?)\\s?(lassostart|lassoend|lassomove)$"
+     */
     match: new RegExp("(.*?)\\s?(lassostart|lassoend|lassomove)$")
 },
-//Prototype functions
+/* @prototype */
 {    
+    /**
+     * Creates the Lasso action
+     * @param {Object} action
+     * @param {Object} f
+     * @param {Object} controller
+     */
     init: function(action, f, controller){
 		//can't use init, so set default members
         this.action = action;
@@ -39,7 +74,12 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend({
 	   return false;
 	}
 });
-
+/**
+ * @constructor MVC.Lasso
+ * Blah
+ * @hide 
+ * @init abc
+ */
 MVC.Lasso = function(params){
     this.element = params.element; 		//the element that has been clicked on
     this.moved = false;					//if a mousemove has come after the click
@@ -55,7 +95,12 @@ MVC.Lasso = function(params){
 
 MVC.Lasso.k = function(){};
 
-MVC.Lasso.prototype = {
+MVC.Lasso.prototype = 
+/* @prototype */
+{
+    /**
+     * 
+     */
     style_element : function(){
 		var s = this.lasso_element.style;
 		s.position = 'absolute';
@@ -63,6 +108,10 @@ MVC.Lasso.prototype = {
 		s.border="dotted 1px Gray";
 		s.zIndex = 1000;
 	},
+    /**
+     * 
+     * @param {Object} event
+     */
 	position_lasso : function(event){
 		var current = MVC.Event.pointer(event);
 		//find the top left event

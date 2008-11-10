@@ -2,31 +2,36 @@
  * Documents a function.
  * Doc can guess at a functions name and params if the source following a comment
  * matches something like:
- * <pre>
+ * @code_start
  * myFuncOne : function(param1, param2){}  //or
- * myFuncTwo = function(param1, param2){} </pre>
- * 
+ * myFuncTwo = function(param1, param2){} 
+ * @code_end
  * <h3>Directives</h3>
  * Use the following directives to document a function.
-<pre>@function <i>function_name</i>                  -> Forces a function
+@code_start no-highlight
+@function <i>function_name</i>                  -> Forces a function
 @param {<i>optional:type</i>} <i>param_name</i> <i>Description</i>     -> Describes a parameter
 @return {<i>type</i>} <i>Description</i>               -> Describes the return value
-</pre>
+@code_end
  * Add <i>optional:</i> for optional params.
  * <h3>Example</h3>
-<pre>
+@code_start
 /* Adds, Mr. or Ms. before someone's name
 * * @param {String} name the persons name
 * * @param {optional:Boolean} gender true if a man, false if female.  Defaults to true.
 * * @return {String} returns the appropriate honorific before the person's name.
 * *| 
  honorific = function(name, gender){
-</pre>
+@code_end
  */
 MVC.Doc.Function = MVC.Doc.Pair.extend('function',
 /* @static */
 {
-    code_match: /([\w\.\$]+)\s*[:=]\s*function\(([^\)]*)/
+    code_match: /([\w\.\$]+)\s*[:=]\s*function\(([^\)]*)/,
+    init : function(){
+        this.add(MVC.Doc.Directive.Return, MVC.Doc.Directive.Param, MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd)
+        this._super();
+    }
 },
 /* @prototype */
 {
@@ -83,44 +88,7 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         }
         if(this.comment_setup_complete) this.comment_setup_complete();
     },
-    param_add_more : function(line, last){
-        if(last)
-            last.description += "\n"+line;
-    },
-    /**
-     * Adds @param data to the constructor function
-     * @param {String} line
-     */
-    param_add: function(line){
-        var parts = line.match(/\s*@param\s+(?:\{(?:(optional):)?([\w\.\/]+)\})?\s+([\w\.]+) ?(.*)?/);
-        if(!parts) return;
-        var description = parts.pop();
-        var n = parts.pop();
-        
-        var param = this.params[n] ? this.params[n] : this.params[n] = {order: this.ordered_params().length };
 
-        param.description = description || "";
-        param.name = n;
-        param.type = parts.pop()|| "";
-        param.optional = parts.pop() ? true : false;
-        
-        return this.params[n];
-    },
-    /**
-     * 
-     * @param {Object} line
-     */
-    return_add: function(line){
-        
-        var parts = line.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s*(.*)?/);
-        
-        if(!parts) return;
-
-        var description = parts.pop() || "";
-        var type = parts.pop();
-        this.ret = {description: description, type: type};
-        return this.ret;
-    },
     /**
      * Sets the function's name if one can't be determined from the source
      * @param {Object} line

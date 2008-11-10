@@ -1,11 +1,33 @@
 /**
- * 
+ * Mouseover and Mouseout sometimes cause unexpected behavior when using nested elements.
+ * Mouseenter and mouseleave will only be called when a mouse enters or leaves an element even if
+ * it moves over nested elements.
+ * <h3>Example</h3>
+@code_start
+TasksController = MVC.Controller.extend('tasks',{
+  mouseenter : function(params){ params.element.style.background = "red" },
+  mouseleave : function(params){ params.element.style.background = "" }
+})
+@code_end
+ * <h3>Install</h3>
+@code_start
+include.plugins('controller/hover')
+@code_end
  */
-MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend({
+MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend(
+/* @static */
+{
+    /* matches "(.*?)\\s?(mouseenter|mouseleave)$" */
     match: new RegExp("(.*?)\\s?(mouseenter|mouseleave)$")
 },
 //Prototype functions
 {    
+    /**
+     * Sets up the new action to be called appropriately
+     * @param {String} action
+     * @param {Function} f
+     * @param {MVC.Controller} controller
+     */
     init: function(action, f, controller){
         this.action = action;
         this.func = f;
@@ -14,6 +36,9 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend({
         var selector = this.selector();
         this[this.event_type]()
     },
+    /**
+     * Attaches a mouseover event, but checks that the related target is not within the outer element.
+     */
     mouseenter : function(){
         new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind( function(params){
             //set a timeout and compare position
@@ -23,6 +48,9 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend({
             
         }, this));
     },
+    /**
+     * Attaches a mouseout event, but checks that the related target is not within the outer element.
+     */
     mouseleave : function(){
         //add myself to hover outs to be called on the mouseout
         new MVC.Delegator(this.selector(), 'mouseout', MVC.Function.bind( function(params){
@@ -38,16 +66,36 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend({
 // Idea, and very small amonts of code taken from Brian Cherne <brian@cherne.net>
 // http://cherne.net/brian/resources/jquery.hoverIntent.js  
 /**
- * provides hoverover,hoverout,hoverenter,hoverleave
+ * Provides hoverenter and hoverleave Controller actions.  
+ * 
+ * Hoverenter is called only when a user stops moving their mouse over an element.  This is
+ * good to use when mouseover is expensive, or would be annoying to the user.
+ * 
+ * Hoverout is called on mouseout of an element that has had hoverenter called.
+ * <h2>Example</h2>
+@code_start
+TasksController = MVC.Controller.extend('tasks',{
+  hoverenter : function(params){ params.element.style.background = "red" },
+  hoverleave : function(params){ params.element.style.background = "" }
+})
+@code_end
+ * <h3>Install</h3>
+@code_start
+include.plugins('controller/hover')
+@code_end
+ * <h3>Adjusting Sensitivity and Interval</h3>
+ * Change the sensitivity or interval to change how quickly a hoverover will take place.
  */
-MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend({
+MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
+/* @static */
+{
     match: new RegExp("(.*?)\\s?(hoverenter|hoverleave)$"),
     /**
-     * 
+     * How many pixels the mouse can move and still trigger a hoverenter
      */
     sensitivity: 6,
     /**
-     * 
+     * Time between requests.
      */
     interval: 100,
     /**
@@ -76,16 +124,27 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend({
         }
         this.Class.hovers[this.selector()][this.event_type] = this;
     },
+    /**
+     * Calls hoverenter if there is one.
+     * @param {Object} params
+     */
 	hoverenter : function(params){
 		 var hoverenter = this.Class.hovers[this.selector()]["hoverenter"];
          if(hoverenter)
             hoverenter.func(params);
 	},
+     /**
+     * Calls hoverleave if there is one.
+     * @param {Object} params
+     */
 	hoverleave : function(params){
 		var hoverleave = this.Class.hovers[this.selector()]["hoverleave"];
         if(hoverleave)
             hoverleave.func(params);
 	},
+    /**
+     * Checks if 2 mouse moves are within sensitivity
+     */
     check :function(){
         var diff = this.starting_position.minus(this.current_position);
         var size = Math.abs( diff.x() ) + Math.abs( diff.y() );
@@ -99,6 +158,10 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend({
             this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
         }
     },
+    /**
+     * Called on the mouseover. Sets up the check.
+     * @param {Object} params
+     */
     mouseover : function(params){
         //set a timeout and compare position
         //if(this.event_type == "hoverenter"){
@@ -112,15 +175,24 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend({
         this.starting_position = MVC.Event.pointer(params.event);
         this.element = params.element;
         this.mouseover_event = params.event;
-        this.mousemove = MVC.Function.bind( function(event){
-            this.mousemove_event = event;
-            this.current_position = MVC.Event.pointer(event);
-        }, this);
-        MVC.Event.observe(params.element, "mousemove", this.mousemove);
+        this.mousemove_function = MVC.Function.bind(this.mousemove , this)
+        MVC.Event.observe(params.element, "mousemove", mousemove_function);
 
         this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
         
     },
+    /**
+     * Updates the current_position of the mosuemove.
+     * @param {Object} event
+     */
+    mousemove : function(event){
+            this.mousemove_event = event;
+            this.current_position = MVC.Event.pointer(event);
+    },
+    /**
+     * 
+     * @param {Object} params
+     */
     mouseout : function(params){
         //the other mouse out, if there is one, will be handled
         //check if hoverover has been called, if it has fire hoverout, otherwise, do nothing
@@ -133,7 +205,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend({
 			return true;
 		//}
         clearTimeout(this.timer);
-        MVC.Event.stop_observing(params.element, "mousemove", this.mousemove);
+        MVC.Event.stop_observing(params.element, "mousemove", this.mousemove_function);
         if(this.called){ //call hoverleave
             this.hoverleave({element: this.element, event: params.event})
         }
