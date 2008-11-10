@@ -24,6 +24,9 @@ var self = window;
         },
         javaEnabled : function(){
             return true;
+        },
+        get platform(){
+            return "Win32"
         }
 	};
     window.screen = {

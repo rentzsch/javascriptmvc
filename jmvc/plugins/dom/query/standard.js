@@ -1,9 +1,10 @@
-/*
-	cssQuery, version 2.0.3 (http://dean.edwards.name/my/cssQuery)
-	License: http://creativecommons.org/licenses/LGPL/2.1/
-*/
+//  cssQuery, version 2.0.3 (http://dean.edwards.name/my/cssQuery)
+//	License: http://creativecommons.org/licenses/LGPL/2.1/
 
-// the following functions allow querying of the DOM using CSS selectors
+/**
+ * @class MVC.Query
+ * Performs a CSS Query.  If Prototype or jQuery are loaded, this function will use their selectors.
+ */
 MVC.Query = function() {
 var version = "2.0.3";
 
@@ -382,7 +383,13 @@ return cssQuery;
 }(); // cssQuery
 
 
-MVC.Query.descendant = function(element,selector){
+MVC.Query.
+/**
+ * Queiries from one element.
+ * @param {Object} element
+ * @param {Object} selector
+ */
+descendant = function(element,selector){
 	return MVC.Query(selector, element);
 };
 

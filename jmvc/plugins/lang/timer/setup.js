@@ -1,3 +1,9 @@
+/**
+ * @constructor
+ * Creates a simple timer class
+ * @init
+ * @param {Object} options
+ */
 MVC.Timer = function(options){
     options = options || {};
     this.time = options.time || 500;

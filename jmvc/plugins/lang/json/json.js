@@ -1,11 +1,27 @@
-//Heavily borrowed from prototype
+//Heavily borrowed from prototype.org
+
+/**
+ *  @add  MVC.Native.Number  Static
+ */
 MVC.Object.extend(MVC.Number, {
+    /**
+     * @plugin lang/json
+     * @param {Object} number
+     */
     to_json: function(number) {
         return isFinite(number) ? number.toString() : 'null';
     }
 });
+
+/**
+ *  @add  MVC.Native.Date  Static
+ */
 if(!MVC.Date) MVC.Date = {};
 MVC.Object.extend(MVC.Date, {
+    /**
+     * @plugin lang/json
+     * @param {Object} date
+     */
     to_json: function(date) {
       return '"' + date.getUTCFullYear() + '-' +
         MVC.Number.to_padded_string(date.getUTCMonth() + 1, 2) + '-' +
@@ -15,7 +31,14 @@ MVC.Object.extend(MVC.Date, {
         MVC.Number.to_padded_string(date.getUTCSeconds(), 2) + 'Z"';
     }
 });
+/**
+ *  @add  MVC.Native.String  Static
+ */
 MVC.Object.extend(MVC.String, {
+    /**
+     * @plugin lang/json
+     * @param {Object} string
+     */
     to_json: function(string) {
         var specialChar= {
             '\b': '\\b',
@@ -33,7 +56,15 @@ MVC.Object.extend(MVC.String, {
         return '"' + escapedString.replace(/"/g, '\\"') + '"';
     }
 });
+/**
+ *  @add  MVC.Native.Array  Static
+ */
 MVC.Object.extend(MVC.Array,{
+    /**
+     * @plugin lang/json
+     * @param {Object} array
+     * @param {Object} nested
+     */
     to_json: function(array,nested) {
         var results = [];
         for(var i=0; i < array.length; i++){
@@ -43,8 +74,16 @@ MVC.Object.extend(MVC.Array,{
         return '[' + results.join(', ') + ']';
     }
 });
-
-MVC.Object.to_json = function(object, nested){
+/**
+ *  @add  MVC.Native.Object  Static
+ */
+MVC.Object.
+/**
+ * @plugin lang/json
+ * @param {Object} object
+ * @param {Object} nested
+ */
+to_json = function(object, nested){
     var type = typeof object;
     switch (type) {
       case 'undefined':

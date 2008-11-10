@@ -16,16 +16,14 @@ FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TOR
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/*
-	MVC.History: An object that provides history, history data, and bookmarking for DHTML and Ajax applications.
+window.
+/**
+ * @class MVC.History
+ * Provides history, history data, and bookmarking for DHTML and Ajax applications.
+ */
+MVC.History = {
 	
-	dependencies:
-		* the historyStorage object included in this file.
-
-*/
-window.MVC.History = {
-	
-	/*Public: User-agent booleans*/
+	//Public: User-agent booleans
 	isIE: false,
 	isOpera: false,
 	isSafari: false,
@@ -35,15 +33,15 @@ window.MVC.History = {
     throwErrors: true,
     fireInitialChange: true,
 	
-	/*Public: Create the DHTML history infrastructure*/
+	/*Creates the DHTML history infrastructure*/
 	create: function(options) {
 		
-		/*
-			options - object to store initialization parameters
-			options.debugMode - boolean that causes hidden form fields to be shown for development purposes.
-			options.toJSON - function to override default JSON stringifier
-			options.fromJSON - function to override default JSON parser
-		*/
+		
+		//	options - object to store initialization parameters
+		//	options.debugMode - boolean that causes hidden form fields to be shown for development purposes.
+		//	options.toJSON - function to override default JSON stringifier
+		//	options.fromJSON - function to override default JSON parser
+		
 
 		var that = this;
 
@@ -68,30 +66,30 @@ window.MVC.History = {
 			this.isSupported = true;
 		}
 
-		/*Set up the historyStorage object; pass in init parameters*/
+		//Set up the historyStorage object; pass in init parameters
 		window.historyStorage.setup(options);
 
-		/*Execute browser-specific setup methods*/
+		//Execute browser-specific setup methods
 		if (this.isSafari) {
 			this.createSafari();
 		} else if (this.isOpera) {
 			this.createOpera();
 		}
 		
-		/*Get our initial location*/
+		//Get our initial location
 		var initialHash = this.getCurrentLocation();
 
-		/*Save it as our current location*/
+		//Save it as our current location
 		this.currentLocation = initialHash;
 
-		/*Now that we have a hash, create IE-specific code*/
+		//Now that we have a hash, create IE-specific code
 		if (this.isIE) {
 			this.createIE(initialHash);
 		}
 
-		/*Add an unload listener for the page; this is needed for FF 1.5+ because this browser caches all dynamic updates to the
-		page, which can break some of our logic related to testing whether this is the first instance a page has loaded or whether
-		it is being pulled from the cache*/
+		//Add an unload listener for the page; this is needed for FF 1.5+ because this browser caches all dynamic updates to the
+		//page, which can break some of our logic related to testing whether this is the first instance a page has loaded or whether
+		//it is being pulled from the cache
 
 		var unloadHandler = function() {
 			that.firstLoad = null;
@@ -99,47 +97,47 @@ window.MVC.History = {
 		
 		this.addEventListener(window,'unload',unloadHandler);		
 
-		/*Determine if this is our first page load; for IE, we do this in this.iframeLoaded(), which is fired on pageload. We do it
-		there because we have no historyStorage at this point, which only exists after the page is finished loading in IE*/
+		//Determine if this is our first page load; for IE, we do this in this.iframeLoaded(), which is fired on pageload. We do it
+		//there because we have no historyStorage at this point, which only exists after the page is finished loading in IE
 		if (this.isIE) {
-			/*The iframe will get loaded on page load, and we want to ignore this fact*/
+			//The iframe will get loaded on page load, and we want to ignore this fact
 			this.ignoreLocationChange = true;
 		} else {
 			if (!historyStorage.hasKey(this.PAGELOADEDSTRING)) {
-				/*This is our first page load, so ignore the location change and add our special history entry*/
+				//This is our first page load, so ignore the location change and add our special history entry
 				this.ignoreLocationChange = true;
 				this.firstLoad = true;
 				historyStorage.put(this.PAGELOADEDSTRING, true);
 			} else {
-				/*This isn't our first page load, so indicate that we want to pay attention to this location change*/
+				//This isn't our first page load, so indicate that we want to pay attention to this location change
 				this.ignoreLocationChange = false;
-				/*For browsers other than IE, fire a history change event; on IE, the event will be thrown automatically when its
-				hidden iframe reloads on page load. Unfortunately, we don't have any listeners yet; indicate that we want to fire
-				an event when a listener is added.*/
+				//For browsers other than IE, fire a history change event; on IE, the event will be thrown automatically when its
+				//hidden iframe reloads on page load. Unfortunately, we don't have any listeners yet; indicate that we want to fire
+				//an event when a listener is added.
 				this.fireOnNewListener = false;
 			}
 		}
 
-		/*Other browsers can use a location handler that checks at regular intervals as their primary mechanism; we use it for IE as
-		well to handle an important edge case; see checkLocation() for details*/
+		//Other browsers can use a location handler that checks at regular intervals as their primary mechanism; we use it for IE as
+		//well to handle an important edge case; see checkLocation() for details
 		var locationHandler = function() {
 			that.checkLocation();
 		};
 		setInterval(locationHandler, 100);
 	},	
 	
-	/*Public: Initialize our DHTML history. You must call this after the page is finished loading.*/
+	/*Initialize our DHTML history. You must call this after the page is finished loading.*/
 	initialize: function() {
-		/*IE needs to be explicitly initialized. IE doesn't autofill form data until the page is finished loading, so we have to wait*/
+		//IE needs to be explicitly initialized. IE doesn't autofill form data until the page is finished loading, so we have to wait
 		if (this.isIE) {
-			/*If this is the first time this page has loaded*/
+			//If this is the first time this page has loaded
 			if (!historyStorage.hasKey(this.PAGELOADEDSTRING)) {
-				/*For IE, we do this in initialize(); for other browsers, we do it in create()*/
+				//For IE, we do this in initialize(); for other browsers, we do it in create()
 				this.fireOnNewListener = false;
 				this.firstLoad = true;
 				historyStorage.put(this.PAGELOADEDSTRING, true);
 			}
-			/*Else if this is a fake onload event*/
+			//Else if this is a fake onload event
 			else {
 				this.fireOnNewListener = false;
 				this.firstLoad = false;   
@@ -147,17 +145,17 @@ window.MVC.History = {
 		}
 	},
 
-	/*Public: Adds a history change listener. Note that only one listener is supported at this time.*/
+	/*Adds a history change listener. Note that only one listener is supported at this time.*/
 	addListener: function(listener) {
 		this.listener = listener;
-		/*If the page was just loaded and we should not ignore it, fire an event to our new listener now*/
+		//If the page was just loaded and we should not ignore it, fire an event to our new listener now
 		if (this.fireOnNewListener) {
 			this.fireHistoryEvent(this.currentLocation);
 			this.fireOnNewListener = false;
 		}
 	},
 	
-	/*Public: Generic utility function for attaching events*/
+	/*Generic utility function for attaching events*/
 	addEventListener: function(o,e,l) {
 		if (o.addEventListener) {
 			o.addEventListener(e,l,false);
@@ -168,44 +166,44 @@ window.MVC.History = {
 		}
 	},
 	
-	/*Public: Add a history point.*/
+	/*Add a history point.*/
 	add: function(newLocation, historyData) {
 		if (this.isSafari) {
 			
-			/*Remove any leading hash symbols on newLocation*/
+			//Remove any leading hash symbols on newLocation
 			newLocation = this.removeHash(newLocation);
 
-			/*Store the history data into history storage*/
+			//Store the history data into history storage
 			historyStorage.put(newLocation, historyData);
 
-			/*Save this as our current location*/
+			//Save this as our current location
 			this.currentLocation = newLocation;
 	
-			/*Change the browser location*/
+			//Change the browser location
 			window.location.hash = newLocation;
 		
-			/*Save this to the Safari form field*/
+			//Save this to the Safari form field
 			this.putSafariState(newLocation);
 
 		} else {
 			
-			/*Most browsers require that we wait a certain amount of time before changing the location, such
-			as 200 MS; rather than forcing external callers to use window.setTimeout to account for this,
-			we internally handle it by putting requests in a queue.*/
+			//Most browsers require that we wait a certain amount of time before changing the location, such
+			//as 200 MS; rather than forcing external callers to use window.setTimeout to account for this,
+			//we internally handle it by putting requests in a queue.
 			var that = this;
 			var addImpl = function() {
 
-				/*Indicate that the current wait time is now less*/
+				//Indicate that the current wait time is now less
 				if (that.currentWaitTime > 0) {
 					that.currentWaitTime = that.currentWaitTime - that.waitTime;
 				}
 			
-				/*Remove any leading hash symbols on newLocation*/
+				//Remove any leading hash symbols on newLocation
 				newLocation = that.removeHash(newLocation);
 
-				/*IE has a strange bug; if the newLocation is the same as _any_ preexisting id in the
-				document, then the history action gets recorded twice; throw a programmer exception if
-				there is an element with this ID*/
+				//IE has a strange bug; if the newLocation is the same as _any_ preexisting id in the
+				//document, then the history action gets recorded twice; throw a programmer exception if
+				//there is an element with this ID
 				if (MVC.$E(newLocation) && that.debugMode) {
 					var e = "Exception: History locations can not have the same value as _any_ IDs that might be in the document,"
 					+ " due to a bug in IE; please ask the developer to choose a history location that does not match any HTML"
@@ -213,49 +211,48 @@ window.MVC.History = {
 					throw new Error(e); 
 				}
 
-				/*Store the history data into history storage*/
+				//Store the history data into history storage
 				historyStorage.put(newLocation, historyData);
 
-				/*Indicate to the browser to ignore this upcomming location change since we're making it programmatically*/
+				//Indicate to the browser to ignore this upcomming location change since we're making it programmatically
 				that.ignoreLocationChange = true;
 
-				/*Indicate to IE that this is an atomic location change block*/
+				//Indicate to IE that this is an atomic location change block
 				that.ieAtomicLocationChange = true;
 
-				/*Save this as our current location*/
+				//Save this as our current location
 				that.currentLocation = newLocation;
 		
-				/*Change the browser location*/
+				//Change the browser location
 				window.location.hash = newLocation;
 
-				/*Change the hidden iframe's location if on IE*/
+				//Change the hidden iframe's location if on IE
 				if (that.isIE) {
 					that.iframe.src = that.blank_html_path+"blank.html?" + newLocation;
 				}
 
-				/*End of atomic location change block for IE*/
+				//End of atomic location change block for IE
 				that.ieAtomicLocationChange = false;
 			};
 
-			/*Now queue up this add request*/
+			//Now queue up this add request
 			window.setTimeout(addImpl, this.currentWaitTime);
 
-			/*Indicate that the next request will have to wait for awhile*/
+			//Indicate that the next request will have to wait for awhile
 			this.currentWaitTime = this.currentWaitTime + this.waitTime;
 		}
 	},
 
-	/*Public*/
+	/* */
 	isFirstLoad: function() {
 		return this.firstLoad;
 	},
 
-	/*Public*/
+	/* */
 	getVersion: function() {
 		return "0.6";
 	},
 
-	/*Get browser's current hash location; for Safari, read value from a hidden form field*/
 
 	/*Public
 	getCurrentLocation: function() {
@@ -265,12 +262,16 @@ window.MVC.History = {
 		);
 		return r;
 	},*/
+   
+    /**
+     * Get browser's current hash location; for Safari, read value from a hidden form field
+     */
 	getCurrentLocation: function() {
 		var r = this.getCurrentHash();
 
 		return r;
 	},
-	/*Public: Manually parse the current url for a hash; tip of the hat to YUI*/
+	/*Manually parse the current url for a hash; tip of the hat to YUI*/
     getCurrentHash: function() {
 		var r = window.location.href;
 		var i = r.indexOf("#");
@@ -282,27 +283,27 @@ window.MVC.History = {
 	
 	/*- - - - - - - - - - - -*/
 	
-	/*Private: Constant for our own internal history event called when the page is loaded*/
+	/*Constant for our own internal history event called when the page is loaded*/
 	PAGELOADEDSTRING: "DhtmlHistory_pageLoaded",
 	
 	blank_html_path: MVC.mvc_root+'/plugins/dom/history/',
 	
-	/*Private: Our history change listener.*/
+	/*Our history change listener.*/
 	listener: null,
 
-	/*Private: MS to wait between add requests - will be reset for certain browsers*/
+	/*MS to wait between add requests - will be reset for certain browsers*/
 	waitTime: 200,
 	
-	/*Private: MS before an add request can execute*/
+	/*MS before an add request can execute*/
 	currentWaitTime: 0,
 
-	/*Private: Our current hash location, without the "#" symbol.*/
+	/*Our current hash location, without the "#" symbol.*/
 	currentLocation: null,
 
-	/*Private: Hidden iframe used to IE to detect history changes*/
+	/*Hidden iframe used to IE to detect history changes*/
 	iframe: null,
 
-	/*Private: Flags and DOM references used only by Safari*/
+	/*Flags and DOM references used only by Safari*/
 	safariHistoryStartPoint: null,
 	safariStack: null,
 	safariLength: null,
@@ -401,9 +402,9 @@ window.MVC.History = {
 
 	/*Private: Notify the listener of new history changes.*/
 	fireHistoryEvent: function(newHash) {
-		/*extract the value from our history storage for this hash*/
+		//extract the value from our history storage for this hash
 		var historyData = historyStorage.get(newHash);
-		/*call our listener*/
+		//call our listener
 		this.listener.call(null, newHash, historyData);
 	},
 	
@@ -412,7 +413,7 @@ window.MVC.History = {
 	to intercept this and notify any history listener.*/
 	checkLocation: function() {
 		
-		/*Ignore any location changes that we made ourselves for browsers other than IE*/
+		//Ignore any location changes that we made ourselves for browsers other than IE
 		if (!this.isIE && this.ignoreLocationChange) {
 			this.ignoreLocationChange = false;
 			return;
@@ -554,7 +555,7 @@ window.historyStorage = {
 			? 'width: 800px;height:80px;border:1px solid black;'
 			: historyStorage.hideStyles
 		);
-		if(MVC.History.isSafari){
+		if(MVC.History.isSafari || MVC.Browser.Rhino){
 			var form = document.createElement('form');
 			form.id = formID;
 			form.setAttribute('style',formStyles);
@@ -705,7 +706,13 @@ MVC.Controller.test_dispatch = function(controller, action){
 };
 
 
-MVC.History.historyChange = function(newLocation, historyData) {
+MVC.History.
+/**
+ * Called when history changes
+ * @param {Object} newLocation
+ * @param {Object} historyData
+ */
+historyChange = function(newLocation, historyData) {
 
 	var path = new MVC.Path(location.href);
 	var data = MVC.Path.get_data(path);
@@ -814,9 +821,18 @@ MVC.Path.get_data = function(path) {
 	}
 	return data;
 };
-
+/**
+ * @add MVC.Controller Prototype
+ */
 //this should convert options to params
-MVC.Controller.prototype.redirect_to = function(options){
+
+MVC.Controller.prototype.
+/**
+ * Redirects to another page.
+ * @plugin 'dom/history'
+ * @param {Object} options
+ */
+redirect_to = function(options){
 	var controller_name = options.controller || this.Class.className;
 	var action_name = options.action || 'index';
 	var lhs = window.location.href.split('#')[0];

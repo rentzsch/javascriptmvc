@@ -20,7 +20,11 @@
 
 // prevent re-definition of the OpenAjax object
 if(!window["OpenAjax"]){
-	OpenAjax = new function(){
+	/**
+	 * @class OpenAjax
+	 * Use OpenAjax.hub to publish and subscribe to messages.
+	 */
+    OpenAjax = new function(){
 		var t = true;
 		var f = false;
 		var g = window;

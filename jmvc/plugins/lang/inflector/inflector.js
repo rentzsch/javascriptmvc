@@ -113,7 +113,7 @@ MVC.Inflector = {
   }
 };
 /**
- *  @add  MVC.String  Static
+ *  @add  MVC.Native.String  Static
  */
 MVC.Native.extend('String', {
   /**
