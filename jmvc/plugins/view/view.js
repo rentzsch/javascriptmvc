@@ -3,17 +3,30 @@
 /**
  * @constructor
  * View provides client side templates.  Typically they work with controller to render data in HTML form.
- * 
- * 
- * <h2>Install</h2>
+
+ * <h3>Install</h3>
  * @code_start
  * include.plugins('view') //for basic templating functionality
  * include.plugins('view/helpers') //for HTML helpers
  * @code_end
- * <h2>Including views</h2>
- * MVC can package processed views in the production file.
+ * <h3>Including views</h3>
+ * MVC can package processed views in the production file.  After including the include plugin, you
+ * can use include.views wrapped in an include callback function.  Because included views are already
+ * processed, they don't rely on eval.  Here's how to include them:
+ * @code_start
+ * include.plugins('view','controller')
+ * include.controllers('tasks');
+ * include(function(){
+ *   include.views('views/tasks/show');
+ * })
+ * @code_end
+ * Read more about [include.static.views include.views].
+ * <h3>View Helpers</h3>
+ * View Helpers create html code.  View by default only comes with 
+ * [MVC.View.Helpers.prototype.partial partial] and [MVC.View.Helpers.prototype.to_text to_text].
+ * You can include more with the view/helpers plugin.  But, you can easily make your own!
+ * Learn how in the [MVC.View.Helpers Helpers] page.
  * 
- * <h2></h2>
  * @init Creates a new view
  * @param {Object} options A hash with the following options
  * <table class="options">
@@ -520,6 +533,8 @@ include.view = function(path){
 include.
 /**
  * @plugin view
+ * Includes views into the production file.  This is highly encouraged as the files are preprocessed
+ * and don't rely on eval.
  */
 views = function(){
 	for(var i=0; i< arguments.length; i++){
