@@ -271,12 +271,12 @@ Controller('todos',{
 		}, this), delay );
     },
     /**
-     * Publishes an action to OpenAjax.hub
-     * @param {Object} message
-     * @param {Object} params
+     * Publishes a message to OpenAjax.hub.  Other controllers 
+     * @param {String} message
+     * @param {Object} data
      */
-    publish: function(message, params){
-        this.Class.publish(message,params);
+    publish: function(message, data){
+        this.Class.publish(message,data);
     }
 });
 

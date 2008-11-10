@@ -1,5 +1,6 @@
 /**
  * A base class for a comment and the line of code following it.
+ * @hide
  */
 MVC.Doc.Pair = MVC.Class.extend(
 /* @Static */
@@ -80,6 +81,17 @@ MVC.Doc.Pair = MVC.Class.extend(
              this._view = new View({text: readFile(ejs), name: ejs });
         }
     },
+    /**
+     * Adds [MVC.Doc.Directive|directives] to this class.
+     * @code_start
+     * {
+     *   init: function(){
+     *     this._super();
+     *     this.add(MVC.Doc.Directive.Return, MVC.Doc.Directive.Param)
+     *   }
+     * }
+     * @code_end
+     */
     add : function(){
         var args = MVC.Array.from(arguments)   
         for(var i = 0; i < args.length; i++){
@@ -179,10 +191,40 @@ MVC.Doc.Pair = MVC.Class.extend(
             return arr;
     },
     /**
-     * Can add this to another object.
-     * @param {Object} line
+     * Goes through the comment line by line.  Searches for lines starting with a <i>@directive</i>.
+     * If a line with a directive is found, it sees if the instance has a function that matches
+     * <i>directive</i>_add exists.  If it does, <i>directive</i>_add is called on that object.
+     * If following lines do not have a directive, the <i>directive</i>_add_more function is called
+     * on the instance
+     * <br/>
+     * Initial comments are added to real_comment.<br>
+     * This function is shared by Class and Constructor.
      */
-    plugin_add : function(line){
-        this.plugin = line.match(/@plugin ([^ ]+)/)[1];
+    comment_setup: function(){
+        var i = 0;
+        var lines = this.comment.split("\n");
+        this.real_comment = '';
+        if(!this.params) this.params = {};
+        if(!this.ret) this.ret = {type: 'undefined',description: ""};
+        var last, last_data;
+        for(var l=0; l < lines.length; l++){
+            var line = lines[l];
+            var match = line.match(/^[\s*]?@(\w+)/)
+            if(match){
+                var fname = (match[1]+'_add').toLowerCase();
+                if(! this[fname]) {
+                    this.real_comment+= line+"\n"
+                    continue;
+                }
+                last_data = this[fname](line);
+                if(last_data) last = match[1].toLowerCase(); else last = null;
+            }
+            else if(!line.match(/^constructor/i) && !last )
+                this.real_comment+= line+"\n"
+            else if(last && this[last+'_add_more']){
+                this[last+'_add_more'](line, last_data);
+            }
+        }
+        if(this.comment_setup_complete) this.comment_setup_complete();
     }
 })

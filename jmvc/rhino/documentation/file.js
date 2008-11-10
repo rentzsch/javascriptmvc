@@ -3,6 +3,7 @@
  * Represents a file.
  * Breaks up file into comment and code parts.
  * Creates new [MVC.Doc.Pair | Doc.Pairs].
+ * @hide
  */
 MVC.Doc.File = MVC.Doc.Pair.extend('file',
 {

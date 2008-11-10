@@ -1,11 +1,68 @@
-MVC.Doc.Directive = MVC.Class.extend({
-    
-},
+/**
+ * @hide
+ * The base directive class.  Classes extending [MVC.Doc.Pair] [MVC.Doc.Pair.static.add|add] directives
+ * to be matched against.  The available directives are:
+ * <ul>
+ *     <li>[MVC.Doc.Directive.Init|init]</li>
+ *     <li>[MVC.Doc.Directive.Param|param]</li>
+ *     <li>[MVC.Doc.Directive.Inherits|inherits]</li>
+ *     <li>[MVC.Doc.Directive.Return|return]</li>
+ *     <li>[MVC.Doc.Directive.Author|author]</li>
+ *     <li>[MVC.Doc.Directive.Hide|hide]</li>
+ *     <li>[MVC.Doc.Directive.CodeStart|code_start]</li>
+ *     <li>[MVC.Doc.Directive.CodeEnd|code_end]</li>
+ *     <li>[MVC.Doc.Directive.Alias|alias]</li>
+ *     <li>[MVC.Doc.Directive.Plugin|plugin]</li>
+ * </ul>
+ * <h3>How directives work</h3>
+ * Directives mix in their add and add_more functions into MVC.Doc.Pair classes.  
+ * These functions work with [MVC.Doc.Pair.prototype.comment_setup|Pair::comment_setup] to
+ * read directives (things that look like <i>@something</i>) and make sense of their data.
+ * 
+ * 
+ */
+MVC.Doc.Directive = MVC.Class.extend(
+/* @prototype */
 {
-    
+    /**
+     * Called when [MVC.Doc.Pair.prototype.comment_setup|comment_setup] first sees a line with the matching
+     * directive.
+     * If the function returns null or false, following lines without another directive will be added to 
+     * real_comment.  If the function returns data, the add_more will be called with lines following this line
+     * and the data returned.
+     * 
+     * In these functions, save the data from comments like:
+     * @code_start
+     * this.my_data = line.match(/\d\d/)
+     * @code_end
+     * It's important to note that this refers to the Pair instance of the class that has added this directive.
+     * 
+     * @param {String} line the line with the directive on it.
+     * @return {Object} if false, add future lines to real_comment, otherwise, call add_more with future lines
+     * and the data returned.
+     */
+    add: function(line){
+        var m = line.match(/^\s*@(\w+)\s*(.*)/)
+        if(m){
+            this[m[1]] = m[2];
+        }
+    }
+    /**
+     * @function add_more
+     * Adds lines following a directive.
+     * @param {String} line the current comment line
+     * @param {Object} prior data the data returned from the previous add or add_more.
+     * @return {Object} if false, ends calling add_more with future lines, otherwise; calls add_more with the next
+     * line and the return value.
+     */
 })
-
-MVC.Doc.Directive.Init = MVC.Class.extend('init',{
+//start directives
+/**
+ * @hide
+ * Describes constructor functionality
+ */
+MVC.Doc.Directive.Init = MVC.Class.extend('init',
+{
     add: function(line){
             var parts = line.match(/\s?@init(.*)?/);
             if(!parts || !parts[1]){
@@ -19,6 +76,10 @@ MVC.Doc.Directive.Init = MVC.Class.extend('init',{
         this.init_description +="\n"+ line;
     }
 });
+/**
+ * @hide
+ * Adds parameter information
+ */
 MVC.Doc.Directive.Param = MVC.Class.extend('param',{
     add_more : function(line, last){
         if(last)
@@ -40,11 +101,13 @@ MVC.Doc.Directive.Param = MVC.Class.extend('param',{
         param.name = n;
         param.type = parts.pop()|| "";
         param.optional = parts.pop() ? true : false;
-        
         return this.params[n];
     }
 });
-
+/**
+ * @hide
+ * Tells what something inherits from
+ */
 MVC.Doc.Directive.Inherits = MVC.Class.extend('inherits',{
     add: function(line){
         var m = line.match(/^\s*@\w+ ([\w\.]+)/)
@@ -53,6 +116,10 @@ MVC.Doc.Directive.Inherits = MVC.Class.extend('inherits',{
         }
     }
 })
+/**
+ * @hide
+ * Describes return data
+ */
 MVC.Doc.Directive.Return = MVC.Class.extend('return',{
     add: function(line){
         var parts = line.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s*(.*)?/);
@@ -70,6 +137,10 @@ MVC.Doc.Directive.Return = MVC.Class.extend('return',{
         this.ret.description += "\n"+line;
     }
 })
+/**
+ * @hide
+ * Tells who the author is
+ */
 MVC.Doc.Directive.Author = MVC.Class.extend('author',{
     add: function(line){
         var m = line.match(/^\s*@author\s*(.*)/)
@@ -78,6 +149,10 @@ MVC.Doc.Directive.Author = MVC.Class.extend('author',{
         }
     }
 });
+/**
+ * @hide
+ * Hides this class or constructor from the left hand side bar.
+ */
 MVC.Doc.Directive.Hide = MVC.Class.extend('hide',{
     add: function(line){
         var m = line.match(/^\s*@hide/)
@@ -86,6 +161,10 @@ MVC.Doc.Directive.Hide = MVC.Class.extend('hide',{
         }
     }
 });
+/**
+ * @hide
+ * Starts a code block
+ */
 MVC.Doc.Directive.CodeStart = MVC.Class.extend('code_start',{
     add: function(line){
         var m = line.match(/^\s*@code_start\s*([\w-]*)\s*(.*)/)
@@ -99,6 +178,10 @@ MVC.Doc.Directive.CodeStart = MVC.Class.extend('code_start',{
         this.comment_code.push(line);
     }
 });
+/**
+ * @hide
+ * Stops a code block
+ */
 MVC.Doc.Directive.CodeEnd = MVC.Class.extend('code_end',{
     add: function(line){
         var m = line.match(/^\s*@code_end/)
@@ -110,11 +193,24 @@ MVC.Doc.Directive.CodeEnd = MVC.Class.extend('code_end',{
         return false;
     }
 });
+/**
+ * @hide
+ * This Class or Constructor is known by another name.
+ */
 MVC.Doc.Directive.Alias = MVC.Class.extend('alias',{
     add: function(line){
         var m = line.match(/^\s*@alias\s*([\w\-\.]*)/)
         if(m){
             this.alias = m[1];
         }
+    }
+});
+/**
+ * @hide
+ * Adds to another plugin.
+ */
+MVC.Doc.Directive.Plugin = MVC.Class.extend('plugin',{
+    add: function(line){
+        this.plugin = line.match(/@plugin ([^ ]+)/)[1];
     }
 });

@@ -1,4 +1,5 @@
 /**
+ * @hide
  * Documents javascript constructor classes typically created like:
  * new MyContructor(args).
  * 
@@ -57,7 +58,8 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
                 MVC.Doc.Directive.Inherits,
                 MVC.Doc.Directive.Author,
                 MVC.Doc.Directive.Return,
-                MVC.Doc.Directive.Hide, MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd, MVC.Doc.Directive.Alias);
+                MVC.Doc.Directive.Hide, MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd, MVC.Doc.Directive.Alias,
+                MVC.Doc.Directive.Plugin);
         this._super();
         var ejs = "jmvc/rhino/documentation/templates/file.ejs"
         this._file_view = new View({text: readFile(ejs), name: ejs });
@@ -81,7 +83,6 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
         this.parent.add(this);
     },
     code_setup: MVC.Doc.Function.prototype.code_setup,
-    comment_setup: MVC.Doc.Function.prototype.comment_setup,
     toFile : function(summary){
         this.summary = summary
         //try{

@@ -1,4 +1,5 @@
 /**
+ * @hide
  * Documents an attribute.  Example:
  * @code_start
  * MVC.Object.extend(Person, {
@@ -24,5 +25,11 @@ MVC.Doc.Attribute = MVC.Doc.Pair.extend('attribute',
      code_setup: function(){
         var parts = this.code.match(/(\w+)\s*[:=]\s*/);
         this.name = parts[1];
+     },
+     attribute_add: function(line){
+        var m = line.match(/^@\w+ ([\w\.]+)/)
+        if(m){
+            this.name = m[1];
+        }
      }
  })

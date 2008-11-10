@@ -1,4 +1,5 @@
 /**
+ * @hide
  * Documents a 'Class'.  A class is typically a collection of static and prototype functions.
  * MVC Doc can automatically detect classes created with MVC.Class.  However, you can make anything
  * a class with the <b>@class <i>ClassName</i></b> directive.
@@ -17,7 +18,8 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         this.add(MVC.Doc.Directive.Inherits, 
         MVC.Doc.Directive.Author,
         MVC.Doc.Directive.Hide,
-        MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd, MVC.Doc.Directive.Alias)
+        MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd, MVC.Doc.Directive.Alias,
+        MVC.Doc.Directive.Plugin)
         
         this._super();
         
@@ -63,8 +65,8 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         this.name = parts[1];
         this.inherits = parts[2];
     },
-    comment_setup: MVC.Doc.Function.prototype.comment_setup,
     class_add: function(line){
+        
         var m = line.match(/^@\w+ ([\w\.]+)/)
         if(m){
             this.name = m[1];

@@ -29,7 +29,18 @@ MVC.render_to = function(file, ejs, data){
  *     <li>[MVC.Doc.Static | @static] - add to the previous class or constructor's static functions</li>
  *     <li>[MVC.Doc.Add |@add] - add docs to a class or construtor described in another file</li>
  * </ul>    
- * 
+ * <p>Finally, you have [MVC.Doc.Directive|directives] that provide addtional info about the comment:</p>
+ * <ul>
+ *     <li>[MVC.Doc.Directive.Alias|@alias]</li>
+ *     <li>[MVC.Doc.Directive.Author|@author]</li>
+ *     <li>[MVC.Doc.Directive.CodeStart|@code_start] - [MVC.Doc.Directive.CodeEnd|@code_end]</li>
+ *     <li>[MVC.Doc.Directive.Hide|@hide]</li>
+ *     <li>[MVC.Doc.Directive.Inherits|@inherits]</li>
+ *     <li>[MVC.Doc.Directive.Init|@init]</li>
+ *     <li>[MVC.Doc.Directive.Param|@param]</li>
+ *     <li>[MVC.Doc.Directive.Plugin|@plugin]</li>
+ *     <li>[MVC.Doc.Directive.Return|@return]</li>
+ * </ul>
  * <h3>Example</h3>
  * The following documents a Person constructor.
  * @code_start
@@ -70,7 +81,9 @@ MVC.render_to = function(file, ejs, data){
  * <pre>js apps/app_name/compress.js</pre>
  * The docs will be put in your docs folder.
  * <h3>Using without JavaScriptMVC</h3>
- * This process will be made easier in the future.  But you have to create a js file that looks like this:
+ * This process will be made easier in the future.  But you have to create a js file using
+ * [MVC.Doc.Application|application] that
+ * looks like this:
  * @code_start
  * //loads doc source
  * load('jmvc/rhino/documentation/setup.js'); 
@@ -93,14 +106,19 @@ MVC.Doc =
      * @param {String} content Any text, usually a commment.
      */
     link_content : function(content){
-        return content.replace(/\[\s*([^\|\]\s]*)\s*\|?\s*([^\]]*)\s*\]/g, function(match, first, name){
+        return content.replace(/\[\s*([^\|\]\s]*)\s*\|?\s*([^\]]*)\s*\]/g, function(match, first, n){
             //need to get last
             //need to remove trailing whitespace
             var url = MVC.Doc.objects[first];
-            if(!name){
-                name = first.replace(/\.prototype|\.static/)
+            if(url){
+                if(!n){
+                    n = first.replace(/\.prototype|\.static/,"")
+                }
+                return "<a href='"+url+"'>"+n+"</a>"
+            }else if(typeof first == 'string' && first.match(/^https?|www\.|#/)){
+                return "<a href='"+first+"'>"+(n || first)+"</a>"
             }
-            return url ? "<a href='"+url+"'>"+name+"</a>" : match;
+            return  match;
         })
     },
     /**
@@ -120,6 +138,7 @@ MVC.Doc =
 
 /**
  * @constructor
+ * @hide
  * Creates documentation for an application
  * @init
  * Generates documentation from the passed in files.

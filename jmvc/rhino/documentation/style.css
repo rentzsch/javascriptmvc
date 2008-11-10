@@ -32,7 +32,12 @@ a:hover .matches_previous {
 	opacity: 1.0;
 }
 
-
+.real_comment {
+    margin: 0px 40px 10px 40px;
+}
+.real_comment pre {
+    margin: 10px 0px;
+}
 .highlight { background-color:#FFFFCC; }
 .html_key { color:#7F3300; }
 .plugins { list-style: none; }

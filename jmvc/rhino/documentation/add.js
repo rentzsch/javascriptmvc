@@ -1,4 +1,5 @@
 /**
+ * @hide
  * Used to set scope to add to classes or methods in another file.
  * Examples:
  * @code_start no-highlight

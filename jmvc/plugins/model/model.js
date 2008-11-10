@@ -141,8 +141,22 @@ MVC.Model = MVC.Class.extend(
      * @param {Object} data
      */
     publish : function(event, data){
-        OpenAjax.hub.publish(this.className + "."+event, data);
-    }
+        OpenAjax.hub.publish(   this.className + "."+event, data);
+    },
+    /**
+     * Namespaces are used to publish messages to a specific namespace.
+     * @code_start
+     * Org.Task = MVC.Model.extend('task',{
+     *   namespace: "org"
+     * },
+     * {
+     *   update: function(){
+     *     this.publish("update") // publishes 'this' to 'org.task.update'
+     *   }
+     * })
+     * @code_end
+     */
+    namespace : null
 },
 /* @Prototype*/
 {   
@@ -251,7 +265,7 @@ MVC.Model = MVC.Class.extend(
     is_new_record : function(){ return true;},
     /**
      * Saves the instance
-     * @param {optional:Function} callback or object of callbacks
+     * @param {optional:Function} callbacks onComplete function or object of callbacks
      */
     save: function(callbacks){
         var result;

@@ -18,7 +18,7 @@
  <% var ordered = this.ordered_params() 
   	for(var n = 0; n < ordered.length; n++){   
        var param = ordered[n]; %>  
-      <div class='param <% param.optional ? "optional" : ""%>'>
+      <div class='param <%= param.optional ? "optional" : ""%>'>
           <label><%= param.name%></label>
           <code>{<%=(param.optional ? '' : '') +""+MVC.Doc.link(param.type) %>}</code> - <%= param.description %>
       </div>
