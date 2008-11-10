@@ -8,7 +8,10 @@
  *     <li>Model.update(id, attributes, callbacks)</li>
  *     <li>Model.destroy(id, callbacks)</li>
  * </ul>
- * Model is also designed to work with ModelViewHelper.
+ * 
+ * <h2>Using Stores</h2>
+ * <h2>Using OpenAjax</h2>
+ * 
  */
 MVC.Model = MVC.Class.extend(
 /* @Static*/

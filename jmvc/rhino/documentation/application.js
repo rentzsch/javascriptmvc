@@ -175,6 +175,24 @@ MVC.Doc.Application.prototype =
     left_side: function(){
         return MVC.Doc.render("jmvc/rhino/documentation/templates/left_side.ejs" , this)
     },
+    get_name : function(i){
+        var me = this.all_sorted[i].name
+        if(i == 0) return me;
+        
+        //break previous and self
+        var previous = this.all_sorted[i-1].name;
+        var t = me.split(/\./)
+        var p = previous.split(/\./);
+        var left_res = [], right_res = []
+        for(var j = 0; j < t.length; j++){
+            if(p[j] && p[j] ==  t[j])
+                left_res.push(t[j])
+            else
+                right_res.push(t[j])
+        }
+        return (left_res.length > 0 ? 
+        "<span class='matches_previous'>"+left_res.join(".")+".</span>" : "")+right_res.join(".")
+    },
     /**
      * Creates a page for all classes and constructors
      * @param {String} summary the left hand side.

@@ -49,6 +49,7 @@ MVC = {
 		if(!MVC.Browser.Rhino) f();
 	},
 	Ajax: {},
+    IO: {},
     _env : "development",
     env : function(arg){
         MVC._env = arg || MVC._env;

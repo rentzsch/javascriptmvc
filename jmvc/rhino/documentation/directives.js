@@ -110,3 +110,11 @@ MVC.Doc.Directive.CodeEnd = MVC.Class.extend('code_end',{
         return false;
     }
 });
+MVC.Doc.Directive.Alias = MVC.Class.extend('alias',{
+    add: function(line){
+        var m = line.match(/^\s*@alias\s*([\w\-\.]*)/)
+        if(m){
+            this.alias = m[1];
+        }
+    }
+});

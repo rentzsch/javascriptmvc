@@ -16,9 +16,17 @@ MVC.Function.params = function(func){
 	return ps;
 };
 
-
+/**
+ * @class MVC.Native
+ */
 MVC.Native ={};
-MVC.Native.extend = function(class_name, source){
+MVC.Native.
+/**
+ * 
+ * @param {Object} class_name
+ * @param {Object} source
+ */
+extend = function(class_name, source){
 	if(!MVC[class_name]) MVC[class_name] = {};
 	var dest = MVC[class_name];
 	for (var property in source){
@@ -45,19 +53,37 @@ MVC.Native.set_prototype = function(class_name, property_name, func){
 	};
 };
 
-//Object helpers
-MVC.Object = {};
-MVC.Object.extend = function(destination, source) {
+/**
+ * @class MVC.Native.Object
+ * @alias MVC.Object
+ * Object helpers
+ */
+MVC.Native.Object = {};
+
+MVC.Native.Object.
+/**
+ * Copies one object to another
+ * @param {Object} destination
+ * @param {Object} source
+ * @return {Object} the destination object
+ */
+extend = function(destination, source) {
   for (var property in source)
     destination[property] = source[property];
   return destination;
 };
-//these are really only for forms
-MVC.Object.to_query_string = function(object,name){
+
+MVC.Native.Object.
+/**
+ * For an object, returns url params.
+ * @param {Object} object
+ * @param {Object} name
+ */
+to_query_string = function(object,name){
 	if(typeof object != 'object') return object;
-	return MVC.Object.to_query_string.worker(object,name).join('&');
+	return MVC.Native.Object.to_query_string.worker(object,name).join('&');
 };
-MVC.Object.to_query_string.worker = function(obj,name){
+MVC.Native.Object.to_query_string.worker = function(obj,name){
 	var parts2 = [];
 	for(var thing in obj){
 		if(obj.hasOwnProperty(thing)) {
@@ -82,7 +108,7 @@ MVC.Object.to_query_string.worker = function(obj,name){
 				var newer_name = encodeURIComponent(name ? name+'['+thing+']' : thing) ;
 				parts2.push( newer_name+'='+nice_val )  ;
 			}else{
-				parts2 = parts2.concat( MVC.Object.to_query_string.worker(value,  name ? name+'['+thing+']' : thing ))
+				parts2 = parts2.concat( MVC.Native.Object.to_query_string.worker(value,  name ? name+'['+thing+']' : thing ))
 			}
 		}
 	}
@@ -90,7 +116,8 @@ MVC.Object.to_query_string.worker = function(obj,name){
 };
 
 /* 
- * @class MVC.String
+ * @class MVC.Native.String
+ * @alias MVC.String
  * When not in no-conflict mode, JMVC adds the following helpers to string
  */
 MVC.Native.extend('String', 
@@ -159,7 +186,8 @@ MVC.Native.extend('String',
 //Date Helpers, probably should be moved into its own class
 
 /* 
- * @class MVC.Array
+ * @class MVC.Native.Array
+ * @alias MVC.Array
  * When not in no-conflict mode, JMVC adds the following helpers to array
  */
 MVC.Native.extend('Array',
@@ -191,7 +219,8 @@ MVC.Native.extend('Array',
 	}
 });
 /* 
- * @class MVC.Function
+ * @class MVC.Native.Function
+ * @alias MVC.Function
  * When not in no-conflict mode, JMVC adds the following helpers to function
  */
 MVC.Native.extend('Function', 
@@ -214,7 +243,8 @@ MVC.Native.extend('Function',
 	params: MVC.Function.params
 });
 /* 
- * @class MVC.Number
+ * @class MVC.Native.Number
+ * @alias MVC.Number
  * When not in no-conflict mode, JMVC adds the following helpers to number
  */
 MVC.Native.extend('Number', 
@@ -237,4 +267,8 @@ MVC.Native.extend('Number',
     }
 })
 
-
+MVC.Native.Array = MVC.Array
+MVC.Native.Function = MVC.Function
+MVC.Native.Number = MVC.Number
+MVC.Native.String = MVC.String
+MVC.Object = MVC.Native.Object

@@ -10,6 +10,13 @@
         <script type="text/javascript">
           hljs.initHighlightingOnLoad('html', 'css','javascript');
         </script>
-
+        <script type="text/javascript">
+            //select someone
+            parts = window.location.href.split("/")
+            var selected = document.getElementById(parts.pop().replace(/[#|?].*/,""))
+            if(selected){
+                selected.className = "selected";
+            }
+        </script>
     </body>
 </html>

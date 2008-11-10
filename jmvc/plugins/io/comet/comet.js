@@ -1,7 +1,8 @@
 // new Comet("http://127.0.0.1/GetEvents", {onSuccess: myfunc, headers: {"Cookie": User.sessionID}})
 
 /**
- * @constructor
+ * @constructor MVC.IO.Comet
+ * @alias MVC.Comet
  * The Comet class opens a connection with a given transport.  It assumes the connection will 
  * be long held. After the connection comes back, it will immediately reconnect.
  * @init 
@@ -164,7 +165,7 @@ MVC.Event.observe(window, 'unload', function(){
 		MVC.Comet.connection.transport.abort();
 });
 
-
+MVC.IO.Comet = MVC.Comet
 if(!MVC._no_conflict && typeof Comet == 'undefined'){
 	Comet = MVC.Comet;
 }

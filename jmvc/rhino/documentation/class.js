@@ -17,7 +17,7 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         this.add(MVC.Doc.Directive.Inherits, 
         MVC.Doc.Directive.Author,
         MVC.Doc.Directive.Hide,
-        MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd)
+        MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd, MVC.Doc.Directive.Alias)
         
         this._super();
         

@@ -2,7 +2,14 @@
 if(MVC.Browser.Opera){
     
 
-
+/**
+ * 
+ * @constructor MVC.IO.XDoc
+ * @alias MVC.XDoc
+ * Provides cross document transport similar to [MVC.IO.Ajax MVC.Ajax] for Opera.
+ * 
+ * @init a
+ */
     MVC.XDoc = function(url, options){
         this.url = url;
         this.options = options || {};

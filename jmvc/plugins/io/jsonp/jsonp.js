@@ -1,3 +1,9 @@
+/**
+ * @constructor MVC.IO.JsonP
+ * @alias MVC.JsonP
+ * Provides JSONP functionality similar to [MVC.IO.Ajax MVC.Ajax]
+ * @init a
+ */
 MVC.JsonP = function(url, options){
     this.url = url;
     this.options = options || {};
@@ -87,3 +93,4 @@ MVC.JsonP.prototype = {
     }
 }
 MVC.JsonP._cbs = {};
+MVC.IO.JsonP = MVC.JsonP;

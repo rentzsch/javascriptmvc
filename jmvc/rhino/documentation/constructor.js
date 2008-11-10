@@ -57,7 +57,7 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
                 MVC.Doc.Directive.Inherits,
                 MVC.Doc.Directive.Author,
                 MVC.Doc.Directive.Return,
-                MVC.Doc.Directive.Hide, MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd);
+                MVC.Doc.Directive.Hide, MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd, MVC.Doc.Directive.Alias);
         this._super();
         var ejs = "jmvc/rhino/documentation/templates/file.ejs"
         this._file_view = new View({text: readFile(ejs), name: ejs });
@@ -109,14 +109,14 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
             for(var n in this.params){
                 res.push(n)
             }
-            var n = this.name;
+            var n = this.alias ? this.alias : this.name;
             //if(this.parent.Class.className == 'static')
             //    n = this.parent.parent.name+"."+this.name;
             //else if(this.parent.Class.className == 'prototype')
             //    n = this.parent.parent.name.toLowerCase()+"."+this.name;
             if(this.ret.type =='undefined'){
                 n = "new "+n;
-                this.ret.type = this.name.toLowerCase();
+                this.ret.type = this.alias ? this.alias.toLowerCase() : this.name.toLowerCase();
             }
             return n+"("+res.join(", ")+") -> "+this.ret.type;
     },

@@ -1,11 +1,17 @@
 // Modified version of Ajax.Request from prototype
 //  Prototype JavaScript framework, version 1.6.0.1
 //  (c) 2005-2007 Sam Stephenson
+/**
+ * 
+ * @class MVC.IO
+ */
+
 (function(){
 	var factory = MVC.Ajax.factory;
 	
     /**
-     * @constructor
+     * @constructor MVC.IO.Ajax
+     * @alias MVC.Ajax
      * Ajax is used to perform Ajax requests. It mimics the Prototype library's Ajax functionality.
      * @init Initiates and processes an AJAX request.
      * @param {String} url the url where the request is directed
@@ -183,5 +189,5 @@ MVC.Ajax.prototype = {
 		}
 	}
 };
-
+MVC.IO.Ajax = MVC.Ajax;
 if(!MVC._no_conflict) Ajax = MVC.Ajax;

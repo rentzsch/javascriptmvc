@@ -1,10 +1,12 @@
 include.resources();
 include.plugins(
 
-    'core','controller/comet','controller/dragdrop','dom/query','io/comet','io/jsonp','io/window_name',
-    'io/xdoc','lang/date','lang/json',
+    'controller/comet','controller/dragdrop','controller/stateful','controller/hover','controller/lasso',
+    'dom/query',
+    'io/comet','io/jsonp','io/window_name','io/xdoc',
+    'lang/date','lang/json',
     'model','model/ajax','model/cookie','model/jsonp','model/rest_json','model/window_name','model/rest_xml',
-    'test','controller/stateful','controller/hover','controller/lasso'
+    'test'
     );
 
 //dom/history

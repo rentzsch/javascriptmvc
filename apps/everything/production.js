@@ -1,235 +1,28 @@
 include.set_path('apps');
 include.resources();
-include.plugins("core","controller/comet","controller/dragdrop","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/window_name","model/rest_xml","test","controller/stateful","controller/hover","controller/lasso");
+include.plugins("controller/comet","controller/dragdrop","controller/stateful","controller/hover","controller/lasso","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/window_name","model/rest_xml","test");
 MVC.load_doc=true;
 include("../jmvc/rhino/documentation/setup");
 include(function(){
 });
 ;
-include.set_path('jmvc/plugins/core');
-if(typeof Prototype=="undefined"){
-include({path:"../lang/standard_helpers.js",shrink_variables:false},"../lang/inflector/inflector","../dom/event/standard","../io/ajax/ajax","../lang/class/setup");
-}else{
-MVC.Event=Event;
-include({path:"../lang/prototype_helpers.js",shrink_variables:false},"../lang/inflector/inflector","../io/ajax/prototype_ajax","../lang/class/setup");
-}
+include.set_path('jmvc/plugins/controller/comet');
+include.plugins("io/comet","controller");
+include("comet_controller");
+;
+include.set_path('jmvc/plugins/io/comet');
+include.plugins("dom/event");
+include("comet");
 if(MVC.Console){
-include("../io/ajax/debug");
-}
-include("../view/view","../controller/controller","../controller/delegator","../controller/view/controller_view");
-include.plugins("dom/element","controller/scaffold","model/view_helper","view/helpers");
-if(include.get_env()=="development"){
-include("../view/fulljslint");
+include("debug");
 }
 ;
-include.set_path('jmvc/plugins/lang');
-MVC.String={};
-MVC.String.strip=function(_1){
-return _1.replace(/^\s+/,"").replace(/\s+$/,"");
-};
-MVC.Function={};
-MVC.Function.params=function(_2){
-var ps=_2.toString().match(/^[\s\(]*function[^(]*\((.*?)\)/)[1].split(",");
-if(ps.length==1&&!ps[0]){
-return [];
-}
-for(var i=0;i<ps.length;i++){
-ps[i]=MVC.String.strip(ps[i]);
-}
-return ps;
-};
-MVC.Native={};
-MVC.Native.extend=function(_5,_6){
-if(!MVC[_5]){
-MVC[_5]={};
-}
-var _7=MVC[_5];
-for(var _8 in _6){
-_7[_8]=_6[_8];
-if(!MVC._no_conflict){
-window[_5][_8]=_6[_8];
-if(typeof _6[_8]=="function"){
-var _9=MVC.Function.params(_6[_8]);
-if(_9.length==0){
-continue;
-}
-var _a=_9[0];
-if(_a.match(_5.substr(0,1).toLowerCase())||(_a=="func"&&_5=="Function")){
-MVC.Native.set_prototype(_5,_8,_6[_8]);
-}
-}
-}
-}
-};
-MVC.Native.set_prototype=function(_b,_c,_d){
-if(!_d){
-_d=MVC[_b][_c];
-}
-window[_b].prototype[_c]=function(){
-var _e=[this];
-for(var i=0,_10=arguments.length;i<_10;i++){
-_e.push(arguments[i]);
-}
-return _d.apply(this,_e);
-};
-};
-MVC.Object={};
-MVC.Object.extend=function(_11,_12){
-for(var _13 in _12){
-_11[_13]=_12[_13];
-}
-return _11;
-};
-MVC.Object.to_query_string=function(_14,_15){
-if(typeof _14!="object"){
-return _14;
-}
-return MVC.Object.to_query_string.worker(_14,_15).join("&");
-};
-MVC.Object.to_query_string.worker=function(obj,_17){
-var _18=[];
-for(var _19 in obj){
-if(obj.hasOwnProperty(_19)){
-var _1a=obj[_19];
-if(_1a&&_1a.constructor===Date){
-_1a=_1a.getUTCFullYear()+"-"+MVC.Number.to_padded_string(_1a.getUTCMonth()+1,2)+"-"+MVC.Number.to_padded_string(_1a.getUTCDate(),2)+" "+MVC.Number.to_padded_string(_1a.getUTCHours(),2)+":"+MVC.Number.to_padded_string(_1a.getUTCMinutes(),2)+":"+MVC.Number.to_padded_string(_1a.getUTCSeconds(),2);
-}
-if(_1a instanceof Array&&_1a.length){
-var _1b=encodeURIComponent(_17?_17+"["+_19+"]":_19);
-for(var i=0;i<_1a.length;i++){
-var _1d=encodeURIComponent(_1a[i].toString());
-_18.push(_1b+"="+_1d);
-}
+include.set_path('jmvc/plugins/dom/event');
+if(typeof Prototype=="undefined"){
+include("standard");
 }else{
-if(typeof _1a!="object"){
-var _1d=encodeURIComponent(_1a.toString());
-var _1b=encodeURIComponent(_17?_17+"["+_19+"]":_19);
-_18.push(_1b+"="+_1d);
-}else{
-_18=_18.concat(MVC.Object.to_query_string.worker(_1a,_17?_17+"["+_19+"]":_19));
+include("prototype_event");
 }
-}
-}
-}
-return _18;
-};
-MVC.Native.extend("String",{capitalize:function(s){
-return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();
-},include:function(s,_20){
-return s.indexOf(_20)>-1;
-},ends_with:function(s,_22){
-var d=s.length-_22.length;
-return d>=0&&s.lastIndexOf(_22)===d;
-},camelize:function(s){
-var _25=s.split(/_|-/);
-for(var i=1;i<_25.length;i++){
-_25[i]=MVC.String.capitalize(_25[i]);
-}
-return _25.join("");
-},classize:function(s){
-var _28=s.split(/_|-/);
-for(var i=0;i<_28.length;i++){
-_28[i]=MVC.String.capitalize(_28[i]);
-}
-return _28.join("");
-},strip:MVC.String.strip});
-MVC.Native.extend("Array",{include:function(a,_2b){
-for(var i=0;i<a.length;i++){
-if(a[i]==_2b){
-return true;
-}
-}
-return false;
-},from:function(_2d){
-if(!_2d){
-return [];
-}
-var _2e=[];
-for(var i=0,_30=_2d.length;i<_30;i++){
-_2e.push(_2d[i]);
-}
-return _2e;
-}});
-MVC.Native.extend("Function",{bind:function(f){
-var _32=MVC.Array.from(arguments);
-_32.shift();
-_32.shift();
-var _33=f,_34=arguments[1];
-return function(){
-return _33.apply(_34,_32.concat(MVC.Array.from(arguments)));
-};
-},params:MVC.Function.params});
-MVC.Native.extend("Number",{to_padded_string:function(n,len,_37){
-var _38=n.toString(_37||10);
-var ret="",_3a=len-_38.length;
-for(var i=0;i<_3a;i++){
-ret+="0";
-}
-return ret+_38;
-}});
-;
-include.set_path('jmvc/plugins/lang/inflector');
-MVC.Inflector={Inflections:{plural:[[/(quiz)$/i,"$1zes"],[/^(ox)$/i,"$1en"],[/([m|l])ouse$/i,"$1ice"],[/(matr|vert|ind)ix|ex$/i,"$1ices"],[/(x|ch|ss|sh)$/i,"$1es"],[/([^aeiouy]|qu)y$/i,"$1ies"],[/(hive)$/i,"$1s"],[/(?:([^f])fe|([lr])f)$/i,"$1$2ves"],[/sis$/i,"ses"],[/([ti])um$/i,"$1a"],[/(buffal|tomat)o$/i,"$1oes"],[/(bu)s$/i,"$1ses"],[/(alias|status)$/i,"$1es"],[/(octop|vir)us$/i,"$1i"],[/(ax|test)is$/i,"$1es"],[/s$/i,"s"],[/$/,"s"]],singular:[[/(quiz)zes$/i,"$1"],[/(matr)ices$/i,"$1ix"],[/(vert|ind)ices$/i,"$1ex"],[/^(ox)en/i,"$1"],[/(alias|status)es$/i,"$1"],[/(octop|vir)i$/i,"$1us"],[/(cris|ax|test)es$/i,"$1is"],[/(shoe)s$/i,"$1"],[/(o)es$/i,"$1"],[/(bus)es$/i,"$1"],[/([m|l])ice$/i,"$1ouse"],[/(x|ch|ss|sh)es$/i,"$1"],[/(m)ovies$/i,"$1ovie"],[/(s)eries$/i,"$1eries"],[/([^aeiouy]|qu)ies$/i,"$1y"],[/([lr])ves$/i,"$1f"],[/(tive)s$/i,"$1"],[/(hive)s$/i,"$1"],[/([^f])ves$/i,"$1fe"],[/(^analy)ses$/i,"$1sis"],[/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$/i,"$1$2sis"],[/([ti])a$/i,"$1um"],[/(n)ews$/i,"$1ews"],[/s$/i,""]],irregular:[["move","moves"],["sex","sexes"],["child","children"],["man","men"],["foreman","foremen"],["person","people"]],uncountable:["sheep","fish","series","species","money","rice","information","equipment"]},pluralize:function(_1){
-for(var i=0;i<MVC.Inflector.Inflections.uncountable.length;i++){
-var _3=MVC.Inflector.Inflections.uncountable[i];
-if(_1.toLowerCase()==_3){
-return _3;
-}
-}
-for(var i=0;i<MVC.Inflector.Inflections.irregular.length;i++){
-var _4=MVC.Inflector.Inflections.irregular[i][0];
-var _5=MVC.Inflector.Inflections.irregular[i][1];
-if((_1.toLowerCase()==_4)||(_1==_5)){
-return _1.substring(0,1)+_5.substring(1);
-}
-}
-for(var i=0;i<MVC.Inflector.Inflections.plural.length;i++){
-var _6=MVC.Inflector.Inflections.plural[i][0];
-var _7=MVC.Inflector.Inflections.plural[i][1];
-if(_6.test(_1)){
-return _1.replace(_6,_7);
-}
-}
-},singularize:function(_8){
-for(var i=0;i<MVC.Inflector.Inflections.uncountable.length;i++){
-var _a=MVC.Inflector.Inflections.uncountable[i];
-if(_8.toLowerCase()==_a){
-return _a;
-}
-}
-for(var i=0;i<MVC.Inflector.Inflections.irregular.length;i++){
-var _b=MVC.Inflector.Inflections.irregular[i][0];
-var _c=MVC.Inflector.Inflections.irregular[i][1];
-if((_8.toLowerCase()==_b)||(_8.toLowerCase()==_c)){
-return _8.substring(0,1)+_b.substring(1);
-}
-}
-for(var i=0;i<MVC.Inflector.Inflections.singular.length;i++){
-var _d=MVC.Inflector.Inflections.singular[i][0];
-var _e=MVC.Inflector.Inflections.singular[i][1];
-if(_d.test(_8)){
-return _8.replace(_d,_e);
-}
-}
-}};
-MVC.Native.extend("String",{pluralize:function(_f,_10,_11){
-if(typeof _10=="undefined"){
-return MVC.Inflector.pluralize(_f);
-}else{
-return _10+" "+(1==parseInt(_10)?_f:_11||MVC.Inflector.pluralize(_f));
-}
-},singularize:function(_12,_13){
-if(typeof _13=="undefined"){
-return MVC.Inflector.singularize(_12);
-}else{
-return _13+" "+MVC.Inflector.singularize(_12);
-}
-},is_singular:function(_14){
-if(MVC.String.singularize(_14)==null&&_14){
-return true;
-}
-return false;
-}});
 ;
 include.set_path('jmvc/plugins/dom/event');
 if(document.addEventListener){
@@ -325,110 +118,314 @@ if(!MVC._no_conflict&&typeof Event=="undefined"){
 Event=MVC.Event;
 }
 ;
-include.set_path('jmvc/plugins/io/ajax');
-(function(){
-var _1=MVC.Ajax.factory;
-MVC.Ajax=function(_2,_3){
-this.options={method:"post",asynchronous:true,contentType:"application/x-www-form-urlencoded",encoding:"UTF-8",parameters:""};
-this.url=_2;
-MVC.Object.extend(this.options,_3||{});
-this.options.method=this.options.method.toLowerCase();
-if(!MVC.Array.include(["get","post"],this.options.method)){
-if(this.options.parameters==""){
-this.options.parameters={_method:this.options.method};
-}else{
-if(typeof this.options.parameters=="string"||typeof this.options.parameters=="number"){
-this.options.parameters=""+this.options.parameters+"&_method="+this.options.method;
-}else{
-this.options.parameters["_method"]=this.options.method;
+include.set_path('jmvc/plugins/io/comet');
+MVC.Comet=function(_1,_2){
+this.url=_1;
+this.options=_2||{};
+this.options.wait_time=this.options.wait_time||0;
+this.onSuccess=_2.onSuccess;
+this.onComplete=_2.onComplete;
+this.onFailure=_2.onFailure;
+delete this.options.onSuccess;
+delete this.options.onComplete;
+this.options.onComplete=MVC.Function.bind(this.callback,this);
+var _3=false;
+var _4=true;
+this.kill=function(){
+_3=true;
+};
+this.poll_now=MVC.Function.bind(function(){
+if(this.is_polling()){
+return;
 }
-}
-this.options.method="post";
-}
-if(this.options.method=="get"&&this.options.parameters!=""){
-this.url+=(MVC.String.include(this.url,"?")?"&":"?")+MVC.Object.to_query_string(this.options.parameters);
-delete this.options.parameters;
-}
-if(!this.options.parameters){
-var _4=null;
-}else{
-if(_3.json_string){
-var _4=MVC.Object.to_json(this.options.parameters);
-}else{
-var _4=MVC.Object.to_query_string(this.options.parameters);
-}
-}
-this.transport=MVC.Ajax.factory();
-if(this.options.asynchronous==false){
-this.transport.open(this.options.method,this.url,this.options.asynchronous);
-this.set_request_headers(_3.headers);
-try{
-this.transport.send(_4);
-}
-catch(e){
-return null;
-}
-return this.transport;
-}else{
-this.transport.onreadystatechange=MVC.Function.bind(function(){
-var _5=MVC.Ajax.Events[this.transport.readyState];
-if(_5=="Complete"){
-if(!this.options.onSuccess){
-}else{
-if(this.success()){
-this.options.onSuccess(this.transport);
-}else{
-if(this.options.onFailure){
-this.options.onFailure(this.transport);
-}
-}
-}
-}
-if(this.options["on"+_5]){
-this.options["on"+_5](this.transport);
-}
+clearTimeout(this.timeout);
+this.options.polling();
+MVC.Comet.connection=new this.transport(this.url,this.options);
 },this);
-this.transport.open(this.options.method,this.url,true);
-this.set_request_headers(_3.headers);
-this.transport.send(_4);
+this.options.is_killed=function(){
+return _3;
+};
+this.options.waiting_to_poll=function(){
+_4=false;
+};
+this.options.polling=function(){
+_4=true;
+};
+this.is_polling=function(){
+return _4;
+};
+this.transport=this.options.transport||MVC.Comet.transport;
+MVC.Comet.connection=new this.transport(_1,this.options);
+};
+MVC.Comet.transport=MVC.Ajax;
+MVC.Comet.prototype={callback:function(_5){
+this.options.waiting_to_poll();
+if(this.options.is_killed()){
+return;
+}
+if(this.onSuccess&&_5.responseText!=""&&this.onSuccess(_5)==false){
+return false;
+}
+if(this.onComplete){
+if(this.onComplete(_5)==false){
+return false;
+}
+}
+var _6=this.url;
+var _7=this.options;
+var _5=this.transport;
+var _8=typeof _7.wait_time=="function"?_7.wait_time():_7.wait_time;
+this.timeout=setTimeout(MVC.Function.bind(function(){
+_7.polling();
+MVC.Comet.connection=new _5(_6,_7);
+},this),_8);
+}};
+MVC.Event.observe(window,"unload",function(){
+MVC.Comet.send=false;
+if(MVC.Comet.connection&&MVC.Comet.connection.transport&&MVC.Comet.transport.className&&MVC.Comet.transport.className=="Ajax"){
+MVC.Comet.connection.transport.abort();
+}
+});
+MVC.IO.Comet=MVC.Comet;
+if(!MVC._no_conflict&&typeof Comet=="undefined"){
+Comet=MVC.Comet;
+}
+;
+include.set_path('jmvc/plugins/controller');
+include.plugins("lang","lang/inflector","dom/event","lang/class","lang/openajax");
+include("delegator","controller");
+if(MVC.View){
+include.plugins("controller/view");
+}
+;
+include.set_path('jmvc/plugins/lang');
+if(typeof Prototype!="undefined"){
+include({path:"prototype_helpers.js",shrink_variables:false});
+}else{
+if(typeof jQuery!="undefined"){
+include({path:"jquery_helpers.js",shrink_variables:false});
+}else{
+include({path:"standard_helpers.js",shrink_variables:false});
+}
+}
+;
+include.set_path('jmvc/plugins/lang');
+MVC.String={};
+MVC.String.strip=function(_1){
+return _1.replace(/^\s+/,"").replace(/\s+$/,"");
+};
+MVC.Function={};
+MVC.Function.params=function(_2){
+var ps=_2.toString().match(/^[\s\(]*function[^(]*\((.*?)\)/)[1].split(",");
+if(ps.length==1&&!ps[0]){
+return [];
+}
+for(var i=0;i<ps.length;i++){
+ps[i]=MVC.String.strip(ps[i]);
+}
+return ps;
+};
+MVC.Native={};
+MVC.Native.extend=function(_5,_6){
+if(!MVC[_5]){
+MVC[_5]={};
+}
+var _7=MVC[_5];
+for(var _8 in _6){
+_7[_8]=_6[_8];
+if(!MVC._no_conflict){
+window[_5][_8]=_6[_8];
+if(typeof _6[_8]=="function"){
+var _9=MVC.Function.params(_6[_8]);
+if(_9.length==0){
+continue;
+}
+var _a=_9[0];
+if(_a.match(_5.substr(0,1).toLowerCase())||(_a=="func"&&_5=="Function")){
+MVC.Native.set_prototype(_5,_8,_6[_8]);
+}
+}
+}
 }
 };
-MVC.Ajax.factory=_1;
-})();
-MVC.Ajax.className="Ajax";
-MVC.Ajax.Events=["Uninitialized","Loading","Loaded","Interactive","Complete"];
-MVC.Ajax.prototype={success:function(){
-var _6=this.getStatus();
-return !_6||(_6>=200&&_6<300);
-},getStatus:function(){
-try{
-return this.transport.status||0;
+MVC.Native.set_prototype=function(_b,_c,_d){
+if(!_d){
+_d=MVC[_b][_c];
 }
-catch(e){
-return 0;
+window[_b].prototype[_c]=function(){
+var _e=[this];
+for(var i=0,_10=arguments.length;i<_10;i++){
+_e.push(arguments[i]);
 }
-},set_request_headers:function(_7){
-var _8={};
-if(this.options.method=="post"){
-_8["Content-type"]=this.options.contentType+(this.options.encoding?"; charset="+this.options.encoding:"");
-if(this.transport.overrideMimeType&&(navigator.userAgent.match(/Gecko\/(\d{4})/)||[0,2005])[1]<2005){
-_8["Connection"]="close";
+return _d.apply(this,_e);
+};
+};
+MVC.Native.Object={};
+MVC.Native.Object.extend=function(_11,_12){
+for(var _13 in _12){
+_11[_13]=_12[_13];
+}
+return _11;
+};
+MVC.Native.Object.to_query_string=function(_14,_15){
+if(typeof _14!="object"){
+return _14;
+}
+return MVC.Native.Object.to_query_string.worker(_14,_15).join("&");
+};
+MVC.Native.Object.to_query_string.worker=function(obj,_17){
+var _18=[];
+for(var _19 in obj){
+if(obj.hasOwnProperty(_19)){
+var _1a=obj[_19];
+if(_1a&&_1a.constructor===Date){
+_1a=_1a.getUTCFullYear()+"-"+MVC.Number.to_padded_string(_1a.getUTCMonth()+1,2)+"-"+MVC.Number.to_padded_string(_1a.getUTCDate(),2)+" "+MVC.Number.to_padded_string(_1a.getUTCHours(),2)+":"+MVC.Number.to_padded_string(_1a.getUTCMinutes(),2)+":"+MVC.Number.to_padded_string(_1a.getUTCSeconds(),2);
+}
+if(_1a instanceof Array&&_1a.length){
+var _1b=encodeURIComponent(_17?_17+"["+_19+"]":_19);
+for(var i=0;i<_1a.length;i++){
+var _1d=encodeURIComponent(_1a[i].toString());
+_18.push(_1b+"="+_1d);
+}
+}else{
+if(typeof _1a!="object"){
+var _1d=encodeURIComponent(_1a.toString());
+var _1b=encodeURIComponent(_17?_17+"["+_19+"]":_19);
+_18.push(_1b+"="+_1d);
+}else{
+_18=_18.concat(MVC.Native.Object.to_query_string.worker(_1a,_17?_17+"["+_19+"]":_19));
 }
 }
-for(var _9 in _8){
-if(_8.hasOwnProperty(_9)){
-this.transport.setRequestHeader(_9,_8[_9]);
 }
 }
-if(_7){
-for(var _a in _7){
-this.transport.setRequestHeader(_a,_7[_a]);
+return _18;
+};
+MVC.Native.extend("String",{capitalize:function(s){
+return s.charAt(0).toUpperCase()+s.substr(1).toLowerCase();
+},include:function(s,_20){
+return s.indexOf(_20)>-1;
+},ends_with:function(s,_22){
+var d=s.length-_22.length;
+return d>=0&&s.lastIndexOf(_22)===d;
+},camelize:function(s){
+var _25=s.split(/_|-/);
+for(var i=1;i<_25.length;i++){
+_25[i]=MVC.String.capitalize(_25[i]);
+}
+return _25.join("");
+},classize:function(s){
+var _28=s.split(/_|-/);
+for(var i=0;i<_28.length;i++){
+_28[i]=MVC.String.capitalize(_28[i]);
+}
+return _28.join("");
+},strip:MVC.String.strip});
+MVC.Native.extend("Array",{include:function(a,_2b){
+for(var i=0;i<a.length;i++){
+if(a[i]==_2b){
+return true;
+}
+}
+return false;
+},from:function(_2d){
+if(!_2d){
+return [];
+}
+var _2e=[];
+for(var i=0,_30=_2d.length;i<_30;i++){
+_2e.push(_2d[i]);
+}
+return _2e;
+}});
+MVC.Native.extend("Function",{bind:function(f){
+var _32=MVC.Array.from(arguments);
+_32.shift();
+_32.shift();
+var _33=f,_34=arguments[1];
+return function(){
+return _33.apply(_34,_32.concat(MVC.Array.from(arguments)));
+};
+},params:MVC.Function.params});
+MVC.Native.extend("Number",{to_padded_string:function(n,len,_37){
+var _38=n.toString(_37||10);
+var ret="",_3a=len-_38.length;
+for(var i=0;i<_3a;i++){
+ret+="0";
+}
+return ret+_38;
+}});
+MVC.Native.Array=MVC.Array;
+MVC.Native.Function=MVC.Function;
+MVC.Native.Number=MVC.Number;
+MVC.Native.String=MVC.String;
+MVC.Object=MVC.Native.Object;
+;
+include.set_path('jmvc/plugins/lang/inflector');
+include.plugins("lang");
+include("inflector");
+;
+include.set_path('jmvc/plugins/lang/inflector');
+MVC.Inflector={Inflections:{plural:[[/(quiz)$/i,"$1zes"],[/^(ox)$/i,"$1en"],[/([m|l])ouse$/i,"$1ice"],[/(matr|vert|ind)ix|ex$/i,"$1ices"],[/(x|ch|ss|sh)$/i,"$1es"],[/([^aeiouy]|qu)y$/i,"$1ies"],[/(hive)$/i,"$1s"],[/(?:([^f])fe|([lr])f)$/i,"$1$2ves"],[/sis$/i,"ses"],[/([ti])um$/i,"$1a"],[/(buffal|tomat)o$/i,"$1oes"],[/(bu)s$/i,"$1ses"],[/(alias|status)$/i,"$1es"],[/(octop|vir)us$/i,"$1i"],[/(ax|test)is$/i,"$1es"],[/s$/i,"s"],[/$/,"s"]],singular:[[/(quiz)zes$/i,"$1"],[/(matr)ices$/i,"$1ix"],[/(vert|ind)ices$/i,"$1ex"],[/^(ox)en/i,"$1"],[/(alias|status)es$/i,"$1"],[/(octop|vir)i$/i,"$1us"],[/(cris|ax|test)es$/i,"$1is"],[/(shoe)s$/i,"$1"],[/(o)es$/i,"$1"],[/(bus)es$/i,"$1"],[/([m|l])ice$/i,"$1ouse"],[/(x|ch|ss|sh)es$/i,"$1"],[/(m)ovies$/i,"$1ovie"],[/(s)eries$/i,"$1eries"],[/([^aeiouy]|qu)ies$/i,"$1y"],[/([lr])ves$/i,"$1f"],[/(tive)s$/i,"$1"],[/(hive)s$/i,"$1"],[/([^f])ves$/i,"$1fe"],[/(^analy)ses$/i,"$1sis"],[/((a)naly|(b)a|(d)iagno|(p)arenthe|(p)rogno|(s)ynop|(t)he)ses$/i,"$1$2sis"],[/([ti])a$/i,"$1um"],[/(n)ews$/i,"$1ews"],[/s$/i,""]],irregular:[["move","moves"],["sex","sexes"],["child","children"],["man","men"],["foreman","foremen"],["person","people"]],uncountable:["sheep","fish","series","species","money","rice","information","equipment"]},pluralize:function(_1){
+for(var i=0;i<MVC.Inflector.Inflections.uncountable.length;i++){
+var _3=MVC.Inflector.Inflections.uncountable[i];
+if(_1.toLowerCase()==_3){
+return _3;
+}
+}
+for(var i=0;i<MVC.Inflector.Inflections.irregular.length;i++){
+var _4=MVC.Inflector.Inflections.irregular[i][0];
+var _5=MVC.Inflector.Inflections.irregular[i][1];
+if((_1.toLowerCase()==_4)||(_1==_5)){
+return _1.substring(0,1)+_5.substring(1);
+}
+}
+for(var i=0;i<MVC.Inflector.Inflections.plural.length;i++){
+var _6=MVC.Inflector.Inflections.plural[i][0];
+var _7=MVC.Inflector.Inflections.plural[i][1];
+if(_6.test(_1)){
+return _1.replace(_6,_7);
+}
+}
+},singularize:function(_8){
+for(var i=0;i<MVC.Inflector.Inflections.uncountable.length;i++){
+var _a=MVC.Inflector.Inflections.uncountable[i];
+if(_8.toLowerCase()==_a){
+return _a;
+}
+}
+for(var i=0;i<MVC.Inflector.Inflections.irregular.length;i++){
+var _b=MVC.Inflector.Inflections.irregular[i][0];
+var _c=MVC.Inflector.Inflections.irregular[i][1];
+if((_8.toLowerCase()==_b)||(_8.toLowerCase()==_c)){
+return _8.substring(0,1)+_b.substring(1);
+}
+}
+for(var i=0;i<MVC.Inflector.Inflections.singular.length;i++){
+var _d=MVC.Inflector.Inflections.singular[i][0];
+var _e=MVC.Inflector.Inflections.singular[i][1];
+if(_d.test(_8)){
+return _8.replace(_d,_e);
 }
 }
 }};
-if(!MVC._no_conflict){
-Ajax=MVC.Ajax;
+MVC.Native.extend("String",{pluralize:function(_f,_10,_11){
+if(typeof _10=="undefined"){
+return MVC.Inflector.pluralize(_f);
+}else{
+return _10+" "+(1==parseInt(_10)?_f:_11||MVC.Inflector.pluralize(_f));
 }
+},singularize:function(_12,_13){
+if(typeof _13=="undefined"){
+return MVC.Inflector.singularize(_12);
+}else{
+return _13+" "+MVC.Inflector.singularize(_12);
+}
+},is_singular:function(_14){
+if(MVC.String.singularize(_14)==null&&_14){
+return true;
+}
+return false;
+}});
 ;
 include.set_path('jmvc/plugins/lang/class');
 (function(){
@@ -504,391 +501,392 @@ if(!MVC._no_conflict&&typeof Class=="undefined"){
 Class=MVC.Class;
 }
 ;
-include.set_path('jmvc/plugins/view');
-MVC.View=function(_1){
-this.set_options(_1);
-if(_1.precompiled){
-this.template={};
-this.template.process=_1.precompiled;
-MVC.View.update(this.name,this);
+include.set_path('jmvc/plugins/lang/openajax');
+if(!window["OpenAjax"]){
+OpenAjax=new function(){
+var t=true;
+var f=false;
+var g=window;
+var _4="org.openajax.hub.";
+var h={};
+this.hub=h;
+h.implementer="http://openajax.org";
+h.implVersion="1.0";
+h.specVersion="1.0";
+h.implExtraData={};
+var _6={};
+h.libraries=_6;
+h.registerLibrary=function(_7,_8,_9,_a){
+_6[_7]={prefix:_7,namespaceURI:_8,version:_9,extraData:_a};
+this.publish(_4+"registerLibrary",_6[_7]);
+};
+h.unregisterLibrary=function(_b){
+this.publish(_4+"unregisterLibrary",_6[_b]);
+delete _6[_b];
+};
+h._subscriptions={c:{},s:[]};
+h._cleanup=[];
+h._subIndex=0;
+h._pubDepth=0;
+h.subscribe=function(_c,_d,_e,_f,_10){
+if(!_e){
+_e=window;
+}
+var _11=_c+"."+this._subIndex;
+var sub={scope:_e,cb:_d,fcb:_10,data:_f,sid:this._subIndex++,hdl:_11};
+var _13=_c.split(".");
+this._subscribe(this._subscriptions,_13,0,sub);
+return _11;
+};
+h.publish=function(_14,_15){
+var _16=_14.split(".");
+this._pubDepth++;
+this._publish(this._subscriptions,_16,0,_14,_15);
+this._pubDepth--;
+if((this._cleanup.length>0)&&(this._pubDepth==0)){
+for(var i=0;i<this._cleanup.length;i++){
+this.unsubscribe(this._cleanup[i].hdl);
+}
+delete (this._cleanup);
+this._cleanup=[];
+}
+};
+h.unsubscribe=function(sub){
+var _19=sub.split(".");
+var sid=_19.pop();
+this._unsubscribe(this._subscriptions,_19,0,sid);
+};
+h._subscribe=function(_1b,_1c,_1d,sub){
+var _1f=_1c[_1d];
+if(_1d==_1c.length){
+_1b.s.push(sub);
+}else{
+if(typeof _1b.c=="undefined"){
+_1b.c={};
+}
+if(typeof _1b.c[_1f]=="undefined"){
+_1b.c[_1f]={c:{},s:[]};
+this._subscribe(_1b.c[_1f],_1c,_1d+1,sub);
+}else{
+this._subscribe(_1b.c[_1f],_1c,_1d+1,sub);
+}
+}
+};
+h._publish=function(_20,_21,_22,_23,msg,pcb,_26){
+if(typeof _20!="undefined"){
+var _27;
+if(_22==_21.length){
+_27=_20;
+}else{
+this._publish(_20.c[_21[_22]],_21,_22+1,_23,msg,pcb,_26);
+this._publish(_20.c["*"],_21,_22+1,_23,msg,pcb,_26);
+_27=_20.c["**"];
+}
+if(typeof _27!="undefined"){
+var _28=_27.s;
+var max=_28.length;
+for(var i=0;i<max;i++){
+if(_28[i].cb){
+var sc=_28[i].scope;
+var cb=_28[i].cb;
+var fcb=_28[i].fcb;
+var d=_28[i].data;
+var sid=_28[i].sid;
+var _30=_28[i].cid;
+if(typeof cb=="string"){
+cb=sc[cb];
+}
+if(typeof fcb=="string"){
+fcb=sc[fcb];
+}
+if((!fcb)||(fcb.call(sc,_23,msg,d))){
+if((!pcb)||(pcb(_23,msg,_26,_30))){
+cb.call(sc,_23,msg,d,sid);
+}
+}
+}
+}
+}
+}
+};
+h._unsubscribe=function(_31,_32,_33,sid){
+if(typeof _31!="undefined"){
+if(_33<_32.length){
+var _35=_31.c[_32[_33]];
+this._unsubscribe(_35,_32,_33+1,sid);
+if(_35.s.length==0){
+for(var x in _35.c){
 return;
 }
-if(_1.url||_1.absolute_url||_1.view_url){
-this.name=this.name?this.name:_1.url||_1.absolute_url||"views/"+_1.view_url;
-var _2=_1.absolute_url||(_1.url?MVC.root.join(_1.url+(_1.url.match(/\.ejs/)?"":".ejs")):MVC.root.join("views/"+_1.view_url+(_1.view_url.match(/\.ejs/)?"":".ejs")));
-var _3=MVC.View.get(this.name,this.cache);
-if(_3){
-return _3;
+delete _31.c[_32[_33]];
 }
-if(_3==MVC.View.INVALID_PATH){
-return null;
-}
-this.text=include.request(_2+(this.cache||window._rhino?"":"?"+Math.random()));
-if(this.text==null){
-if(window._rhino){
-print("Exception: "+"There is no template at "+_2);
-}
-throw ({type:"JMVC",message:"There is no template at "+_2});
-}
+return;
 }else{
-if(_1.hasOwnProperty("element")){
-if(typeof _1.element=="string"){
-var _4=_1.element;
-_1.element=MVC.$E(_1.element);
-if(_1.element==null){
-throw _4+"does not exist!";
-}
-}
-if(_1.element.value){
-this.text=_1.element.value;
+var _37=_31.s;
+var max=_37.length;
+for(var i=0;i<max;i++){
+if(sid==_37[i].sid){
+if(this._pubDepth>0){
+_37[i].cb=null;
+this._cleanup.push(_37[i]);
 }else{
-this.text=_1.element.innerHTML;
+_37.splice(i,1);
 }
-this.name=_1.element.id;
-this.type="[";
-}
-}
-var _3=new MVC.View.Compiler(this.text,this.type);
-_3.compile(_1);
-MVC.View.update(this.name,this);
-this.template=_3;
-};
-MVC.View.prototype={render:function(_5,_6){
-_5=_5||{};
-var v=new MVC.View.Helpers(_5);
-MVC.Object.extend(v,_6||{});
-return this.template.process.call(_5,_5,v);
-},out:function(){
-return this.template.out;
-},set_options:function(_8){
-this.type=_8.type!=null?_8.type:MVC.View.type;
-this.cache=_8.cache!=null?_8.cache:MVC.View.cache;
-this.text=_8.text!=null?_8.text:null;
-this.name=_8.name!=null?_8.name:null;
-},update:function(_9,_a){
-if(typeof _9=="string"){
-_9=MVC.$E(_9);
-}
-if(_a==null){
-_template=this;
-return function(_b){
-MVC.View.prototype.update.call(_template,_9,_b);
-};
-}
-if(typeof _a=="string"){
-params={};
-params.url=_a;
-_template=this;
-params.onComplete=function(_c){
-var _d=eval("("+_c.responseText+")");
-MVC.View.prototype.update.call(_template,_9,_d);
-};
-if(!MVC.Ajax){
-alert("You must include the Ajax plugin to use this feature");
-}
-new MVC.Ajax(params.url,params);
-}else{
-_9.innerHTML=this.render(_a);
-}
-}};
-MVC.View.Scanner=function(_e,_f,_10){
-this.left_delimiter=_f+"%";
-this.right_delimiter="%"+_10;
-this.double_left=_f+"%%";
-this.double_right="%%"+_10;
-this.left_equal=_f+"%=";
-this.left_comment=_f+"%#";
-if(_f=="["){
-this.SplitRegexp=/(\[%%)|(%%\])|(\[%=)|(\[%#)|(\[%)|(%\]\n)|(%\])|(\n)/;
-}else{
-this.SplitRegexp=new RegExp("("+this.double_left+")|(%%"+this.double_right+")|("+this.left_equal+")|("+this.left_comment+")|("+this.left_delimiter+")|("+this.right_delimiter+"\n)|("+this.right_delimiter+")|(\n)");
-}
-this.source=_e;
-this.stag=null;
-this.lines=0;
-};
-MVC.View.Scanner.to_text=function(_11){
-if(_11==null||_11===undefined){
-return "";
-}
-if(_11 instanceof Date){
-return _11.toDateString();
-}
-if(_11.toString){
-return _11.toString();
-}
-return "";
-};
-MVC.View.Scanner.prototype={scan:function(_12){
-scanline=this.scanline;
-regex=this.SplitRegexp;
-if(!this.source==""){
-var _13=MVC.String.rsplit(this.source,/\n/);
-for(var i=0;i<_13.length;i++){
-var _15=_13[i];
-this.scanline(_15,regex,_12);
-}
-}
-},scanline:function(_16,_17,_18){
-this.lines++;
-var _19=MVC.String.rsplit(_16,_17);
-for(var i=0;i<_19.length;i++){
-var _1b=_19[i];
-if(_1b!=null){
-try{
-_18(_1b,this);
-}
-catch(e){
-throw {type:"MVC.View.Scanner",line:this.lines};
-}
-}
-}
-}};
-MVC.View.Buffer=function(_1c,_1d){
-this.line=new Array();
-this.script="";
-this.pre_cmd=_1c;
-this.post_cmd=_1d;
-for(var i=0;i<this.pre_cmd.length;i++){
-this.push(_1c[i]);
-}
-};
-MVC.View.Buffer.prototype={push:function(cmd){
-this.line.push(cmd);
-},cr:function(){
-this.script=this.script+this.line.join("; ");
-this.line=new Array();
-this.script=this.script+"\n";
-},close:function(){
-if(this.line.length>0){
-for(var i=0;i<this.post_cmd.length;i++){
-this.push(pre_cmd[i]);
-}
-this.script=this.script+this.line.join("; ");
-line=null;
-}
-}};
-MVC.View.Compiler=function(_21,_22){
-this.pre_cmd=["var ___ViewO = [];"];
-this.post_cmd=new Array();
-this.source=" ";
-if(_21!=null){
-if(typeof _21=="string"){
-_21=_21.replace(/\r\n/g,"\n");
-_21=_21.replace(/\r/g,"\n");
-this.source=_21;
-}else{
-if(_21.innerHTML){
-this.source=_21.innerHTML;
-}
-}
-if(typeof this.source!="string"){
-this.source="";
-}
-}
-_22=_22||"<";
-var _23=">";
-switch(_22){
-case "[":
-_23="]";
-break;
-case "<":
-break;
-default:
-throw _22+" is not a supported deliminator";
-break;
-}
-this.scanner=new MVC.View.Scanner(this.source,_22,_23);
-this.out="";
-};
-MVC.View.Compiler.prototype={compile:function(_24){
-_24=_24||{};
-this.out="";
-var _25="___ViewO.push(";
-var _26=_25;
-var _27=new MVC.View.Buffer(this.pre_cmd,this.post_cmd);
-var _28="";
-var _29=function(_2a){
-_2a=_2a.replace(/\\/g,"\\\\");
-_2a=_2a.replace(/\n/g,"\\n");
-_2a=_2a.replace(/"/g,"\\\"");
-return _2a;
-};
-this.scanner.scan(function(_2b,_2c){
-if(_2c.stag==null){
-switch(_2b){
-case "\n":
-_28=_28+"\n";
-_27.push(_25+"\""+_29(_28)+"\");");
-_27.cr();
-_28="";
-break;
-case _2c.left_delimiter:
-case _2c.left_equal:
-case _2c.left_comment:
-_2c.stag=_2b;
-if(_28.length>0){
-_27.push(_25+"\""+_29(_28)+"\")");
-}
-_28="";
-break;
-case _2c.double_left:
-_28=_28+_2c.left_delimiter;
-break;
-default:
-_28=_28+_2b;
-break;
-}
-}else{
-switch(_2b){
-case _2c.right_delimiter:
-switch(_2c.stag){
-case _2c.left_delimiter:
-if(_28[_28.length-1]=="\n"){
-_28=MVC.String.chop(_28);
-_27.push(_28);
-_27.cr();
-}else{
-_27.push(_28);
-}
-break;
-case _2c.left_equal:
-_27.push(_26+"(MVC.View.Scanner.to_text("+_28+")))");
-break;
-}
-_2c.stag=null;
-_28="";
-break;
-case _2c.double_right:
-_28=_28+_2c.right_delimiter;
-break;
-default:
-_28=_28+_2b;
-break;
-}
-}
-});
-if(_28.length>0){
-_27.push(_25+"\""+_29(_28)+"\")");
-}
-_27.close();
-this.out=_27.script+";";
-var _2d="this.process = function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {"+this.out+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}};";
-try{
-eval(_2d);
-}
-catch(e){
-if(typeof JSLINT!="undefined"){
-JSLINT(this.out);
-for(var i=0;i<JSLINT.errors.length;i++){
-var _30=JSLINT.errors[i];
-if(_30.reason!="Unnecessary semicolon."){
-_30.line++;
-var e=new Error();
-e.lineNumber=_30.line;
-e.message=_30.reason;
-if(_24.url){
-e.fileName=_24.url;
-}
-throw e;
-}
-}
-}else{
-throw e;
-}
-}
-}};
-MVC.View.config=function(_31){
-MVC.View.cache=_31.cache!=null?_31.cache:MVC.View.cache;
-MVC.View.type=_31.type!=null?_31.type:MVC.View.type;
-var _32={};
-MVC.View.templates_directory=_32;
-MVC.View.get=function(_33,_34){
-if(_34==false){
-return null;
-}
-if(_32[_33]){
-return _32[_33];
-}
-return null;
-};
-MVC.View.update=function(_35,_36){
-if(_35==null){
 return;
 }
-_32[_35]=_36;
-};
-MVC.View.INVALID_PATH=-1;
-};
-MVC.View.config({cache:include.get_env()=="production",type:"<"});
-MVC.View.PreCompiledFunction=function(_37,_38,f){
-new MVC.View({name:_38,precompiled:f});
-};
-MVC.View.Helpers=function(_3a){
-this.data=_3a;
-};
-MVC.View.Helpers.prototype={partial:function(_3b,_3c){
-if(!_3c){
-_3c=this.data;
 }
-return new MVC.View(_3b).render(_3c);
-},to_text:function(_3d,_3e){
-if(_3d==null||_3d===undefined){
-return _3e||"";
 }
-if(_3d instanceof Date){
-return _3d.toDateString();
 }
-if(_3d.toString){
-return _3d.toString().replace(/\n/g,"<br />").replace(/''/g,"'");
+};
+h.reinit=function(){
+for(var lib in OpenAjax.hub.libraries){
+delete OpenAjax.hub.libraries[lib];
 }
-return "";
+OpenAjax.hub.registerLibrary("OpenAjax","http://openajax.org/hub","1.0",{});
+delete OpenAjax._subscriptions;
+OpenAjax._subscriptions={c:{},s:[]};
+delete OpenAjax._cleanup;
+OpenAjax._cleanup=[];
+OpenAjax._subIndex=0;
+OpenAjax._pubDepth=0;
+};
+};
+OpenAjax.hub.registerLibrary("OpenAjax","http://openajax.org/hub","1.0",{});
+}
+OpenAjax.hub.registerLibrary("JavaScriptMVC","http://JavaScriptMVC.com","1.5",{});
+;
+include.set_path('jmvc/plugins/controller');
+MVC.Delegator=function(_1,_2,f){
+this._event=_2;
+this._selector=_1;
+this._func=f;
+if(_2=="contextmenu"&&MVC.Browser.Opera){
+return this.context_for_opera();
+}
+if(_2=="submit"&&MVC.Browser.IE){
+return this.submit_for_ie();
+}
+if(_2=="change"&&MVC.Browser.IE){
+return this.change_for_ie();
+}
+if(_2=="change"&&MVC.Browser.WebKit){
+return this.change_for_webkit();
+}
+this.add_to_delegator();
+};
+MVC.Object.extend(MVC.Delegator,{node_path:function(el){
+var _5=document.documentElement,_6=[],_7=el;
+while(_7!=_5){
+_6.unshift({tag:_7.nodeName,className:_7.className,id:_7.id,element:_7});
+_7=_7.parentNode;
+if(_7==null){
+return [];
+}
+}
+return _6;
+},dispatch_event:function(_8){
+var _9=_8.target,_a=false,_b=true,_c=[];
+var _d=MVC.Delegator.events[_8.type];
+var _e=MVC.Delegator.node_path(_9);
+for(var i=0;i<_d.length;i++){
+var _10=_d[i];
+var _11=_10.match(_9,_8,_e);
+if(_11){
+_c.push(_11);
+}
+}
+if(_c.length==0){
+return true;
+}
+MVC.Delegator.add_kill_event(_8);
+_c.sort(MVC.Delegator.sort_by_order);
+var _12;
+for(var m=0;m<_c.length;m++){
+_12=_c[m];
+_b=_12.delegation_event._func({event:_8,element:MVC.$E(_12.node)})&&_b;
+if(_8.is_killed()){
+return false;
+}
+}
+},add_kill_event:function(_14){
+if(!_14.kill){
+var _15=false;
+_14.kill=function(){
+_15=true;
+if(!_14){
+_14=window.event;
+}
+try{
+_14.cancelBubble=true;
+if(_14.stopPropagation){
+_14.stopPropagation();
+}
+if(_14.preventDefault){
+_14.preventDefault();
+}
+}
+catch(e){
+}
+};
+_14.is_killed=function(){
+return _15;
+};
+}
+},sort_by_order:function(a,b){
+if(a.order<b.order){
+return 1;
+}
+if(b.order<a.order){
+return -1;
+}
+var ae=a._event,be=b._event;
+if(ae=="click"&&be=="change"){
+return 1;
+}
+if(be=="click"&&ae=="change"){
+return -1;
+}
+return 0;
+},events:{}});
+MVC.Delegator.prototype={event:function(){
+if(MVC.Browser.IE){
+if(this._event=="focus"){
+return "activate";
+}else{
+if(this._event=="blur"){
+return "deactivate";
+}
+}
+}
+return this._event;
+},capture:function(){
+return MVC.Array.include(["focus","blur"],this._event);
+},add_to_delegator:function(_1a,_1b,_1c){
+var s=_1a||this._selector;
+var e=_1b||this.event();
+var f=_1c||this._func;
+if(!MVC.Delegator.events[e]){
+MVC.Event.observe(document.documentElement,e,MVC.Delegator.dispatch_event,this.capture());
+MVC.Delegator.events[e]=[];
+}
+MVC.Delegator.events[e].push(this);
+},submit_for_ie:function(){
+this.add_to_delegator(null,"click");
+this.add_to_delegator(null,"keypress");
+this.filters={click:function(el,_21,_22){
+if(el.nodeName.toUpperCase()=="INPUT"&&el.type.toLowerCase()=="submit"){
+for(var e=0;e<_22.length;e++){
+if(_22[e].tag=="FORM"){
+return true;
+}
+}
+}
+return false;
+},keypress:function(el,_25,_26){
+if(el.nodeName.toUpperCase()!="INPUT"){
+return false;
+}
+var res=typeof Prototype!="undefined"?(_25.keyCode==13):(_25.charCode==13);
+if(res){
+for(var e=0;e<_26.length;e++){
+if(_26[e].tag=="FORM"){
+return true;
+}
+}
+}
+return false;
 }};
-include.view=function(_3f){
-if(include.get_env()=="development"){
-new MVC.View({url:new MVC.File("../"+_3f).join_current()});
+},change_for_ie:function(){
+this.add_to_delegator(null,"click");
+this.end_filters={click:function(el,_2a){
+if(typeof el.selectedIndex=="undefined"||el.nodeName.toUpperCase()!="SELECT"){
+return false;
+}
+var old=el.getAttribute("_old_value");
+if(old==null){
+el.setAttribute("_old_value",el.selectedIndex);
+return false;
 }else{
-if(include.get_env()=="compress"){
-include({path:"../"+_3f,process:MVC.View.process_include,ignore:true});
-new MVC.View({url:new MVC.File("../"+_3f).join_current()});
+if(old==el.selectedIndex.toString()){
+return false;
+}
+el.setAttribute("_old_value",null);
+return true;
+}
+}};
+},change_for_webkit:function(){
+this.add_to_delegator(null,"change");
+this.end_filters={change:function(el,_2d){
+if(typeof el.value=="undefined"){
+return false;
+}
+var old=el.getAttribute("_old_value");
+el.setAttribute("_old_value",el.value);
+return el.value!=old;
+}};
+},context_for_opera:function(){
+this.add_to_delegator(null,"click");
+this.end_filters={click:function(el,_30){
+return _30.shiftKey;
+}};
+},regexp_patterns:{tag:/^\s*(\*|[\w\-]+)(\b|$)?/,id:/^#([\w\-\*]+)(\b|$)/,className:/^\.([\w\-\*]+)(\b|$)/},selector_order:function(){
+if(this.order){
+return this.order;
+}
+var _31=this._selector.split(/\s+/);
+var _32=this.regexp_patterns;
+var _33=[];
+for(var i=0;i<_31.length;i++){
+var v={},r,p=_31[i];
+for(var _38 in _32){
+if(_32.hasOwnProperty(_38)){
+if((r=p.match(_32[_38]))){
+if(_38=="tag"){
+v[_38]=r[1].toUpperCase();
 }else{
+v[_38]=r[1];
+}
+p=p.replace(r[0],"");
 }
 }
-};
-include.views=function(){
-for(var i=0;i<arguments.length;i++){
-include.view(arguments[i]+".ejs");
 }
-};
-MVC.View.process_include=function(_41){
-var _42=new MVC.View({text:_41.text});
-return "MVC.View.PreCompiledFunction(\""+_41.original_path+"\", \""+_41.path+"\",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {"+_42.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
-};
-if(!MVC._no_conflict){
-View=MVC.View;
+_33.push(v);
 }
-MVC.Native.extend("String",{rsplit:function(_43,_44){
-var _45=_44.exec(_43);
-var _46=new Array();
-while(_45!=null){
-var _47=_45.index;
-var _48=_44.lastIndex;
-if((_47)!=0){
-var _49=_43.substring(0,_47);
-_46.push(_43.substring(0,_47));
-_43=_43.slice(_47);
+this.order=_33;
+return this.order;
+},match:function(el,_3a,_3b){
+if(this.filters&&!this.filters[_3a.type](el,_3a,_3b)){
+return null;
 }
-_46.push(_45[0]);
-_43=_43.slice(_45[0].length);
-_45=_44.exec(_43);
+var _3c=0;
+for(var n=0;n<_3b.length;n++){
+var _3e=_3b[n],_3f=this.selector_order()[_3c],_40=true;
+for(var _41 in _3f){
+if(!_3f.hasOwnProperty(_41)||_41=="element"){
+continue;
 }
-if(!_43==""){
-_46.push(_43);
+if(_3f[_41]&&_41=="className"){
+if(!MVC.Array.include(_3e.className.split(" "),_3f[_41])){
+_40=false;
 }
-return _46;
-},chop:function(_4a){
-return _4a.substr(0,_4a.length-1);
-}});
+}else{
+if(_3f[_41]&&_3e[_41]!=_3f[_41]){
+_40=false;
+}
+}
+}
+if(_40){
+_3c++;
+if(_3c>=this.selector_order().length){
+if(this.end_filters&&!this.end_filters[_3a.type](el,_3a)){
+return null;
+}
+return {node:_3e.element,order:n,delegation_event:this};
+}
+}
+}
+return null;
+}};
 ;
 include.set_path('jmvc/plugins/controller');
 MVC.Object.is_number=function(o){
@@ -1162,330 +1160,68 @@ if(!MVC._no_conflict&&typeof Controller=="undefined"){
 Controller=MVC.Controller;
 }
 ;
-include.set_path('jmvc/plugins/controller');
-MVC.Delegator=function(_1,_2,f){
-this._event=_2;
-this._selector=_1;
-this._func=f;
-if(_2=="contextmenu"&&MVC.Browser.Opera){
-return this.context_for_opera();
+include.set_path('jmvc/plugins/controller/comet');
+MVC.Controller.Comet=MVC.Controller.extend({init:function(){
+},run:function(_1){
+var _2=new this();
+_2.run(_1);
+},kill:function(){
+var _3=new this();
+_3.kill();
+},convert:function(_4){
+return _4;
+},set_wait_time:function(_5){
+this._wait_time=_5*1000;
+if(this._comet){
+this._comet.poll_now();
 }
-if(_2=="submit"&&MVC.Browser.IE){
-return this.submit_for_ie();
-}
-if(_2=="change"&&MVC.Browser.IE){
-return this.change_for_ie();
-}
-if(_2=="change"&&MVC.Browser.WebKit){
-return this.change_for_webkit();
-}
-this.add_to_delegator();
-};
-MVC.Object.extend(MVC.Delegator,{node_path:function(el){
-var _5=document.documentElement,_6=[],_7=el;
-while(_7!=_5){
-_6.unshift({tag:_7.nodeName,className:_7.className,id:_7.id,element:_7});
-_7=_7.parentNode;
-if(_7==null){
-return [];
-}
-}
-return _6;
-},dispatch_event:function(_8){
-var _9=_8.target,_a=false,_b=true,_c=[];
-var _d=MVC.Delegator.events[_8.type];
-var _e=MVC.Delegator.node_path(_9);
-for(var i=0;i<_d.length;i++){
-var _10=_d[i];
-var _11=_10.match(_9,_8,_e);
-if(_11){
-_c.push(_11);
-}
-}
-if(_c.length==0){
-return true;
-}
-MVC.Delegator.add_kill_event(_8);
-_c.sort(MVC.Delegator.sort_by_order);
-var _12;
-for(var m=0;m<_c.length;m++){
-_12=_c[m];
-_b=_12.delegation_event._func({event:_8,element:MVC.$E(_12.node)})&&_b;
-if(_8.is_killed()){
-return false;
-}
-}
-},add_kill_event:function(_14){
-if(!_14.kill){
-var _15=false;
-_14.kill=function(){
-_15=true;
-if(!_14){
-_14=window.event;
-}
-try{
-_14.cancelBubble=true;
-if(_14.stopPropagation){
-_14.stopPropagation();
-}
-if(_14.preventDefault){
-_14.preventDefault();
-}
-}
-catch(e){
-}
-};
-_14.is_killed=function(){
-return _15;
-};
-}
-},sort_by_order:function(a,b){
-if(a.order<b.order){
-return 1;
-}
-if(b.order<a.order){
-return -1;
-}
-var ae=a._event,be=b._event;
-if(ae=="click"&&be=="change"){
-return 1;
-}
-if(be=="click"&&ae=="change"){
-return -1;
-}
-return 0;
-},events:{}});
-MVC.Delegator.prototype={event:function(){
-if(MVC.Browser.IE){
-if(this._event=="focus"){
-return "activate";
-}else{
-if(this._event=="blur"){
-return "deactivate";
-}
-}
-}
-return this._event;
-},capture:function(){
-return MVC.Array.include(["focus","blur"],this._event);
-},add_to_delegator:function(_1a,_1b,_1c){
-var s=_1a||this._selector;
-var e=_1b||this.event();
-var f=_1c||this._func;
-if(!MVC.Delegator.events[e]){
-MVC.Event.observe(document.documentElement,e,MVC.Delegator.dispatch_event,this.capture());
-MVC.Delegator.events[e]=[];
-}
-MVC.Delegator.events[e].push(this);
-},submit_for_ie:function(){
-this.add_to_delegator(null,"click");
-this.add_to_delegator(null,"keypress");
-this.filters={click:function(el,_21,_22){
-if(el.nodeName.toUpperCase()=="INPUT"&&el.type.toLowerCase()=="submit"){
-for(var e=0;e<_22.length;e++){
-if(_22[e].tag=="FORM"){
-return true;
-}
-}
-}
-return false;
-},keypress:function(el,_25,_26){
-if(el.nodeName.toUpperCase()!="INPUT"){
-return false;
-}
-var res=typeof Prototype!="undefined"?(_25.keyCode==13):(_25.charCode==13);
-if(res){
-for(var e=0;e<_26.length;e++){
-if(_26[e].tag=="FORM"){
-return true;
-}
-}
-}
-return false;
-}};
-},change_for_ie:function(){
-this.add_to_delegator(null,"click");
-this.end_filters={click:function(el,_2a){
-if(typeof el.selectedIndex=="undefined"||el.nodeName.toUpperCase()!="SELECT"){
-return false;
-}
-var old=el.getAttribute("_old_value");
-if(old==null){
-el.setAttribute("_old_value",el.selectedIndex);
-return false;
-}else{
-if(old==el.selectedIndex.toString()){
-return false;
-}
-el.setAttribute("_old_value",null);
-return true;
-}
-}};
-},change_for_webkit:function(){
-this.add_to_delegator(null,"change");
-this.end_filters={change:function(el,_2d){
-if(typeof el.value=="undefined"){
-return false;
-}
-var old=el.getAttribute("_old_value");
-el.setAttribute("_old_value",el.value);
-return el.value!=old;
-}};
-},context_for_opera:function(){
-this.add_to_delegator(null,"click");
-this.end_filters={click:function(el,_30){
-return _30.shiftKey;
-}};
-},regexp_patterns:{tag:/^\s*(\*|[\w\-]+)(\b|$)?/,id:/^#([\w\-\*]+)(\b|$)/,className:/^\.([\w\-\*]+)(\b|$)/},selector_order:function(){
-if(this.order){
-return this.order;
-}
-var _31=this._selector.split(/\s+/);
-var _32=this.regexp_patterns;
-var _33=[];
-for(var i=0;i<_31.length;i++){
-var v={},r,p=_31[i];
-for(var _38 in _32){
-if(_32.hasOwnProperty(_38)){
-if((r=p.match(_32[_38]))){
-if(_38=="tag"){
-v[_38]=r[1].toUpperCase();
-}else{
-v[_38]=r[1];
-}
-p=p.replace(r[0],"");
-}
-}
-}
-_33.push(v);
-}
-this.order=_33;
-return this.order;
-},match:function(el,_3a,_3b){
-if(this.filters&&!this.filters[_3a.type](el,_3a,_3b)){
-return null;
-}
-var _3c=0;
-for(var n=0;n<_3b.length;n++){
-var _3e=_3b[n],_3f=this.selector_order()[_3c],_40=true;
-for(var _41 in _3f){
-if(!_3f.hasOwnProperty(_41)||_41=="element"){
+},_wait_time:0,wait_time:function(){
+return this._wait_time;
+},dispatch:function(_6){
+var _7=this.convert(_6);
+for(var _8 in _6){
+if(_8=="responseText"){
 continue;
 }
-if(_3f[_41]&&_41=="className"){
-if(!MVC.Array.include(_3e.className.split(" "),_3f[_41])){
-_40=false;
+var _9=_6[_8];
+for(var _a in _9){
+var _b=_9[_a];
+if(this.models_map[_8]!=null){
+if(this.models_map[_8]!=false){
+_b=this.models_map[_8].create_many_as_existing(_b);
 }
 }else{
-if(_3f[_41]&&_3e[_41]!=_3f[_41]){
-_40=false;
+if(MVC.Model.models[_8.toLowerCase()]){
+_b=MVC.Model.models[_8.toLowerCase()].create_many_as_existing(_b);
 }
 }
-}
-if(_40){
-_3c++;
-if(_3c>=this.selector_order().length){
-if(this.end_filters&&!this.end_filters[_3a.type](el,_3a)){
-return null;
-}
-return {node:_3e.element,order:n,delegation_event:this};
+var _c=this.controller_map[_8]?this.controller_map[_8]:MVC.String.pluralize(_8).toLowerCase();
+MVC.Controller.publish(_c+"."+_a,{data:_b});
 }
 }
+},controller_map:{},error_mode:false},{run:function(){
+this.start_polling();
+},start_polling:function(){
+this.Class._comet=new MVC.Comet((this.Class.domain?this.Class.domain:"")+"/"+this.Class.className,{method:"get",onComplete:this.continue_to("complete"),onSuccess:this.continue_to("success"),onFailure:this.continue_to("failure"),parameters:this.Class.parameters||null,session:this.Class.session||null,transport:this.Class.transport,wait_time:MVC.Function.bind(this.Class.wait_time,this.Class)});
+},failure:function(){
+this.error_mode=true;
+this.run();
+},success:function(_d){
+this.Class.dispatch(_d);
+},complete:function(){
+if(this.error_mode&&this.restore_from_failure){
+this.restore_from_failure();
 }
-return null;
-}};
+this.error_mode=false;
+},kill:function(){
+if(this.Class._comet){
+this.Class._comet.kill();
+}
+}});
 ;
-include.set_path('jmvc/plugins/controller/view');
-MVC.Controller.prototype.render=function(_1){
-var _2,_3=MVC.RENDER_TO,_4;
-var _5=this.Class.className;
-var _6=this.action_name;
-if(!_1){
-_1={};
-}
-var _7={};
-if(_1.helpers){
-for(var h=0;h<_1.helpers.length;h++){
-var n=MVC.String.classize(_1.helpers[h]);
-MVC.Object.extend(_7,window[n]?window[n].View().helpers:{});
-}
-}
-if(typeof _1=="string"){
-_2=new MVC.View({url:_1}).render(this,_7);
-}else{
-if(_1.text){
-_2=_1.text;
-}else{
-var _a=function(_b){
-var _b=MVC.String.include(_b,"/")?_b.split("/").join("/_"):_5+"/"+_b;
-var _b=_b+".ejs";
-return _b;
-};
-if(_1.plugin){
-_4="../jmvc/plugins/"+_1.plugin;
-}
-if(_1.action){
-var _c="../views/"+_a(_1.action);
-}else{
-if(_1.partial){
-var _c="../views/"+_a(_1.partial);
-}else{
-var _c="../views/"+_5+"/"+_6.replace(/\.|#/g,"").replace(/ /g,"_")+".ejs";
-}
-}
-var _d=this;
-if(_1.locals){
-for(var _e in _1.locals){
-_d[_e]=_1.locals[_e];
-}
-}
-var _f;
-if(!_4){
-_f=new MVC.View({url:new MVC.File(_c).join_from(this.Class._path)});
-}else{
-try{
-var _f=new MVC.View({url:MVC.View.get(_4)?_4:_c});
-}
-catch(e){
-if(e.type!="JMVC"){
-throw e;
-}
-var _f=new MVC.View({url:_4});
-}
-}
-_2=_f.render(_d,_7);
-}
-}
-var _10=["to","before","after","top","bottom"];
-var _11=null;
-for(var l=0;l<_10.length;l++){
-if(typeof _1[_10[l]]=="string"){
-var id=_1[_10[l]];
-_1[_10[l]]=MVC.$E(id);
-if(!_1[_10[l]]){
-throw {message:"Can't find element with id: "+id,name:"ControllerView: Missing Element"};
-}
-}
-if(_1[_10[l]]){
-_11=_1[_10[l]];
-if(_10[l]=="to"){
-if(MVC.$E.update){
-MVC.$E.update(_1.to,_2);
-}else{
-_1.to.innerHTML=_2;
-}
-}else{
-if(!MVC.$E.insert){
-throw {message:"Include can't insert "+_10[l]+" without the element plugin.",name:"ControllerView: Missing Plugin"};
-}
-var opt={};
-opt[_10[l]]=_2;
-MVC.$E.insert(_11,opt);
-}
-}
-}
-return _2;
-};
+include.set_path('jmvc/plugins/controller/dragdrop');
+include.plugins("controller","dom/element","dom/query","dom/position","dom/animate");
+include("drag","drop");
 ;
 include.set_path('jmvc/plugins/dom/element');
 include.plugins("lang/vector");
@@ -1494,24 +1230,6 @@ include("element");
 include.set_path('jmvc/plugins/lang/vector');
 include.plugins("lang","dom/event");
 include("vector");
-;
-include.set_path('jmvc/plugins/lang');
-if(typeof Prototype!="undefined"){
-include({path:"prototype_helpers.js",shrink_variables:false});
-}else{
-if(typeof jQuery!="undefined"){
-include({path:"jquery_helpers.js",shrink_variables:false});
-}else{
-include({path:"standard_helpers.js",shrink_variables:false});
-}
-}
-;
-include.set_path('jmvc/plugins/dom/event');
-if(typeof Prototype=="undefined"){
-include("standard");
-}else{
-include("prototype_event");
-}
 ;
 include.set_path('jmvc/plugins/lang/vector');
 MVC.Vector=function(){
@@ -1796,784 +1514,6 @@ MVC.$E=MVC.Element;
 if(!MVC._no_conflict){
 $E=MVC.$E;
 }
-;
-include.set_path('jmvc/plugins/controller/scaffold');
-MVC.Controller.scaffold=function(){
-if(!this.className){
-return;
-}
-var _1=MVC.String.singularize(MVC.String.classize(this.className));
-this.scaffold_model=window[_1];
-this.singular_name=MVC.String.singularize(this.className);
-for(var _2 in MVC.Controller.scaffold.functions){
-if(this.prototype[_2]){
-continue;
-}
-this.prototype[_2]=MVC.Controller.scaffold.functions[_2];
-}
-if(!window[_1+"ViewHelper"]){
-this.scaffold_view_helper=window[_1+"ViewHelper"]=MVC.ModelViewHelper.extend(this.singular_name);
-}else{
-this.scaffold_view_helper=window[_1+"ViewHelper"];
-}
-};
-MVC.Controller.scaffold.functions={load:function(_3){
-if(!MVC.$E(this.Class.className)){
-var _4=document.createElement("div");
-_4.id=this.Class.className;
-document.body.appendChild(_4);
-}
-this.Class.scaffold_model.find("all",{},this.continue_to("list"));
-},list:function(_5){
-this.singular_name=this.Class.singular_name;
-this[this.Class.className]=_5;
-this.controller_name=this.Class.className;
-this.objects=_5;
-this.render({to:this.Class.className,plugin:"controller/scaffold/display",action:this.Class.className});
-},"# form submit":function(_6){
-_6.event.kill();
-this.Class.scaffold_model.create(_6.form_params()[this.Class.singular_name],this.continue_to("created"));
-},created:function(_7){
-if(_7.errors.length>0){
-_7.View().show_errors();
-}else{
-this.Class.scaffold_model.View().clear();
-_7.View().clear_errors();
-this[this.Class.className]=[_7];
-this.objects=[_7];
-this.singular_name=this.Class.singular_name;
-this.render({bottom:"recipe_list",plugin:"controller/scaffold/list",action:"list"});
-}
-},".delete click":function(_8){
-this[this.Class.singular_name]=_8.object_data();
-if(confirm("Are you sure you want to delete")){
-this[this.Class.singular_name].destroy(this.continue_to("destroyed"));
-}
-},".edit click":function(_9){
-this[this.Class.singular_name]=_9.object_data();
-this.singular_name=this.Class.singular_name;
-this.render({to:this[this.Class.singular_name].View().element_id(),action:"edit",plugin:"controller/scaffold/edit"});
-},".cancel click":function(_a){
-this.show(_a.object_data());
-},".save click":function(_b){
-this[this.Class.singular_name]=_b.object_data();
-var _c=this[this.Class.singular_name].View().edit_values();
-this[this.Class.singular_name].update_attributes(_c,this.continue_to("show"));
-},show:function(_d){
-this[this.Class.singular_name]=_d;
-this.singular_name=this.Class.singular_name;
-this.render({to:this[this.Class.singular_name].View().element_id(),action:"show",plugin:"controller/scaffold/show"});
-},destroyed:function(_e){
-if(_e){
-this[this.Class.singular_name].View().destroy();
-}
-}};
-;
-include.set_path('jmvc/plugins/model/view_helper');
-include("model_view_helper");
-;
-include.set_path('jmvc/plugins/model/view_helper');
-MVC.ModelViewHelper=MVC.Class.extend({init:function(){
-if(!this.className){
-return;
-}
-var _1;
-if(!this.className){
-return;
-}
-if(!(_1=this.modelClass=window[MVC.String.classize(this.className)])){
-throw "ModelViewHelpers can't find class "+this.className;
-}
-var _2=this;
-this.modelClass.View=function(){
-return _2;
-};
-this.modelClass.prototype.View=function(){
-return new _2(this);
-};
-if(this.modelClass.attributes){
-this._view=new MVC.View.Helpers({});
-var _3;
-for(var _4 in this.modelClass.attributes){
-if(!this.modelClass.attributes.hasOwnProperty(_4)||typeof this.modelClass.attributes[_4]!="string"){
-continue;
-}
-this.add_helper(_4);
-}
-}
-},form_helper:function(_5){
-if(!this.helpers[_5]+"_field"){
-this.add_helper(_5);
-}
-var f=this.helpers[_5+"_field"];
-var _7=MVC.Array.from(arguments);
-_7.shift();
-return f.apply(this._view,_7);
-},add_helper:function(_8){
-var h=this._helper(_8);
-this.helpers[_8+"_field"]=h;
-},helpers:{},_helper:function(_a){
-var _b=this._view_helper(_a);
-var _c=this;
-var _d=this.modelClass.className+"["+_a+"]";
-var id=this.modelClass.className+"_"+_a;
-return function(){
-var _f=MVC.Array.from(arguments);
-_f.unshift(_d);
-_f[2]=_f[2]||{};
-_f[2].id=id;
-return _b.apply(_c._view,_f);
-};
-},_view_helper:function(_10){
-switch(this.modelClass.attributes[_10].toLowerCase()){
-case "boolean":
-return this._view.check_box_tag;
-case "text":
-return this._view.text_area_tag;
-default:
-return this._view.text_field_tag;
-}
-},clear:function(){
-var _11=this.modelClass.className,el;
-for(var _13 in this.modelClass.attributes){
-if((el=MVC.$E(_11+"_"+_13))){
-el.value="";
-}
-}
-},from_html:function(_14){
-var el=MVC.$E(_14);
-var _16=this.modelClass?this.modelClass:window[MVC.String.classize(el.getAttribute("type"))];
-if(!_16){
-return null;
-}
-var _17={};
-_17[_16.id]=this.element_id_to_id(el.id);
-return _16.create_as_existing(_17);
-},element_id_to_id:function(_18){
-var re=new RegExp(this.className+"_","");
-return _18.replace(re,"");
-}},{init:function(_1a){
-this._inst=_1a;
-this._className=this._inst.Class.className;
-this._Class=this._inst.Class;
-},id:function(){
-return this._inst[this._inst.Class.id];
-},element:function(){
-if(this._element){
-return this._element;
-}
-this._element=MVC.$E(this.element_id());
-if(this._element){
-return this._element;
-}
-},create_element:function(){
-this._element=document.createElement("div");
-this._element.id=this.element_id();
-this._element.className=this._className;
-this._element.setAttribute("type",this._className);
-return this._element;
-},element_id:function(){
-return this._className+"_"+this._inst[this._inst.Class.id];
-},show_errors:function(){
-var err=MVC.$E(this._className+"_error");
-var err=err||MVC.$E(this._className+"_error");
-var _1c=[];
-for(var i=0;i<this._inst.errors.length;i++){
-var _1e=this._inst.errors[i];
-var el=MVC.$E(this._className+"_"+_1e[0]);
-if(el){
-el.className="error";
-var _20=MVC.$E(this._className+"_"+_1e[0]+"_error");
-if(_20){
-_20.innerHTML=_1e[1];
-}
-}else{
-_1c.push(_1e[0]+" is "+_1e[1]);
-}
-}
-if(_1c.length>0){
-if(err){
-err.innerHTML=_1c.join(", ");
-}else{
-alert(_1c.join(", "));
-}
-}
-},clear_errors:function(){
-var p;
-var cn=this._className;
-for(var _23 in this._Class.attributes){
-if(this._Class.attributes.hasOwnProperty(_23)){
-var el=MVC.$E(cn+"_"+p);
-if(el){
-el.className=el.className.replace(/(^|\\s+)error(\\s+|$)/," ");
-}
-var _25=MVC.$E(cn+"_"+_23+"_error");
-if(_25){
-_25.innerHTML="&nbsp;";
-}
-}
-}
-var _26=MVC.$E(cn+"_error");
-if(_26){
-_26.innerHTML="";
-}
-},edit:function(_27){
-var _28=MVC.Array.from(arguments);
-var _29=this._className+"["+_27+"]";
-_28.shift();
-_28.unshift({id:this.edit_id(_27)});
-_28.unshift(this._inst[_27]);
-_28.unshift(_29);
-var _2a=this.Class._view_helper(_27);
-return _2a.apply(this.Class._view,_28);
-},edit_values:function(){
-var _2b={};
-var cn=this._className,p,el;
-for(var _2f in this._Class.attributes){
-if(this._Class.attributes.hasOwnProperty(_2f)){
-el=MVC.$E(this.edit_id(_2f));
-}
-if(el){
-_2b[_2f]=el.value;
-}
-}
-return _2b;
-},edit_id:function(_30){
-return this._className+"_"+this._inst.id+"_"+_30+"_edit";
-},destroy:function(){
-var el=this.element();
-el.parentNode.removeChild(el);
-}});
-MVC.Controller.Params.prototype.object_data=function(){
-var _32=this._className(),_33,_34=this.element,_35=new RegExp("^"+_32+"_(.*)$");
-if(!(_33=MVC.Model.models[_32])){
-return;
-}
-while(_34&&_34.parentNode&&!_34.id.match(_35)){
-_34=_34.parentNode;
-}
-if(!_34){
-return null;
-}
-var id=_34.id.match(_35)[1];
-return _33.store.find_one(id);
-};
-;
-include.set_path('jmvc/plugins/view/helpers');
-include.plugins("view");
-include("view_helpers");
-;
-include.set_path('jmvc/plugins/view');
-include.plugins("lang");
-include("view");
-if(include.get_env()=="development"){
-include("fulljslint");
-}
-if(MVC.Controller){
-include.plugins("controller/view");
-}
-;
-include.set_path('jmvc/plugins/controller/view');
-include.plugins("view","controller");
-include("controller_view");
-;
-include.set_path('jmvc/plugins/controller');
-include.plugins("lang","lang/inflector","dom/event","lang/class","lang/openajax");
-include("delegator","controller");
-if(MVC.View){
-include.plugins("controller/view");
-}
-;
-include.set_path('jmvc/plugins/lang/inflector');
-include.plugins("lang");
-include("inflector");
-;
-include.set_path('jmvc/plugins/lang/openajax');
-if(!window["OpenAjax"]){
-OpenAjax=new function(){
-var t=true;
-var f=false;
-var g=window;
-var _4="org.openajax.hub.";
-var h={};
-this.hub=h;
-h.implementer="http://openajax.org";
-h.implVersion="1.0";
-h.specVersion="1.0";
-h.implExtraData={};
-var _6={};
-h.libraries=_6;
-h.registerLibrary=function(_7,_8,_9,_a){
-_6[_7]={prefix:_7,namespaceURI:_8,version:_9,extraData:_a};
-this.publish(_4+"registerLibrary",_6[_7]);
-};
-h.unregisterLibrary=function(_b){
-this.publish(_4+"unregisterLibrary",_6[_b]);
-delete _6[_b];
-};
-h._subscriptions={c:{},s:[]};
-h._cleanup=[];
-h._subIndex=0;
-h._pubDepth=0;
-h.subscribe=function(_c,_d,_e,_f,_10){
-if(!_e){
-_e=window;
-}
-var _11=_c+"."+this._subIndex;
-var sub={scope:_e,cb:_d,fcb:_10,data:_f,sid:this._subIndex++,hdl:_11};
-var _13=_c.split(".");
-this._subscribe(this._subscriptions,_13,0,sub);
-return _11;
-};
-h.publish=function(_14,_15){
-var _16=_14.split(".");
-this._pubDepth++;
-this._publish(this._subscriptions,_16,0,_14,_15);
-this._pubDepth--;
-if((this._cleanup.length>0)&&(this._pubDepth==0)){
-for(var i=0;i<this._cleanup.length;i++){
-this.unsubscribe(this._cleanup[i].hdl);
-}
-delete (this._cleanup);
-this._cleanup=[];
-}
-};
-h.unsubscribe=function(sub){
-var _19=sub.split(".");
-var sid=_19.pop();
-this._unsubscribe(this._subscriptions,_19,0,sid);
-};
-h._subscribe=function(_1b,_1c,_1d,sub){
-var _1f=_1c[_1d];
-if(_1d==_1c.length){
-_1b.s.push(sub);
-}else{
-if(typeof _1b.c=="undefined"){
-_1b.c={};
-}
-if(typeof _1b.c[_1f]=="undefined"){
-_1b.c[_1f]={c:{},s:[]};
-this._subscribe(_1b.c[_1f],_1c,_1d+1,sub);
-}else{
-this._subscribe(_1b.c[_1f],_1c,_1d+1,sub);
-}
-}
-};
-h._publish=function(_20,_21,_22,_23,msg,pcb,_26){
-if(typeof _20!="undefined"){
-var _27;
-if(_22==_21.length){
-_27=_20;
-}else{
-this._publish(_20.c[_21[_22]],_21,_22+1,_23,msg,pcb,_26);
-this._publish(_20.c["*"],_21,_22+1,_23,msg,pcb,_26);
-_27=_20.c["**"];
-}
-if(typeof _27!="undefined"){
-var _28=_27.s;
-var max=_28.length;
-for(var i=0;i<max;i++){
-if(_28[i].cb){
-var sc=_28[i].scope;
-var cb=_28[i].cb;
-var fcb=_28[i].fcb;
-var d=_28[i].data;
-var sid=_28[i].sid;
-var _30=_28[i].cid;
-if(typeof cb=="string"){
-cb=sc[cb];
-}
-if(typeof fcb=="string"){
-fcb=sc[fcb];
-}
-if((!fcb)||(fcb.call(sc,_23,msg,d))){
-if((!pcb)||(pcb(_23,msg,_26,_30))){
-cb.call(sc,_23,msg,d,sid);
-}
-}
-}
-}
-}
-}
-};
-h._unsubscribe=function(_31,_32,_33,sid){
-if(typeof _31!="undefined"){
-if(_33<_32.length){
-var _35=_31.c[_32[_33]];
-this._unsubscribe(_35,_32,_33+1,sid);
-if(_35.s.length==0){
-for(var x in _35.c){
-return;
-}
-delete _31.c[_32[_33]];
-}
-return;
-}else{
-var _37=_31.s;
-var max=_37.length;
-for(var i=0;i<max;i++){
-if(sid==_37[i].sid){
-if(this._pubDepth>0){
-_37[i].cb=null;
-this._cleanup.push(_37[i]);
-}else{
-_37.splice(i,1);
-}
-return;
-}
-}
-}
-}
-};
-h.reinit=function(){
-for(var lib in OpenAjax.hub.libraries){
-delete OpenAjax.hub.libraries[lib];
-}
-OpenAjax.hub.registerLibrary("OpenAjax","http://openajax.org/hub","1.0",{});
-delete OpenAjax._subscriptions;
-OpenAjax._subscriptions={c:{},s:[]};
-delete OpenAjax._cleanup;
-OpenAjax._cleanup=[];
-OpenAjax._subIndex=0;
-OpenAjax._pubDepth=0;
-};
-};
-OpenAjax.hub.registerLibrary("OpenAjax","http://openajax.org/hub","1.0",{});
-}
-OpenAjax.hub.registerLibrary("JavaScriptMVC","http://JavaScriptMVC.com","1.5",{});
-;
-include.set_path('jmvc/plugins/view/helpers');
-MVC.Object.extend(MVC.View.Helpers.prototype,{check_box_tag:function(_1,_2,_3,_4){
-_3=_3||{};
-if(_4){
-_3.checked="checked";
-}
-return this.input_field_tag(_1,_2,"checkbox",_3);
-},date_tag:function(_5,_6,_7){
-if(!(_6 instanceof Date)){
-_6=new Date();
-}
-var _8=[],_9=[],_a=[];
-var _b=_6.getFullYear(),_c=_6.getMonth(),_d=_6.getDate();
-for(var y=_b-15;y<_b+15;y++){
-_8.push({value:y,text:y});
-}
-for(var m=0;m<12;m++){
-_9.push({value:(m),text:MVC.Date.month_names[m]});
-}
-for(var d=0;d<31;d++){
-_a.push({value:(d+1),text:(d+1)});
-}
-var _11=this.select_tag(_5+"[year]",_b,_8,{id:_5+"[year]"});
-var _12=this.select_tag(_5+"[month]",_c,_9,{id:_5+"[month]"});
-var _13=this.select_tag(_5+"[day]",_d,_a,{id:_5+"[day]"});
-return _11+_12+_13;
-},file_tag:function(_14,_15,_16){
-return this.input_field_tag(_14+"[file]",_15,"file",_16);
-},form_tag:function(_17,_18){
-_18=_18||{};
-if(_18.multipart==true){
-_18.method="post";
-_18.enctype="multipart/form-data";
-}
-_18.action=_17;
-return this.start_tag_for("form",_18);
-},form_tag_end:function(){
-return this.tag_end("form");
-},hidden_field_tag:function(_19,_1a,_1b){
-return this.input_field_tag(_19,_1a,"hidden",_1b);
-},input_field_tag:function(_1c,_1d,_1e,_1f){
-_1f=_1f||{};
-_1f.id=_1f.id||_1c;
-_1f.value=_1d||"";
-_1f.type=_1e||"text";
-_1f.name=_1c;
-return this.single_tag_for("input",_1f);
-},label_tag:function(_20,_21){
-_21=_21||{};
-return this.start_tag_for("label",_21)+_20+this.tag_end("label");
-},link_to:function(_22,url,_24){
-if(!_22){
-var _22="null";
-}
-if(!_24){
-var _24={};
-}
-this.set_confirm(_24);
-_24.href=url;
-return this.start_tag_for("a",_24)+_22+this.tag_end("a");
-},link_to_if:function(_25,_26,url,_28){
-return this.link_to_unless((!_25),_26,url,_28);
-},link_to_unless:function(_29,_2a,url,_2c){
-if(_29){
-return _2a;
-}
-return this.link_to(_2a,url,_2c);
-},set_confirm:function(_2d){
-if(_2d.confirm){
-_2d.onclick=_2d.onclick||"";
-_2d.onclick=_2d.onclick+"; var ret_confirm = confirm(\""+_2d.confirm+"\"); if(!ret_confirm){ return false;} ";
-_2d.confirm=null;
-}
-},submit_link_to:function(_2e,_2f,_30,_31){
-if(!_2e){
-var _2e="null";
-}
-if(!_30){
-_30={};
-}
-_30.type="submit";
-_30.value=_2e;
-this.set_confirm(_30);
-_30.onclick=_30.onclick+";window.location=\""+_2f+"\"; return false;";
-return this.single_tag_for("input",_30);
-},password_field_tag:function(_32,_33,_34){
-return this.input_field_tag(_32,_33,"password",_34);
-},select_tag:function(_35,_36,_37,_38){
-_38=_38||{};
-_38.id=_38.id||_35;
-_38.name=_35;
-var txt="";
-txt+=this.start_tag_for("select",_38);
-for(var i=0;i<_37.length;i++){
-var _3b=_37[i];
-if(typeof _3b=="string"){
-_3b={value:_3b};
-}
-if(!_3b.text){
-_3b.text=_3b.value;
-}
-if(!_3b.value){
-_3b.text=_3b.text;
-}
-var _3c={value:_3b.value};
-if(_3b.value==_36){
-_3c.selected="selected";
-}
-txt+=this.start_tag_for("option",_3c)+_3b.text+this.tag_end("option");
-}
-txt+=this.tag_end("select");
-return txt;
-},single_tag_for:function(tag,_3e){
-return this.tag(tag,_3e,"/>");
-},start_tag_for:function(tag,_40){
-return this.tag(tag,_40);
-},submit_tag:function(_41,_42){
-_42=_42||{};
-_42.type=_42.type||"submit";
-_42.value=_41||"Submit";
-return this.single_tag_for("input",_42);
-},tag:function(tag,_44,end){
-end=end||">";
-var txt=" ";
-for(var _47 in _44){
-if(_44.hasOwnProperty(_47)){
-value=_44[_47]!=null?_44[_47].toString():"";
-if(_47=="Class"||_47=="klass"){
-_47="class";
-}
-if(value.indexOf("'")!=-1){
-txt+=_47+"=\""+value+"\" ";
-}else{
-txt+=_47+"='"+value+"' ";
-}
-}
-}
-return "<"+tag+txt+end;
-},tag_end:function(tag){
-return "</"+tag+">";
-},text_area_tag:function(_49,_4a,_4b){
-_4b=_4b||{};
-_4b.id=_4b.id||_49;
-_4b.name=_4b.name||_49;
-_4a=_4a||"";
-if(_4b.size){
-_4b.cols=_4b.size.split("x")[0];
-_4b.rows=_4b.size.split("x")[1];
-delete _4b.size;
-}
-_4b.cols=_4b.cols||50;
-_4b.rows=_4b.rows||4;
-return this.start_tag_for("textarea",_4b)+_4a+this.tag_end("textarea");
-},text_field_tag:function(_4c,_4d,_4e){
-return this.input_field_tag(_4c,_4d,"text",_4e);
-},img_tag:function(_4f,_50){
-_50=_50||{};
-_50.src="resources/images/"+_4f;
-return this.single_tag_for("img",_50);
-}});
-MVC.View.Helpers.prototype.text_tag=MVC.View.Helpers.prototype.text_area_tag;
-(function(){
-var _51={};
-var _52=0;
-MVC.View.Helpers.link_data=function(_53){
-var _54=_52++;
-_51[_54]=_53;
-return "_data='"+_54+"'";
-};
-MVC.View.Helpers.get_data=function(el){
-if(!el){
-return null;
-}
-var _56=el.getAttribute("_data");
-if(!_56){
-return null;
-}
-return _51[parseInt(_56)];
-};
-MVC.View.Helpers.prototype.link_data=function(_57){
-return MVC.View.Helpers.link_data(_57);
-};
-MVC.View.Helpers.prototype.get_data=function(el){
-return MVC.View.Helpers.get_data(el);
-};
-})();
-;
-include.set_path('jmvc/plugins/controller/comet');
-include.plugins("io/comet");
-include("comet_controller");
-;
-include.set_path('jmvc/plugins/io/comet');
-include.plugins("dom/event");
-include("comet");
-if(MVC.Console){
-include("debug");
-}
-;
-include.set_path('jmvc/plugins/io/comet');
-MVC.Comet=function(_1,_2){
-this.url=_1;
-this.options=_2||{};
-this.options.wait_time=this.options.wait_time||0;
-this.onSuccess=_2.onSuccess;
-this.onComplete=_2.onComplete;
-this.onFailure=_2.onFailure;
-delete this.options.onSuccess;
-delete this.options.onComplete;
-this.options.onComplete=MVC.Function.bind(this.callback,this);
-var _3=false;
-var _4=true;
-this.kill=function(){
-_3=true;
-};
-this.poll_now=MVC.Function.bind(function(){
-if(this.is_polling()){
-return;
-}
-clearTimeout(this.timeout);
-this.options.polling();
-MVC.Comet.connection=new this.transport(this.url,this.options);
-},this);
-this.options.is_killed=function(){
-return _3;
-};
-this.options.waiting_to_poll=function(){
-_4=false;
-};
-this.options.polling=function(){
-_4=true;
-};
-this.is_polling=function(){
-return _4;
-};
-this.transport=this.options.transport||MVC.Comet.transport;
-MVC.Comet.connection=new this.transport(_1,this.options);
-};
-MVC.Comet.transport=MVC.Ajax;
-MVC.Comet.prototype={callback:function(_5){
-this.options.waiting_to_poll();
-if(this.options.is_killed()){
-return;
-}
-if(this.onSuccess&&_5.responseText!=""&&this.onSuccess(_5)==false){
-return false;
-}
-if(this.onComplete){
-if(this.onComplete(_5)==false){
-return false;
-}
-}
-var _6=this.url;
-var _7=this.options;
-var _5=this.transport;
-var _8=typeof _7.wait_time=="function"?_7.wait_time():_7.wait_time;
-this.timeout=setTimeout(MVC.Function.bind(function(){
-_7.polling();
-MVC.Comet.connection=new _5(_6,_7);
-},this),_8);
-}};
-MVC.Event.observe(window,"unload",function(){
-MVC.Comet.send=false;
-if(MVC.Comet.connection&&MVC.Comet.connection.transport&&MVC.Comet.transport.className&&MVC.Comet.transport.className=="Ajax"){
-MVC.Comet.connection.transport.abort();
-}
-});
-if(!MVC._no_conflict&&typeof Comet=="undefined"){
-Comet=MVC.Comet;
-}
-;
-include.set_path('jmvc/plugins/controller/comet');
-MVC.Controller.Comet=MVC.Controller.extend({init:function(){
-},run:function(_1){
-var _2=new this();
-_2.run(_1);
-},kill:function(){
-var _3=new this();
-_3.kill();
-},convert:function(_4){
-return _4;
-},set_wait_time:function(_5){
-this._wait_time=_5*1000;
-if(this._comet){
-this._comet.poll_now();
-}
-},_wait_time:0,wait_time:function(){
-return this._wait_time;
-},dispatch:function(_6){
-var _7=this.convert(_6);
-for(var _8 in _6){
-if(_8=="responseText"){
-continue;
-}
-var _9=_6[_8];
-for(var _a in _9){
-var _b=_9[_a];
-if(this.models_map[_8]!=null){
-if(this.models_map[_8]!=false){
-_b=this.models_map[_8].create_many_as_existing(_b);
-}
-}else{
-if(MVC.Model.models[_8.toLowerCase()]){
-_b=MVC.Model.models[_8.toLowerCase()].create_many_as_existing(_b);
-}
-}
-var _c=this.controller_map[_8]?this.controller_map[_8]:MVC.String.pluralize(_8).toLowerCase();
-MVC.Controller.publish(_c+"."+_a,{data:_b});
-}
-}
-},controller_map:{},error_mode:false},{run:function(){
-this.start_polling();
-},start_polling:function(){
-this.Class._comet=new MVC.Comet((this.Class.domain?this.Class.domain:"")+"/"+this.Class.className,{method:"get",onComplete:this.continue_to("complete"),onSuccess:this.continue_to("success"),onFailure:this.continue_to("failure"),parameters:this.Class.parameters||null,session:this.Class.session||null,transport:this.Class.transport,wait_time:MVC.Function.bind(this.Class.wait_time,this.Class)});
-},failure:function(){
-this.error_mode=true;
-this.run();
-},success:function(_d){
-this.Class.dispatch(_d);
-},complete:function(){
-if(this.error_mode&&this.restore_from_failure){
-this.restore_from_failure();
-}
-this.error_mode=false;
-},kill:function(){
-if(this.Class._comet){
-this.Class._comet.kill();
-}
-}});
-;
-include.set_path('jmvc/plugins/controller/dragdrop');
-include.plugins("controller","dom/element","dom/query","dom/position","dom/animate");
-include("drag","drop");
 ;
 include.set_path('jmvc/plugins/dom/query');
 if(typeof Prototype!="undefined"){
@@ -3266,6 +2206,368 @@ MVC.Droppables.add(_21[e],MVC.Droppables.selectors[_20]);
 this.drops=[];
 }};
 ;
+include.set_path('jmvc/plugins/controller/stateful');
+include.plugins("controller");
+include("stateful_controller");
+;
+include.set_path('jmvc/plugins/controller/stateful');
+MVC.Controller.Stateful=MVC.Controller.extend({init:function(){
+this._super();
+if(!this.className){
+return;
+}
+if(MVC.String.is_singular(this.className)){
+throw "Only plural names for stateful controller!";
+}
+},event_closure:function(_1,_2){
+return MVC.Function.bind(function(_3){
+var _4=new MVC.Controller.Params({event:_3,action:_1});
+for(var _5 in this.instances){
+var _6=this.instances[_5];
+_6.params=_4;
+_6.action_name=_1;
+this._dispatch_action(_6,_1,_4);
+}
+},this);
+},subscribe_closure:function(_7){
+return MVC.Function.bind(function(_8){
+var _9=new MVC.Controller.Params({action:_7});
+for(var _a in this.instances){
+var _b=this.instances[_a];
+_b.params=_9;
+_b.action_name=_7;
+this._dispatch_action(_b,_7,_9);
+}
+},this);
+},_get_instance:function(_c,_d){
+var ce=_d.class_element();
+var _f=this.instances[ce.id];
+if(!_f){
+var re=new RegExp(this.className+"_","");
+_d.id=ce.id.replace(re,"");
+_f=new controller(_d);
+}
+return _f;
+},instances:{},destroy_by_element:function(_11){
+if(!_11.id){
+throw "element must have an id to remove the instance";
+}
+this.instances[_11.id].destroy();
+}},{init:function(_12){
+_12=_12||{};
+this.id=(_12.id||MVC.get_random(10));
+this.element_id=this.Class.className+"_"+this.id;
+this.Class.instances[this.element_id]=this;
+this.action_name="init";
+},create_element:function(tag){
+var _14=document.createElement(tag||"div");
+_14.id=this.element_id;
+_14.className=this.Class.singularName;
+return _14;
+},destroy:function(){
+delete this.Class.instances[this.element_id];
+var _15=MVC.$E(this.element_id);
+if(_15&&_15.parentNode){
+_15.parentNode.removeChild(_15);
+}
+delete this;
+}});
+;
+include.set_path('jmvc/plugins/controller/hover');
+include.plugins("controller","lang/vector","dom/element");
+include("hover");
+;
+include.set_path('jmvc/plugins/controller/hover');
+MVC.Controller.Action.EnterLeave=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(mouseenter|mouseleave)$")},{init:function(_1,f,_3){
+this.action=_1;
+this.func=f;
+this.controller=_3;
+this.css_and_event();
+var _4=this.selector();
+this[this.event_type]();
+},mouseenter:function(){
+new MVC.Delegator(this.selector(),"mouseover",MVC.Function.bind(function(_5){
+var _6=_5.event.relatedTarget;
+if(_5.element==_6||MVC.$E(_5.element).has(_6)){
+return true;
+}
+this.func(_5);
+},this));
+},mouseleave:function(){
+new MVC.Delegator(this.selector(),"mouseout",MVC.Function.bind(function(_7){
+var _8=_7.event.relatedTarget;
+if(_7.element==_8||MVC.$E(_7.element).has(_8)){
+return true;
+}
+this.func(_7);
+},this));
+}});
+MVC.Controller.Action.Hover=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(hoverenter|hoverleave)$"),sensitivity:6,interval:100,hovers:{}},{init:function(_9,f,_b){
+this.action=_9;
+this.func=_b.dispatch_closure(_9);
+this.controller=_b;
+this.css_and_event();
+var _c=this.selector();
+if(!this.Class.hovers[this.selector()]){
+this.Class.hovers[this.selector()]={};
+new MVC.Delegator(this.selector(),"mouseover",MVC.Function.bind(this.mouseover,this));
+new MVC.Delegator(this.selector(),"mouseout",MVC.Function.bind(this.mouseout,this));
+}
+this.Class.hovers[this.selector()][this.event_type]=this;
+},hoverenter:function(_d){
+var _e=this.Class.hovers[this.selector()]["hoverenter"];
+if(_e){
+_e.func(_d);
+}
+},hoverleave:function(_f){
+var _10=this.Class.hovers[this.selector()]["hoverleave"];
+if(_10){
+_10.func(_f);
+}
+},check:function(){
+var _11=this.starting_position.minus(this.current_position);
+var _12=Math.abs(_11.x())+Math.abs(_11.y());
+if(_12<this.Class.sensitivity){
+this.called=true;
+this.hoverenter({element:this.element,mouseover_event:this.mouseover_event});
+MVC.Event.stop_observing(this.element,"mousemove",this.mousemove);
+}else{
+this.current_position=this.starting_position;
+this.timer=setTimeout(MVC.Function.bind(this.check,this),this.Class.interval);
+}
+},mouseover:function(_13){
+var _14=_13.event.relatedTarget;
+if(_13.element==_14||MVC.$E(_13.element).has(_14)){
+return true;
+}
+this.called=false;
+this.starting_position=MVC.Event.pointer(_13.event);
+this.element=_13.element;
+this.mouseover_event=_13.event;
+this.mousemove_function=MVC.Function.bind(this.mousemove,this);
+MVC.Event.observe(_13.element,"mousemove",mousemove_function);
+this.timer=setTimeout(MVC.Function.bind(this.check,this),this.Class.interval);
+},mousemove:function(_15){
+this.mousemove_event=_15;
+this.current_position=MVC.Event.pointer(_15);
+},mouseout:function(_16){
+var _17=_16.event.relatedTarget;
+if(_16.element==_17||MVC.$E(_16.element).has(_17)){
+return true;
+}
+clearTimeout(this.timer);
+MVC.Event.stop_observing(_16.element,"mousemove",this.mousemove_function);
+if(this.called){
+this.hoverleave({element:this.element,event:_16.event});
+}
+}});
+;
+include.set_path('jmvc/plugins/controller/lasso');
+include.plugins("controller","dom/element","dom/query","dom/position");
+include("lasso","selectable");
+;
+include.set_path('jmvc/plugins/controller/lasso');
+MVC.Controller.Action.Lasso=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(lassostart|lassoend|lassomove)$")},{init:function(_1,f,_3){
+this.action=_1;
+this.func=f;
+this.controller=_3;
+this.css_and_event();
+var _4=this.selector();
+if(MVC.Lasso.selectors[_4]){
+MVC.Lasso.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
+return;
+}
+MVC.Lasso.selectors[_4]=new MVC.Delegator(_4,"mousedown",MVC.Function.bind(this.mousedown,this));
+MVC.Lasso.selectors[_4].callbacks={};
+MVC.Lasso.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
+},mousedown:function(_5){
+MVC.Object.extend(_5,MVC.Lasso.selectors[this.selector()].callbacks);
+MVC.Lasso.current=new MVC.Lasso(_5);
+_5.event.kill();
+return false;
+}});
+MVC.Lasso=function(_6){
+this.element=_6.element;
+this.moved=false;
+this._cancelled=false;
+this.lassostart=_6.lassostart||MVC.Lasso.k;
+this.lassoend=_6.lassoend||MVC.Lasso.k;
+this.lassomove=_6.lassomove||MVC.Lasso.k;
+};
+MVC.Lasso.k=function(){
+};
+MVC.Lasso.prototype={style_element:function(){
+var s=this.lasso_element.style;
+s.position="absolute";
+s.border="dotted 1px Gray";
+s.zIndex=1000;
+},position_lasso:function(_8){
+var _9=MVC.Event.pointer(_8);
+this.top=_9.top()<this.start_position.top()?_9.top():this.start_position.top();
+this.left=_9.left()<this.start_position.left()?_9.left():this.start_position.left();
+this.height=Math.abs(_9.top()-this.start_position.top());
+this.width=Math.abs(_9.left()-this.start_position.left());
+var s=this.lasso_element.style;
+s.top=this.top+"px";
+s.left=this.left+"px";
+s.width=this.width+"px";
+s.height=this.height+"px";
+},start:function(_b){
+this.moved=true;
+this.lasso_element=document.createElement("div");
+document.body.appendChild(this.lasso_element);
+this.style_element();
+MVC.Element.make_positioned(this.lasso_element);
+this.start_position=MVC.Event.pointer(_b);
+var _c={event:_b,element:this.element,lasso_element:this.lasso_element,lasso_action:this};
+this.lassostart(_c);
+MVC.Selectables.compile();
+},currentDelta:function(){
+return new MVC.Vector(parseInt(MVC.Element.get_style(this.lasso_element,"left")||"0"),parseInt(MVC.Element.get_style(this.lasso_element,"top")||"0"));
+},draw:function(_d,_e){
+if(!this.moved){
+this.start(_e);
+}
+if(this._cancelled){
+return;
+}
+MVC.Position.prepare();
+this.position_lasso(_e);
+var _f={event:_e,element:this.element,lasso_action:this,lasso_element:this.lasso_element};
+this.lassomove(_f);
+MVC.Selectables.show(_d,this,_e);
+},end:function(_10){
+var _11={element:this.element,event:_10,lasso_element:this.lasso_element,lasso_action:this};
+this.lassoend(_11);
+document.body.removeChild(this.lasso_element);
+},cleanup:function(){
+if(this.drag_element!=this.element){
+this.drag_element.style.display="none";
+}
+},contains:function(_12){
+return MVC.Position.withinBoxIncludingScrollingOffsets(_12.element,this.left,this.top,this.width,this.height,_12);
+}};
+MVC.Lasso.selectors={};
+MVC.Lasso.current=null;
+MVC.Event.observe(document,"mousemove",function(_13){
+if(!MVC.Lasso.current){
+return;
+}
+MVC.Delegator.add_kill_event(_13);
+_13.kill();
+MVC.Lasso.current.draw(MVC.Event.pointer(_13),_13);
+return false;
+});
+MVC.Event.observe(document,"mouseup",function(_14){
+MVC.Delegator.add_kill_event(_14);
+if(MVC.Lasso.current&&MVC.Lasso.current.moved){
+MVC.Lasso.current.end(_14);
+MVC.Selectables.fire(_14,MVC.Lasso.current);
+MVC.Selectables.clear();
+}
+MVC.Lasso.current=null;
+});
+;
+include.set_path('jmvc/plugins/controller/lasso');
+MVC.Controller.Action.Selectable=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(selectover|selected|selectout|selectadd|selectmove)$")},{init:function(_1,f,_3){
+this.action=_1;
+this.func=f;
+this.controller=_3;
+this.css_and_event();
+var _4=this.selector();
+if(!MVC.Selectables.selectors[_4]){
+MVC.Selectables.selectors[_4]={};
+}
+MVC.Selectables.selectors[_4][this.event_type]=_3.dispatch_closure(_1);
+}});
+MVC.Selectable=MVC.Controller.Params;
+MVC.Selectable.prototype=new MVC.Controller.Params();
+MVC.Object.extend(MVC.Selectable.prototype,{cache_position:function(){
+this._cache=true;
+},cancel:function(){
+this._cancel=true;
+}});
+MVC.Selectables={selectables:[],selectors:{},add:function(_5,_6){
+_5=MVC.$E(_5);
+_6=MVC.Object.extend({selectover:MVC.Lasso.k,selected:MVC.Lasso.k,selectout:MVC.Lasso.k,selectadd:MVC.Lasso.k,selectmove:MVC.Lasso.k},_6);
+_6.element=_5;
+_6._is_selected=false;
+var _7=new MVC.Selectable(_6);
+if(_7.selectadd){
+_7.selectadd(_7);
+}
+if(!_7._canceled){
+MVC.Element.make_positioned(_5);
+this.selectables.push(_7);
+}
+},findDeepestChild:function(_8){
+if(_8.length==0){
+return null;
+}
+var _9=_8[0];
+for(i=1;i<_8.length;++i){
+if(MVC.Element.has(_8[i].element,_9.element)){
+_9=_8[i];
+}
+}
+return _9;
+},isAffected:function(_a,_b){
+return (_a.contains(_b));
+},deactivate:function(_c,_d,_e){
+this.last_active=null;
+if(_c.dropout){
+_c.dropout({element:_c.element,drag:_d,event:_e});
+}
+},activate:function(_f,_10,_11){
+this.last_active=_f;
+if(_f.dropover){
+_f.dropover({element:_f.element,drag:_10,event:_11});
+}
+},dropmove:function(_12,_13,_14){
+if(_12.dropmove){
+_12.dropmove({element:_12.element,drag:_13,event:_14});
+}
+},show:function(_15,_16,_17){
+if(!this.selectables.length){
+return;
+}
+var _18,_19=[];
+for(var d=0;d<this.selectables.length;d++){
+var _1b=this.selectables[d];
+var ef=MVC.Selectables.isAffected(_16,this.selectables[d]);
+if(ef&&!_1b._is_selected){
+_1b.selectover({element:_1b.element});
+_1b._is_selected=true;
+}
+if(ef){
+_1b.selectmove({element:_1b.element});
+}
+if(!ef&&_1b._is_selected){
+_1b._is_selected=false;
+_1b.selectout({element:_1b.element});
+}
+}
+},fire:function(_1d,_1e){
+MVC.Position.prepare();
+for(var d=0;d<this.selectables.length;d++){
+var _20=this.selectables[d];
+var ef=MVC.Selectables.isAffected(_1e,this.selectables[d]);
+if(ef){
+_20.selected({element:_20.element,event:_1d});
+}
+}
+},compile:function(){
+var _22=[];
+for(var _23 in MVC.Selectables.selectors){
+var _24=_22.concat(MVC.Query(_23));
+for(var e=0;e<_24.length;e++){
+MVC.Selectables.add(_24[e],MVC.Selectables.selectors[_23]);
+}
+}
+},clear:function(){
+this.selectables=[];
+}};
+;
 include.set_path('jmvc/plugins/io/jsonp');
 include.plugins("lang");
 include("jsonp");
@@ -3345,6 +2647,7 @@ _11.parentNode.removeChild(_11);
 }
 }};
 MVC.JsonP._cbs={};
+MVC.IO.JsonP=MVC.JsonP;
 ;
 include.set_path('jmvc/plugins/io/window_name');
 include.plugins("lang");
@@ -3477,6 +2780,7 @@ _d.style.border="0px";
 if(!MVC._no_conflict&&typeof WindowName=="undefined"){
 WindowName=MVC.WindowName;
 }
+MVC.IO.WindowName=MVC.WindowName;
 ;
 include.set_path('jmvc/plugins/io/xdoc');
 include("xdoc");
@@ -3920,6 +3224,112 @@ include("ajax");
 }
 if(MVC.Console||MVC.use_fixtures){
 include("debug");
+}
+;
+include.set_path('jmvc/plugins/io/ajax');
+(function(){
+var _1=MVC.Ajax.factory;
+MVC.Ajax=function(_2,_3){
+this.options={method:"post",asynchronous:true,contentType:"application/x-www-form-urlencoded",encoding:"UTF-8",parameters:""};
+this.url=_2;
+MVC.Object.extend(this.options,_3||{});
+this.options.method=this.options.method.toLowerCase();
+if(!MVC.Array.include(["get","post"],this.options.method)){
+if(this.options.parameters==""){
+this.options.parameters={_method:this.options.method};
+}else{
+if(typeof this.options.parameters=="string"||typeof this.options.parameters=="number"){
+this.options.parameters=""+this.options.parameters+"&_method="+this.options.method;
+}else{
+this.options.parameters["_method"]=this.options.method;
+}
+}
+this.options.method="post";
+}
+if(this.options.method=="get"&&this.options.parameters!=""){
+this.url+=(MVC.String.include(this.url,"?")?"&":"?")+MVC.Object.to_query_string(this.options.parameters);
+delete this.options.parameters;
+}
+if(!this.options.parameters){
+var _4=null;
+}else{
+if(_3.json_string){
+var _4=MVC.Object.to_json(this.options.parameters);
+}else{
+var _4=MVC.Object.to_query_string(this.options.parameters);
+}
+}
+this.transport=MVC.Ajax.factory();
+if(this.options.asynchronous==false){
+this.transport.open(this.options.method,this.url,this.options.asynchronous);
+this.set_request_headers(_3.headers);
+try{
+this.transport.send(_4);
+}
+catch(e){
+return null;
+}
+return this.transport;
+}else{
+this.transport.onreadystatechange=MVC.Function.bind(function(){
+var _5=MVC.Ajax.Events[this.transport.readyState];
+if(_5=="Complete"){
+if(!this.options.onSuccess){
+}else{
+if(this.success()){
+this.options.onSuccess(this.transport);
+}else{
+if(this.options.onFailure){
+this.options.onFailure(this.transport);
+}
+}
+}
+}
+if(this.options["on"+_5]){
+this.options["on"+_5](this.transport);
+}
+},this);
+this.transport.open(this.options.method,this.url,true);
+this.set_request_headers(_3.headers);
+this.transport.send(_4);
+}
+};
+MVC.Ajax.factory=_1;
+})();
+MVC.Ajax.className="Ajax";
+MVC.Ajax.Events=["Uninitialized","Loading","Loaded","Interactive","Complete"];
+MVC.Ajax.prototype={success:function(){
+var _6=this.getStatus();
+return !_6||(_6>=200&&_6<300);
+},getStatus:function(){
+try{
+return this.transport.status||0;
+}
+catch(e){
+return 0;
+}
+},set_request_headers:function(_7){
+var _8={};
+if(this.options.method=="post"){
+_8["Content-type"]=this.options.contentType+(this.options.encoding?"; charset="+this.options.encoding:"");
+if(this.transport.overrideMimeType&&(navigator.userAgent.match(/Gecko\/(\d{4})/)||[0,2005])[1]<2005){
+_8["Connection"]="close";
+}
+}
+for(var _9 in _8){
+if(_8.hasOwnProperty(_9)){
+this.transport.setRequestHeader(_9,_8[_9]);
+}
+}
+if(_7){
+for(var _a in _7){
+this.transport.setRequestHeader(_a,_7[_a]);
+}
+}
+}};
+MVC.IO.Ajax=MVC.Ajax;
+if(!MVC._no_conflict){
+Ajax=MVC.Ajax;
 }
 ;
 include.set_path('jmvc/plugins/model/ajax');
@@ -5655,368 +5065,6 @@ _44.top=_40;
 return _44;
 };
 ;
-include.set_path('jmvc/plugins/controller/stateful');
-include.plugins("controller");
-include("stateful_controller");
-;
-include.set_path('jmvc/plugins/controller/stateful');
-MVC.Controller.Stateful=MVC.Controller.extend({init:function(){
-this._super();
-if(!this.className){
-return;
-}
-if(MVC.String.is_singular(this.className)){
-throw "Only plural names for stateful controller!";
-}
-},event_closure:function(_1,_2){
-return MVC.Function.bind(function(_3){
-var _4=new MVC.Controller.Params({event:_3,action:_1});
-for(var _5 in this.instances){
-var _6=this.instances[_5];
-_6.params=_4;
-_6.action_name=_1;
-this._dispatch_action(_6,_1,_4);
-}
-},this);
-},subscribe_closure:function(_7){
-return MVC.Function.bind(function(_8){
-var _9=new MVC.Controller.Params({action:_7});
-for(var _a in this.instances){
-var _b=this.instances[_a];
-_b.params=_9;
-_b.action_name=_7;
-this._dispatch_action(_b,_7,_9);
-}
-},this);
-},_get_instance:function(_c,_d){
-var ce=_d.class_element();
-var _f=this.instances[ce.id];
-if(!_f){
-var re=new RegExp(this.className+"_","");
-_d.id=ce.id.replace(re,"");
-_f=new controller(_d);
-}
-return _f;
-},instances:{},destroy_by_element:function(_11){
-if(!_11.id){
-throw "element must have an id to remove the instance";
-}
-this.instances[_11.id].destroy();
-}},{init:function(_12){
-_12=_12||{};
-this.id=(_12.id||MVC.get_random(10));
-this.element_id=this.Class.className+"_"+this.id;
-this.Class.instances[this.element_id]=this;
-this.action_name="init";
-},create_element:function(tag){
-var _14=document.createElement(tag||"div");
-_14.id=this.element_id;
-_14.className=this.Class.singularName;
-return _14;
-},destroy:function(){
-delete this.Class.instances[this.element_id];
-var _15=MVC.$E(this.element_id);
-if(_15&&_15.parentNode){
-_15.parentNode.removeChild(_15);
-}
-delete this;
-}});
-;
-include.set_path('jmvc/plugins/controller/hover');
-include.plugins("controller","lang/vector","dom/element");
-include("hover");
-;
-include.set_path('jmvc/plugins/controller/hover');
-MVC.Controller.Action.EnterLeave=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(mouseenter|mouseleave)$")},{init:function(_1,f,_3){
-this.action=_1;
-this.func=f;
-this.controller=_3;
-this.css_and_event();
-var _4=this.selector();
-this[this.event_type]();
-},mouseenter:function(){
-new MVC.Delegator(this.selector(),"mouseover",MVC.Function.bind(function(_5){
-var _6=_5.event.relatedTarget;
-if(_5.element==_6||MVC.$E(_5.element).has(_6)){
-return true;
-}
-this.func(_5);
-},this));
-},mouseleave:function(){
-new MVC.Delegator(this.selector(),"mouseout",MVC.Function.bind(function(_7){
-var _8=_7.event.relatedTarget;
-if(_7.element==_8||MVC.$E(_7.element).has(_8)){
-return true;
-}
-this.func(_7);
-},this));
-}});
-MVC.Controller.Action.Hover=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(hoverenter|hoverleave)$"),sensitivity:6,interval:100,hovers:{}},{init:function(_9,f,_b){
-this.action=_9;
-this.func=_b.dispatch_closure(_9);
-this.controller=_b;
-this.css_and_event();
-var _c=this.selector();
-if(!this.Class.hovers[this.selector()]){
-this.Class.hovers[this.selector()]={};
-new MVC.Delegator(this.selector(),"mouseover",MVC.Function.bind(this.mouseover,this));
-new MVC.Delegator(this.selector(),"mouseout",MVC.Function.bind(this.mouseout,this));
-}
-this.Class.hovers[this.selector()][this.event_type]=this;
-},hoverenter:function(_d){
-var _e=this.Class.hovers[this.selector()]["hoverenter"];
-if(_e){
-_e.func(_d);
-}
-},hoverleave:function(_f){
-var _10=this.Class.hovers[this.selector()]["hoverleave"];
-if(_10){
-_10.func(_f);
-}
-},check:function(){
-var _11=this.starting_position.minus(this.current_position);
-var _12=Math.abs(_11.x())+Math.abs(_11.y());
-if(_12<this.Class.sensitivity){
-this.called=true;
-this.hoverenter({element:this.element,mouseover_event:this.mouseover_event});
-MVC.Event.stop_observing(this.element,"mousemove",this.mousemove);
-}else{
-this.current_position=this.starting_position;
-this.timer=setTimeout(MVC.Function.bind(this.check,this),this.Class.interval);
-}
-},mouseover:function(_13){
-var _14=_13.event.relatedTarget;
-if(_13.element==_14||MVC.$E(_13.element).has(_14)){
-return true;
-}
-this.called=false;
-this.starting_position=MVC.Event.pointer(_13.event);
-this.element=_13.element;
-this.mouseover_event=_13.event;
-this.mousemove_function=MVC.Function.bind(this.mousemove,this);
-MVC.Event.observe(_13.element,"mousemove",mousemove_function);
-this.timer=setTimeout(MVC.Function.bind(this.check,this),this.Class.interval);
-},mousemove:function(_15){
-this.mousemove_event=_15;
-this.current_position=MVC.Event.pointer(_15);
-},mouseout:function(_16){
-var _17=_16.event.relatedTarget;
-if(_16.element==_17||MVC.$E(_16.element).has(_17)){
-return true;
-}
-clearTimeout(this.timer);
-MVC.Event.stop_observing(_16.element,"mousemove",this.mousemove_function);
-if(this.called){
-this.hoverleave({element:this.element,event:_16.event});
-}
-}});
-;
-include.set_path('jmvc/plugins/controller/lasso');
-include.plugins("controller","dom/element","dom/query","dom/position");
-include("lasso","selectable");
-;
-include.set_path('jmvc/plugins/controller/lasso');
-MVC.Controller.Action.Lasso=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(lassostart|lassoend|lassomove)$")},{init:function(_1,f,_3){
-this.action=_1;
-this.func=f;
-this.controller=_3;
-this.css_and_event();
-var _4=this.selector();
-if(MVC.Lasso.selectors[_4]){
-MVC.Lasso.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
-return;
-}
-MVC.Lasso.selectors[_4]=new MVC.Delegator(_4,"mousedown",MVC.Function.bind(this.mousedown,this));
-MVC.Lasso.selectors[_4].callbacks={};
-MVC.Lasso.selectors[_4].callbacks[this.event_type]=_3.dispatch_closure(_1);
-},mousedown:function(_5){
-MVC.Object.extend(_5,MVC.Lasso.selectors[this.selector()].callbacks);
-MVC.Lasso.current=new MVC.Lasso(_5);
-_5.event.kill();
-return false;
-}});
-MVC.Lasso=function(_6){
-this.element=_6.element;
-this.moved=false;
-this._cancelled=false;
-this.lassostart=_6.lassostart||MVC.Lasso.k;
-this.lassoend=_6.lassoend||MVC.Lasso.k;
-this.lassomove=_6.lassomove||MVC.Lasso.k;
-};
-MVC.Lasso.k=function(){
-};
-MVC.Lasso.prototype={style_element:function(){
-var s=this.lasso_element.style;
-s.position="absolute";
-s.border="dotted 1px Gray";
-s.zIndex=1000;
-},position_lasso:function(_8){
-var _9=MVC.Event.pointer(_8);
-this.top=_9.top()<this.start_position.top()?_9.top():this.start_position.top();
-this.left=_9.left()<this.start_position.left()?_9.left():this.start_position.left();
-this.height=Math.abs(_9.top()-this.start_position.top());
-this.width=Math.abs(_9.left()-this.start_position.left());
-var s=this.lasso_element.style;
-s.top=this.top+"px";
-s.left=this.left+"px";
-s.width=this.width+"px";
-s.height=this.height+"px";
-},start:function(_b){
-this.moved=true;
-this.lasso_element=document.createElement("div");
-document.body.appendChild(this.lasso_element);
-this.style_element();
-MVC.Element.make_positioned(this.lasso_element);
-this.start_position=MVC.Event.pointer(_b);
-var _c={event:_b,element:this.element,lasso_element:this.lasso_element,lasso_action:this};
-this.lassostart(_c);
-MVC.Selectables.compile();
-},currentDelta:function(){
-return new MVC.Vector(parseInt(MVC.Element.get_style(this.lasso_element,"left")||"0"),parseInt(MVC.Element.get_style(this.lasso_element,"top")||"0"));
-},draw:function(_d,_e){
-if(!this.moved){
-this.start(_e);
-}
-if(this._cancelled){
-return;
-}
-MVC.Position.prepare();
-this.position_lasso(_e);
-var _f={event:_e,element:this.element,lasso_action:this,lasso_element:this.lasso_element};
-this.lassomove(_f);
-MVC.Selectables.show(_d,this,_e);
-},end:function(_10){
-var _11={element:this.element,event:_10,lasso_element:this.lasso_element,lasso_action:this};
-this.lassoend(_11);
-document.body.removeChild(this.lasso_element);
-},cleanup:function(){
-if(this.drag_element!=this.element){
-this.drag_element.style.display="none";
-}
-},contains:function(_12){
-return MVC.Position.withinBoxIncludingScrollingOffsets(_12.element,this.left,this.top,this.width,this.height,_12);
-}};
-MVC.Lasso.selectors={};
-MVC.Lasso.current=null;
-MVC.Event.observe(document,"mousemove",function(_13){
-if(!MVC.Lasso.current){
-return;
-}
-MVC.Delegator.add_kill_event(_13);
-_13.kill();
-MVC.Lasso.current.draw(MVC.Event.pointer(_13),_13);
-return false;
-});
-MVC.Event.observe(document,"mouseup",function(_14){
-MVC.Delegator.add_kill_event(_14);
-if(MVC.Lasso.current&&MVC.Lasso.current.moved){
-MVC.Lasso.current.end(_14);
-MVC.Selectables.fire(_14,MVC.Lasso.current);
-MVC.Selectables.clear();
-}
-MVC.Lasso.current=null;
-});
-;
-include.set_path('jmvc/plugins/controller/lasso');
-MVC.Controller.Action.Selectable=MVC.Controller.Action.Event.extend({match:new RegExp("(.*?)\\s?(selectover|selected|selectout|selectadd|selectmove)$")},{init:function(_1,f,_3){
-this.action=_1;
-this.func=f;
-this.controller=_3;
-this.css_and_event();
-var _4=this.selector();
-if(!MVC.Selectables.selectors[_4]){
-MVC.Selectables.selectors[_4]={};
-}
-MVC.Selectables.selectors[_4][this.event_type]=_3.dispatch_closure(_1);
-}});
-MVC.Selectable=MVC.Controller.Params;
-MVC.Selectable.prototype=new MVC.Controller.Params();
-MVC.Object.extend(MVC.Selectable.prototype,{cache_position:function(){
-this._cache=true;
-},cancel:function(){
-this._cancel=true;
-}});
-MVC.Selectables={selectables:[],selectors:{},add:function(_5,_6){
-_5=MVC.$E(_5);
-_6=MVC.Object.extend({selectover:MVC.Lasso.k,selected:MVC.Lasso.k,selectout:MVC.Lasso.k,selectadd:MVC.Lasso.k,selectmove:MVC.Lasso.k},_6);
-_6.element=_5;
-_6._is_selected=false;
-var _7=new MVC.Selectable(_6);
-if(_7.selectadd){
-_7.selectadd(_7);
-}
-if(!_7._canceled){
-MVC.Element.make_positioned(_5);
-this.selectables.push(_7);
-}
-},findDeepestChild:function(_8){
-if(_8.length==0){
-return null;
-}
-var _9=_8[0];
-for(i=1;i<_8.length;++i){
-if(MVC.Element.has(_8[i].element,_9.element)){
-_9=_8[i];
-}
-}
-return _9;
-},isAffected:function(_a,_b){
-return (_a.contains(_b));
-},deactivate:function(_c,_d,_e){
-this.last_active=null;
-if(_c.dropout){
-_c.dropout({element:_c.element,drag:_d,event:_e});
-}
-},activate:function(_f,_10,_11){
-this.last_active=_f;
-if(_f.dropover){
-_f.dropover({element:_f.element,drag:_10,event:_11});
-}
-},dropmove:function(_12,_13,_14){
-if(_12.dropmove){
-_12.dropmove({element:_12.element,drag:_13,event:_14});
-}
-},show:function(_15,_16,_17){
-if(!this.selectables.length){
-return;
-}
-var _18,_19=[];
-for(var d=0;d<this.selectables.length;d++){
-var _1b=this.selectables[d];
-var ef=MVC.Selectables.isAffected(_16,this.selectables[d]);
-if(ef&&!_1b._is_selected){
-_1b.selectover({element:_1b.element});
-_1b._is_selected=true;
-}
-if(ef){
-_1b.selectmove({element:_1b.element});
-}
-if(!ef&&_1b._is_selected){
-_1b._is_selected=false;
-_1b.selectout({element:_1b.element});
-}
-}
-},fire:function(_1d,_1e){
-MVC.Position.prepare();
-for(var d=0;d<this.selectables.length;d++){
-var _20=this.selectables[d];
-var ef=MVC.Selectables.isAffected(_1e,this.selectables[d]);
-if(ef){
-_20.selected({element:_20.element,event:_1d});
-}
-}
-},compile:function(){
-var _22=[];
-for(var _23 in MVC.Selectables.selectors){
-var _24=_22.concat(MVC.Query(_23));
-for(var e=0;e<_24.length;e++){
-MVC.Selectables.add(_24[e],MVC.Selectables.selectors[_23]);
-}
-}
-},clear:function(){
-this.selectables=[];
-}};
-;
 include.set_path('jmvc/rhino/documentation');
 if(typeof load!="undefined"&&!MVC.load_doc){
 load("jmvc/plugins/lang/standard_helpers.js");
@@ -6037,6 +5085,498 @@ load("jmvc/rhino/documentation/attribute.js");
 include.plugins("view","lang/class");
 include("application","pair","directives","function","class","constructor","file","add","static","prototype","attribute");
 }
+;
+include.set_path('jmvc/plugins/view');
+include.plugins("lang");
+include("view");
+if(include.get_env()=="development"){
+include("fulljslint");
+}
+if(MVC.Controller){
+include.plugins("controller/view");
+}
+;
+include.set_path('jmvc/plugins/view');
+MVC.View=function(_1){
+this.set_options(_1);
+if(_1.precompiled){
+this.template={};
+this.template.process=_1.precompiled;
+MVC.View.update(this.name,this);
+return;
+}
+if(_1.url||_1.absolute_url||_1.view_url){
+this.name=this.name?this.name:_1.url||_1.absolute_url||"views/"+_1.view_url;
+var _2=_1.absolute_url||(_1.url?MVC.root.join(_1.url+(_1.url.match(/\.ejs/)?"":".ejs")):MVC.root.join("views/"+_1.view_url+(_1.view_url.match(/\.ejs/)?"":".ejs")));
+var _3=MVC.View.get(this.name,this.cache);
+if(_3){
+return _3;
+}
+if(_3==MVC.View.INVALID_PATH){
+return null;
+}
+this.text=include.request(_2+(this.cache||window._rhino?"":"?"+Math.random()));
+if(this.text==null){
+if(window._rhino){
+print("Exception: "+"There is no template at "+_2);
+}
+throw ({type:"JMVC",message:"There is no template at "+_2});
+}
+}else{
+if(_1.hasOwnProperty("element")){
+if(typeof _1.element=="string"){
+var _4=_1.element;
+_1.element=MVC.$E(_1.element);
+if(_1.element==null){
+throw _4+"does not exist!";
+}
+}
+if(_1.element.value){
+this.text=_1.element.value;
+}else{
+this.text=_1.element.innerHTML;
+}
+this.name=_1.element.id;
+this.type="[";
+}
+}
+var _3=new MVC.View.Compiler(this.text,this.type);
+_3.compile(_1);
+MVC.View.update(this.name,this);
+this.template=_3;
+};
+MVC.View.prototype={render:function(_5,_6){
+_5=_5||{};
+var v=new MVC.View.Helpers(_5);
+MVC.Object.extend(v,_6||{});
+return this.template.process.call(_5,_5,v);
+},out:function(){
+return this.template.out;
+},set_options:function(_8){
+this.type=_8.type!=null?_8.type:MVC.View.type;
+this.cache=_8.cache!=null?_8.cache:MVC.View.cache;
+this.text=_8.text!=null?_8.text:null;
+this.name=_8.name!=null?_8.name:null;
+},update:function(_9,_a){
+if(typeof _9=="string"){
+_9=MVC.$E(_9);
+}
+if(_a==null){
+_template=this;
+return function(_b){
+MVC.View.prototype.update.call(_template,_9,_b);
+};
+}
+if(typeof _a=="string"){
+params={};
+params.url=_a;
+_template=this;
+params.onComplete=function(_c){
+var _d=eval("("+_c.responseText+")");
+MVC.View.prototype.update.call(_template,_9,_d);
+};
+if(!MVC.Ajax){
+alert("You must include the Ajax plugin to use this feature");
+}
+new MVC.Ajax(params.url,params);
+}else{
+_9.innerHTML=this.render(_a);
+}
+}};
+MVC.View.Scanner=function(_e,_f,_10){
+this.left_delimiter=_f+"%";
+this.right_delimiter="%"+_10;
+this.double_left=_f+"%%";
+this.double_right="%%"+_10;
+this.left_equal=_f+"%=";
+this.left_comment=_f+"%#";
+if(_f=="["){
+this.SplitRegexp=/(\[%%)|(%%\])|(\[%=)|(\[%#)|(\[%)|(%\]\n)|(%\])|(\n)/;
+}else{
+this.SplitRegexp=new RegExp("("+this.double_left+")|(%%"+this.double_right+")|("+this.left_equal+")|("+this.left_comment+")|("+this.left_delimiter+")|("+this.right_delimiter+"\n)|("+this.right_delimiter+")|(\n)");
+}
+this.source=_e;
+this.stag=null;
+this.lines=0;
+};
+MVC.View.Scanner.to_text=function(_11){
+if(_11==null||_11===undefined){
+return "";
+}
+if(_11 instanceof Date){
+return _11.toDateString();
+}
+if(_11.toString){
+return _11.toString();
+}
+return "";
+};
+MVC.View.Scanner.prototype={scan:function(_12){
+scanline=this.scanline;
+regex=this.SplitRegexp;
+if(!this.source==""){
+var _13=MVC.String.rsplit(this.source,/\n/);
+for(var i=0;i<_13.length;i++){
+var _15=_13[i];
+this.scanline(_15,regex,_12);
+}
+}
+},scanline:function(_16,_17,_18){
+this.lines++;
+var _19=MVC.String.rsplit(_16,_17);
+for(var i=0;i<_19.length;i++){
+var _1b=_19[i];
+if(_1b!=null){
+try{
+_18(_1b,this);
+}
+catch(e){
+throw {type:"MVC.View.Scanner",line:this.lines};
+}
+}
+}
+}};
+MVC.View.Buffer=function(_1c,_1d){
+this.line=new Array();
+this.script="";
+this.pre_cmd=_1c;
+this.post_cmd=_1d;
+for(var i=0;i<this.pre_cmd.length;i++){
+this.push(_1c[i]);
+}
+};
+MVC.View.Buffer.prototype={push:function(cmd){
+this.line.push(cmd);
+},cr:function(){
+this.script=this.script+this.line.join("; ");
+this.line=new Array();
+this.script=this.script+"\n";
+},close:function(){
+if(this.line.length>0){
+for(var i=0;i<this.post_cmd.length;i++){
+this.push(pre_cmd[i]);
+}
+this.script=this.script+this.line.join("; ");
+line=null;
+}
+}};
+MVC.View.Compiler=function(_21,_22){
+this.pre_cmd=["var ___ViewO = [];"];
+this.post_cmd=new Array();
+this.source=" ";
+if(_21!=null){
+if(typeof _21=="string"){
+_21=_21.replace(/\r\n/g,"\n");
+_21=_21.replace(/\r/g,"\n");
+this.source=_21;
+}else{
+if(_21.innerHTML){
+this.source=_21.innerHTML;
+}
+}
+if(typeof this.source!="string"){
+this.source="";
+}
+}
+_22=_22||"<";
+var _23=">";
+switch(_22){
+case "[":
+_23="]";
+break;
+case "<":
+break;
+default:
+throw _22+" is not a supported deliminator";
+break;
+}
+this.scanner=new MVC.View.Scanner(this.source,_22,_23);
+this.out="";
+};
+MVC.View.Compiler.prototype={compile:function(_24){
+_24=_24||{};
+this.out="";
+var _25="___ViewO.push(";
+var _26=_25;
+var _27=new MVC.View.Buffer(this.pre_cmd,this.post_cmd);
+var _28="";
+var _29=function(_2a){
+_2a=_2a.replace(/\\/g,"\\\\");
+_2a=_2a.replace(/\n/g,"\\n");
+_2a=_2a.replace(/"/g,"\\\"");
+return _2a;
+};
+this.scanner.scan(function(_2b,_2c){
+if(_2c.stag==null){
+switch(_2b){
+case "\n":
+_28=_28+"\n";
+_27.push(_25+"\""+_29(_28)+"\");");
+_27.cr();
+_28="";
+break;
+case _2c.left_delimiter:
+case _2c.left_equal:
+case _2c.left_comment:
+_2c.stag=_2b;
+if(_28.length>0){
+_27.push(_25+"\""+_29(_28)+"\")");
+}
+_28="";
+break;
+case _2c.double_left:
+_28=_28+_2c.left_delimiter;
+break;
+default:
+_28=_28+_2b;
+break;
+}
+}else{
+switch(_2b){
+case _2c.right_delimiter:
+switch(_2c.stag){
+case _2c.left_delimiter:
+if(_28[_28.length-1]=="\n"){
+_28=MVC.String.chop(_28);
+_27.push(_28);
+_27.cr();
+}else{
+_27.push(_28);
+}
+break;
+case _2c.left_equal:
+_27.push(_26+"(MVC.View.Scanner.to_text("+_28+")))");
+break;
+}
+_2c.stag=null;
+_28="";
+break;
+case _2c.double_right:
+_28=_28+_2c.right_delimiter;
+break;
+default:
+_28=_28+_2b;
+break;
+}
+}
+});
+if(_28.length>0){
+_27.push(_25+"\""+_29(_28)+"\")");
+}
+_27.close();
+this.out=_27.script+";";
+var _2d="this.process = function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {"+this.out+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}};";
+try{
+eval(_2d);
+}
+catch(e){
+if(typeof JSLINT!="undefined"){
+JSLINT(this.out);
+for(var i=0;i<JSLINT.errors.length;i++){
+var _30=JSLINT.errors[i];
+if(_30.reason!="Unnecessary semicolon."){
+_30.line++;
+var e=new Error();
+e.lineNumber=_30.line;
+e.message=_30.reason;
+if(_24.url){
+e.fileName=_24.url;
+}
+throw e;
+}
+}
+}else{
+throw e;
+}
+}
+}};
+MVC.View.config=function(_31){
+MVC.View.cache=_31.cache!=null?_31.cache:MVC.View.cache;
+MVC.View.type=_31.type!=null?_31.type:MVC.View.type;
+var _32={};
+MVC.View.templates_directory=_32;
+MVC.View.get=function(_33,_34){
+if(_34==false){
+return null;
+}
+if(_32[_33]){
+return _32[_33];
+}
+return null;
+};
+MVC.View.update=function(_35,_36){
+if(_35==null){
+return;
+}
+_32[_35]=_36;
+};
+MVC.View.INVALID_PATH=-1;
+};
+MVC.View.config({cache:include.get_env()=="production",type:"<"});
+MVC.View.PreCompiledFunction=function(_37,_38,f){
+new MVC.View({name:_38,precompiled:f});
+};
+MVC.View.Helpers=function(_3a){
+this.data=_3a;
+};
+MVC.View.Helpers.prototype={partial:function(_3b,_3c){
+if(!_3c){
+_3c=this.data;
+}
+return new MVC.View(_3b).render(_3c);
+},to_text:function(_3d,_3e){
+if(_3d==null||_3d===undefined){
+return _3e||"";
+}
+if(_3d instanceof Date){
+return _3d.toDateString();
+}
+if(_3d.toString){
+return _3d.toString().replace(/\n/g,"<br />").replace(/''/g,"'");
+}
+return "";
+}};
+include.view=function(_3f){
+if(include.get_env()=="development"){
+new MVC.View({url:new MVC.File("../"+_3f).join_current()});
+}else{
+if(include.get_env()=="compress"){
+include({path:"../"+_3f,process:MVC.View.process_include,ignore:true});
+new MVC.View({url:new MVC.File("../"+_3f).join_current()});
+}else{
+}
+}
+};
+include.views=function(){
+for(var i=0;i<arguments.length;i++){
+include.view(arguments[i]+".ejs");
+}
+};
+MVC.View.process_include=function(_41){
+var _42=new MVC.View({text:_41.text});
+return "MVC.View.PreCompiledFunction(\""+_41.original_path+"\", \""+_41.path+"\",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {"+_42.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
+};
+if(!MVC._no_conflict){
+View=MVC.View;
+}
+MVC.Native.extend("String",{rsplit:function(_43,_44){
+var _45=_44.exec(_43);
+var _46=new Array();
+while(_45!=null){
+var _47=_45.index;
+var _48=_44.lastIndex;
+if((_47)!=0){
+var _49=_43.substring(0,_47);
+_46.push(_43.substring(0,_47));
+_43=_43.slice(_47);
+}
+_46.push(_45[0]);
+_43=_43.slice(_45[0].length);
+_45=_44.exec(_43);
+}
+if(!_43==""){
+_46.push(_43);
+}
+return _46;
+},chop:function(_4a){
+return _4a.substr(0,_4a.length-1);
+}});
+;
+include.set_path('jmvc/plugins/controller/view');
+include.plugins("view","controller");
+include("controller_view");
+;
+include.set_path('jmvc/plugins/controller/view');
+MVC.Controller.prototype.render=function(_1){
+var _2,_3=MVC.RENDER_TO,_4;
+var _5=this.Class.className;
+var _6=this.action_name;
+if(!_1){
+_1={};
+}
+var _7={};
+if(_1.helpers){
+for(var h=0;h<_1.helpers.length;h++){
+var n=MVC.String.classize(_1.helpers[h]);
+MVC.Object.extend(_7,window[n]?window[n].View().helpers:{});
+}
+}
+if(typeof _1=="string"){
+_2=new MVC.View({url:_1}).render(this,_7);
+}else{
+if(_1.text){
+_2=_1.text;
+}else{
+var _a=function(_b){
+var _b=MVC.String.include(_b,"/")?_b.split("/").join("/_"):_5+"/"+_b;
+var _b=_b+".ejs";
+return _b;
+};
+if(_1.plugin){
+_4="../jmvc/plugins/"+_1.plugin;
+}
+if(_1.action){
+var _c="../views/"+_a(_1.action);
+}else{
+if(_1.partial){
+var _c="../views/"+_a(_1.partial);
+}else{
+var _c="../views/"+_5+"/"+_6.replace(/\.|#/g,"").replace(/ /g,"_")+".ejs";
+}
+}
+var _d=this;
+if(_1.locals){
+for(var _e in _1.locals){
+_d[_e]=_1.locals[_e];
+}
+}
+var _f;
+if(!_4){
+_f=new MVC.View({url:new MVC.File(_c).join_from(this.Class._path)});
+}else{
+try{
+var _f=new MVC.View({url:MVC.View.get(_4)?_4:_c});
+}
+catch(e){
+if(e.type!="JMVC"){
+throw e;
+}
+var _f=new MVC.View({url:_4});
+}
+}
+_2=_f.render(_d,_7);
+}
+}
+var _10=["to","before","after","top","bottom"];
+var _11=null;
+for(var l=0;l<_10.length;l++){
+if(typeof _1[_10[l]]=="string"){
+var id=_1[_10[l]];
+_1[_10[l]]=MVC.$E(id);
+if(!_1[_10[l]]){
+throw {message:"Can't find element with id: "+id,name:"ControllerView: Missing Element"};
+}
+}
+if(_1[_10[l]]){
+_11=_1[_10[l]];
+if(_10[l]=="to"){
+if(MVC.$E.update){
+MVC.$E.update(_1.to,_2);
+}else{
+_1.to.innerHTML=_2;
+}
+}else{
+if(!MVC.$E.insert){
+throw {message:"Include can't insert "+_10[l]+" without the element plugin.",name:"ControllerView: Missing Plugin"};
+}
+var opt={};
+opt[_10[l]]=_2;
+MVC.$E.insert(_11,opt);
+}
+}
+}
+return _2;
+};
 ;
 include.set_path('jmvc/rhino/documentation');
 MVC.render_to=function(_1,_2,_3){
@@ -6086,15 +5626,32 @@ MVC.Doc.Constructor.listing[i].toFile(_15);
 this.summary_page(_15);
 },left_side:function(){
 return MVC.Doc.render("jmvc/rhino/documentation/templates/left_side.ejs",this);
-},summary_page:function(_17){
-MVC.Doc.render_to("docs/"+this.name+".html","jmvc/rhino/documentation/templates/summary.ejs",this);
-},clean_path:function(_18){
-return _18;
-var _19=_18.split("/");
-if(_19.length>5){
-_19=_19.slice(_19.length-5);
+},get_name:function(i){
+var me=this.all_sorted[i].name;
+if(i==0){
+return me;
 }
-return _19.join("/");
+var _19=this.all_sorted[i-1].name;
+var t=me.split(/\./);
+var p=_19.split(/\./);
+var _1c=[],_1d=[];
+for(var j=0;j<t.length;j++){
+if(p[j]&&p[j]==t[j]){
+_1c.push(t[j]);
+}else{
+_1d.push(t[j]);
+}
+}
+return (_1c.length>0?"<span class='matches_previous'>"+_1c.join(".")+".</span>":"")+_1d.join(".");
+},summary_page:function(_1f){
+MVC.Doc.render_to("docs/"+this.name+".html","jmvc/rhino/documentation/templates/summary.ejs",this);
+},clean_path:function(_20){
+return _20;
+var _21=_20.split("/");
+if(_21.length>5){
+_21=_21.slice(_21.length-5);
+}
+return _21.join("/");
 }};
 ;
 include.set_path('jmvc/rhino/documentation');
@@ -6298,6 +5855,12 @@ this.real_comment+="<pre><code class='"+this.comment_code_type+"'>"+this.comment
 }
 return false;
 }});
+MVC.Doc.Directive.Alias=MVC.Class.extend("alias",{add:function(_1b){
+var m=_1b.match(/^\s*@alias\s*([\w\-\.]*)/);
+if(m){
+this.alias=m[1];
+}
+}});
 ;
 include.set_path('jmvc/rhino/documentation');
 MVC.Doc.Function=MVC.Doc.Pair.extend("function",{code_match:/([\w\.\$]+)\s*[:=]\s*function\(([^\)]*)/,init:function(){
@@ -6375,7 +5938,7 @@ return n+"("+_e.join(", ")+") -> "+this.ret.type;
 ;
 include.set_path('jmvc/rhino/documentation');
 MVC.Doc.Class=MVC.Doc.Pair.extend("class",{code_match:/([\w\.]+)\s*=\s*([\w\.]+?).extend\(/,starts_scope:true,listing:[],init:function(){
-this.add(MVC.Doc.Directive.Inherits,MVC.Doc.Directive.Author,MVC.Doc.Directive.Hide,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd);
+this.add(MVC.Doc.Directive.Inherits,MVC.Doc.Directive.Author,MVC.Doc.Directive.Hide,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd,MVC.Doc.Directive.Alias);
 this._super();
 var _1="jmvc/rhino/documentation/templates/file.ejs";
 this._file_view=new View({text:readFile(_1),name:_1});
@@ -6438,7 +6001,7 @@ _1+="<a href='"+_3+".html'>"+_3+"</a> ";
 _1+="</body></html>";
 MVCOptions.save("docs/constructors/index2.html",_1);
 },init:function(){
-this.add(MVC.Doc.Directive.Init,MVC.Doc.Directive.Param,MVC.Doc.Directive.Inherits,MVC.Doc.Directive.Author,MVC.Doc.Directive.Return,MVC.Doc.Directive.Hide,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd);
+this.add(MVC.Doc.Directive.Init,MVC.Doc.Directive.Param,MVC.Doc.Directive.Inherits,MVC.Doc.Directive.Author,MVC.Doc.Directive.Return,MVC.Doc.Directive.Hide,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd,MVC.Doc.Directive.Alias);
 this._super();
 var _4="jmvc/rhino/documentation/templates/file.ejs";
 this._file_view=new View({text:readFile(_4),name:_4});
@@ -6468,10 +6031,10 @@ var _f=[];
 for(var n in this.params){
 _f.push(n);
 }
-var n=this.name;
+var n=this.alias?this.alias:this.name;
 if(this.ret.type=="undefined"){
 n="new "+n;
-this.ret.type=this.name.toLowerCase();
+this.ret.type=this.alias?this.alias.toLowerCase():this.name.toLowerCase();
 }
 return n+"("+_f.join(", ")+") -> "+this.ret.type;
 },cleaned_comment:function(){

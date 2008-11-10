@@ -1,6 +1,13 @@
 //Almost all code and technique comes from Kris Zyp's/Dojo's window.name Transport
 //http://www.sitepen.com/blog/2008/07/22/windowname-transport/
-
+/**
+ * 
+ * @constructor MVC.IO.WindowName
+ * @alias MVC.WindowName
+ * Provides window name as a transport similar to [MVC.IO.Ajax MVC.Ajax]
+ * 
+ * @init a
+ */
 MVC.WindowName = function(url, params){
     this.url = url;
     this.params = params || {};
@@ -149,3 +156,4 @@ MVC.WindowName.styleFrame = function(frame){
 if(!MVC._no_conflict && typeof WindowName == 'undefined'){
 	WindowName = MVC.WindowName;
 }
+MVC.IO.WindowName = MVC.WindowName;
