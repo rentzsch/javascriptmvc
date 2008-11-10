@@ -308,12 +308,12 @@ MVC.Controller.Action = MVC.Class.extend(
 {
     /**
      * Called with prototype functions that match this action.
-     * @param {String} action
+     * @param {String} action_name
      * @param {Function} f
      * @param {MVC.Controller} controller
      */
     init: function(action_name, f, controller){
-        this.action = action;
+        this.action = action_name;
         this.func = f;
         this.controller = controller;
     }
