@@ -1,6 +1,84 @@
-/*
- * Provides abstract functionality for a wide variety of models.  It provides a base which 
- * one can assume all other models must have.  A model must provide:
+/**
+ * Models wrap an application's data layer.  This is done in two ways:
+ * <ul>
+ *     <li>Requesting data from and interacting with services</li>
+ *     <li>Wrap service data with a domain-specific representation</li>
+ * </ul>
+ * A strong model layer keeps your code organized and maintainable, but it typically
+ * is the least developed part of the MVC architecture.  This guide introduces you
+ * to the basics of how a model should work.  Note that much of what it demonstrates could be 
+ * done easier with a different base Model class such as [MVC.Model.Ajax|Model.Ajax].
+ * <h2>Services</h2>
+ * Your models should be the way you communicate with the server.  Instead of using 
+ * Ajax/XHR requests directly, perform those requests in a model.  
+ * 
+ * For example:
+@code_start
+//instead of:
+new Ajax('/tasks.json', {onComplete: find_tasks_next_week })
+//do this:
+Task.find('all', find_tasks_next_week)
+
+//instead of
+new Ajax('/tasks/'+id+'/complete.json',{onComplete: task_completed})
+//do this:
+task.complete(task_completed)
+@code_end
+Typically there are two types of services any application connects to:
+<ul>
+     <li>Group - operate on many instances.  Ex: getting all tasks for a user.</li>
+     <li>Singular - operate on one instance. Ex: completing a task. </li>
+</ul>
+For these types of services, you will want to build them in slightly different ways.
+<h3>Group Services</h3>
+Group services that request data should look like the following:
+@code_start
+Task = MVC.Model.extend('task',
+{
+  find : function(params, callback){
+    new Ajax('/tasks.json', {onComplete: MVC.Function.bind(function(response){
+        //get data into the right format for create_as_existing
+        var data =  eval('('+json_string+')');     
+        //call create_as_existing to create instances
+        var instances = this.create_many_as_existing(data);
+        //call back with data.
+        callback(instances)
+    }) })
+  }
+},
+{})
+@code_end
+Note this function uses [MVC.Model.static.create_many_as_existing|create_many_as_existing]
+to create new instances.  By using create_many_as_existing, the model will also publish
+[OpenAjax|OpenAjax.hub] messages that can be listed to by controllers.
+<h3>Singular Service</h3>
+Singular services that minipulate data might look like:
+@code_start
+Task = MVC.Model.extend('task',
+{},
+{
+  complete: function(callback){
+    new Ajax('/tasks/'+this.id+'/complete.json', {onComplete: MVC.Function.bind(function(response){
+        this.completed = true;
+        callback(this)
+        this.publish("completed")
+    }) })
+  }
+})
+@code_end
+<h2>Wrapping Data</h2>
+Now that you have instances, you can wrap their data in useful ways.  This is done by adding
+functions to the Model's prototype methods.  For example:
+@code_start
+Task = MVC.Model.extend('task',
+{},
+{
+  status : function(){
+    return this.complete ? "COMPLETE" : "INCOMPLETE"
+  }
+})
+@code_end
+<h3>P</h3>
  * <ul>
  *     <li>Model.find_one(params, callbacks)</li>
  *     <li>Model.find_all(params, callbacks)</li>
@@ -10,6 +88,9 @@
  * </ul>
  * 
  * <h2>Using Stores</h2>
+ * Model keeps all instances of a class in a [MVC.Store|Store].  Stores provide an easy way of
+ * looking up instances by id.  
+ * 
  * <h2>Using OpenAjax</h2>
  * 
  */
@@ -284,7 +365,7 @@ MVC.Model = MVC.Class.extend(
      * @param {Object} {optional:Function} callback or object of callbacks
      */
     destroy : function(callback){
-        this.Class.destroy(this[this.Class.id], callback);
+        this.Class.destroy(this[this.Class.id], cb);
         this.Class.store.destroy(this[this.Class.id]);
     },
     add_errors : function(errors){
