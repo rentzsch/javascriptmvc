@@ -2,8 +2,18 @@
 
 /**
  * @constructor
- * View cleans the HTML out of your JavaScript with client side templates. After View gets its rubber gloves on dirty code, 
- * you'll feel organized and uncluttered.
+ * View provides client side templates.  Typically they work with controller to render data in HTML form.
+ * 
+ * 
+ * <h2>Install</h2>
+ * @code_start
+ * include.plugins('view') //for basic templating functionality
+ * include.plugins('view/helpers') //for HTML helpers
+ * @code_end
+ * <h2>Including views</h2>
+ * MVC can package processed views in the production file.
+ * 
+ * <h2></h2>
  * @init Creates a new view
  * @param {Object} options A hash with the following options
  * <table class="options">

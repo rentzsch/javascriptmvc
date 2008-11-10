@@ -1,6 +1,6 @@
 include.set_path('apps');
 include.resources();
-include.plugins("controller/comet","controller/dragdrop","controller/stateful","controller/hover","controller/lasso","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/window_name","model/rest_xml","test");
+include.plugins("controller/comet","controller/dragdrop","controller/stateful","controller/hover","controller/lasso","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/window_name","model/rest_xml","test","view","view/helpers");
 MVC.load_doc=true;
 include("../jmvc/rhino/documentation/setup");
 include(function(){
@@ -1009,7 +1009,7 @@ if(this.matches){
 MVC.Controller.actions.push(this);
 }
 }},{init:function(_27,f,_29){
-this.action=action;
+this.action=_27;
 this.func=f;
 this.controller=_29;
 }});
@@ -5065,27 +5065,6 @@ _44.top=_40;
 return _44;
 };
 ;
-include.set_path('jmvc/rhino/documentation');
-if(typeof load!="undefined"&&!MVC.load_doc){
-load("jmvc/plugins/lang/standard_helpers.js");
-load("jmvc/plugins/view/view.js");
-load("jmvc/plugins/lang/class/setup.js");
-load("jmvc/rhino/documentation/application.js");
-load("jmvc/rhino/documentation/pair.js");
-load("jmvc/rhino/documentation/directives.js");
-load("jmvc/rhino/documentation/function.js");
-load("jmvc/rhino/documentation/class.js");
-load("jmvc/rhino/documentation/constructor.js");
-load("jmvc/rhino/documentation/file.js");
-load("jmvc/rhino/documentation/add.js");
-load("jmvc/rhino/documentation/static.js");
-load("jmvc/rhino/documentation/prototype.js");
-load("jmvc/rhino/documentation/attribute.js");
-}else{
-include.plugins("view","lang/class");
-include("application","pair","directives","function","class","constructor","file","add","static","prototype","attribute");
-}
-;
 include.set_path('jmvc/plugins/view');
 include.plugins("lang");
 include("view");
@@ -5577,6 +5556,218 @@ MVC.$E.insert(_11,opt);
 }
 return _2;
 };
+;
+include.set_path('jmvc/plugins/view/helpers');
+include.plugins("view");
+include("view_helpers");
+;
+include.set_path('jmvc/plugins/view/helpers');
+MVC.Object.extend(MVC.View.Helpers.prototype,{check_box_tag:function(_1,_2,_3,_4){
+_3=_3||{};
+if(_4){
+_3.checked="checked";
+}
+return this.input_field_tag(_1,_2,"checkbox",_3);
+},date_tag:function(_5,_6,_7){
+if(!(_6 instanceof Date)){
+_6=new Date();
+}
+var _8=[],_9=[],_a=[];
+var _b=_6.getFullYear(),_c=_6.getMonth(),_d=_6.getDate();
+for(var y=_b-15;y<_b+15;y++){
+_8.push({value:y,text:y});
+}
+for(var m=0;m<12;m++){
+_9.push({value:(m),text:MVC.Date.month_names[m]});
+}
+for(var d=0;d<31;d++){
+_a.push({value:(d+1),text:(d+1)});
+}
+var _11=this.select_tag(_5+"[year]",_b,_8,{id:_5+"[year]"});
+var _12=this.select_tag(_5+"[month]",_c,_9,{id:_5+"[month]"});
+var _13=this.select_tag(_5+"[day]",_d,_a,{id:_5+"[day]"});
+return _11+_12+_13;
+},file_tag:function(_14,_15,_16){
+return this.input_field_tag(_14+"[file]",_15,"file",_16);
+},form_tag:function(_17,_18){
+_18=_18||{};
+if(_18.multipart==true){
+_18.method="post";
+_18.enctype="multipart/form-data";
+}
+_18.action=_17;
+return this.start_tag_for("form",_18);
+},form_tag_end:function(){
+return this.tag_end("form");
+},hidden_field_tag:function(_19,_1a,_1b){
+return this.input_field_tag(_19,_1a,"hidden",_1b);
+},input_field_tag:function(_1c,_1d,_1e,_1f){
+_1f=_1f||{};
+_1f.id=_1f.id||_1c;
+_1f.value=_1d||"";
+_1f.type=_1e||"text";
+_1f.name=_1c;
+return this.single_tag_for("input",_1f);
+},label_tag:function(_20,_21){
+_21=_21||{};
+return this.start_tag_for("label",_21)+_20+this.tag_end("label");
+},link_to:function(_22,url,_24){
+if(!_22){
+var _22="null";
+}
+if(!_24){
+var _24={};
+}
+this.set_confirm(_24);
+_24.href=url;
+return this.start_tag_for("a",_24)+_22+this.tag_end("a");
+},link_to_if:function(_25,_26,url,_28){
+return this.link_to_unless((!_25),_26,url,_28);
+},link_to_unless:function(_29,_2a,url,_2c){
+if(_29){
+return _2a;
+}
+return this.link_to(_2a,url,_2c);
+},set_confirm:function(_2d){
+if(_2d.confirm){
+_2d.onclick=_2d.onclick||"";
+_2d.onclick=_2d.onclick+"; var ret_confirm = confirm(\""+_2d.confirm+"\"); if(!ret_confirm){ return false;} ";
+_2d.confirm=null;
+}
+},submit_link_to:function(_2e,_2f,_30,_31){
+if(!_2e){
+var _2e="null";
+}
+if(!_30){
+_30={};
+}
+_30.type="submit";
+_30.value=_2e;
+this.set_confirm(_30);
+_30.onclick=_30.onclick+";window.location=\""+_2f+"\"; return false;";
+return this.single_tag_for("input",_30);
+},password_field_tag:function(_32,_33,_34){
+return this.input_field_tag(_32,_33,"password",_34);
+},select_tag:function(_35,_36,_37,_38){
+_38=_38||{};
+_38.id=_38.id||_35;
+_38.name=_35;
+var txt="";
+txt+=this.start_tag_for("select",_38);
+for(var i=0;i<_37.length;i++){
+var _3b=_37[i];
+if(typeof _3b=="string"){
+_3b={value:_3b};
+}
+if(!_3b.text){
+_3b.text=_3b.value;
+}
+if(!_3b.value){
+_3b.text=_3b.text;
+}
+var _3c={value:_3b.value};
+if(_3b.value==_36){
+_3c.selected="selected";
+}
+txt+=this.start_tag_for("option",_3c)+_3b.text+this.tag_end("option");
+}
+txt+=this.tag_end("select");
+return txt;
+},single_tag_for:function(tag,_3e){
+return this.tag(tag,_3e,"/>");
+},start_tag_for:function(tag,_40){
+return this.tag(tag,_40);
+},submit_tag:function(_41,_42){
+_42=_42||{};
+_42.type=_42.type||"submit";
+_42.value=_41||"Submit";
+return this.single_tag_for("input",_42);
+},tag:function(tag,_44,end){
+end=end||">";
+var txt=" ";
+for(var _47 in _44){
+if(_44.hasOwnProperty(_47)){
+value=_44[_47]!=null?_44[_47].toString():"";
+if(_47=="Class"||_47=="klass"){
+_47="class";
+}
+if(value.indexOf("'")!=-1){
+txt+=_47+"=\""+value+"\" ";
+}else{
+txt+=_47+"='"+value+"' ";
+}
+}
+}
+return "<"+tag+txt+end;
+},tag_end:function(tag){
+return "</"+tag+">";
+},text_area_tag:function(_49,_4a,_4b){
+_4b=_4b||{};
+_4b.id=_4b.id||_49;
+_4b.name=_4b.name||_49;
+_4a=_4a||"";
+if(_4b.size){
+_4b.cols=_4b.size.split("x")[0];
+_4b.rows=_4b.size.split("x")[1];
+delete _4b.size;
+}
+_4b.cols=_4b.cols||50;
+_4b.rows=_4b.rows||4;
+return this.start_tag_for("textarea",_4b)+_4a+this.tag_end("textarea");
+},text_field_tag:function(_4c,_4d,_4e){
+return this.input_field_tag(_4c,_4d,"text",_4e);
+},img_tag:function(_4f,_50){
+_50=_50||{};
+_50.src="resources/images/"+_4f;
+return this.single_tag_for("img",_50);
+}});
+MVC.View.Helpers.prototype.text_tag=MVC.View.Helpers.prototype.text_area_tag;
+(function(){
+var _51={};
+var _52=0;
+MVC.View.Helpers.link_data=function(_53){
+var _54=_52++;
+_51[_54]=_53;
+return "_data='"+_54+"'";
+};
+MVC.View.Helpers.get_data=function(el){
+if(!el){
+return null;
+}
+var _56=el.getAttribute("_data");
+if(!_56){
+return null;
+}
+return _51[parseInt(_56)];
+};
+MVC.View.Helpers.prototype.link_data=function(_57){
+return MVC.View.Helpers.link_data(_57);
+};
+MVC.View.Helpers.prototype.get_data=function(el){
+return MVC.View.Helpers.get_data(el);
+};
+})();
+;
+include.set_path('jmvc/rhino/documentation');
+if(typeof load!="undefined"&&!MVC.load_doc){
+load("jmvc/plugins/lang/standard_helpers.js");
+load("jmvc/plugins/view/view.js");
+load("jmvc/plugins/lang/class/setup.js");
+load("jmvc/rhino/documentation/application.js");
+load("jmvc/rhino/documentation/pair.js");
+load("jmvc/rhino/documentation/directives.js");
+load("jmvc/rhino/documentation/function.js");
+load("jmvc/rhino/documentation/class.js");
+load("jmvc/rhino/documentation/constructor.js");
+load("jmvc/rhino/documentation/file.js");
+load("jmvc/rhino/documentation/add.js");
+load("jmvc/rhino/documentation/static.js");
+load("jmvc/rhino/documentation/prototype.js");
+load("jmvc/rhino/documentation/attribute.js");
+}else{
+include.plugins("view","lang/class");
+include("application","pair","directives","function","class","constructor","file","add","static","prototype","attribute");
+}
 ;
 include.set_path('jmvc/rhino/documentation');
 MVC.render_to=function(_1,_2,_3){
