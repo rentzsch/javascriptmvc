@@ -176,7 +176,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
         this.element = params.element;
         this.mouseover_event = params.event;
         this.mousemove_function = MVC.Function.bind(this.mousemove , this)
-        MVC.Event.observe(params.element, "mousemove", mousemove_function);
+        MVC.Event.observe(params.element, "mousemove", this.mousemove_function);
 
         this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
         
