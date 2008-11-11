@@ -202,7 +202,7 @@ MVC.Model = MVC.Class.extend(
      */
     _clean_callbacks : function(callbacks){
         if(!callbacks) {
-            if(this.asynchronous) throw "You must supply a callback!"; else return null;
+            callbacks = function(){};
         }
         if(typeof callbacks == 'function')
             return {onSuccess: callbacks, onFailure: callbacks};
@@ -212,9 +212,18 @@ MVC.Model = MVC.Class.extend(
 		return callbacks;
     },
     models : {},
+    /**
+     * Creates a callback function that will call back the function on the static class.
+     * If other arguments are passed, they will be added before the parameters used to call the callback.
+     * @param {String} fname
+     * @return {Function} a callback function useful for Ajax calls
+     */
     callback : function(fname){
-        var f = this[fname];
-        return MVC.Function.bind(f, this);
+        var f = typeof fname == 'string' ? this[fname] : fname;
+        var args = MVC.Array.from(arguments);
+        args.shift();
+        args.unshift(f, this);
+        return MVC.Function.bind.apply(null, args);
     },
     /**
      * Publishes to open ajax hub.  Always adds the className.event
@@ -404,6 +413,19 @@ MVC.Model = MVC.Class.extend(
      */
     publish : function(event, data){
         this.Class.publish(event, data||this);
+    },
+    /**
+     * Creates a callback function that will call back the function on the instance.
+     * If other arguments are passed, they will be added before the parameters used to call the callback.
+     * @param {String} fname
+     * @return {Function} a callback function useful for Ajax calls
+     */
+    callback : function(fname){
+        var f = typeof fname == 'string' ? this[fname] : fname;
+        var args = MVC.Array.from(arguments);
+        args.shift();
+        args.unshift(f, this);
+        return MVC.Function.bind.apply(null, args);
     }
 });
 
