@@ -595,7 +595,7 @@ MVC.Object.extend(include,
      * Synchronously requests a file.
      * @param {Object} path
      */
-    request: function(path){
+    request: function(path, content_type){
        var contentType = content_type || "application/x-www-form-urlencoded; charset="+MVC.default_encoding
        var request = MVC.Ajax.factory();
        request.open("GET", path, false);
