@@ -142,5 +142,34 @@ MVC.Position =
              window_right: sl+ ww,
              window_bottom: st+ wh
          }
+    },
+    // Compare Position - MIT Licensed, John Resig
+    /**
+     * 
+     * @param {Object} a
+     * @param {Object} b
+     */
+    compare: function(a, b){
+        if(a.compareDocumentPosition){
+            return a.compareDocumentPosition(b)
+        }
+        var number = 0;
+        number += (a != b && a.contains(b) && 16)
+        number += (a != b && b.contains(a) && 8)
+        if(a.sourceIndex){
+            number += (a.sourceIndex < b.sourceIndex && 4)
+            number += (a.sourceIndex > b.sourceIndex && 2)
+        }else{
+            
+            range = document.createRange();
+            range.selectNode(a);
+            sourceRange = document.createRange();
+            sourceRange.selectNode(b);
+            compare = range.compareBoundaryPoints(Range.START_TO_START, sourceRange);
+            alert(compare)
+            number += (compare == -1 && 4)
+            number += (compare == 1 && 2)
+        }
+        return number;
     }
 }
