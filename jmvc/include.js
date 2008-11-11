@@ -123,7 +123,11 @@ MVC = {
     /**
      * Empty function
      */
-    K : function(){}
+    K : function(){},
+    /**
+     * Default encoding for XHR requests.  Default is utf-8.
+     */
+    default_encoding : "utf-8"
 };
 /**
  * A static random number.
@@ -592,8 +596,12 @@ MVC.Object.extend(include,
      * @param {Object} path
      */
     request: function(path){
+       var contentType = content_type || "application/x-www-form-urlencoded; charset="+MVC.default_encoding
        var request = MVC.Ajax.factory();
        request.open("GET", path, false);
+       request.setRequestHeader('Content-type', contentType)
+       if(request.overrideMimeType) request.overrideMimeType(contentType);
+
        try{request.send(null);}
        catch(e){return null;}
        if ( request.status == 404 || request.status == 2 ||(request.status == 0 && request.responseText == '') ) return null;
