@@ -14,6 +14,7 @@ MVCOptions = {
         var app = new MVC.Doc.Application(total, "jmvc");
         app.generate();
         print("Generated docs.");
+        quit();
     },
     env:"compress"
 }

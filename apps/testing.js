@@ -23,7 +23,9 @@ if(location.href.indexOf('prototype') != -1){
 }
 
 include.engines('testing');
-include.plugins('io/ajax','controller','view','dom/element','model','lang/timer','view/translation');
+include.plugins('io/ajax','controller','view',
+    'dom/element','dom/position',
+    'model','lang/timer','view/translation');
 
 
 

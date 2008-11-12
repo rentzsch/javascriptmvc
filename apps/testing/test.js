@@ -10,7 +10,8 @@ include.unit_tests(
     'vector',
     'timer',
     'model',
-    'translation'
+    'translation',
+    'position'
 );
 
 include.functional_tests();

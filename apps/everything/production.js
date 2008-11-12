@@ -1,6 +1,6 @@
 include.set_path('apps');
 include.resources();
-include.plugins("controller/comet","controller/dragdrop","controller/stateful","controller/hover","controller/lasso","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/window_name","model/rest_xml","test","view","view/helpers");
+include.plugins("controller/comet","controller/dragdrop","controller/stateful","controller/hover","controller/lasso","dom/query","io/comet","io/jsonp","io/window_name","io/xdoc","lang/date","lang/json","model","model/ajax","model/cookie","model/jsonp","model/rest_json","model/window_name","model/rest_xml","test","view","view/helpers","dom/history","lang/date","lang/json");
 MVC.load_doc=true;
 include("../jmvc/rhino/documentation/setup");
 include(function(){
@@ -444,6 +444,7 @@ if(!_5){
 _5=_4;
 _4=null;
 }
+_5=_5||{};
 var _6=this;
 var _7=this.prototype;
 _1=true;
@@ -1522,7 +1523,14 @@ MVC.Query.descendant=function(_1,_2){
 return _1.getElementsBySelector(_2);
 };
 }else{
+if(typeof jQuery!="undefined"){
+MVC.Query=$;
+MVC.Query.descendant=function(_3,_4){
+return $(_3).find(_4);
+};
+}else{
 include("standard");
+}
 }
 ;
 include.set_path('jmvc/plugins/dom/query');
@@ -1865,6 +1873,27 @@ wh=document.body.clientHeight;
 ww=document.body.clientWidth;
 }
 return {window_height:wh,window_width:ww,document_height:MVC.Browser.IE?document.body.offsetHeight:de.offsetHeight,document_width:MVC.Browser.IE?document.body.offsetWidth:de.offsetWidth,scroll_left:sl,scroll_top:st,window_right:sl+ww,window_bottom:st+wh};
+},compare:function(a,b){
+if(a.compareDocumentPosition){
+return a.compareDocumentPosition(b);
+}else{
+if(a.contains){
+}
+}
+var _2c=(a!=b&&a.contains(b)&&16)+(a!=b&&b.contains(a)&&8);
+if(a.sourceIndex){
+_2c+=(a.sourceIndex<b.sourceIndex&&4);
+_2c+=(a.sourceIndex>b.sourceIndex&&2);
+}else{
+range=document.createRange();
+range.selectNode(a);
+sourceRange=document.createRange();
+sourceRange.selectNode(b);
+compare=range.compareBoundaryPoints(Range.START_TO_START,sourceRange);
+_2c+=(compare==-1&&4);
+_2c+=(compare==1&&2);
+}
+return _2c;
 }};
 ;
 include.set_path('jmvc/plugins/dom/animate');
@@ -2345,7 +2374,7 @@ this.starting_position=MVC.Event.pointer(_13.event);
 this.element=_13.element;
 this.mouseover_event=_13.event;
 this.mousemove_function=MVC.Function.bind(this.mousemove,this);
-MVC.Event.observe(_13.element,"mousemove",mousemove_function);
+MVC.Event.observe(_13.element,"mousemove",this.mousemove_function);
 this.timer=setTimeout(MVC.Function.bind(this.check,this),this.Class.interval);
 },mousemove:function(_15){
 this.mousemove_event=_15;
@@ -2905,6 +2934,7 @@ return new Date(Date.UTC(parseInt(_13[0],10),(parseInt(_13[1],10)-1),parseInt(_1
 return _1(_e);
 }});
 })();
+MVC.Native.Date=MVC.Date;
 ;
 include.set_path('jmvc/plugins/lang/json');
 include.plugins("lang");
@@ -3063,11 +3093,8 @@ this.default_attributes[_f]=null;
 }
 },attributes:{},default_attributes:{},_clean_callbacks:function(_11){
 if(!_11){
-if(this.asynchronous){
-throw "You must supply a callback!";
-}else{
-return null;
-}
+_11=function(){
+};
 }
 if(typeof _11=="function"){
 return {onSuccess:_11,onFailure:_11};
@@ -3083,125 +3110,134 @@ _11.onFailure=_11.onComplete;
 }
 return _11;
 },models:{},callback:function(_12){
-var f=this[_12];
-return MVC.Function.bind(f,this);
-},publish:function(_14,_15){
-OpenAjax.hub.publish(this.className+"."+_14,_15);
-}},{init:function(_16){
+var f=typeof _12=="string"?this[_12]:_12;
+var _14=MVC.Array.from(arguments);
+_14.shift();
+_14.unshift(f,this);
+return MVC.Function.bind.apply(null,_14);
+},publish:function(_15,_16){
+OpenAjax.hub.publish(this.className+"."+_15,_16);
+},namespace:null},{init:function(_17){
 this.errors=[];
 this.set_attributes(this.Class.default_attributes||{});
-this.set_attributes(_16);
-},set_attributes:function(_17){
-for(var key in _17){
-if(_17.hasOwnProperty(key)){
-this._setAttribute(key,_17[key]);
+this.set_attributes(_17);
+},set_attributes:function(_18){
+for(var key in _18){
+if(_18.hasOwnProperty(key)){
+this._setAttribute(key,_18[key]);
 }
 }
-return _17;
-},update_attributes:function(_19,_1a){
-this.set_attributes(_19);
-return this.save(_1a);
+return _18;
+},update_attributes:function(_1a,_1b){
+this.set_attributes(_1a);
+return this.save(_1b);
 },valid:function(){
 return this.errors.length==0;
 },validate:function(){
-},_setAttribute:function(_1b,_1c){
-if(MVC.Array.include(this.Class._associations,_1b)){
-this._setAssociation(_1b,_1c);
+},_setAttribute:function(_1c,_1d){
+if(MVC.Array.include(this.Class._associations,_1c)){
+this._setAssociation(_1c,_1d);
 }else{
-this._setProperty(_1b,_1c);
+this._setProperty(_1c,_1d);
 }
-},_setProperty:function(_1d,_1e){
-if(this["set_"+_1d]&&!this["set_"+_1d](_1e)){
+},_setProperty:function(_1e,_1f){
+if(this["set_"+_1e]&&!this["set_"+_1e](_1f)){
 return;
 }
-var old=this[_1d];
-this[_1d]=MVC.Array.include(["created_at","updated_at"],_1d)?MVC.Date.parse(_1e):_1e;
-if(_1d==this.Class.id&&this.Class.store){
+var old=this[_1e];
+this[_1e]=MVC.Array.include(["created_at","updated_at"],_1e)?MVC.Date.parse(_1f):_1f;
+if(_1e==this.Class.id&&this.Class.store){
 if(!old){
 this.Class.store.create(this);
 }else{
-if(old!=this[_1d]){
+if(old!=this[_1e]){
 this.Class.store.destroy(old);
 this.Class.store.create(this);
 }
 }
 }
-this.Class.add_attribute(_1d,MVC.Object.guess_type(_1e));
-},_setAssociation:function(_20,_21){
-this[_20]=function(){
-if(!MVC.String.is_singular(_20)){
-_20=MVC.String.singularize(_20);
+this.Class.add_attribute(_1e,MVC.Object.guess_type(_1f));
+},_setAssociation:function(_21,_22){
+this[_21]=function(){
+if(!MVC.String.is_singular(_21)){
+_21=MVC.String.singularize(_21);
 }
-var _22=window[MVC.String.classize(_20)];
-if(!_22){
-return _21;
+var _23=window[MVC.String.classize(_21)];
+if(!_23){
+return _22;
 }
-return _22.create_many_as_existing(_21);
+return _23.create_many_as_existing(_22);
 };
 },attributes:function(){
-var _23={};
+var _24={};
 var cas=this.Class.attributes;
-for(var _25 in cas){
-if(cas.hasOwnProperty(_25)){
-_23[_25]=this[_25];
+for(var _26 in cas){
+if(cas.hasOwnProperty(_26)){
+_24[_26]=this[_26];
 }
 }
-return _23;
+return _24;
 },is_new_record:function(){
 return true;
-},save:function(_26){
-var _27;
+},save:function(_27){
+var _28;
 this.errors=[];
 this.validate();
 if(!this.valid()){
 return false;
 }
-_27=this.is_new_record()?this.Class.create(this.attributes(),_26):this.Class.update(this[this.Class.id],this.attributes(),_26);
+_28=this.is_new_record()?this.Class.create(this.attributes(),_27):this.Class.update(this[this.Class.id],this.attributes(),_27);
 this.is_new_record=this.Class.new_record_func;
 return true;
-},destroy:function(_28){
-this.Class.destroy(this[this.Class.id],_28);
+},destroy:function(_29){
+this.Class.destroy(this[this.Class.id],cb);
 this.Class.store.destroy(this[this.Class.id]);
-},add_errors:function(_29){
-if(_29){
-this.errors=this.errors.concat(_29);
+},add_errors:function(_2a){
+if(_2a){
+this.errors=this.errors.concat(_2a);
 }
-},_resetAttributes:function(_2a){
+},_resetAttributes:function(_2b){
 this._clear();
 },_clear:function(){
 var cas=this.Class.default_attributes;
-for(var _2c in cas){
-if(cas.hasOwnProperty(_2c)){
-this[_2c]=null;
+for(var _2d in cas){
+if(cas.hasOwnProperty(_2d)){
+this[_2d]=null;
 }
 }
 },element_id:function(){
 return this.Class.className+"_"+this[this.Class.id];
 },element:function(){
 return MVC.$E(this.element_id());
-},publish:function(_2d,_2e){
-this.Class.publish(_2d,_2e||this);
+},publish:function(_2e,_2f){
+this.Class.publish(_2e,_2f||this);
+},callback:function(_30){
+var f=typeof _30=="string"?this[_30]:_30;
+var _32=MVC.Array.from(arguments);
+_32.shift();
+_32.unshift(f,this);
+return MVC.Function.bind.apply(null,_32);
 }});
-MVC.Object.guess_type=function(_2f){
-if(typeof _2f!="string"){
-if(_2f==null){
-return typeof _2f;
+MVC.Object.guess_type=function(_33){
+if(typeof _33!="string"){
+if(_33==null){
+return typeof _33;
 }
-if(_2f.constructor==Date){
+if(_33.constructor==Date){
 return "date";
 }
-if(_2f.constructor==Array){
+if(_33.constructor==Array){
 return "array";
 }
-return typeof _2f;
+return typeof _33;
 }
-if(_2f=="true"||_2f=="false"){
+if(_33=="true"||_33=="false"){
 return "boolean";
 }
-if(!isNaN(_2f)){
+if(!isNaN(_33)){
 return "number";
 }
-return typeof _2f;
+return typeof _33;
 };
 if(!MVC._no_conflict&&typeof Model=="undefined"){
 Model=MVC.Model;
@@ -5748,6 +5784,624 @@ return MVC.View.Helpers.get_data(el);
 };
 })();
 ;
+include.set_path('jmvc/plugins/dom/history');
+if(typeof Prototype=="undefined"){
+include("json2");
+}
+include("rsh");
+;
+include.set_path('jmvc/plugins/dom/history');
+if(!this.JSON){
+JSON={};
+}
+(function(){
+function f(n){
+return n<10?"0"+n:n;
+};
+if(typeof Date.prototype.toJSON!=="function"){
+Date.prototype.toJSON=function(_2){
+return this.getUTCFullYear()+"-"+f(this.getUTCMonth()+1)+"-"+f(this.getUTCDate())+"T"+f(this.getUTCHours())+":"+f(this.getUTCMinutes())+":"+f(this.getUTCSeconds())+"Z";
+};
+String.prototype.toJSON=Number.prototype.toJSON=Boolean.prototype.toJSON=function(_3){
+return this.valueOf();
+};
+}
+var cx=/[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,_5=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,_6,_7,_8={"\b":"\\b","\t":"\\t","\n":"\\n","\f":"\\f","\r":"\\r","\"":"\\\"","\\":"\\\\"},_9;
+function quote(_a){
+_5.lastIndex=0;
+return _5.test(_a)?"\""+_a.replace(_5,function(a){
+var c=_8[a];
+if(typeof c==="string"){
+return c;
+}
+return "\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4);
+})+"\"":"\""+_a+"\"";
+};
+function str(_d,_e){
+var i,k,v,_12,_13=_6,_14,_15=_e[_d];
+if(_15&&typeof _15==="object"&&typeof _15.toJSON==="function"){
+_15=_15.toJSON(_d);
+}
+if(typeof _9==="function"){
+_15=_9.call(_e,_d,_15);
+}
+switch(typeof _15){
+case "string":
+return quote(_15);
+case "number":
+return isFinite(_15)?String(_15):"null";
+case "boolean":
+case "null":
+return String(_15);
+case "object":
+if(!_15){
+return "null";
+}
+_6+=_7;
+_14=[];
+if(typeof _15.length==="number"&&!_15.propertyIsEnumerable("length")){
+_12=_15.length;
+for(i=0;i<_12;i+=1){
+_14[i]=str(i,_15)||"null";
+}
+v=_14.length===0?"[]":_6?"[\n"+_6+_14.join(",\n"+_6)+"\n"+_13+"]":"["+_14.join(",")+"]";
+_6=_13;
+return v;
+}
+if(_9&&typeof _9==="object"){
+_12=_9.length;
+for(i=0;i<_12;i+=1){
+k=_9[i];
+if(typeof k==="string"){
+v=str(k,_15);
+if(v){
+_14.push(quote(k)+(_6?": ":":")+v);
+}
+}
+}
+}else{
+for(k in _15){
+if(Object.hasOwnProperty.call(_15,k)){
+v=str(k,_15);
+if(v){
+_14.push(quote(k)+(_6?": ":":")+v);
+}
+}
+}
+}
+v=_14.length===0?"{}":_6?"{\n"+_6+_14.join(",\n"+_6)+"\n"+_13+"}":"{"+_14.join(",")+"}";
+_6=_13;
+return v;
+}
+};
+if(typeof JSON.stringify!=="function"){
+JSON.stringify=function(_16,_17,_18){
+var i;
+_6="";
+_7="";
+if(typeof _18==="number"){
+for(i=0;i<_18;i+=1){
+_7+=" ";
+}
+}else{
+if(typeof _18==="string"){
+_7=_18;
+}
+}
+_9=_17;
+if(_17&&typeof _17!=="function"&&(typeof _17!=="object"||typeof _17.length!=="number")){
+throw new Error("JSON.stringify");
+}
+return str("",{"":_16});
+};
+}
+if(typeof JSON.parse!=="function"){
+JSON.parse=function(_1a,_1b){
+var j;
+function walk(_1d,key){
+var k,v,_21=_1d[key];
+if(_21&&typeof _21==="object"){
+for(k in _21){
+if(Object.hasOwnProperty.call(_21,k)){
+v=walk(_21,k);
+if(v!==undefined){
+_21[k]=v;
+}else{
+delete _21[k];
+}
+}
+}
+}
+return _1b.call(_1d,key,_21);
+};
+cx.lastIndex=0;
+if(cx.test(_1a)){
+_1a=_1a.replace(cx,function(a){
+return "\\u"+("0000"+a.charCodeAt(0).toString(16)).slice(-4);
+});
+}
+if(/^[\],:{}\s]*$/.test(_1a.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g,"@").replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,"]").replace(/(?:^|:|,)(?:\s*\[)+/g,""))){
+j=eval("("+_1a+")");
+return typeof _1b==="function"?walk({"":j},""):j;
+}
+throw new SyntaxError("JSON.parse");
+};
+}
+})();
+;
+include.set_path('jmvc/plugins/dom/history');
+window.MVC.History={isIE:false,isOpera:false,isSafari:false,isKonquerer:false,isGecko:false,isSupported:false,throwErrors:true,fireInitialChange:true,create:function(_1){
+var _2=this;
+var UA=navigator.userAgent.toLowerCase();
+var _4=navigator.platform.toLowerCase();
+var _5=navigator.vendor||"";
+if(_5==="KDE"){
+this.isKonqueror=true;
+this.isSupported=false;
+}else{
+if(typeof window.opera!=="undefined"){
+this.isOpera=true;
+this.isSupported=true;
+}else{
+if(typeof document.all!=="undefined"){
+this.isIE=true;
+this.isSupported=true;
+}else{
+if(_5.indexOf("Apple Computer, Inc.")>-1){
+this.isSafari=true;
+this.isSupported=(_4.indexOf("mac")>-1);
+}else{
+if(UA.indexOf("gecko")!=-1){
+this.isGecko=true;
+this.isSupported=true;
+}
+}
+}
+}
+}
+window.historyStorage.setup(_1);
+if(this.isSafari){
+this.createSafari();
+}else{
+if(this.isOpera){
+this.createOpera();
+}
+}
+var _6=this.getCurrentLocation();
+this.currentLocation=_6;
+if(this.isIE){
+this.createIE(_6);
+}
+var _7=function(){
+_2.firstLoad=null;
+};
+this.addEventListener(window,"unload",_7);
+if(this.isIE){
+this.ignoreLocationChange=true;
+}else{
+if(!historyStorage.hasKey(this.PAGELOADEDSTRING)){
+this.ignoreLocationChange=true;
+this.firstLoad=true;
+historyStorage.put(this.PAGELOADEDSTRING,true);
+}else{
+this.ignoreLocationChange=false;
+this.fireOnNewListener=false;
+}
+}
+var _8=function(){
+_2.checkLocation();
+};
+setInterval(_8,100);
+},initialize:function(){
+if(this.isIE){
+if(!historyStorage.hasKey(this.PAGELOADEDSTRING)){
+this.fireOnNewListener=false;
+this.firstLoad=true;
+historyStorage.put(this.PAGELOADEDSTRING,true);
+}else{
+this.fireOnNewListener=false;
+this.firstLoad=false;
+}
+}
+},addListener:function(_9){
+this.listener=_9;
+if(this.fireOnNewListener){
+this.fireHistoryEvent(this.currentLocation);
+this.fireOnNewListener=false;
+}
+},addEventListener:function(o,e,l){
+if(o.addEventListener){
+o.addEventListener(e,l,false);
+}else{
+if(o.attachEvent){
+o.attachEvent("on"+e,function(){
+l(window.event);
+});
+}
+}
+},add:function(_d,_e){
+if(this.isSafari){
+_d=this.removeHash(_d);
+historyStorage.put(_d,_e);
+this.currentLocation=_d;
+window.location.hash=_d;
+this.putSafariState(_d);
+}else{
+var _f=this;
+var _10=function(){
+if(_f.currentWaitTime>0){
+_f.currentWaitTime=_f.currentWaitTime-_f.waitTime;
+}
+_d=_f.removeHash(_d);
+if(MVC.$E(_d)&&_f.debugMode){
+var e="Exception: History locations can not have the same value as _any_ IDs that might be in the document,"+" due to a bug in IE; please ask the developer to choose a history location that does not match any HTML"+" IDs in this document. The following ID is already taken and cannot be a location: "+_d;
+throw new Error(e);
+}
+historyStorage.put(_d,_e);
+_f.ignoreLocationChange=true;
+_f.ieAtomicLocationChange=true;
+_f.currentLocation=_d;
+window.location.hash=_d;
+if(_f.isIE){
+_f.iframe.src=_f.blank_html_path+"blank.html?"+_d;
+}
+_f.ieAtomicLocationChange=false;
+};
+window.setTimeout(_10,this.currentWaitTime);
+this.currentWaitTime=this.currentWaitTime+this.waitTime;
+}
+},isFirstLoad:function(){
+return this.firstLoad;
+},getVersion:function(){
+return "0.6";
+},getCurrentLocation:function(){
+var r=this.getCurrentHash();
+return r;
+},getCurrentHash:function(){
+var r=window.location.href;
+var i=r.indexOf("#");
+return (i>=0?r.substr(i+1):"");
+},PAGELOADEDSTRING:"DhtmlHistory_pageLoaded",blank_html_path:MVC.mvc_root+"/plugins/dom/history/",listener:null,waitTime:200,currentWaitTime:0,currentLocation:null,iframe:null,safariHistoryStartPoint:null,safariStack:null,safariLength:null,ignoreLocationChange:null,fireOnNewListener:null,firstLoad:null,ieAtomicLocationChange:null,createIE:function(_15){
+this.waitTime=400;
+var _16=(historyStorage.debugMode?"width: 800px;height:80px;border:1px solid black;":historyStorage.hideStyles);
+var _17="rshHistoryFrame";
+var _18="<iframe frameborder=0\" id=\""+_17+"\" style=\""+_16+"\" src=\""+this.blank_html_path+"blank.html?"+_15+"\"></iframe>";
+document.write(_18);
+this.iframe=MVC.$E(_17);
+},createOpera:function(){
+this.waitTime=400;
+var _19="<img src=\"javascript:location.href='javascript:MVC.History.checkLocation();';\" style=\""+historyStorage.hideStyles+"\" />";
+document.write(_19);
+},createSafari:function(){
+var _1a="rshSafariForm";
+var _1b="rshSafariStack";
+var _1c="rshSafariLength";
+var _1d=historyStorage.debugMode?historyStorage.showStyles:historyStorage.hideStyles;
+var _1e=(historyStorage.debugMode?"width:800px;height:20px;border:1px solid black;margin:0;padding:0;":historyStorage.hideStyles);
+var _1f=document.createElement("form");
+_1f.id=_1a;
+_1f.setAttribute("style",_1d);
+_1f.innerHTML="<input type=\"text\" style=\""+_1e+"\" id=\""+_1b+"\" value=\"[]\"/>"+"<input type=\"text\" style=\""+_1e+"\" id=\""+_1c+"\" value=\"\"/>";
+document.body.appendChild(_1f);
+this.safariStack=MVC.$E(_1b);
+this.safariLength=MVC.$E(_1c);
+if(!historyStorage.hasKey(this.PAGELOADEDSTRING)){
+this.safariHistoryStartPoint=history.length;
+this.safariLength.value=this.safariHistoryStartPoint;
+}else{
+this.safariHistoryStartPoint=this.safariLength.value;
+}
+},getSafariStack:function(){
+var r=this.safariStack.value;
+return historyStorage.fromJSON(r);
+},getSafariState:function(){
+var _21=this.getSafariStack();
+var _22=_21[history.length-this.safariHistoryStartPoint-1];
+return _22;
+},putSafariState:function(_23){
+var _24=this.getSafariStack();
+_24[history.length-this.safariHistoryStartPoint]=_23;
+this.safariStack.value=historyStorage.toJSON(_24);
+},fireHistoryEvent:function(_25){
+var _26=historyStorage.get(_25);
+this.listener.call(null,_25,_26);
+},checkLocation:function(){
+if(!this.isIE&&this.ignoreLocationChange){
+this.ignoreLocationChange=false;
+return;
+}
+if(!this.isIE&&this.ieAtomicLocationChange){
+return;
+}
+var _27=this.getCurrentLocation();
+if(_27==this.currentLocation){
+return;
+}
+this.ieAtomicLocationChange=true;
+if(this.isIE&&this.getIframeHash()!=_27){
+this.iframe.src=this.blank_html_path+"blank.html?"+_27;
+}else{
+if(this.isIE){
+return;
+}
+}
+this.currentLocation=_27;
+this.ieAtomicLocationChange=false;
+this.fireHistoryEvent(_27);
+},getIframeHash:function(){
+var doc=this.iframe.contentWindow.document;
+var _29=String(doc.location.search);
+if(_29.length==1&&_29.charAt(0)=="?"){
+_29="";
+}else{
+if(_29.length>=2&&_29.charAt(0)=="?"){
+_29=_29.substring(1);
+}
+}
+return _29;
+},removeHash:function(_2a){
+var r;
+if(_2a===null||_2a===undefined){
+r=null;
+}else{
+if(_2a===""){
+r="";
+}else{
+if(_2a.length==1&&_2a.charAt(0)=="#"){
+r="";
+}else{
+if(_2a.length>1&&_2a.charAt(0)=="#"){
+r=_2a.substring(1);
+}else{
+r=_2a;
+}
+}
+}
+}
+return r;
+},iframeLoaded:function(_2c){
+if(this.ignoreLocationChange){
+this.ignoreLocationChange=false;
+return;
+}
+var _2d=String(_2c.search);
+if(_2d.length==1&&_2d.charAt(0)=="?"){
+_2d="";
+}else{
+if(_2d.length>=2&&_2d.charAt(0)=="?"){
+_2d=_2d.substring(1);
+}
+}
+window.location.hash=_2d;
+this.fireHistoryEvent(_2d);
+}};
+window.historyStorage={setup:function(_2e){
+if(typeof _2e!=="undefined"){
+if(_2e.debugMode){
+this.debugMode=_2e.debugMode;
+}
+if(_2e.toJSON){
+this.toJSON=_2e.toJSON;
+}
+if(_2e.fromJSON){
+this.fromJSON=_2e.fromJSON;
+}
+}
+var _2f="rshStorageForm";
+var _30="rshStorageField";
+var _31=this.debugMode?historyStorage.showStyles:historyStorage.hideStyles;
+var _32=(historyStorage.debugMode?"width: 800px;height:80px;border:1px solid black;":historyStorage.hideStyles);
+if(MVC.History.isSafari||MVC.Browser.Rhino){
+var _33=document.createElement("form");
+_33.id=_2f;
+_33.setAttribute("style",_31);
+_33.innerHTML="<textarea id=\""+_30+"\" style=\""+_32+"\"></textarea>";
+document.body.appendChild(_33);
+}else{
+var _34="<form id=\""+_2f+"\" style=\""+_31+"\">"+"<textarea id=\""+_30+"\" style=\""+_32+"\"></textarea>"+"</form>";
+document.write(_34);
+}
+this.storageField=MVC.$E(_30);
+if(typeof window.opera!=="undefined"){
+this.storageField.focus();
+}
+},put:function(key,_36){
+this.assertValidKey(key);
+if(this.hasKey(key)){
+this.remove(key);
+}
+this.storageHash[key]=_36;
+this.saveHashTable();
+},get:function(key){
+this.assertValidKey(key);
+this.loadHashTable();
+var _38=this.storageHash[key];
+if(_38===undefined){
+_38=null;
+}
+return _38;
+},remove:function(key){
+this.assertValidKey(key);
+this.loadHashTable();
+delete this.storageHash[key];
+this.saveHashTable();
+},reset:function(){
+this.storageField.value="";
+this.storageHash={};
+},hasKey:function(key){
+this.assertValidKey(key);
+this.loadHashTable();
+return (typeof this.storageHash[key]!=="undefined");
+},isValidKey:function(key){
+return (typeof key==="string");
+},showStyles:"border:0;margin:0;padding:0;",hideStyles:"left:-1000px;top:-1000px;width:1px;height:1px;border:0;position:absolute;",debugMode:false,storageHash:{},hashLoaded:false,storageField:null,assertValidKey:function(key){
+var _3d=this.isValidKey(key);
+if(!_3d&&this.debugMode){
+throw new Error("Please provide a valid key for window.historyStorage. Invalid key = "+key+".");
+}
+},loadHashTable:function(){
+if(!this.hashLoaded){
+var _3e=this.storageField.value;
+if(_3e!==""&&_3e!==null){
+this.storageHash=this.fromJSON(_3e);
+this.hashLoaded=true;
+}
+}
+},saveHashTable:function(){
+this.loadHashTable();
+var _3f=this.toJSON(this.storageHash);
+this.storageField.value=_3f;
+},toJSON:function(o){
+return JSON.stringify(o);
+},fromJSON:function(s){
+return JSON.parse(s);
+}};
+if(typeof Prototype=="undefined"){
+window.MVC.History.create();
+}else{
+window.MVC.History.create({toJSON:function(o){
+return Object.toJSON(o);
+},fromJSON:function(s){
+return s.evalJSON();
+}});
+}
+MVC.Event.observe(window,"load",function(){
+MVC.History.initialize();
+MVC.History.addListener(MVC.History.historyChange);
+if(MVC.History.fireInitialChange){
+MVC.History.historyChange();
+}
+});
+MVC.Controller.test_dispatch=function(_44,_45){
+if(!_44){
+return false;
+}
+return MVC.Controller.get_controller_with_name_and_action(_44,_45)!=null;
+};
+MVC.History.historyChange=function(_46,_47){
+var _48=new MVC.Path(location.href);
+var _49=MVC.Path.get_data(_48);
+var _4a=_48.folder();
+var _4b=null,_4c;
+if(!_4a){
+_4a="index";
+}
+var _4d=_4a.indexOf("/");
+var _4e=new MVC.Controller.Params(_49);
+if(_4d!=-1){
+_4c=_4a.substring(0,_4d);
+_4b=_4a.substring(_4d+1);
+}else{
+if(MVC.Controller.test_dispatch("main",_4a)){
+_4c="main";
+_4b=_4a;
+}else{
+if(MVC.History.throwErrors){
+throw "Can't dispatch location "+_4a;
+}
+return;
+}
+}
+var _4f=MVC.Controller.get_controller_with_name_and_action(_4c,_4b);
+var _50=null;
+if(!_4f){
+if(MVC.History.throwErrors){
+throw "Can't dispatch location "+_4a;
+}
+}else{
+_50=_4f.dispatch(_4b,_4e);
+}
+OpenAjax.hub.publish("history."+_4a.replace("/","."),_4e);
+return _50;
+};
+MVC.Path=function(_51){
+this.path=_51;
+};
+MVC.Path.prototype={domain:function(){
+var lhs=this.path.split("#")[0];
+return "/"+lhs.split("/").slice(3).join("/");
+},folder:function(){
+var _53=this.path.indexOf("#");
+if(_53==-1){
+return null;
+}
+var _54=this.path.substring(_53+1);
+var _55=_54.indexOf("&");
+if(_55==-1){
+return _54.indexOf("=")!=-1?null:_54;
+}
+return _54.substring(0,_55);
+},params:function(){
+var _56=this.path.indexOf("#");
+if(_56==-1){
+return null;
+}
+var _57=this.path.substring(_56+1);
+var _58=_57.indexOf("&");
+if(_58==-1){
+return _57.indexOf("=")!=-1?_57:null;
+}
+return (_57.substring(0,_58).indexOf("=")==-1?_57.substring(_58+1):_57);
+}};
+MVC.Path.get_data=function(_59){
+var _5a=_59.params();
+if(!_5a||!_5a.match(/([^?#]*)(#.*)?$/)){
+return {};
+}
+var _5b={};
+var _5c=_5a.split("&");
+for(var i=0;i<_5c.length;i++){
+var _5e=_5c[i].split("=");
+if(_5e.length!=2){
+continue;
+}
+var key=decodeURIComponent(_5e[0]),_60=decodeURIComponent(_5e[1]);
+var _61=MVC.String.rsplit(key,/\[[^\]]*\]/);
+if(_61.length>1){
+var _62=_61.length-1;
+var _63=_61[0].toString();
+if(!_5b[_63]){
+_5b[_63]={};
+}
+var _64=_5b[_63];
+for(var k=1;k<_62;k++){
+_63=_61[k].substring(1,_61[k].length-1);
+if(!_64[_63]){
+_64[_63]={};
+}
+_64=_64[_63];
+}
+_64[_61[_62].substring(1,_61[_62].length-1)]=_60;
+}else{
+if(key in _5b){
+if(typeof _5b[key]=="string"){
+_5b[key]=[_5b[key]];
+}
+_5b[key].push(_60);
+}else{
+_5b[key]=_60;
+}
+}
+}
+return _5b;
+};
+MVC.Controller.prototype.redirect_to=function(_66){
+var _67=_66.controller||this.Class.className;
+var _68=_66.action||"index";
+var lhs=window.location.href.split("#")[0];
+if(_66.controller){
+delete _66.controller;
+}
+if(_66.action){
+delete _66.action;
+}
+var _6a=(_66)?MVC.Object.to_query_string(_66):"";
+if(_6a.length){
+_6a="&"+_6a;
+}
+window.location=lhs+"#"+_67+"/"+_68+_6a;
+};
+;
 include.set_path('jmvc/rhino/documentation');
 if(typeof load!="undefined"&&!MVC.load_doc){
 load("jmvc/plugins/lang/standard_helpers.js");
@@ -5780,12 +6434,19 @@ MVCOptions.save(_5,this.render(_6,_7));
 var v=new View({text:readFile(_8),name:_8});
 return v.render(_9);
 },link_content:function(_b){
-return _b.replace(/\[\s*([^\|\]\s]*)\s*\|?\s*([^\]]*)\s*\]/g,function(_c,_d,_e){
+return _b.replace(/\[\s*([^\|\]\s]*)\s*\|?\s*([^\]]*)\s*\]/g,function(_c,_d,n){
 var _f=MVC.Doc.objects[_d];
-if(!_e){
-_e=_d.replace(/\.prototype|\.static/);
+if(_f){
+if(!n){
+n=_d.replace(/\.prototype|\.static/,"");
 }
-return _f?"<a href='"+_f+"'>"+_e+"</a>":_c;
+return "<a href='"+_f+"'>"+n+"</a>";
+}else{
+if(typeof _d=="string"&&_d.match(/^https?|www\.|#/)){
+return "<a href='"+_d+"'>"+(n||_d)+"</a>";
+}
+}
+return _c;
 });
 },link:function(_10){
 var url=MVC.Doc.objects[_10];
@@ -5964,98 +6625,143 @@ var _28=this.params[n];
 arr[_28.order]=_28;
 }
 return arr;
-},plugin_add:function(_29){
-this.plugin=_29.match(/@plugin ([^ ]+)/)[1];
+},comment_setup:function(){
+var i=0;
+var _2a=this.comment.split("\n");
+this.real_comment="";
+if(!this.params){
+this.params={};
+}
+if(!this.ret){
+this.ret={type:"undefined",description:""};
+}
+var _2b,_2c;
+for(var l=0;l<_2a.length;l++){
+var _2e=_2a[l];
+var _2f=_2e.match(/^[\s*]?@(\w+)/);
+if(_2f){
+var _30=(_2f[1]+"_add").toLowerCase();
+if(!this[_30]){
+this.real_comment+=_2e+"\n";
+continue;
+}
+_2c=this[_30](_2e);
+if(_2c){
+_2b=_2f[1].toLowerCase();
+}else{
+_2b=null;
+}
+}else{
+if(!_2e.match(/^constructor/i)&&!_2b){
+this.real_comment+=_2e+"\n";
+}else{
+if(_2b&&this[_2b+"_add_more"]){
+this[_2b+"_add_more"](_2e,_2c);
+}
+}
+}
+}
+if(this.comment_setup_complete){
+this.comment_setup_complete();
+}
 }});
 ;
 include.set_path('jmvc/rhino/documentation');
-MVC.Doc.Directive=MVC.Class.extend({},{});
-MVC.Doc.Directive.Init=MVC.Class.extend("init",{add:function(_1){
-var _2=_1.match(/\s?@init(.*)?/);
-if(!_2||!_2[1]){
+MVC.Doc.Directive=MVC.Class.extend({add:function(_1){
+var m=_1.match(/^\s*@(\w+)\s*(.*)/);
+if(m){
+this[m[1]]=m[2];
+}
+}});
+MVC.Doc.Directive.Init=MVC.Class.extend("init",{add:function(_3){
+var _4=_3.match(/\s?@init(.*)?/);
+if(!_4||!_4[1]){
 this.init_description=" ";
 return true;
 }
-this.init_description=_2.pop();
+this.init_description=_4.pop();
 return this.init_description;
-},add_more:function(_3){
-this.init_description+="\n"+_3;
+},add_more:function(_5){
+this.init_description+="\n"+_5;
 }});
-MVC.Doc.Directive.Param=MVC.Class.extend("param",{add_more:function(_4,_5){
-if(_5){
-_5.description+="\n"+_4;
+MVC.Doc.Directive.Param=MVC.Class.extend("param",{add_more:function(_6,_7){
+if(_7){
+_7.description+="\n"+_6;
 }
-},add:function(_6){
-var _7=_6.match(/\s*@param\s+(?:\{(?:(optional):)?([\w\.\/]+)\})?\s+([\w\.]+) ?(.*)?/);
-if(!_7){
+},add:function(_8){
+var _9=_8.match(/\s*@param\s+(?:\{(?:(optional):)?([\w\.\/]+)\})?\s+([\w\.]+) ?(.*)?/);
+if(!_9){
 return;
 }
-var _8=_7.pop();
-var n=_7.pop();
-var _a=this.params[n]?this.params[n]:this.params[n]={order:this.ordered_params().length};
-_a.description=_8||"";
-_a.name=n;
-_a.type=_7.pop()||"";
-_a.optional=_7.pop()?true:false;
+var _a=_9.pop();
+var n=_9.pop();
+var _c=this.params[n]?this.params[n]:this.params[n]={order:this.ordered_params().length};
+_c.description=_a||"";
+_c.name=n;
+_c.type=_9.pop()||"";
+_c.optional=_9.pop()?true:false;
 return this.params[n];
 }});
-MVC.Doc.Directive.Inherits=MVC.Class.extend("inherits",{add:function(_b){
-var m=_b.match(/^\s*@\w+ ([\w\.]+)/);
+MVC.Doc.Directive.Inherits=MVC.Class.extend("inherits",{add:function(_d){
+var m=_d.match(/^\s*@\w+ ([\w\.]+)/);
 if(m){
 this.inherits=m[1];
 }
 }});
-MVC.Doc.Directive.Return=MVC.Class.extend("return",{add:function(_d){
-var _e=_d.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s*(.*)?/);
-if(!_e){
+MVC.Doc.Directive.Return=MVC.Class.extend("return",{add:function(_f){
+var _10=_f.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s*(.*)?/);
+if(!_10){
 return;
 }
-var _f=_e.pop()||"";
-var _10=_e.pop();
-this.ret={description:_f,type:_10};
+var _11=_10.pop()||"";
+var _12=_10.pop();
+this.ret={description:_11,type:_12};
 return this.ret;
-},add_more:function(_11){
-this.ret.description+="\n"+_11;
+},add_more:function(_13){
+this.ret.description+="\n"+_13;
 }});
-MVC.Doc.Directive.Author=MVC.Class.extend("author",{add:function(_12){
-var m=_12.match(/^\s*@author\s*(.*)/);
+MVC.Doc.Directive.Author=MVC.Class.extend("author",{add:function(_14){
+var m=_14.match(/^\s*@author\s*(.*)/);
 if(m){
 this.author=m[1];
 }
 }});
-MVC.Doc.Directive.Hide=MVC.Class.extend("hide",{add:function(_14){
-var m=_14.match(/^\s*@hide/);
+MVC.Doc.Directive.Hide=MVC.Class.extend("hide",{add:function(_16){
+var m=_16.match(/^\s*@hide/);
 if(m){
 this.hide=true;
 }
 }});
-MVC.Doc.Directive.CodeStart=MVC.Class.extend("code_start",{add:function(_16){
-var m=_16.match(/^\s*@code_start\s*([\w-]*)\s*(.*)/);
+MVC.Doc.Directive.CodeStart=MVC.Class.extend("code_start",{add:function(_18){
+var m=_18.match(/^\s*@code_start\s*([\w-]*)\s*(.*)/);
 if(m){
 this.comment_code_type=m[1]?m[1].toLowerCase():"javascript";
 this.comment_code=[];
 return true;
 }
-},add_more:function(_18){
-this.comment_code.push(_18);
+},add_more:function(_1a){
+this.comment_code.push(_1a);
 }});
-MVC.Doc.Directive.CodeEnd=MVC.Class.extend("code_end",{add:function(_19){
-var m=_19.match(/^\s*@code_end/);
+MVC.Doc.Directive.CodeEnd=MVC.Class.extend("code_end",{add:function(_1b){
+var m=_1b.match(/^\s*@code_end/);
 if(m){
 this.real_comment+="<pre><code class='"+this.comment_code_type+"'>"+this.comment_code.join("\n")+"</code></pre>";
 }
 return false;
 }});
-MVC.Doc.Directive.Alias=MVC.Class.extend("alias",{add:function(_1b){
-var m=_1b.match(/^\s*@alias\s*([\w\-\.]*)/);
+MVC.Doc.Directive.Alias=MVC.Class.extend("alias",{add:function(_1d){
+var m=_1d.match(/^\s*@alias\s*([\w\-\.]*)/);
 if(m){
 this.alias=m[1];
 }
 }});
+MVC.Doc.Directive.Plugin=MVC.Class.extend("plugin",{add:function(_1f){
+this.plugin=_1f.match(/@plugin ([^ ]+)/)[1];
+}});
 ;
 include.set_path('jmvc/rhino/documentation');
 MVC.Doc.Function=MVC.Doc.Pair.extend("function",{code_match:/([\w\.\$]+)\s*[:=]\s*function\(([^\)]*)/,init:function(){
-this.add(MVC.Doc.Directive.Return,MVC.Doc.Directive.Param,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd);
+this.add(MVC.Doc.Directive.Return,MVC.Doc.Directive.Param,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd,MVC.Doc.Directive.Plugin);
 this._super();
 }},{code_setup:function(){
 var _1=this.Class.code_match(this.code);
@@ -6072,64 +6778,25 @@ return;
 for(var i=0;i<_2.length;i++){
 this.params[_2[i]]={description:"",type:"",optional:false,order:i,name:_2[i]};
 }
-},comment_setup:function(){
-var i=0;
-var _5=this.comment.split("\n");
-this.real_comment="";
-if(!this.params){
-this.params={};
-}
-if(!this.ret){
-this.ret={type:"undefined",description:""};
-}
-var _6,_7;
-for(var l=0;l<_5.length;l++){
-var _9=_5[l];
-var _a=_9.match(/^[\s*]?@(\w+)/);
-if(_a){
-var _b=(_a[1]+"_add").toLowerCase();
-if(!this[_b]){
-this.real_comment+=_9+"\n";
-continue;
-}
-_7=this[_b](_9);
-if(_7){
-_6=_a[1].toLowerCase();
-}else{
-_6=null;
-}
-}else{
-if(!_9.match(/^constructor/i)&&!_6){
-this.real_comment+=_9+"\n";
-}else{
-if(_6&&this[_6+"_add_more"]){
-this[_6+"_add_more"](_9,_7);
-}
-}
-}
-}
-if(this.comment_setup_complete){
-this.comment_setup_complete();
-}
-},function_add:function(_c){
-var m=_c.match(/^@\w+\s+([\w\.\$]+)/);
+},function_add:function(_4){
+var m=_4.match(/^@\w+\s+([\w\.\$]+)/);
 if(m){
 this.name=m[1];
 }
 },signiture:function(){
-var _e=[];
-var _f=this.ordered_params();
-for(var n=0;n<_f.length;n++){
-var _11=_f[n];
-_e.push(_11.name);
+var _6=[];
+var _7=this.ordered_params();
+for(var n=0;n<_7.length;n++){
+var _9=_7[n];
+_6.push(_9.name);
 }
 var n=this.name;
-return n+"("+_e.join(", ")+") -> "+this.ret.type;
+return n+"("+_6.join(", ")+") -> "+this.ret.type;
 }});
 ;
 include.set_path('jmvc/rhino/documentation');
 MVC.Doc.Class=MVC.Doc.Pair.extend("class",{code_match:/([\w\.]+)\s*=\s*([\w\.]+?).extend\(/,starts_scope:true,listing:[],init:function(){
-this.add(MVC.Doc.Directive.Inherits,MVC.Doc.Directive.Author,MVC.Doc.Directive.Hide,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd,MVC.Doc.Directive.Alias);
+this.add(MVC.Doc.Directive.Inherits,MVC.Doc.Directive.Author,MVC.Doc.Directive.Hide,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd,MVC.Doc.Directive.Alias,MVC.Doc.Directive.Plugin);
 this._super();
 var _1="jmvc/rhino/documentation/templates/file.ejs";
 this._file_view=new View({text:readFile(_1),name:_1});
@@ -6152,7 +6819,7 @@ this.parent.add(this);
 var _6=this.code.match(this.Class.code_match);
 this.name=_6[1];
 this.inherits=_6[2];
-},comment_setup:MVC.Doc.Function.prototype.comment_setup,class_add:function(_7){
+},class_add:function(_7){
 var m=_7.match(/^@\w+ ([\w\.]+)/);
 if(m){
 this.name=m[1];
@@ -6192,7 +6859,7 @@ _1+="<a href='"+_3+".html'>"+_3+"</a> ";
 _1+="</body></html>";
 MVCOptions.save("docs/constructors/index2.html",_1);
 },init:function(){
-this.add(MVC.Doc.Directive.Init,MVC.Doc.Directive.Param,MVC.Doc.Directive.Inherits,MVC.Doc.Directive.Author,MVC.Doc.Directive.Return,MVC.Doc.Directive.Hide,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd,MVC.Doc.Directive.Alias);
+this.add(MVC.Doc.Directive.Init,MVC.Doc.Directive.Param,MVC.Doc.Directive.Inherits,MVC.Doc.Directive.Author,MVC.Doc.Directive.Return,MVC.Doc.Directive.Hide,MVC.Doc.Directive.CodeStart,MVC.Doc.Directive.CodeEnd,MVC.Doc.Directive.Alias,MVC.Doc.Directive.Plugin);
 this._super();
 var _4="jmvc/rhino/documentation/templates/file.ejs";
 this._file_view=new View({text:readFile(_4),name:_4});
@@ -6205,7 +6872,7 @@ _8=_8.parent;
 }
 this.parent=_8;
 this.parent.add(this);
-},code_setup:MVC.Doc.Function.prototype.code_setup,comment_setup:MVC.Doc.Function.prototype.comment_setup,toFile:function(_9){
+},code_setup:MVC.Doc.Function.prototype.code_setup,toFile:function(_9){
 this.summary=_9;
 var _a=this.Class._file_view.render(this);
 MVCOptions.save("docs/classes/"+this.name+".html",_a);
@@ -6344,6 +7011,11 @@ return _1.match(/(\w+)\s*[:=]\s*/)&&!_1.match(/(\w+)\s*[:=]\s*function\(([^\)]*)
 }},{code_setup:function(){
 var _2=this.code.match(/(\w+)\s*[:=]\s*/);
 this.name=_2[1];
+},attribute_add:function(_3){
+var m=_3.match(/^@\w+ ([\w\.]+)/);
+if(m){
+this.name=m[1];
+}
 }});
 ;
 include.next_function();

@@ -390,7 +390,23 @@ var self = window;
                 node = node.parentNode;
             }
             return !!node;
+        },
+        compareDocumentPosition : function(b){
+            var a = this;
+            var number = (a != b && a.contains(b) && 16) + (a != b && b.contains(a) && 8);
+            //find position of both
+            var all = document.getElementsByTagName("*");
+            var my_location = 0, node_location = 0;
+            for(var i=0; i < all.length; i++){
+                if(all[i] == a) my_location = i;
+                if(all[i] == b) node_location = i;
+                if(my_location && node_location) break;
+            }
+            number += (my_location < node_location && 4)
+            number += (my_location > node_location && 2)
+            return number;
         }
+        
 	};
 
 	// DOM Element

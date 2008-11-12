@@ -7,7 +7,9 @@ include.plugins(
     'lang/date','lang/json',
     'model','model/ajax','model/cookie','model/jsonp','model/rest_json','model/window_name','model/rest_xml',
     'test',
-    'view','view/helpers'
+    'view','view/helpers',
+    'dom/history',
+    'lang/date','lang/json'
     );
 
 //dom/history

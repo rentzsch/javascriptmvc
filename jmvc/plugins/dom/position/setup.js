@@ -145,28 +145,40 @@ MVC.Position =
     },
     // Compare Position - MIT Licensed, John Resig
     /**
-     * 
-     * @param {Object} a
-     * @param {Object} b
+     * Compares the position of two nodes and returns at bitmask detailing how they are positioned 
+     * relative to each other.  You can expect it to return the same results as 
+     * [http://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-compareDocumentPosition | compareDocumentPosition].
+     * Parts of this documentation and source come from [http://ejohn.org/blog/comparing-document-position | John Resig].
+     * @param {Object} a the first node
+     * @param {Object} b the second node
+     * @return {Number} A bitmap with the following digit values:
+     * <table class='options'>
+     *     <tr><th>Bits</th><th>Number</th><th>Meaning</th></tr>
+     *     <tr><td>000000</td><td>0</td><td>Elements are identical.</td></tr>
+     *     <tr><td>000001</td><td>1</td><td>The nodes are in different documents (or one is outside of a document).</td></tr>
+     *     <tr><td>000010</td><td>2</td><td>Node B precedes Node A.</td></tr>
+     *     <tr><td>000100</td><td>4</td><td>Node A precedes Node B.</td></tr>
+     *     <tr><td>001000</td><td>4</td><td>Node B contains Node A.</td></tr>
+     *     <tr><td>010000</td><td>16</td><td>Node A contains Node B.</td></tr>
+     *     </tr>
+     * </table>
      */
     compare: function(a, b){
         if(a.compareDocumentPosition){
             return a.compareDocumentPosition(b)
+        }else if(a.contains){
+            
         }
-        var number = 0;
-        number += (a != b && a.contains(b) && 16)
-        number += (a != b && b.contains(a) && 8)
+        var number = (a != b && a.contains(b) && 16) + (a != b && b.contains(a) && 8);
         if(a.sourceIndex){
             number += (a.sourceIndex < b.sourceIndex && 4)
             number += (a.sourceIndex > b.sourceIndex && 2)
         }else{
-            
             range = document.createRange();
             range.selectNode(a);
             sourceRange = document.createRange();
             sourceRange.selectNode(b);
             compare = range.compareBoundaryPoints(Range.START_TO_START, sourceRange);
-            alert(compare)
             number += (compare == -1 && 4)
             number += (compare == 1 && 2)
         }
