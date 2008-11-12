@@ -3,7 +3,9 @@
 /**
  * @constructor
  * View provides client side templates.  Typically they work with controller to render data in HTML form.
-
+ * Typically, you should not be creating and rendering a view with MVC.View, you should be using 
+ * [MVC.Controller.prototype.render] to create and render templates from your [MVC.Controller | controllers].
+ *
  * <h3>Install</h3>
  * @code_start
  * include.plugins('view') //for basic templating functionality
@@ -34,9 +36,14 @@
 				<tr>
 					<td>url</td>
 					<td>&nbsp;</td>
-					<td>loads the template from a file
+					<td>loads the template from a file.  This path should be relative to <i>[MVC.root]</i>.
 					</td>
 				</tr>
+				<tr>
+					<td>view_url</td>
+					<td>&nbsp;</td>
+					<td>loads the template from a file.  This path should be relative to <i>[MVC.root]/views</i>.
+					</td>
 				<tr>
 					<td>text</td>
 					<td>&nbsp;</td>

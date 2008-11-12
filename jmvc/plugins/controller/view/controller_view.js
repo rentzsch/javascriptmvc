@@ -7,7 +7,19 @@ MVC.Controller.prototype.
  * Renders a View template with the controller instance. If action or partial 
  * are not supplied in the options, 
  * it looks for a view in app/views/controller_name/action_name.ejs
+ * 
+ * @code_start
+ * TasksController = MVC.Controller.extend('tasks',{
+ *   click : function(params){
+ *     this.data = "Hello_world"                             // can display with &lt;%= data %>
+ *     this.render({after: params.element, action: "under"}) // renders with views/tasks/under.ejs
+ *     this.render({to: "element_id"})                       // renders with views/tasks/click.ejs
+ *     this.render({top: "another_e", partial: "bee/sugar")) // renders with views/bee/_sugar.ejs
+ *   }
+ * })
+ * @code_end
  * @plugin controller/view
+ * @return {String} the result of the render.
  * @param {Object} options A hash with the following properties
  * <table class="options">
 					<tbody><tr><th>Option</th><th>Default</th><th>Description</th></tr>
@@ -38,7 +50,14 @@ MVC.Controller.prototype.
 						the HTMLElement or element ID.  The dom/element plugin is required for this functionality.
 						</td>
 					</tr>
+					<tr>
+						<td>text</td>
+						<td>null</td>
+						<td>Instead of using a view to generate text, it uses the text as the rendered text.
+						</td>
+					</tr>
 				</tbody></table>
+	 
  */
 render = function(options) {
 		var result, render_to_id = MVC.RENDER_TO, plugin_url;
