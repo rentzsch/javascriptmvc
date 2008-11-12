@@ -179,6 +179,10 @@ MVC.Model = MVC.Class.extend(
         var re = new RegExp(this.className+'_', "i");
         return element_id.replace(re, '');
     },
+    /**
+     * Returns an instance if one can be found in the store.
+     * @param {Object} el
+     */
 	find_by_element: function(el){
 		var re = new RegExp(this.className+'_', "i");
 		return this.store.find_one(el.id.replace(re, ''));

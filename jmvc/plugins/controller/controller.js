@@ -555,9 +555,6 @@ MVC.Controller.Params.prototype = {
      * @return {Boolean} true if the event's target is the element, false if otherwise.
      */
 	is_event_on_element : function(){ return this.event.target == this.element; },
-	_className : function(){
-		return this.controller.singularName;
-	},
     /**
      * Returns the model instance associated with dom this action acted on.  
      * It finds the class_element, then looks if it has an id that matches

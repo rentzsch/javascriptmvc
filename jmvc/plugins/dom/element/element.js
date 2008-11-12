@@ -18,7 +18,7 @@ Element.next('element_id') //-> HTMLElement
 
 $E('element_id').insert({after: '&lt;p&gt;inserted text&lt;/p&gt;'})
 @code_end
- * @init the HTML Element for the given id with functions in Element.
+ * @init the HTML Element for the given id with functions in Element.  This is also aliased as MVC.$E()
  * @param {String/HTMLElement} element Either an HTMLElement or a string describing the element's id.
  * @return {HTMLElement} the HTML Element for the given id with functions in Element.
  */
@@ -104,6 +104,7 @@ MVC.Object.extend(MVC.Element, {
 	},
     /*
      * Returns children with nodeType = 1
+     * @return {HTMLElement}
      */
     get_children : function(element){
         var els = [];
@@ -113,6 +114,7 @@ MVC.Object.extend(MVC.Element, {
     },
     /*
      * Returns the first child with nodeType = 1
+     * @return {HTMLElement}
      */
     first : function(element, check){
         check = check || function(){return true;}
@@ -123,6 +125,7 @@ MVC.Object.extend(MVC.Element, {
     },
     /*
      * returns the last child element with nodeType = 1
+     * @return {HTMLElement}
      */
     last : function(element, check){
         check = check || function(){return true;}
@@ -133,6 +136,7 @@ MVC.Object.extend(MVC.Element, {
     },
     /*
      * Returns the next sibling with nodeType = 1
+     * @return {HTMLElement}
      */
 	next : function(element, wrap, check){
 		check = check || function(){return true;}
@@ -157,12 +161,14 @@ MVC.Object.extend(MVC.Element, {
      * Toggles the style display.  It is assumed that no css is already being used to 
      * hide the element.  If you want to have the element hidden to start, write
      * style="display:none" in your html.
+     * @return {String} the resulting display name.  '' if visible, 'none' if hidden.
      */
 	toggle : function(element){
 		return element.style.display == 'none' ? element.style.display = '' : element.style.display = 'none';
 	},
     /*
      * Makes an element position ('relative', 'absolute', or 'static')
+     * @return {HTMLElement} element
      */
     make_positioned: function(element) {
         element = MVC.$E(element);
@@ -195,9 +201,15 @@ MVC.Object.extend(MVC.Element, {
         if (style == 'opacity') return value ? parseFloat(value) : 1.0;
         return value == 'auto' ? null : value;
     },
-    /*
-     * Returns the vector
-     * @return {Vector} a vector
+    /**
+     * Returns the the position of the element by taking all of it and its parents'
+     * offsetTop and offsetLeft values.
+     * @code_start
+     * MVC.$E('user').cumulative_offset()
+     * MVC.Element.cumulative_offset(myelement);
+     * @code_end
+     * @param {String/HTMLElement} element the element you want the offset of.
+     * @return {MVC.Vector} a vector with the top and bottom values.
      */
     cumulative_offset: function(element) {
         var valueT = 0, valueL = 0;
@@ -208,6 +220,16 @@ MVC.Object.extend(MVC.Element, {
         } while (element);
         return new MVC.Vector( valueL, valueT );
     },
+    /**
+     * Returns the the position of the element by taking all of it and its parents'
+     * scrollTop and scrollLeft values.
+     * @code_start
+     * MVC.$E('user').cumulative_scroll_offset()
+     * MVC.Element.cumulative_scroll_offset(myelement);
+     * @code_end
+     * @param {String/HTMLElement} element the element you want the offset of.
+     * @return {MVC.Vector} a vector with the top and bottom values.
+     */
     cumulative_scroll_offset: function(element) {
         var valueT = 0, valueL = 0;
         do {
@@ -217,17 +239,33 @@ MVC.Object.extend(MVC.Element, {
         } while (element);
         return new MVC.Vector( valueL, valueT );
     },
-    /*
+    /**
      * Returns true or false if one element is inside another element.
+     * Typically this is called with an element's related target to prevent mouseout from being called
+     * on nested HTML.  For example:
+     * @code_start
+     * MVC.$(event.target).has(event.relatedTarget);
+     * @code_end
+     * 
+     * If you need to know more about elements position in the dom, try [MVC.Position.static.compare].
+     * 
+     * @param {HTMLElement} element outer element, or element in MVC.$E()
+     * @param {HTMLElement} b inner element 
+     * @return {Boolean} Returns true if b is in element, false if otherwise.
      */
     has: function(element, b){
+      if(!b) return false; // if there is no relatedTarget
       if(typeof b == 'string') b = MVC.$E(b);
       return element.contains ?
         element != b && element.contains(b) :
         !!(element.compareDocumentPosition(b) & 16);
     },
-    /*
-     * Updates an element with content.  This works for IE's table elements.
+    /**
+     * Updates an element with content.  This is a cross browser substitute for innerHTML.  
+     * It very valuable when inserting new table elements.
+     * @param {HTMLElement} element the element you want updated
+     * @param {String} content html content
+     * @return {HTMLElement} element.
      */
     update: function(element, content){
         element = MVC.$E(element);
@@ -249,11 +287,18 @@ MVC.Object.extend(MVC.Element, {
    /*
     * Removes an element
     */
+   /**
+    * Removes the element from the dom.
+    * @param {Object} element element to be removed
+    * @return {HTMLElement} element
+    */
    remove: function(element){
    		return element.parentNode.removeChild(element);
    },
-   /*
-    * Returns a vector with the dimensions of the element
+   /**
+    * Returns a vector with the element's dimensions.
+    * @param {HTMLElement} element
+    * @return {MVC.Vector} vector element.
     */
    dimensions: function(element){
         var display = element.style.display;
@@ -275,12 +320,25 @@ MVC.Object.extend(MVC.Element, {
         els.visibility = originalVisibility;
         return new MVC.Vector( originalWidth, originalHeight);
     },
+    /**
+     * Adds a class to the html element.
+     * @param {HTMLElement} element element that will have a class added to its className
+     * @param {String} className
+     * @return {HTMLElement} element
+     */
     add_class : function(element, className){
         var cns = element.className.split(/\s+/);
         if(MVC.Array.include(cns, className)) return;
         cns.push(className);
         element.className = cns.join(" ");
+        return element;
     },
+     /**
+     * Removes a class to the html element.
+     * @param {HTMLElement} element element that will have a class removed from its className
+     * @param {String} className
+     * @return {HTMLElement} element
+     */
     remove_class : function(element, className){
         var cns = element.className.split(/\s+/);
         var newcns = [];
@@ -288,6 +346,7 @@ MVC.Object.extend(MVC.Element, {
             if(cns[i] != className) newcns.push(cns[i]);
         }
         element.className = newcns.join(" ");
+        return element;
     }
 });
 
