@@ -73,10 +73,10 @@ MVC.Controller.Comet = MVC.Controller.extend(
             
             for(var action in classHappenings){
                 var objects = classHappenings[action];
-                if(this.models_map[className] != null){
+                if(this.models_map && this.models_map[className] != null){
                     if(this.models_map[className] != false)
                         objects = this.models_map[className].create_many_as_existing(objects);
-                }else if(MVC.Model.models[className.toLowerCase()]){
+                }else if(MVC.Model && MVC.Model.models[className.toLowerCase()]){
                     objects = MVC.Model.models[className.toLowerCase()].create_many_as_existing(objects);
                 }
                 //now pass to controller
