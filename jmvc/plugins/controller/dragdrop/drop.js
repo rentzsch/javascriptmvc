@@ -225,7 +225,7 @@ MVC.Droppables =
 	compile : function(){
 	  var elements = [];
 	  for(var selector in MVC.Droppables.selectors){
-	      var sels = elements.concat( MVC.Query(selector) )
+	      var sels = MVC.Query(selector)
 	      for(var e= 0; e < sels.length; e++){
 	          MVC.Droppables.add(sels[e], MVC.Droppables.selectors[selector])
 	      }
