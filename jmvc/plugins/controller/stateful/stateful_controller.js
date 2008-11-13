@@ -1,6 +1,9 @@
 /**
  * Controller.Stateful provides state for controller instances.  
- * Read the <a href="http://javascriptmvc.com/wiki/index.php?title=Controller.Stateful_Overview">overview page</a> for a good description of how to use Controller.Stateful.
+ * Read the <a href="http://javascriptmvc.com/wiki/index.php?title=Controller.Stateful_Overview">overview page</a> 
+ * and <a href="http://docs.javascriptmvc.com/demos/fixedbox.html">fixedbox demo</a>
+ * for good descriptions of how to use Controller.Stateful.
+ * 
  */
 MVC.Controller.Stateful = MVC.Controller.extend(
 /* @Static*/
@@ -77,7 +80,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
 /* @Prototype */
 {
     /**
-     * Called when a new instance is created.  This looks in params for a sutible id.  If one isn't found,
+     * Called when a new instance is created.  This looks in params for a suitable id.  If one isn't found,
      * it creates one.  It saves the instance to the hash of instances.  It is highly suggested that
      * inheriting classes that overwrite init call _super.
      * @param {optional:Object} params A hash that might contain params.element.id or params.id to be used as the instance's id.
