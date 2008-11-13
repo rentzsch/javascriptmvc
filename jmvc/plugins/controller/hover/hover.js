@@ -93,11 +93,11 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
     /**
      * How many pixels the mouse can move and still trigger a hoverenter
      */
-    sensitivity: 6,
+    sensitivity: 4,
     /**
      * Time between requests.
      */
-    interval: 100,
+    interval: 110,
     /**
      * Stores hover actions by CSS
      */
