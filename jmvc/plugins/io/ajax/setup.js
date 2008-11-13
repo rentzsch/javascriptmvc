@@ -8,5 +8,5 @@ if(typeof jQuery != 'undefined'){
 	include('ajax')
 }
 
-if(MVC.Console || MVC.use_fixtures)
+if(include.get_env() == "test" || MVC.use_fixtures)
 	include('debug')
