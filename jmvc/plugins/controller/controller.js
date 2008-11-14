@@ -198,9 +198,10 @@ MVC.Controller = MVC.Class.extend(
           return new this(action_name, params);
     },
 	_dispatch_action: function(instance, action_name, params){
+        if(!this._listening) return;
         instance.params = params;
 		instance.action_name = action_name;
-		return instance[action_name](params);
+        return instance[action_name](params);
 	},
     controllers : {},
     actions: [],
@@ -224,7 +225,11 @@ MVC.Controller = MVC.Class.extend(
      /**
       * The name of the model this controller can uses for param functions like element_instance
       */
-     modelName: null
+     modelName: null,
+     /**
+      * A flag if controllers can respond to events.
+      */
+     _listening : true
 },
 /* @Prototype*/
 {
