@@ -43,6 +43,28 @@ MVC.Object.extend(MVC.View.Helpers.prototype, {
      * @param {Object} name
      * @param {Object} value
      * @param {Object} html_options
+     * @param {Object} interval - specified in minutes
+     */
+	time_tag: function(name, value, html_options, interval) {	
+		var times = [];
+		
+		if (interval == null || interval == 0)
+			interval = 60;
+
+		for(var h = 0; h < 24 ; h++)
+			for(var m = 0; m < 60; m+=interval)
+			{
+				var time = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+				times.push({ text: time, value: time });
+			}
+
+		return this.select_tag(name, value, times, html_options );
+	},
+    /**
+     * @plugin view/helpers
+     * @param {Object} name
+     * @param {Object} value
+     * @param {Object} html_options
      */
 	file_tag: function(name, value, html_options) {
 	    return this.input_field_tag(name+'[file]', value , 'file', html_options);
