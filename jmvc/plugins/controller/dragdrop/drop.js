@@ -146,13 +146,21 @@ MVC.Droppables =
 	* @return {MVC.Controller.Params.Drop} deepest
 	*/
 	findDeepestChild: function(drops) {
-		//return right away if there are no drops
-		if(drops.length == 0) return null;
-		var deepest = drops[0];
-		  
-		for (i = 1; i < drops.length; ++i)
-		  if (MVC.Element.has(drops[i].element, deepest.element))
-		    deepest = drops[i];
+		var deepest = null;
+		var new_deepest_found = true;
+		var remaining = MVC.Array.from(drops);
+
+		while(new_deepest_found) {
+			new_deepest_found = false;
+
+			for(var i = 0; i < !new_deepest_found && remaining.length; i++) {
+				if ((deepest == null) || (MVC.Element.has(deepest.element, remaining[i].element))) {
+					deepest = remaining[i];
+					new_deepest_found = true;
+					remaining.splice(i, 1);
+				}
+			}
+		}
 		
 		return deepest;
 	},
