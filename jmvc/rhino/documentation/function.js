@@ -28,7 +28,7 @@
 MVC.Doc.Function = MVC.Doc.Pair.extend('function',
 /* @static */
 {
-    code_match: /([\w\.\$]+)\s*[:=]\s*function\(([^\)]*)/,
+    code_match: /(?:([\w\.]+)|(["'][^"']+["']))\s*[:=]\s*function\(([^\)]*)/,
     init : function(){
         this.add(MVC.Doc.Directive.Return, MVC.Doc.Directive.Param, MVC.Doc.Directive.CodeStart, 
         MVC.Doc.Directive.CodeEnd,MVC.Doc.Directive.Plugin)
@@ -39,19 +39,19 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
 {
     code_setup: function(){
         var parts = this.Class.code_match(this.code);
+
         if(!parts){
-            parts = this.code.match(/\s*function\s+([\w\.\$]+)\s*\(([^\)]*)/)
+            parts = this.code.match(/\s*function\s+([\w\.\$]+)\s*(~)?\(([^\)]*)/)
         }
-        this.name = parts[1].replace(/^this\./,"");
+        this.name = parts[1] ? parts[1].replace(/^this\./,"") : parts[2];
         this.params = {};
         this.ret = {type: 'undefined',description: ""}
-        var params = parts[2].match(/\w+/);
+        var params = parts[3].match(/\w+/);
         if(!params) return;
         
         for(var i = 0 ; i < params.length; i++){
             this.params[params[i]] = {description: "", type: "", optional: false, order: i, name: params[i]};
         }
-        
     },
     
 

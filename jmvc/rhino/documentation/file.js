@@ -9,7 +9,7 @@ MVC.Doc.File = MVC.Doc.Pair.extend('file',
 {
     group : new RegExp("(?:/\\*(?:[^*]|(?:\\*+[^*/]))*\\*+/\[^\\w\\{\\(\\[/]*[^\\n]*)", "g"),
     
-    splitter : new RegExp("(?:/\\*+((?:[^*]|(?:\\*+[^*/]))*)\\*+/\[^\\w\\{\\(\\[]*([^\\r\\n]*))")
+    splitter : new RegExp("(?:/\\*+((?:[^*]|(?:\\*+[^*/]))*)\\*+/\[^\\w\\{\\(\\[\"']*([^\\r\\n]*))")
 },{
     /**
      * Generates docs for a file.

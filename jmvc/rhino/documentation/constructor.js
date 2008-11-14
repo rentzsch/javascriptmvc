@@ -37,7 +37,7 @@
 MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
 /* @Static */
 {
-    code_match: /([\w\.]+)\s*[:=]\s*function\(([^\)]*)/,
+    code_match: MVC.Doc.Function.code_match,
     starts_scope: true,
     listing: [],
     create_index : function(){
