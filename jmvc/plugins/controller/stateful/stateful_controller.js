@@ -58,7 +58,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
             //get id from ce.id
             var re = new RegExp(this.className+'_', "");
             params.id = ce.id.replace(re, '');
-            instance = new controller(params);
+            instance = new this(params);
         }
         return instance;
     },
