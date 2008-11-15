@@ -579,7 +579,7 @@ MVC.Controller.Params.prototype = {
         var has_class = function(el){
             var parts = el.className.split(" ")
             for(var i =0; i < parts.length; i++){
-                if(parts == className) return true;
+                if(parts[i] == className) return true;
             }
             return false;
         }
