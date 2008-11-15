@@ -418,6 +418,9 @@ MVC.Model = MVC.Class.extend(
     element : function(){
         return MVC.$E(this.element_id());;
     },
+    elements : function(){
+          return MVC.Query("."+this.element_id());
+    },
     /**
      * Publishes to open ajax hub
      * @param {String} event
