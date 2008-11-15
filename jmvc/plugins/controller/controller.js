@@ -434,10 +434,18 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     plural_selector : function(){
 		if(this.css == "#" || this.css.substring(0,2) == "# "){
-			var newer_action_name = this.css.substring(2,this.css.length);
-            return '#'+this.className + (newer_action_name ?  ' '+newer_action_name : '') ;
+			var newer_action_name = this.css.substring(2,this.css.length)
+            if(this.element == document.documentElement){
+                return '#'+this.className + (newer_action_name ?  ' '+newer_action_name : '') ;
+            }else{
+                return (newer_action_name ?  ' '+newer_action_name : '') ;
+            }
 		}else{
-			return '.'+MVC.String.singularize(this.className)+(this.css? ' '+this.css : '' );
+            if(this.element == document.documentElement){
+			    return '.'+MVC.String.singularize(this.className)+(this.css? ' '+this.css : '' );
+            }else{
+                return this.css;
+            }
 		}
 	},
     /*
@@ -445,7 +453,10 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      * @return {String} the css with the controller name included
      */
     singular_selector : function(){
-        return '#'+this.className+(this.css? ' '+this.css : '' );
+        if(this.element == document.documentElement)
+            return '#'+this.className+(this.css? ' '+this.css : '' );
+        else
+            return this.css;
     },
     /*
      * Gets the full css selector for this action
@@ -458,9 +469,10 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
             }, this));
             return;
         }
-        if(!this.className){
-            this.css_selector = this.css
-        }else if(this.className == 'main') 
+        //if(!this.className){
+        //    this.css_selector = this.css
+        //}else 
+        if(this.className == 'main') 
             this.css_selector = this.main_controller();
         else
             this.css_selector = MVC.String.is_singular(this.className) ? 

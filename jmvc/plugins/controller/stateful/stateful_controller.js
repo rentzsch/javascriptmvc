@@ -48,7 +48,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
                     act = MVC.Controller.actions[a];
                     if(act.matches(action_name)){
                         var callback = this.dispatch_closure(action_name);
-                        this._actions.push(new act(action_name, callback, null,element ));
+                        this._actions.push(new act(action_name, callback, this.Class.className,element ));
                     }
                 }
             }
