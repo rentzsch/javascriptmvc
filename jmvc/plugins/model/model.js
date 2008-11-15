@@ -424,10 +424,10 @@ MVC.Model = MVC.Class.extend(
     /**
      * Publishes to open ajax hub
      * @param {String} event
-     * @param {optional:Object} data if missing, uses the instance
+     * @param {optional:Object} data if missing, uses the instance in {data: this}
      */
     publish : function(event, data){
-        this.Class.publish(event, data||this);
+        this.Class.publish(event, data||{data: this});
     },
     /**
      * Creates a callback function that will call back the function on the instance.
