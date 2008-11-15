@@ -84,7 +84,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         return MVC.Function.bind(function(params){
             params = params || {};
             params.action = f_name;
-            params.controller = this;
+            params.controller = this.Class;
             params = params.constructor == MVC.Controller.Params ? params : new MVC.Controller.Params(params)
 			
             this.params = params;
