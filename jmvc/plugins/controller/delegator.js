@@ -26,17 +26,27 @@ MVC.Object.extend(MVC.Delegator,
 
     add_kill_event: function(event){ //this should really be in event
 		if(!event.kill){
-			var killed = false;
+			if(!event) event = window.event;
+            var killed = false;
 			event.kill = function(){
 				killed = true;
-				if(!event) event = window.event;
 			    try{
-				    event.cancelBubble = true;
 				    if (event.stopPropagation)  event.stopPropagation(); 
 				    if (event.preventDefault)  event.preventDefault();
 			    }catch(e){}
 			};
 			event.is_killed = function(){return killed;};
+            event.stop_propagation = function(){
+                killed = true;
+                try{
+			        if (event.stopPropagation)  event.stopPropagation(); 
+			    }catch(e){}
+            }
+            event.prevent_default = function(){
+                try{
+			        if (event.preventDefault)  event.preventDefault(); 
+			    }catch(e){}
+            }
 		}	
 	},
     /**

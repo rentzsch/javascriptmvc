@@ -71,7 +71,7 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
        //extend params with callbacks
 	   MVC.Object.extend(params, MVC.Lasso.selectors[this.selector()].callbacks)
 	   MVC.Lasso.current = new MVC.Lasso(params);
-       params.event.kill();
+       params.event.prevent_default();
 	   return false;
 	}
 });

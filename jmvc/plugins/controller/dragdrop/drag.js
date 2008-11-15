@@ -75,7 +75,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
        //extend params with callbacks
 	   MVC.Object.extend(params, MVC.Draggable.selectors[this.selector()].callbacks)
 	   MVC.Draggable.current = new MVC.Draggable(params);
-       params.event.kill();
+       params.event.prevent_default();
 	   return false;
 	}
 });
