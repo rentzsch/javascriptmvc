@@ -347,6 +347,22 @@ MVC.Object.extend(MVC.Element, {
         }
         element.className = newcns.join(" ");
         return element;
+    },
+    /**
+     * Returns an array of matches if the element has a className, null if otherwise.
+     * @code_start
+     * MVC.$E("element_id").has_class(/\w+_(\d+)/) -> ['thing_5','5']
+     * @code_end
+     * @param {HTMLElement} element
+     * @param {RegExp} regexp
+     * @return {Array} 
+     */
+    has_class : function(element , regexp){
+        var cns = element.className.split(/\s+/);
+        var matches;
+        for(var i =0; i < cns.length; i++){
+            if((matches = cns[i].match(regexp))) return matches;
+        }
     }
 });
 

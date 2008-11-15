@@ -1,6 +1,3 @@
-
-
-
 load('jmvc/rhino/command/file.js')
 load('jmvc/rhino/command/recursive_http_fetcher.js');
 
