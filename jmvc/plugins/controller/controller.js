@@ -314,6 +314,12 @@ MVC.Controller.Action = MVC.Class.extend(
         this.callback = callback;
         this.className = className;
         this.element = element
+    },
+    /**
+     * Disables an action.
+     */
+    destroy: function(){
+        
     }
 });
 /**
@@ -351,7 +357,7 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
     init: function(action_name, callback, className, element){
         this._super(action_name, callback, className, element);
         this.message();
-        OpenAjax.hub.subscribe(this.message_name, MVC.Function.bind(this.subscribe, this) );
+        this.subscription = OpenAjax.hub.subscribe(this.message_name, MVC.Function.bind(this.subscribe, this) );
     },
     /**
      * Gets the message name from the action name.
@@ -364,6 +370,10 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
         var params = data || {};
         params.event_name = event_name
         this.callback(params)
+    },
+    destroy : function(){
+        OpenAjax.hub.unsubscribe(this.subscription)
+        this._super();
     }
 })
 /*
@@ -395,7 +405,7 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
         
         var selector = this.selector();
         if(selector != null){
-            new MVC.Delegator(selector, this.event_type, callback, element );
+            this.delegator = new MVC.Delegator(selector, this.event_type, callback, element );
         }
     },
     /*
@@ -456,6 +466,10 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
             this.css_selector = MVC.String.is_singular(this.className) ? 
                 this.singular_selector() : this.plural_selector();
         return this.css_selector;
+    },
+    destroy : function(){
+        if(this.delegator) this.delegator.destroy();
+        this._super();
     }
 });
 

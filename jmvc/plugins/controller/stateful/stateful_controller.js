@@ -40,7 +40,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      */
     init: function(element){
         //needs to go through prototype, and attach events to this instance
-        this.actions = {};
+        this._actions = [];
         for(var action_name in this){
     		val = this[action_name];
     		if( typeof val == 'function' && action_name != 'Class'){
@@ -48,7 +48,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
                     act = MVC.Controller.actions[a];
                     if(act.matches(action_name)){
                         var callback = this.dispatch_closure(action_name);
-                        this.actions[action_name] =new act(action_name, callback, null,element );
+                        this._actions.push(new act(action_name, callback, null,element ));
                     }
                 }
             }
@@ -61,12 +61,19 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      * It also removes this.element from the page.
      */
     destroy: function(){
+        //destroy actions
+        for(var i = 0; i < this._actions.length; i++){
+            this._actions[i].destroy();
+            delete this._actions[i];
+        }
+        
         if(this.element){
             //take out any listeners on this guy
             for(var event_type in this.element.__devents){
                 var events = this.element.__devents[event_type]
                 for(var i = 0; i < events.length; i++){
                     events[i].destroy();
+                    delete events[i];
                 }
             }
         }
