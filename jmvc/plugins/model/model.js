@@ -184,9 +184,17 @@ MVC.Model = MVC.Class.extend(
      * @param {Object} el
      */
 	find_by_element: function(el){
-		var re = new RegExp(this.className+'_', "i");
-		return this.store.find_one(el.id.replace(re, ''));
+		return this._find_by_element(el, this.className, this);
 	},
+    _find_by_element: function(ce, modelName, model){
+        var matches, id,  matcher = new RegExp("^"+modelName+"_(.*)$");
+        if(ce && ce.id && (matches= ce.id.match(matcher) ) && matches.length > 1){
+            id = matches[1]
+        }else{
+            id = ce.has_class(matcher)[1]
+        }
+        return model.store.find_one(id);
+    },
     /**
      * Adds an attribute to the list of attributes for this class.
      * @param {String} property

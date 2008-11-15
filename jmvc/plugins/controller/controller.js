@@ -606,16 +606,11 @@ MVC.Controller.Params.prototype = {
      * it will use a different model to look up the data.
      */
     element_instance : function(){
-        var ce, matches, model, matcher, modelName = this.controller.modelName, id,  matcher = new RegExp("^"+modelName+"_(.*)$");
+        var ce, matches, model, modelName = this.controller.modelName, id,  matcher = new RegExp("^"+modelName+"_(.*)$");
         if(! (model=MVC.Model.models[modelName])  ) throw "No model for the "+ this.controller.className+ " controller!";
         ce = this.class_element();
         //first check the class
-        if(ce && ce.id && (matches= ce.id.match(matcher) ) && matches.length > 1){
-            id = matches[1]
-        }else{
-            id = ce.has_class(matcher)[1]
-        }
-	    return model.store.find_one(id);
+        return Model._find_by_element(ce, modelName, model)
     }
 };
 
