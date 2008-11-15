@@ -97,6 +97,6 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      * @param {Object} selector
      */
     query: function(selector){
-        MVC.Query.descendant(this.element, selector)
+        return MVC.Query.descendant(this.element, selector)
     }
 });
