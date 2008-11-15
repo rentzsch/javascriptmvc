@@ -91,5 +91,12 @@ MVC.Controller.Stateful = MVC.Controller.extend(
     		this.action_name = f_name;
             return this[f_name](params);
 		},this);
+    },
+    /**
+     * Queries from the current element.
+     * @param {Object} selector
+     */
+    query: function(selector){
+        MVC.Query.descendant(this.element, selector)
     }
 });
