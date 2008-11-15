@@ -28,10 +28,12 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend(
      * @param {Function} f
      * @param {MVC.Controller} controller
      */
-    init: function(action, f, controller){
-        this.action = action;
-        this.func = f;
-        this.controller = controller;
+    init: function(action_name, callback, className, element){
+		//can't use init, so set default members
+        this.action = action_name;
+        this.callback = callback;
+        this.className = className;
+        this.element = element
         this.css_and_event();
         var selector = this.selector();
         this[this.event_type]()
@@ -44,7 +46,7 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend(
             //set a timeout and compare position
 			var related_target = params.event.relatedTarget;
 			if(params.element == related_target || MVC.$E(params.element).has(related_target)) return true;
-			this.func(params);
+			this.callback(params);
             
         }, this));
     },
@@ -57,7 +59,7 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend(
             //set a timeout and compare position
 			var related_target = params.event.relatedTarget;
 			if(params.element == related_target || MVC.$E(params.element).has(related_target)) return true;
-			this.func(params);
+			this.callback(params);
         }, this));
     }
 });
@@ -111,10 +113,11 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
      * @param {Object} f
      * @param {Object} controller
      */
-    init: function(action, f, controller){
-        this.action = action;
-        this.func = controller.dispatch_closure(action );
-        this.controller = controller;
+    init: function(action_name, callback, className, element){
+        this.action = action_name;
+        this.callback = callback;
+        this.className = className;
+        this.element = element
         this.css_and_event();
         var selector = this.selector();
         if(! this.Class.hovers[this.selector()]){
@@ -131,7 +134,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
 	hoverenter : function(params){
 		 var hoverenter = this.Class.hovers[this.selector()]["hoverenter"];
          if(hoverenter)
-            hoverenter.func(params);
+            hoverenter.callback(params);
 	},
      /**
      * Calls hoverleave if there is one.
@@ -140,7 +143,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
 	hoverleave : function(params){
 		var hoverleave = this.Class.hovers[this.selector()]["hoverleave"];
         if(hoverleave)
-            hoverleave.func(params);
+            hoverleave.callback(params);
 	},
     /**
      * Checks if 2 mouse moves are within sensitivity

@@ -6,10 +6,12 @@
  * @param {String} event a dom event
  * @param {Function} f a function to call
  */
-MVC.Delegator = function(selector, event, f){
+MVC.Delegator = function(selector, event, f, element){
     this._event = event;
-    this._selector = selector;
+    this._selector = selector
     this._func = f;
+    this.element = element || document.documentElement;
+    if(!this.element.__devents) this.element.__devents = {};
     if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
     if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
 	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
@@ -21,51 +23,7 @@ MVC.Delegator = function(selector, event, f){
 MVC.Object.extend(MVC.Delegator,
 /* @Static*/
 {
-    /**
-     * Returns an array of objects that represent the path of the node to documentElement.  Each item in the array
-     * has a tag, className, id, and element attribute.
-     * @param {Object} el element in the dom that is nested under the documentElement
-     * @return {Array} representation of the path between the element and the DocumentElement
-     */
-    node_path: function(el){
-		var body = document.documentElement,parents = [],iterator =el;
-		while(iterator != body){
-			parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
-			iterator = iterator.parentNode;
-			if(iterator == null) return [];
-		}
-		//parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
-		return parents;
-	},
-    /**
-     * Goes through the delegated events for the given event type (e.g. Click).  Orders the matches
-     * by how nested they are in the dom.  Adds the kill function on the event, then dispatches each
-     * event.  If kill is called, it will stop dispatching other events.
-     * @param {Event} event the DOM event returned by a normal event handler.
-     */
-	dispatch_event: function(event){
-		var target = event.target, matched = false, ret_value = true,matches = [];
-		var delegation_events = MVC.Delegator.events[event.type];
-        var parents_path = MVC.Delegator.node_path(target);
-        
-		for(var i =0; i < delegation_events.length;  i++){
-			var delegation_event = delegation_events[i];
-			var match_result = delegation_event.match(target, event, parents_path);
-			if(match_result){
-				matches.push(match_result);
-			}
-		}
 
-		if(matches.length == 0) return true;
-		MVC.Delegator.add_kill_event(event);
-		matches.sort(MVC.Delegator.sort_by_order);
-        var match;
-		for(var m = 0; m < matches.length; m++){
-            match = matches[m];
-            ret_value = match.delegation_event._func( {event: event, element: MVC.$E(match.node)} ) && ret_value;
-			if(event.is_killed()) return false;
-		}
-	},
     add_kill_event: function(event){ //this should really be in event
 		if(!event.kill){
 			var killed = false;
@@ -135,11 +93,26 @@ MVC.Delegator.prototype = {
         var e = event || this.event();
         var f = func || this._func;
         
-        if(!MVC.Delegator.events[e]){
-            MVC.Event.observe(document.documentElement, e, MVC.Delegator.dispatch_event, this.capture() );
-            MVC.Delegator.events[e] = [];
+        if(!this.element.__devents[e] || this.element.__devents[e].length == 0){
+            var bind_function = MVC.Function.bind(this.dispatch_event, this)
+            MVC.Event.observe(this.element, e, bind_function, this.capture() );
+            this.element.__devents[e] = [];
+            this.element.__devents[e]._bind_function = bind_function;
 		}
-		MVC.Delegator.events[e].push(this);
+		this.element.__devents[e].push(this);
+    },
+    _remove_from_delegator : function(){
+        var event = this.event();
+        var events = this.element.__devents[event];
+        for(var i = 0; i < events.length;i++ ){
+            if(events[i] == this){
+                events.splice(i, 1);
+                break;
+            }
+        }
+        if(events.length == 0){
+            MVC.Event.stop_observing(this.element, event, events._bind_function, this.capture() );
+        }
     },
     /*
      * Handles the submit case for IE.  It checks if a keypress return happens in an
@@ -225,6 +198,7 @@ MVC.Delegator.prototype = {
 		var selector_parts = this._selector.split(/\s+/);
 		var patterns = this.regexp_patterns;
 		var order = [];
+        if(this._selector)
 		for(var i =0; i< selector_parts.length; i++){
 			var v = {}, r, p =selector_parts[i];
 			for(var attr in patterns){
@@ -254,8 +228,12 @@ MVC.Delegator.prototype = {
         if(this.filters && !this.filters[event.type](el, event, parents)) return null;
 		//if(this.controller.className != 'main' &&  (el == document.documentElement || el==document.body) ) return false;
 		var matching = 0;
-		for(var n=0; n < parents.length; n++){
-			var node = parents[n], match = this.selector_order()[matching], matched = true;
+		var selector_order = this.selector_order();
+        if(selector_order.length == 0){ //attached to top node
+            return {node: parents[0].element, order: 0, delegation_event: this}
+        } 
+        for(var n=0; n < parents.length; n++){
+			var node = parents[n], match = selector_order[matching], matched = true;
 			for(var attr in match){
 				if(!match.hasOwnProperty(attr) || attr == 'element') continue;
 				if(match[attr] && attr == 'className'){
@@ -266,12 +244,64 @@ MVC.Delegator.prototype = {
 			}
 			if(matched){
 				matching++;
-                if(matching >= this.selector_order().length) {
+                if(matching >= selector_order.length) {
                     if(this.end_filters && !this.end_filters[event.type](el, event)) return null;
                     return {node: node.element, order: n, delegation_event: this};
                 }
 			}
 		}
 		return null;
+    },
+    /**
+     * Goes through the delegated events for the given event type (e.g. Click).  Orders the matches
+     * by how nested they are in the dom.  Adds the kill function on the event, then dispatches each
+     * event.  If kill is called, it will stop dispatching other events.
+     * @param {Event} event the DOM event returned by a normal event handler.
+     */
+	dispatch_event: function(event){
+        var target = event.target, matched = false, ret_value = true,matches = [];
+		var delegation_events = this.element.__devents[event.type];
+        var parents_path = this.node_path(target);
+		for(var i =0; i < delegation_events.length;  i++){
+			var delegation_event = delegation_events[i];
+			var match_result = delegation_event.match(target, event, parents_path);
+			if(match_result){
+				matches.push(match_result);
+			}
+		}
+
+		if(matches.length == 0) return true;
+		MVC.Delegator.add_kill_event(event);
+		matches.sort(MVC.Delegator.sort_by_order);
+        var match;
+		for(var m = 0; m < matches.length; m++){
+            match = matches[m];
+            ret_value = match.delegation_event._func( {event: event, element: MVC.$E(match.node)} ) && ret_value;
+			if(event.is_killed()) return false;
+		}
+	},
+    /**
+     * Returns an array of objects that represent the path of the node to documentElement.  Each item in the array
+     * has a tag, className, id, and element attribute.
+     * @param {Object} el element in the dom that is nested under the documentElement
+     * @return {Array} representation of the path between the element and the DocumentElement
+     */
+    node_path: function(el){
+        var body = this.element,parents = [],iterator =el;
+		while(iterator != body){
+            parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
+			iterator = iterator.parentNode;
+			if(iterator == null) return [];
+		}
+		parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
+        return parents;
+	},
+    destroy : function(){
+        //remove from events
+        //if(this._event == 'contextmenu' && MVC.Browser.Opera) return this.destroy_context_for_opera();
+        //if(this._event == 'submit' && MVC.Browser.IE) return this.destroy_submit_for_ie();
+    	//if(this._event == 'change' && MVC.Browser.IE) return this.destroy_change_for_ie();
+    	//if(this._event == 'change' && MVC.Browser.WebKit) return this.destroy_change_for_webkit();
+        this._remove_from_delegator()
     }
 };

@@ -1,71 +1,57 @@
 MainController = MVC.Controller.extend('main',{
 	load : function(){
 		MainController.loaded = true;
+        success('load')
 	},
 	resize : function(){
-		//success('resize')
+		success('resize')
 	},
 	scroll : function(){
-		//success('scroll')
+		success('scroll')
 	},
 	unload : function(){
-		//success('unload')
+		success('unload')
 	},
 	click: function(){
-		//success('mainclick')
+		success('mainclick')
 	}
 });
 
-
-
-
-
 TestsController = MVC.Controller.extend('tests',{
 	change: function(){
-		//success('change')
+		success('change')
 	},
 	click : function(params){
-		//success('click')
+		success('click')
 	},
 	focus : function(params){
-		//success('focus')
+		success('focus')
 	},
 	blur : function(){
-		//success('blur')
+		success('blur')
 	},
 	'# submit' :function(params){
-		//success('submit')
+		success('submit')
+        
 		params.event.kill();
 	},
 	mousedown : function(params){
-		//success('mousedown')
+		success('mousedown')
 	},
 	mousemove : function(params){
-		//success('mousemove')
+		success('mousemove')
 	},
 	mouseup : function(params){
-		//success('mouseup')
+		success('mouseup')
 	},
 	mouseover : function(params){
 		success('mouseover')
 	},
 	mouseout : function(params){
-		//success('mouseout')
+		success('mouseout')
 	},
 	contextmenu : function(params){
-		//success('contextmenu')
-	},
-	"render_to subscribe" : function(params){
-		this.data = 'HelloWorld'
-		this.render({to: 'render_here'});
-	},
-	to_element : function(params){
-		this.data = 'HelloWorld'
-		this.render({to: document.getElementById('render_here')});
-	},
-	after : function(params){
-		this.data = 'HelloWorld'
-		this.render({after: 'render_here'});
+		success('contextmenu')
 	}
 });
 

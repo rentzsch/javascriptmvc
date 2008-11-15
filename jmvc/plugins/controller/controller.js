@@ -122,21 +122,11 @@ MVC.Controller = MVC.Class.extend(
         if(!MVC.Controller.controllers[this.className]) MVC.Controller.controllers[this.className] = [];
         MVC.Controller.controllers[this.className].unshift(this);
         var val, act;
-        this.actions = {};
-        for(var action_name in this.prototype){
-    		val = this.prototype[action_name];
-    		if( typeof val == 'function' && action_name != 'Class'){
-                for(var a = 0 ; a < MVC.Controller.actions.length; a++){
-                    act = MVC.Controller.actions[a];
-                    if(act.matches(action_name)){
-                        this.actions[action_name] =new act(action_name, val, this);
-                    }
-                }
-            }
-	    }
+        
         if(!this.modelName)
             this.modelName = MVC.String.is_singular(this.className) ? this.className : MVC.String.singularize(this.className)
-
+        if(this._should_attach_actions)
+            this._create_actions();
         //load tests
         if(include.get_env() == 'test'){
             var path = MVC.root.join('test/functional/'+this.className+'_controller_test.js');
@@ -148,25 +138,25 @@ MVC.Controller = MVC.Class.extend(
 			}
 			else {
 				MVC.Console.log('Test Controller not found at "test/functional/' + this.className + '_controller_test.js"');
-				return;
 			}
         }
         this._path =  include.get_path().match(/(.*?)controllers/)[1]+"controllers";
     },
-    event_closure: function(f_name, element){
-		return MVC.Function.bind(function(event){
-			var params = new MVC.Controller.Params({event: event, element: element, action: f_name, controller: this  });
-			return this.dispatch(f_name, params);
-		}, this);
-	},
-    subscribe_closure : function(f_name){
-        return  MVC.Function.bind(function(event_name, data){
-            var params = data || {};
-            params.action = f_name;
-            params.controller = this;
-            params.event_name = event_name;
-			return this.dispatch(f_name,  new MVC.Controller.Params( params)  );
-		},this);
+    _should_attach_actions : true,
+    _create_actions : function(){
+        this.actions = {};
+        for(var action_name in this.prototype){
+    		val = this.prototype[action_name];
+    		if( typeof val == 'function' && action_name != 'Class'){
+                for(var a = 0 ; a < MVC.Controller.actions.length; a++){
+                    act = MVC.Controller.actions[a];
+                    if(act.matches(action_name)){
+                        var callback = this.dispatch_closure(action_name);
+                        this.actions[action_name] =new act(action_name, callback, this.className, this._element, this._events);
+                    }
+                }
+            }
+	    }
     },
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
@@ -229,7 +219,9 @@ MVC.Controller = MVC.Class.extend(
      /**
       * A flag if controllers can respond to events.
       */
-     _listening : true
+     _listening : true,
+     _events : MVC.Delegator.events,
+     _element : document.documentElement
 },
 /* @Prototype*/
 {
@@ -317,10 +309,11 @@ MVC.Controller.Action = MVC.Class.extend(
      * @param {Function} f
      * @param {MVC.Controller} controller
      */
-    init: function(action_name, f, controller){
+    init: function(action_name, callback, className, element){
         this.action = action_name;
-        this.func = f;
-        this.controller = controller;
+        this.callback = callback;
+        this.className = className;
+        this.element = element
     }
 });
 /**
@@ -355,10 +348,10 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
      * @param {Object} f
      * @param {Object} controller
      */
-    init: function(action, f, controller){
-        this._super(action, f, controller);
+    init: function(action_name, callback, className, element){
+        this._super(action_name, callback, className, element);
         this.message();
-        OpenAjax.hub.subscribe(this.message_name, this.controller.subscribe_closure(action ) );
+        OpenAjax.hub.subscribe(this.message_name, MVC.Function.bind(this.subscribe, this) );
     },
     /**
      * Gets the message name from the action name.
@@ -366,6 +359,11 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
     message: function(){
         this.parts = this.action.match(this.Class.match);
         this.message_name = this.parts[1];
+    },
+    subscribe : function(event_name, data){
+        var params = data || {};
+        params.event_name = event_name
+        this.callback(params)
     }
 })
 /*
@@ -391,14 +389,13 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
 },
 /* @Prototype*/
 {    
-    init: function(action, f, controller){
-        this._super(action, f, controller);
+    init: function(action_name, callback, className, element){
+        this._super(action_name, callback, className, element);
         this.css_and_event();
         
         var selector = this.selector();
         if(selector != null){
-            new MVC.Delegator(selector, this.event_type, 
-                this.controller.dispatch_closure(action ) );
+            new MVC.Delegator(selector, this.event_type, callback, element );
         }
     },
     /*
@@ -414,7 +411,9 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     main_controller: function(){
 	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, this.controller.event_closure( this.event_type, window) );
+            MVC.Event.observe(window, this.event_type, MVC.Function.bind(function(event){
+                this.callback({event: event, element: window})
+            }, this))
             return;
         }
         return this.css;
@@ -426,9 +425,9 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
     plural_selector : function(){
 		if(this.css == "#" || this.css.substring(0,2) == "# "){
 			var newer_action_name = this.css.substring(2,this.css.length);
-            return '#'+this.controller.className + (newer_action_name ?  ' '+newer_action_name : '') ;
+            return '#'+this.className + (newer_action_name ?  ' '+newer_action_name : '') ;
 		}else{
-			return '.'+MVC.String.singularize(this.controller.className)+(this.css? ' '+this.css : '' );
+			return '.'+MVC.String.singularize(this.className)+(this.css? ' '+this.css : '' );
 		}
 	},
     /*
@@ -436,7 +435,7 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      * @return {String} the css with the controller name included
      */
     singular_selector : function(){
-        return '#'+this.controller.className+(this.css? ' '+this.css : '' );
+        return '#'+this.className+(this.css? ' '+this.css : '' );
     },
     /*
      * Gets the full css selector for this action
@@ -444,15 +443,17 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     selector : function(){
         if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, this.controller.event_closure(this.event_type, window) );
+            MVC.Event.observe(window, this.event_type, MVC.Function.bind(function(event){
+                this.callback({event: event, element: window})
+            }, this));
             return;
         }
-        
-        
-        if(this.controller.className == 'main') 
+        if(!this.className){
+            this.css_selector = this.css
+        }else if(this.className == 'main') 
             this.css_selector = this.main_controller();
         else
-            this.css_selector = MVC.String.is_singular(this.controller.className) ? 
+            this.css_selector = MVC.String.is_singular(this.className) ? 
                 this.singular_selector() : this.plural_selector();
         return this.css_selector;
     }
@@ -549,7 +550,14 @@ MVC.Controller.Params.prototype = {
 	class_element : function(){
 		var start = this.element;
 		var className = this._className();
-		while(start && start.className.indexOf(className) == -1 ){
+        var has_class = function(el){
+            var parts = el.className.split(" ")
+            for(var i =0; i < parts.length; i++){
+                if(parts == className) return true;
+            }
+            return false;
+        }
+        while(start && !has_class(start) ){
 			start = start.parentNode;
 			if(start == document) return null;
 		}

@@ -32,7 +32,7 @@ include.plugins('io/ajax','controller','view',
 
 include(function(){ //runs after prior includes are loaded
   include.models('todo');
-  include.controllers('controllertest');
+  include.controllers('render');
   include.translation("spanish");
   //include.views();
 });

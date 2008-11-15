@@ -66,16 +66,18 @@ MVC.Controller.Action.Selectable = MVC.Controller.Action.Event.extend(
      * @param {Object} f
      * @param {Object} controller
      */
-    init: function(action, f, controller){
-        this.action = action;
-        this.func = f;
-        this.controller = controller;
+    init: function(action_name, callback, className, element){
+		//can't use init, so set default members
+        this.action = action_name;
+        this.callback = callback;
+        this.className = className;
+        this.element = element
         this.css_and_event();
         var selector = this.selector();
         
 		// add selector to list of selectors:
         if(! MVC.Selectables.selectors[selector]) MVC.Selectables.selectors[selector] = {};
-        MVC.Selectables.selectors[selector][this.event_type] = controller.dispatch_closure(action); 
+        MVC.Selectables.selectors[selector][this.event_type] = callback; 
     }
 });
 /**

@@ -3,8 +3,11 @@
 /**
  * @constructor
  * Used for creating and dispatching synthetic events.
+ * @code_start
+ * new MVC.SyntheticEvent('click').send(MVC.$E('id'))
+ * @code_end
  * @init Sets up a synthetic event.
- * @param {String} type type of event
+ * @param {String} type type of event, ex: 'click'
  * @param {optional:Object} options
  */
 MVC.SyntheticEvent = function(type, options){
@@ -16,7 +19,7 @@ MVC.SyntheticEvent.prototype =
 {
 	/**
 	 * Dispatches the event on the given element
-	 * @param {Object} element the element that will be the target of the event.
+	 * @param {HTMLElement} element the element that will be the target of the event.
 	 */
     send : function(element){
 		this.firefox_autocomplete_off(element);
@@ -41,7 +44,6 @@ MVC.SyntheticEvent.prototype =
 			this.createEventObject(element);
 		} else
 			throw "Your browser doesn't support dispatching events";
-		
 		return this.event;
 	},
 	createEvent : function(element) {

@@ -14,58 +14,9 @@ MVC.Controller.Stateful = MVC.Controller.extend(
     init: function(){
         this._super();
         if(!this.className) return;
-        if( MVC.String.is_singular(this.className)) throw "Only plural names for stateful controller!";
+        //if( MVC.String.is_singular(this.className)) throw "Only plural names for stateful controller!";
     },
-    /**
-     * Returns a function that calls each instance in instances.  
-     * The function is called on Load, Unload, Resize and Scroll.
-     * @param {String} f_name 
-     * @param {HTMLElement} element
-     */
-    event_closure: function( f_name, element){
-		return MVC.Function.bind(function(event){
-			var params = new MVC.Controller.Params({event: event, action: f_name   });
-			for(var element_id in this.instances){
-                var instance = this.instances[element_id];
-                instance.params = params;
-        		instance.action_name = f_name;
-                this._dispatch_action(instance,f_name, params);
-            }
-		},this);
-	},
-    subscribe_closure: function(f_name){
-        return MVC.Function.bind(function(event){
-			var params = new MVC.Controller.Params({action: f_name   });
-			for(var element_id in this.instances){
-                var instance = this.instances[element_id];
-                instance.params = params;
-        		instance.action_name = f_name;
-                this._dispatch_action(instance,f_name, params);
-            }
-		},this);
-    },
-    /**
-     * For an event, gets the class_element from the params.  It sees if it has an id that 
-     * is in instances.  If it does, it returns that instance; otherwise, it creates a new instance
-     * and puts that instance in instances by id.
-     * @param {String} action_name The action that will be called on the instance.
-     * @param {MVC.Params} params The params the action will be called with.
-     */
-    _get_instance: function(action_name, params){
-        var ce = params.class_element();
-        var instance = this.instances[ce.id];
-        if(!instance){
-            //get id from ce.id
-            var re = new RegExp(this.className+'_', "");
-            params.id = ce.id.replace(re, '');
-            instance = new this(params);
-        }
-        return instance;
-    },
-    /**
-     * A collection of instances of this Controller.
-     */
-    instances : {},
+    _should_attach_actions: false,
     /**
      * Removes the instance associated with an element.  This assumes the destroy
      * function handles clearing the element.
@@ -75,7 +26,9 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         if(!element.id) throw "element must have an id to remove the instance"
         this.instances[element.id].destroy();
         
-    }
+    },
+    _events : null,
+    _element : null
 },
 /* @Prototype */
 {
@@ -85,38 +38,51 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      * inheriting classes that overwrite init call _super.
      * @param {optional:Object} params A hash that might contain params.element.id or params.id to be used as the instance's id.
      */
-    init: function(params){
-        params = params || {};
-        this.id = (params.id || MVC.get_random(10))
-        this.element_id = this.Class.className + "_" +this.id;
-        this.Class.instances[this.element_id] = this;
-        
+    init: function(element){
+        //needs to go through prototype, and attach events to this instance
+        this.actions = {};
+        for(var action_name in this){
+    		val = this[action_name];
+    		if( typeof val == 'function' && action_name != 'Class'){
+                for(var a = 0 ; a < MVC.Controller.actions.length; a++){
+                    act = MVC.Controller.actions[a];
+                    if(act.matches(action_name)){
+                        var callback = this.dispatch_closure(action_name);
+                        this.actions[action_name] =new act(action_name, callback, null,element );
+                    }
+                }
+            }
+	    }
         this.action_name = "init";
+        this.element = element;
     },
+
     /**
-     * Creates an html element that represents this instance.  This creates a new element then sets
-     * its className to the Controller's single name and the element's id to the id of the controller instance.
-     * It also adds the element as this.element to the instance.  But, it is important to note that 
-     * this does not insert the element into the page, it assumes you do that on your own.
-     * 
-     * @param {optional:String} tag type type of html element to create.  Defaults to "div".
-     * @return {HTMLElement} The element to be inserted in the page.
-     */
-    create_element: function(tag){
-        var element = document.createElement(tag || "div");
-        element.id = this.element_id;
-        element.className = this.Class.singularName;
-        return element;
-    },
-    /**
-     * Removes this instance from the list of instances.  It also removes it from the page.
+     * It also removes this.element from the page.
      */
     destroy: function(){
-        //delete element and instance from list
-        delete this.Class.instances[this.element_id];
-        var element = MVC.$E(this.element_id);
-        
-        if(element && element.parentNode){ element.parentNode.removeChild(element);}
+        if(this.element){
+            //take out any listeners on this guy
+            for(var event_type in this.element.__devents){
+                var events = this.element.__devents[event_type]
+                for(var i = 0; i < events.length; i++){
+                    events[i].destroy();
+                }
+            }
+        }
+        if(this.element && this.element.parentNode){ this.element.parentNode.removeChild(this.element);}
         delete this;
+    },
+    dispatch_closure: function(f_name){
+        return MVC.Function.bind(function(params){
+            params = params || {};
+            params.action = f_name;
+            params.controller = this;
+            params = params.constructor == MVC.Controller.Params ? params : new MVC.Controller.Params(params)
+			
+            this.params = params;
+    		this.action_name = f_name;
+            return this[f_name](params);
+		},this);
     }
 });

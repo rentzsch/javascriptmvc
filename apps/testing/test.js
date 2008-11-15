@@ -11,7 +11,8 @@ include.unit_tests(
     'timer',
     'model',
     'translation',
-    'position'
+    'position',
+    'delegation'
 );
 
 include.functional_tests();

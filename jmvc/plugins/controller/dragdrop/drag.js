@@ -47,24 +47,25 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
      * @param {Function} f the function itself
      * @param {MVC.Controller} controller the controller this action belongs to
      */
-    init: function(action, f, controller){
+    init: function(action_name, callback, className, element){
 		//can't use init, so set default members
-        this.action = action;
-        this.func = f;
-        this.controller = controller;
+        this.action = action_name;
+        this.callback = callback;
+        this.className = className;
+        this.element = element
         this.css_and_event();
         var selector = this.selector();
 		
         //If the selector has already been added, just add this action to its list of possible action callbacks
 		if(MVC.Draggable.selectors[selector]) {
-            MVC.Draggable.selectors[selector].callbacks[this.event_type] = controller.dispatch_closure(action);
+            MVC.Draggable.selectors[selector].callbacks[this.event_type] = callback;
             return;
         }
 		//create a new mousedown event for selectors that match our mouse event
         MVC.Draggable.selectors[selector] = 
 			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this));
         MVC.Draggable.selectors[selector].callbacks = {};
-        MVC.Draggable.selectors[selector].callbacks[this.event_type] = controller.dispatch_closure(action);
+        MVC.Draggable.selectors[selector].callbacks[this.event_type] = callback;
     },
 	/**
 	 * Called when someone mouses down on a draggable object.
@@ -139,7 +140,19 @@ MVC.Draggable.prototype =
         
 		//style the drag element for dragging
         MVC.Element.make_positioned(this.drag_element);
-        this.start_position =MVC.Element.cumulative_offset(this.drag_element);
+        //if it is something else (absolutely positioned on the page)
+        //this should probably get it's offset minus its left top
+        if(this.drag_element != this.element){
+            this.start_position = 
+                MVC.Element.cumulative_offset(this.drag_element)
+                    //.minus( 
+                    //new MVC.Vector( 
+                    //    parseInt(MVC.Element.get_style(this.drag_element,'left') || '0'), 
+                    //        parseInt(MVC.Element.get_style(this.drag_element,'top') || '0')))
+        }
+        else
+            this.start_position = this.currentDelta(); //if it is us
+            
         this.drag_element.style.zIndex = 1000;
         
 		//Get the list of Droppables.  

@@ -47,16 +47,17 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
      * @param {Object} f
      * @param {Object} controller
      */
-    init: function(action, f, controller){
-        this.action = action;
-        this.func = f;
-        this.controller = controller;
+    init: function(action_name, callback, className, element){
+        this.action = action_name;
+        this.callback = callback;
+        this.className = className;
+        this.element = element
         this.css_and_event();
         var selector = this.selector();
         
 		// add selector to list of selectors:
         if(! MVC.Droppables.selectors[selector]) MVC.Droppables.selectors[selector] = {};
-        MVC.Droppables.selectors[selector][this.event_type] = controller.dispatch_closure(action); 
+        MVC.Droppables.selectors[selector][this.event_type] = callback; 
     }
 });
 /**
@@ -80,8 +81,8 @@ MVC.Object.extend(MVC.Controller.Params.Drop.prototype,
      * dropadd : function(params){ params.cache_position() }
      * @code_end
      */
-	cache_position: function(){
-        this._cache = true;
+	cache_position: function(value){
+        this._cache = value != null ? value : true;
     },
 	/**
 	 * cancels this drop

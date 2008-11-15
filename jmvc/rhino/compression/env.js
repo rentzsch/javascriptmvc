@@ -158,11 +158,11 @@ var self = window;
 	var events = [{}];
 
 	window.addEventListener = function(type, fn){
-		if ( !this.uuid || this == window ) {
+        if ( !this.uuid || this == window ) {
 			this.uuid = events.length;
 			events[this.uuid] = {};
 		}
-	   
+	    
 		if ( !events[this.uuid][type] )
 			events[this.uuid][type] = [];
 		
@@ -184,20 +184,24 @@ var self = window;
 				return f != fn;
 			});
 	};
-	
+
 	window.dispatchEvent = function(event){
-		if ( event.type ) {
+        if(!event.target)
+            event.target = this;
+        if ( event.type ) {
 			if ( this.uuid && events[this.uuid][event.type] ) {
 				var self = this;
-			
 				events[this.uuid][event.type].forEach(function(fn){
-					fn.call( self, event );
+                    fn.call( self, event );
 				});
 			}
 			
 			if ( this["on" + event.type] )
 				this["on" + event.type].call( self, event );
 		}
+        if(this.parentNode){
+            this.parentNode.dispatchEvent.call(this.parentNode, event);
+        }
 	};
 	
     
@@ -312,8 +316,12 @@ var self = window;
     Event.prototype = {
         initEvent: function(type){
 			this.type = type;
+		},
+        initMouseEvent: function(type){
+            this.type = type;
 		}
     }
+    
 	function getDocument(node){
 		return obj_nodes.get(node);
 	}

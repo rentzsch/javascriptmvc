@@ -41,24 +41,25 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
      * @param {Object} f
      * @param {Object} controller
      */
-    init: function(action, f, controller){
+    init: function(action_name, callback, className, element){
 		//can't use init, so set default members
-        this.action = action;
-        this.func = f;
-        this.controller = controller;
+        this.action = action_name;
+        this.callback = callback;
+        this.className = className;
+        this.element = element
         this.css_and_event();
         var selector = this.selector();
 		
         //If the selector has already been added, just add this action to its list of possible action callbacks
 		if(MVC.Lasso.selectors[selector]) {
-            MVC.Lasso.selectors[selector].callbacks[this.event_type] = controller.dispatch_closure(action);
+            MVC.Lasso.selectors[selector].callbacks[this.event_type] = callback;
             return;
         }
 		//create a new mousedown event for selectors that match our mouse event
         MVC.Lasso.selectors[selector] = 
 			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this));
         MVC.Lasso.selectors[selector].callbacks = {};
-        MVC.Lasso.selectors[selector].callbacks[this.event_type] = controller.dispatch_closure(action);
+        MVC.Lasso.selectors[selector].callbacks[this.event_type] = callback;
 		
 		
     },
