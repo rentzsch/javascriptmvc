@@ -441,11 +441,11 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
                 return (newer_action_name ?  ' '+newer_action_name : '') ;
             }
 		}else{
-            if(this.element == document.documentElement){
+            //if(this.element == document.documentElement){
 			    return '.'+MVC.String.singularize(this.className)+(this.css? ' '+this.css : '' );
-            }else{
-                return this.css;
-            }
+            //}else{
+            //    return this.css;
+            //}
 		}
 	},
     /*
