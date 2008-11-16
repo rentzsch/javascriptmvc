@@ -356,7 +356,7 @@ MVC.Object.extend(MVC.Element, {
     class_names : function(element){
         return element.className.split(MVC.Element._class_name_split);
     },
-    _class_name_split : /\s+/
+    _class_name_split : /\s+/,
     /**
      * Returns an array of matches if the element has a className, null if otherwise.
      * @code_start
