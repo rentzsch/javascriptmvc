@@ -834,9 +834,10 @@ MVC.Controller.prototype.
 /**
  * Redirects to another page.
  * @plugin 'dom/history'
- * @param {Object} options
+ * @param {Object} options an object that will turned into a url like controller/action&param1=value1
+ * @param {Object} data extra data saved in history
  */
-redirect_to = function(options){
+redirect_to = function(options, data){
 	var controller_name = options.controller || this.Class.className;
 	var action_name = options.action || 'index';
 	//var lhs = window.location.href.split('#')[0];
@@ -850,6 +851,6 @@ redirect_to = function(options){
 	var paramString = (options) ? MVC.Object.to_query_string(options) : '';
 	if(paramString.length)
 		paramString = '&' + paramString;
-    MVC.History.add(controller_name+'/'+action_name + paramString)
+    MVC.History.add(controller_name+'/'+action_name + paramString, data)
 	//window.location = lhs+
 };
