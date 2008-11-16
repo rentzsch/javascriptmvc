@@ -166,7 +166,11 @@ MVC.History = {
 		}
 	},
 	
-	/*Add a history point.*/
+	/**
+	 * Adds a new history point.  Equivalent to this.redirect_to
+	 * @param {String} newLocation
+	 * @param {Object} historyData
+	 */
 	add: function(newLocation, historyData) {
 		if (this.isSafari) {
 			
@@ -835,7 +839,7 @@ MVC.Controller.prototype.
 redirect_to = function(options){
 	var controller_name = options.controller || this.Class.className;
 	var action_name = options.action || 'index';
-	var lhs = window.location.href.split('#')[0];
+	//var lhs = window.location.href.split('#')[0];
    
 	/* Convert the options to parameters (removing controller and action if needed) */
 	if(options.controller)
@@ -846,6 +850,6 @@ redirect_to = function(options){
 	var paramString = (options) ? MVC.Object.to_query_string(options) : '';
 	if(paramString.length)
 		paramString = '&' + paramString;
-
-	window.location = lhs+'#'+controller_name+'/'+action_name + paramString;
+    MVC.History.add(controller_name+'/'+action_name + paramString)
+	//window.location = lhs+
 };
