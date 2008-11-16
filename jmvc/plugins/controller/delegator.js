@@ -300,8 +300,7 @@ MVC.Delegator.prototype = {
         var body = this.element,parents = [],iterator =el;
 		do{
             parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
-			iterator = iterator.parentNode;
-        }while(iterator != body)
+        }while((iterator = iterator.parentNode) != body)
         
         return parents;
 	},
