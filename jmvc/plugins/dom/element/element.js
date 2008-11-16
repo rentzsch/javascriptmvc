@@ -112,9 +112,10 @@ MVC.Object.extend(MVC.Element, {
         while(el){ els.push(el);el = el.next(); }
         return els;
     },
-    /*
+    /**
      * Returns the first child with nodeType = 1
-     * @return {HTMLElement}
+     * @param {HTMLElement} element
+     * @param {Function} check if provided should return true or false for the element you want returned
      */
     first : function(element, check){
         check = check || function(){return true;}
