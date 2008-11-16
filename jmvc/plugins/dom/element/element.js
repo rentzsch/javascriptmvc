@@ -328,7 +328,7 @@ MVC.Object.extend(MVC.Element, {
      * @return {HTMLElement} element
      */
     add_class : function(element, className){
-        var cns = element.className.split(/\s+/);
+        var cns = this.class_names(element);
         if(MVC.Array.include(cns, className)) return;
         cns.push(className);
         element.className = cns.join(" ");
@@ -341,7 +341,7 @@ MVC.Object.extend(MVC.Element, {
      * @return {HTMLElement} element
      */
     remove_class : function(element, className){
-        var cns = element.className.split(/\s+/);
+        var cns = this.class_names(element);
         var newcns = [];
         for(var i =0; i < cns.length; i++){
             if(cns[i] != className) newcns.push(cns[i]);
@@ -349,6 +349,14 @@ MVC.Object.extend(MVC.Element, {
         element.className = newcns.join(" ");
         return element;
     },
+    /**
+     * Returns a list of classNames
+     * @param {Array} element
+     */
+    class_names : function(element){
+        return element.className.split(MVC.Element._class_name_split);
+    },
+    _class_name_split : /\s+/
     /**
      * Returns an array of matches if the element has a className, null if otherwise.
      * @code_start
@@ -359,7 +367,7 @@ MVC.Object.extend(MVC.Element, {
      * @return {Array} 
      */
     has_class : function(element , regexp){
-        var cns = element.className.split(/\s+/);
+        var cns = this.class_names(element);
         var matches;
         for(var i =0; i < cns.length; i++){
             if((matches = cns[i].match(regexp))) return matches;
@@ -367,19 +375,11 @@ MVC.Object.extend(MVC.Element, {
     }
 });
 
-
-
-
-
-
 MVC.Element.extend = function(el){
 	for(var f in MVC.Element){
 		if(!MVC.Element.hasOwnProperty(f)) continue;
 		var func = MVC.Element[f];
 		if(typeof func == 'function'){
-			//var names = MVC.Function.params(func);
-			//if( names.length == 0) continue;
-			//var first_arg = names[0];
 			if( f[0] != "_" ) MVC.Element._extend(func, f, el);
 		}
 	}
