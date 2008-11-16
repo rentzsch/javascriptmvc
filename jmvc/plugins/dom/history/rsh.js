@@ -512,7 +512,7 @@ MVC.History = {
 		window.location.hash = hash;
 
 		/*Notify listeners of the change*/
-		this.fireHistoryEvent(hash);
+		//this.fireHistoryEvent(hash);
 	}
 
 };
