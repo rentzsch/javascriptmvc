@@ -21,7 +21,7 @@ MVC.Store = MVC.Class.extend(
 	 * @param {Object} id
 	 */
     find_one: function(id){
-		return this._data[id];
+        return id ? this._data[id] : null;
 	},
 	/**
 	 * 
