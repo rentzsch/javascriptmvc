@@ -298,12 +298,11 @@ MVC.Delegator.prototype = {
      */
     node_path: function(el){
         var body = this.element,parents = [],iterator =el;
-		while(iterator != body){
+		do{
             parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
 			iterator = iterator.parentNode;
-			//if(iterator == null) return [];
-		}
-		parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
+        }while(iterator != body)
+        
         return parents;
 	},
     destroy : function(){
