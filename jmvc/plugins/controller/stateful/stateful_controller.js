@@ -8,25 +8,8 @@
 MVC.Controller.Stateful = MVC.Controller.extend(
 /* @Static*/
 {
-    /*
-     * Only allows plural class names.
-     */
-    init: function(){
-        this._super();
-        if(!this.className) return;
-        //if( MVC.String.is_singular(this.className)) throw "Only plural names for stateful controller!";
-    },
     _should_attach_actions: false,
-    /**
-     * Removes the instance associated with an element.  This assumes the destroy
-     * function handles clearing the element.
-     * @param {Object} element
-     */
-    destroy_by_element : function(element){
-        if(!element.id) throw "element must have an id to remove the instance"
-        this.instances[element.id].destroy();
-        
-    },
+
     _events : null,
     _element : null
 },
@@ -61,24 +44,20 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      * It also removes this.element from the page.
      */
     destroy: function(){
-        //destroy actions
         for(var i = 0; i < this._actions.length; i++){
             this._actions[i].destroy();
-            delete this._actions[i];
         }
-        
         if(this.element){
             //take out any listeners on this guy
             for(var event_type in this.element.__devents){
                 var events = this.element.__devents[event_type]
                 for(var i = 0; i < events.length; i++){
                     events[i].destroy();
-                    delete events[i];
                 }
             }
         }
-        if(this.element && this.element.parentNode){ this.element.parentNode.removeChild(this.element);}
-        delete this;
+        if(this.element && this.element.parentNode)
+            this.element.parentNode.removeChild(this.element);
     },
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
