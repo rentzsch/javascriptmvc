@@ -206,13 +206,13 @@ MVC.Object.extend(MVC.Element, {
      * Returns the the position of the element by taking all of it and its parents'
      * offsetTop and offsetLeft values.
      * @code_start
-     * MVC.$E('user').cumulative_offset()
-     * MVC.Element.cumulative_offset(myelement);
+     * MVC.$E('user').offset()
+     * MVC.Element.offset(myelement);
      * @code_end
      * @param {String/HTMLElement} element the element you want the offset of.
      * @return {MVC.Vector} a vector with the top and bottom values.
      */
-    cumulative_offset: function(element) {
+    offset: function(element) {
         var valueT = 0, valueL = 0;
         do {
           valueT += element.offsetTop  || 0;
@@ -225,13 +225,13 @@ MVC.Object.extend(MVC.Element, {
      * Returns the the position of the element by taking all of it and its parents'
      * scrollTop and scrollLeft values.
      * @code_start
-     * MVC.$E('user').cumulative_scroll_offset()
-     * MVC.Element.cumulative_scroll_offset(myelement);
+     * MVC.$E('user').scroll_offset()
+     * MVC.Element.scroll_offset(myelement);
      * @code_end
      * @param {String/HTMLElement} element the element you want the offset of.
      * @return {MVC.Vector} a vector with the top and bottom values.
      */
-    cumulative_scroll_offset: function(element) {
+    scroll_offset: function(element) {
         var valueT = 0, valueL = 0;
         do {
           valueT += element.scrollTop  || 0;

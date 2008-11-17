@@ -36,7 +36,7 @@ MVC.Position =
       return this.withinIncludingScrolloffsets(element, x, y);
     this.xcomp = x;
     this.ycomp = y;
-    this.offset = MVC.Element.cumulative_offset(element);
+    this.offset = MVC.Element.offset(element);
 
     return (y >= this.offset[1] &&
             y <  this.offset[1] + element.offsetHeight &&
@@ -58,8 +58,8 @@ MVC.Position =
 					cache._cumulative_scroll_offset && 
 					cache._cumulative_offset;
 	if(!caching){
-		cache._cumulative_scroll_offset = MVC.Element.cumulative_scroll_offset(element);
-		cache._cumulative_offset = MVC.Element.cumulative_offset(element);
+		cache._cumulative_scroll_offset = MVC.Element.scroll_offset(element);
+		cache._cumulative_offset = MVC.Element.offset(element);
 	}
 	
     var xcomp = x + cache._cumulative_scroll_offset[0] - this.deltaX;
@@ -78,8 +78,8 @@ MVC.Position =
 					cache._cumulative_scroll_offset && 
 					cache._cumulative_offset;
 	if(!caching){
-		cache._cumulative_scroll_offset = MVC.Element.cumulative_scroll_offset(element);
-		cache._cumulative_offset = MVC.Element.cumulative_offset(element);
+		cache._cumulative_scroll_offset = MVC.Element.scroll_offset(element);
+		cache._cumulative_offset = MVC.Element.offset(element);
 	}
 	
 	//get element coords
@@ -112,8 +112,8 @@ MVC.Position =
     					cache._cumulative_scroll_offset && 
     					cache._cumulative_offset;
      if(!caching){
-		cache._cumulative_scroll_offset = MVC.Element.cumulative_scroll_offset(element);
-		cache._cumulative_offset = MVC.Element.cumulative_offset(element);
+		cache._cumulative_scroll_offset = MVC.Element.scroll_offset(element);
+		cache._cumulative_offset = MVC.Element.offset(element);
 	 }
      var point = MVC.Event.pointer(event);
      var xcomp = point.x() + cache._cumulative_scroll_offset[0] - this.deltaX;
@@ -185,3 +185,10 @@ MVC.Position =
         return number;
     }
 }
+
+
+
+
+
+	
+

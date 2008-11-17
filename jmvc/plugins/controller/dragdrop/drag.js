@@ -128,7 +128,7 @@ MVC.Draggable = function(params){
 	//used to know where to position element relative to the mouse.
 	this.mouse_position_on_element = 
 		MVC.Event.pointer(params.event).
-			minus( MVC.Element.cumulative_offset(params.element) );
+			minus( MVC.Element.offset(params.element) );
 	
 	//Add default functions to be called.
     this.dragstart = params.dragstart || MVC.Draggable.k;
@@ -174,7 +174,7 @@ MVC.Draggable.prototype =
         //this should probably get it's offset minus its left top
         if(this.drag_element != this.element){
             this.start_position = 
-                MVC.Element.cumulative_offset(this.drag_element)
+                MVC.Element.offset(this.drag_element)
                     //.minus( 
                     //new MVC.Vector( 
                     //    parseInt(MVC.Element.get_style(this.drag_element,'left') || '0'), 
@@ -210,7 +210,7 @@ MVC.Draggable.prototype =
 		//Calculate where we should move the drag element to
 
 		var pos = 													//Drag element's starting coords on the page if it had top=0, left=0
-				MVC.Element.cumulative_offset(this.drag_element)	//Drag element's actual coords on the page
+				MVC.Element.offset(this.drag_element)	//Drag element's actual coords on the page
 				.minus(this.currentDelta());						//How far Drag has moved from its starting coords
         
         var p = 													//Drag element's Top/Left that will move the element to be under the mouse in the right spot
