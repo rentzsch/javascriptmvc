@@ -58,6 +58,20 @@ MVC.Vector.prototype =
             arr[i] = (arr[i] ? arr[i] : 0) - args[i];
          return vec.update(arr);
     },
+    /**
+     * Returns the current vector if it is equal to the vector passed in.  
+     * False if otherwise.
+     * @return {MVC.Vector}
+     */
+    equal : function(){
+        var args = arguments[0] instanceof MVC.Vector ? 
+                 arguments[0].array : 
+                 MVC.Array.from(arguments), 
+             arr=this.array.slice(0), vec = new MVC.Vector();
+         for(var i=0; i < args.length; i++)
+            if(arr[i] != args[i]) return null;
+         return vec.update(arr);
+    },
     /*
      * Returns the 2nd value of the vector
      * @return {Number}
