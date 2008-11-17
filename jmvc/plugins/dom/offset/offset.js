@@ -47,7 +47,7 @@ else
             top  += Math.max(docElem.scrollTop, body.scrollTop);
             left += Math.max(docElem.scrollLeft, body.scrollLeft);
 
-        return { top: top, left: left };
+        return new MVC.Vector(left, top);
     };
 
 MVC.Element._offset = {
