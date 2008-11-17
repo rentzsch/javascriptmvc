@@ -47,7 +47,8 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         for(var i = 0; i < this._actions.length; i++){
             this._actions[i].destroy();
         }
-        if(this.element){
+        
+        if(this.element && this.element.__jmvc){
             //take out any listeners on this guy
             for(var event_type in this.element.__jmvc.delegation_events){
                 var events = this.element.__jmvc.delegation_events[event_type]
