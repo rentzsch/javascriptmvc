@@ -157,7 +157,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
             this.hoverenter({element: this.element, mouseover_event: this.mouseover_event}) 
             MVC.Event.stop_observing(this.element, "mousemove", this.mousemove);
         }else{
-            this.current_position = this.starting_position;
+            this.starting_position = this.current_position
             this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
         }
     },
