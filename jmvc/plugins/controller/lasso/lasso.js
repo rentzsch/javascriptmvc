@@ -90,7 +90,7 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
 	 * Called when someone mouses down on a draggable object.
 	 * Gathers all callback functions and creates a new Lasso.
 	 */
-	mousedown : function(params){
+	mousedown : function(element, params){
        var jmvc= MVC.Delegator.jmvc(element);
        if(jmvc.responding == false) return;
        var lasso = jmvc.custom.lasso

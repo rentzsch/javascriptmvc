@@ -103,8 +103,8 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
        MVC.Object.extend(params, drag[this.selector()].callbacks)
 	   MVC.Lasso.current = new MVC.Lasso(params);
        params.event.prevent_default();
-       MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Lasso.mousemove)
-       MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Lasso.mouseup);
+       MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
+       MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
 	   return false;
 	}
 });
