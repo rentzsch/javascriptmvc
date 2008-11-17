@@ -63,7 +63,7 @@ MVC.Vector.prototype =
      * False if otherwise.
      * @return {MVC.Vector}
      */
-    equal : function(){
+    equals : function(){
         var args = arguments[0] instanceof MVC.Vector ? 
                  arguments[0].array : 
                  MVC.Array.from(arguments), 
