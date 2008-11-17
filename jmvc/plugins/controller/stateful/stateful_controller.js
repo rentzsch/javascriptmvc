@@ -79,6 +79,10 @@ MVC.Controller.Stateful = MVC.Controller.extend(
     query: function(selector){
         return MVC.Query.descendant(this.element, selector)
     },
+    /**
+     * Can 'shut' down this controller, preventing it from responding to any event.
+     * @param {Boolean} respond true to respond to events, false to repond to nothing.
+     */
     respond: function(respond){
         this.element.__jmvc.responding = respond;
     }
