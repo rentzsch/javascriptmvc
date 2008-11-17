@@ -77,17 +77,19 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
         this.element = element
         this.css_and_event();
         var selector = this.selector();
-		
+		var jmvc = MVC.Delegator.add_jmvc(element)
         //If the selector has already been added, just add this action to its list of possible action callbacks
-		if(MVC.Draggable.selectors[selector]) {
-            MVC.Draggable.selectors[selector].callbacks[this.event_type] = callback;
+		if(!element.__cevents) element.__cevents = {};
+        //If the selector has already been added, just add this action to its list of possible action callbacks
+		if(element.__cevents[selector]) {
+            element.__cevents[selector].callbacks[this.event_type] = callback;
             return;
         }
 		//create a new mousedown event for selectors that match our mouse event
-        MVC.Draggable.selectors[selector] = 
-			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this));
-        MVC.Draggable.selectors[selector].callbacks = {};
-        MVC.Draggable.selectors[selector].callbacks[this.event_type] = callback;
+        element.__cevents[selector] = 
+			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this, element), element);
+        element.__cevents[selector].callbacks = {};
+        element.__cevents[selector].callbacks[this.event_type] = callback;
     },
 	/**
 	 * Called when someone mouses down on a draggable object.

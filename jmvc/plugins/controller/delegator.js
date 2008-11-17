@@ -11,7 +11,7 @@ MVC.Delegator = function(selector, event, f, element){
     this._selector = selector
     this._func = f;
     this.element = element || document.documentElement;
-    if(!this.element.__devents) this.element.__devents = {};
+    MVC.Delegator.jmvc(this.element)
     if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
     if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
 	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
@@ -23,7 +23,21 @@ MVC.Delegator = function(selector, event, f, element){
 MVC.Object.extend(MVC.Delegator,
 /* @Static*/
 {
-
+    /**
+     * Adds _jmvc to elements to keep track of delegation events.
+     * @param {Object} element
+     * @return {Object} the jmvc object.
+     */
+    jmvc : function(element){
+        if(!element.__jmvc) element.__jmvc = {};
+        if(!element.__jmvc.delegation_events) element.__jmvc.delegation_events = {};
+        if(element.__jmvc.responding == null) element.__jmvc.responding = true;
+        return element.__jmvc;
+    },
+    /**
+     * Adds kill() on an event.
+     * @param {Object} event
+     */
     add_kill_event: function(event){ //this should really be in event
 		if(!event.kill){
 			if(!event) event = window.event;
@@ -103,17 +117,17 @@ MVC.Delegator.prototype = {
         var e = event || this.event();
         var f = func || this._func;
         
-        if(!this.element.__devents[e] || this.element.__devents[e].length == 0){
+        if(!this.element.__jmvc.delegation_events[e] || this.element.__jmvc.delegation_events[e].length == 0){
             var bind_function = MVC.Function.bind(this.dispatch_event, this)
             MVC.Event.observe(this.element, e, bind_function, this.capture() );
-            this.element.__devents[e] = [];
-            this.element.__devents[e]._bind_function = bind_function;
+            this.element.__jmvc.delegation_events[e] = [];
+            this.element.__jmvc.delegation_events[e]._bind_function = bind_function;
 		}
-		this.element.__devents[e].push(this);
+		this.element.__jmvc.delegation_events[e].push(this);
     },
     _remove_from_delegator : function(){
         var event = this.event();
-        var events = this.element.__devents[event];
+        var events = this.element.__jmvc.delegation_events[event];
         for(var i = 0; i < events.length;i++ ){
             if(events[i] == this){
                 events.splice(i, 1);
@@ -270,7 +284,7 @@ MVC.Delegator.prototype = {
      */
 	dispatch_event: function(event){
         var target = event.target, matched = false, ret_value = true,matches = [];
-		var delegation_events = this.element.__devents[event.type];
+		var delegation_events = this.element.__jmvc.delegation_events[event.type];
         var parents_path = this.node_path(target);
 		for(var i =0; i < delegation_events.length;  i++){
 			var delegation_event = delegation_events[i];

@@ -24,7 +24,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
     init: function(element){
         //needs to go through prototype, and attach events to this instance
         this._actions = [];
-        this.__responding = true;
+        element.__responding = true;
         for(var action_name in this){
     		val = this[action_name];
     		if( typeof val == 'function' && action_name != 'Class'){
@@ -50,8 +50,8 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         }
         if(this.element){
             //take out any listeners on this guy
-            for(var event_type in this.element.__devents){
-                var events = this.element.__devents[event_type]
+            for(var event_type in this.element.__jmvc.delegation_events){
+                var events = this.element.__jmvc.delegation_events[event_type]
                 for(var i = 0; i < events.length; i++){
                     events[i].destroy();
                 }
@@ -62,13 +62,13 @@ MVC.Controller.Stateful = MVC.Controller.extend(
     },
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
-            if(!this.__responding) return;
+            if(!this.element.__jmvc.responding) return;
             params = params || {};
             params.action = f_name;
             params.controller = this.Class;
             params = params.constructor == MVC.Controller.Params ? params : new MVC.Controller.Params(params)
 			
-            this.params = params;
+            //this.params = params;
     		this.action_name = f_name;
             return this[f_name](params);
 		},this);
@@ -79,5 +79,8 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      */
     query: function(selector){
         return MVC.Query.descendant(this.element, selector)
+    },
+    respond: function(respond){
+        this.element.__jmvc.responding = respond;
     }
 });
