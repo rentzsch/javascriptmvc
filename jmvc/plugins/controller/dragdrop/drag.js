@@ -36,7 +36,29 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
     /**
      * Matches "(.*?)\\s?(dragstart|dragend|dragging)$"
      */
-    match: new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$")
+    match: new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$"),
+    mousemove : function(event){
+        if(!MVC.Draggable.current ) return;  //do nothing if nothing is being dragged.
+        var current = MVC.Draggable.current;
+        var pointer = MVC.Event.pointer(event);
+        if(current._start_position && current._start_position.equals(pointer)) return;
+        MVC.Delegator.add_kill_event(event);
+        event.kill();
+        MVC.Draggable.current.draw(pointer, event); //update draw
+        return false;
+    },
+    mouseup : function(event){
+        MVC.Delegator.add_kill_event(event);
+        //if there is a current, we should call its dragstop
+        if(MVC.Draggable.current && MVC.Draggable.current.moved){
+            MVC.Draggable.current.end(event);
+    		MVC.Droppables.clear();
+        }
+    
+        MVC.Draggable.current = null;
+        MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
+        MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
+    }
 },
 /* @prototype */
 {    
@@ -76,9 +98,15 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
 	   MVC.Object.extend(params, MVC.Draggable.selectors[this.selector()].callbacks)
 	   MVC.Draggable.current = new MVC.Draggable(params);
        params.event.prevent_default();
+       MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
+       MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
 	   return false;
 	}
 });
+
+
+
+
 /**
  * @constructor
  * @hide
@@ -95,7 +123,8 @@ MVC.Draggable = function(params){
     this.element = params.element; 		//the element that has been clicked on
     this.moved = false;					//if a mousemove has come after the click
     this._cancelled = false;			//if the drag has been cancelled
-	
+	this._start_position =              //starting position, used to make sure a move happens
+        MVC.Event.pointer(params.event)
 	//used to know where to position element relative to the mouse.
 	this.mouse_position_on_element = 
 		MVC.Event.pointer(params.event).
@@ -120,7 +149,8 @@ MVC.Draggable.prototype =
      * @param {Object} event
      */
 	start: function(event){
-		this.moved = true;					//we have been moved
+		this._start_position = null;        //we no longer care about this
+        this.moved = true;					//we have been moved
         this.drag_element = this.element;	//drag_element is what people should use to referrer to 
         									//what has been dragged
 		
@@ -248,24 +278,9 @@ MVC.Draggable.current = null;
 
 
 //Observe all mousemoves and mouseups.
-MVC.Event.observe(document, 'mousemove', function(event){
-    if(!MVC.Draggable.current ) return;  //do nothing if nothing is being dragged.
-    MVC.Delegator.add_kill_event(event);
-    event.kill();
-    MVC.Draggable.current.draw(MVC.Event.pointer(event), event); //update draw
-    return false;
-});
 
-MVC.Event.observe(document, 'mouseup', function(event){
-    MVC.Delegator.add_kill_event(event);
-    //if there is a current, we should call its dragstop
-    if(MVC.Draggable.current && MVC.Draggable.current.moved){
-        MVC.Draggable.current.end(event);
-		MVC.Droppables.clear();
-    }
 
-    MVC.Draggable.current = null;
-});
+
 
 /**
  * @constructor MVC.Controller.Params.Drag
