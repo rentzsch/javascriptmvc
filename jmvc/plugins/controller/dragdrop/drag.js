@@ -79,30 +79,32 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
         var selector = this.selector();
 		var jmvc = MVC.Delegator.jmvc(this.element)
         if(!jmvc.custom) jmvc.custom = {};
+        if(!jmvc.custom.drag) jmvc.custom.drag = {};
+        var drag = jmvc.custom.drag;
         //If the selector has already been added, just add this action to its list of possible action callbacks
-		if(jmvc.custom[selector]) {
-            jmvc.custom[selector].callbacks[this.event_type] = callback;
+		if(drag[selector]) {
+            drag[selector].callbacks[this.event_type] = callback;
             return;
         }
 		//create a new mousedown event for selectors that match our mouse event
-        jmvc.custom[selector] = 
+        drag[selector] = 
 			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this, element), element);
-        jmvc.custom[selector].callbacks = {};
-        jmvc.custom[selector].callbacks[this.event_type] = callback;
+        drag[selector].callbacks = {};
+        drag[selector].callbacks[this.event_type] = callback;
     },
 	/**
 	 * Called when someone mouses down on a draggable object.
 	 * Gathers all callback functions and creates a new Draggable.
 	 */
 	mousedown : function(element, params){
-       //extend params with callbacks
-	   var jmvc = MVC.Delegator.jmvc(element)
+       var jmvc= MVC.Delegator.jmvc(element);
        if(jmvc.responding == false) return;
-       MVC.Object.extend(params, jmvc.custom[this.selector()].callbacks)
-	   MVC.Draggable.current = new MVC.Draggable(params);
+       var drag = jmvc.custom.drag
+       MVC.Object.extend(params, drag[this.selector()].callbacks)
+	   MVC.Lasso.current = new MVC.Lasso(params);
        params.event.prevent_default();
-       MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
-       MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
+       MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Lasso.mousemove)
+       MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Lasso.mouseup);
 	   return false;
 	}
 });

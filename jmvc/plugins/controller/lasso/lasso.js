@@ -31,7 +31,29 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
     /**
      * Matches "(.*?)\\s?(lassostart|lassoend|lassomove)$"
      */
-    match: new RegExp("(.*?)\\s?(lassostart|lassoend|lassomove)$")
+    match: new RegExp("(.*?)\\s?(lassostart|lassoend|lassomove)$"),
+    mousemove : function(event){
+        if(!MVC.Lasso.current ) return;  //do nothing if nothing is being dragged.
+        var current = MVC.Lasso.current;
+        var pointer = MVC.Event.pointer(event);
+        if(current._start_position && current._start_position.equals(pointer)) return;
+        MVC.Delegator.add_kill_event(event);
+        event.kill();
+        MVC.Lasso.current.draw(pointer, event); //update draw
+        return false;
+    },
+    mouseup : function(event){
+        MVC.Delegator.add_kill_event(event);
+        //if there is a current, we should call its dragstop
+        if(MVC.Lasso.current && MVC.Lasso.current.moved){
+            MVC.Lasso.current.end(event);
+    		MVC.Droppables.clear();
+        }
+    
+        MVC.Lasso.current = null;
+        MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Lasso.mousemove)
+        MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Lasso.mouseup);
+    }
 },
 /* @prototype */
 {    
@@ -49,29 +71,34 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
         this.element = element
         this.css_and_event();
         var selector = this.selector();
-		
+		var jmvc = MVC.Delegator.jmvc(this.element)
+        if(!jmvc.custom) jmvc.custom = {};
+        if(!jmvc.custom.lasso) jmvc.custom.lasso = {};
+        var lasso = jmvc.custom.lasso;
         //If the selector has already been added, just add this action to its list of possible action callbacks
-		if(MVC.Lasso.selectors[selector]) {
-            MVC.Lasso.selectors[selector].callbacks[this.event_type] = callback;
+		if(lasso[selector]) {
+            lasso[selector].callbacks[this.event_type] = callback;
             return;
         }
 		//create a new mousedown event for selectors that match our mouse event
-        MVC.Lasso.selectors[selector] = 
-			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this));
-        MVC.Lasso.selectors[selector].callbacks = {};
-        MVC.Lasso.selectors[selector].callbacks[this.event_type] = callback;
-		
-		
+        lasso[selector] = 
+			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this, element), element);
+        lasso[selector].callbacks = {};
+        lasso[selector].callbacks[this.event_type] = callback;
     },
 	/**
 	 * Called when someone mouses down on a draggable object.
 	 * Gathers all callback functions and creates a new Lasso.
 	 */
 	mousedown : function(params){
-       //extend params with callbacks
-	   MVC.Object.extend(params, MVC.Lasso.selectors[this.selector()].callbacks)
+       var jmvc= MVC.Delegator.jmvc(element);
+       if(jmvc.responding == false) return;
+       var lasso = jmvc.custom.lasso
+       MVC.Object.extend(params, lasso[this.selector()].callbacks)
 	   MVC.Lasso.current = new MVC.Lasso(params);
        params.event.prevent_default();
+       MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Lasso.mousemove)
+       MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Lasso.mouseup);
 	   return false;
 	}
 });
