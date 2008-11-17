@@ -24,6 +24,8 @@
 @code_start
 include.plugins('controller/lasso')
 @code_end
+ * <h3>Potential Issues</h3>
+ * If IE lasso area isn't responding, try setting its position to relative.
  */
 MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
 /* @static */
