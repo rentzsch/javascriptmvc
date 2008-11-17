@@ -23,6 +23,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      */
     init: function(element){
         //needs to go through prototype, and attach events to this instance
+        MVC.Delegator.jmvc(element)
         this._actions = [];
         for(var action_name in this){
     		val = this[action_name];
