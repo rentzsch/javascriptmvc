@@ -24,7 +24,6 @@ MVC.Controller.Stateful = MVC.Controller.extend(
     init: function(element){
         //needs to go through prototype, and attach events to this instance
         this._actions = [];
-        element.__responding = true;
         for(var action_name in this){
     		val = this[action_name];
     		if( typeof val == 'function' && action_name != 'Class'){
