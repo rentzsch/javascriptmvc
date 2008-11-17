@@ -81,7 +81,7 @@ new MVC.Test.Unit('element_test',{
         if(window._rhino) return this.messages.push("Skipping -> style related test in Rhino.");
 		
         
-        var off = MVC.$E('insertion_test').cumulative_offset();
+        var off = MVC.$E('insertion_test').offset();
         this.assert( off.x() > 0 );
         this.assert(off.y() > 0  );
     },
@@ -91,7 +91,7 @@ new MVC.Test.Unit('element_test',{
 			return;
 		}
         
-        var off = MVC.$E('insertion_test').cumulative_scroll_offset();
+        var off = MVC.$E('insertion_test').scroll_offset();
         this.assert_equal("number", typeof off.x()  );
         this.assert_equal("number", typeof off.y()  );
     },
