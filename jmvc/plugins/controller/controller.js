@@ -252,7 +252,7 @@ Controller('todos',{
 		if(typeof this[action] != 'function'){ throw 'There is no action named '+action+'. ';}
 		return MVC.Function.bind(function(){
 			this.action_name = action;
-			this[action].apply(this, args.concat(MVC.Array.fron(arguments)));
+			this[action].apply(this, args.concat(MVC.Array.from(arguments)));
 		}, this);
 	},
     /**
