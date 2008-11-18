@@ -98,7 +98,7 @@ render = function(options) {
             {
                 var url = '../views/'+controller_name+'/'+action_name.replace(/\.|#/g, '').replace(/ /g,'_')+'.ejs';
             }
-			var data_to_render = this;
+			var data_to_render = options.using || this;
 			if(options.locals) {
 				for(var local_var in options.locals) {
 					data_to_render[local_var] = options.locals[local_var];
