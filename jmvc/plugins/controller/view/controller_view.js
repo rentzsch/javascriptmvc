@@ -56,6 +56,13 @@ MVC.Controller.prototype.
 						<td>Instead of using a view to generate text, it uses the text as the rendered text.
 						</td>
 					</tr>
+					<tr>
+						<td>using</td>
+						<td>null</td>
+						<td>If present, renders with the data in using instead of the controller instance.  This is important for
+						stateful controllers.
+						</td>
+					</tr>
 				</tbody></table>
 	 
  */
