@@ -236,7 +236,7 @@ Controller('todos',{
    "a click" : function(params){ 
       this.element = params.element;
 	  this.element.innerHTML = 'deleting ...';
-	  new Ajax.Request('delete', {onComplete: this.continue_to('deleted')}
+	  new Ajax('delete', {onComplete: this.continue_to('deleted')}
    },
    deleted : function(response){
       this.element.parentNode.removeChild(this.element);
@@ -247,11 +247,12 @@ Controller('todos',{
      * @return {Function} function that when called, directs to another controller function
      */
     continue_to :function(action){
-		if(!action) action = this.action_name+'ing';
+		var args = MVC.Array.from(arguments)
+        var action = args.shift();
 		if(typeof this[action] != 'function'){ throw 'There is no action named '+action+'. ';}
 		return MVC.Function.bind(function(){
 			this.action_name = action;
-			this[action].apply(this, arguments);
+			this[action].apply(this, args.concat(MVC.Array.fron(arguments)));
 		}, this);
 	},
     /**
