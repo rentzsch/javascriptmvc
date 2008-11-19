@@ -386,7 +386,7 @@ MVC.Model = MVC.Class.extend(
      * @param {Object} {optional:Function} callback or object of callbacks
      */
     destroy : function(callback){
-        this.Class.destroy(this[this.Class.id], cb);
+        this.Class.destroy(this[this.Class.id], callback);
         this.Class.store.destroy(this[this.Class.id]);
     },
     add_errors : function(errors){
