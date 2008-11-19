@@ -55,12 +55,12 @@ MVC.Controller.scaffold.functions = {
 		}
     },
     '.delete click' : function(params){
-        this[this.Class.singular_name] = params.object_data();
+        this[this.Class.singular_name] = params.element_instance();
         if(confirm("Are you sure you want to delete"))
             this[this.Class.singular_name].destroy(this.continue_to('destroyed'));
     },
     '.edit click' : function(params){
-        this[this.Class.singular_name] = params.object_data();
+        this[this.Class.singular_name] = params.element_instance();
         this.singular_name = this.Class.singular_name;
         this.render({to: this[this.Class.singular_name].View().element_id(), action: 'edit', plugin: 'controller/scaffold/edit'}); //!
     },
@@ -68,7 +68,7 @@ MVC.Controller.scaffold.functions = {
         this.show(params.object_data());
     },
     '.save click': function(params){
-        this[this.Class.singular_name] = params.object_data();
+        this[this.Class.singular_name] = params.element_instance();
         var attrs = this[this.Class.singular_name].View().edit_values(); 
         this[this.Class.singular_name].update_attributes( attrs, this.continue_to('show') );
     },
