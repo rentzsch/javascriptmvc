@@ -1,5 +1,9 @@
 Engine =  function(uri, name){
-    this.uri =  uri
+    if(! uri.match(/^http/)){
+        this.name = uri;
+        return this.check_engine_list();
+    }
+    this.uri =  uri;
     if(name){
         this.name = name;
     }else
@@ -19,6 +23,20 @@ Engine.prototype = {
       if(this.name == 'trunk' || ! this.name){
           this.name = new MVC.File( new MVC.File(url).dir() ).basename();
       }
+    },
+	check_engine_list : function(){
+        print("  Looking for engine ...")
+        
+        var plugin_list_source = readUrl("http://javascriptmvc.googlecode.com/svn/trunk/jmvc/rhino/command/engine_list.json");
+        var plugin_list;
+        eval("plugin_list = "+plugin_list_source);
+        this.uri = plugin_list[this.name]
+        if(!this.uri){
+            print("  no plugin named '"+this.name+"' was found.  Maybe try supplying a url.");
+            quit();
+        }
+        print("  Plugin found.")
+        
     }
 }
 
