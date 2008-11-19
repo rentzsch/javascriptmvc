@@ -35,7 +35,7 @@ Engine.prototype = {
             print("  no plugin named '"+this.name+"' was found.  Maybe try supplying a url.");
             quit();
         }
-        print("  Plugin found.")
+        print("  Engine found.")
         
     }
 }
