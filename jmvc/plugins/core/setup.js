@@ -18,8 +18,9 @@ if(MVC.Console)
 
 
 include('../view/view', 
-		'../controller/controller',
 		'../controller/delegator',
+		'../controller/controller',
+		
 		'../controller/view/controller_view');
     
 include.plugins('dom/element', 'controller/scaffold','model/view_helper','view/helpers')
