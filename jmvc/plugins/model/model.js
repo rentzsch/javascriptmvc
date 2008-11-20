@@ -327,7 +327,7 @@ MVC.Model = MVC.Class.extend(
             
 
         this[property] = MVC.Array.include(['created_at','updated_at'], property) ? MVC.Date.parse(value) :  value;
-        if(property == this.Class.id && this.Class.store){
+        if(property == this.Class.id && this[property] && this.Class.store){
             if(!old){
                 this.Class.store.create(this);
             }else if(old != this[property]){
