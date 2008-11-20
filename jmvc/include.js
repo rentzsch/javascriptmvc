@@ -604,7 +604,7 @@ MVC.Object.extend(include,
 
        try{request.send(null);}
        catch(e){return null;}
-       if ( request.status == 404 || request.status == 2 ||(request.status == 0 && request.responseText == '') ) return null;
+       if ( request.status == 500 || request.status == 404 || request.status == 2 ||(request.status == 0 && request.responseText == '') ) return null;
        return request.responseText;
     },
     /**
