@@ -24,11 +24,12 @@ var file_name = f.basename().replace(/%2F/g,"~").replace(/%20/g," ");
 
 var base = ["test/fixtures"]
 for(var i =0; i < folders.length; i++){
-	base.push(folders[i]);
-	MVCOptions.create_folder(base.join( "/" ) );
+	if(folders[i]){
+		base.push(folders[i]);
+		MVCOptions.create_folder(base.join( "/" ) );
+	}
+	
 }
-
-MVCOptions.save(base.join( "/" )+"/"+file_name+"."+method, "//insert data here");
-
-print("\n   Created: "+base.join( "/" )+"/"+file_name+"."+method);
+base.push(file_name+"."+method)
+MVCOptions.save(base.join( "/" ), "//insert data here");
 
