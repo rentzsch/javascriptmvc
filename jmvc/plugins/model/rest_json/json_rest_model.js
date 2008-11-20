@@ -34,7 +34,7 @@
  * @code_end
  * 
  */
-MVC.Model.JSONRest = MVC.Model.Ajax.extend(
+MVC.Model.JsonRest = MVC.Model.Ajax.extend(
 /* @Static*/
 {
     init: function(){

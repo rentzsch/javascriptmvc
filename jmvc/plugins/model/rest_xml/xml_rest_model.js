@@ -6,7 +6,7 @@ MVC.Tree.attr_prefix = "@";
  * Todo = Model.XMLRest.extend('todos')
  * @code_end
  */
-MVC.Model.XMLRest = MVC.Model.Ajax.extend(
+MVC.Model.XmlRest = MVC.Model.Ajax.extend(
 {
     init: function(){
         if(!this.className) return;
