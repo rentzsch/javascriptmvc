@@ -224,16 +224,21 @@ MVC.Draggable.prototype =
 				.minus( this.mouse_position_on_element ); 			//the position relative to the container
 
         var s = this.drag_element.style;
-        s.top =  p.top()+"px";
-        s.left =  p.left()+"px";		
         
-		//Call back to dragging
         var params = new MVC.Controller.Params.Drag(
 				{ event: event, 
 				  element: this.element, 
 				  drag_action: this, 
-				  drag_element: this.drag_element});
+				  drag_element: this.drag_element,
+                  _position: p});
         this.dragging(params);
+        
+        
+        if(!this._horizontal)    s.top  =  params._position.top()+"px";
+        if(!this._vertical)      s.left =  params._position.left()+"px";		
+        
+		//Call back to dragging
+        
 		
 		//Tell dropables where mouse is
 		MVC.Droppables.show(pointer, this, event);  
@@ -377,5 +382,27 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
 	 */
     revert : function(){
         this.drag_action._revert = true;
+    },
+    /**
+     * Isolates the drag to vertical movement.
+     */
+    vertical : function(){
+        this.drag_action._vertical = true;
+    },
+    /**
+     * Isolates the drag to horizontal movement.
+     */
+    horizontal : function(){
+        this.drag_action._horizontal = true;
+    },
+    /**
+     * Gets or sets the new position
+     * @param {MVC.Vector} newposition
+     * @param {MVC.Vector} the position the page will be updated to
+     */
+    position: function(newposition){
+        if(newposition)
+            this._position = newposition;
+        return this._position;
     }
 })
