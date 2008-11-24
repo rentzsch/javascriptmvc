@@ -59,9 +59,9 @@ MVC.Doc.Directive = MVC.Class.extend(
 //start directives
 /**
  * @hide
- * Describes constructor functionality
+ * Describes constructor functionality.  Matches multiple lines
  */
-MVC.Doc.Directive.Init = MVC.Class.extend('init',
+MVC.Doc.Directive.Init = MVC.Doc.Directive.extend('init',
 {
     add: function(line){
             var parts = line.match(/\s?@init(.*)?/);
@@ -78,9 +78,10 @@ MVC.Doc.Directive.Init = MVC.Class.extend('init',
 });
 /**
  * @hide
- * Adds parameter information
+ * Adds parameter information of the format: "@param {<i>optional:</i>type} name description" .
+ * Matches multiple lines.
  */
-MVC.Doc.Directive.Param = MVC.Class.extend('param',{
+MVC.Doc.Directive.Param = MVC.Doc.Directive.extend('param',{
     add_more : function(line, last){
         if(last)
             last.description += "\n"+line;
@@ -106,9 +107,10 @@ MVC.Doc.Directive.Param = MVC.Class.extend('param',{
 });
 /**
  * @hide
- * Tells what something inherits from
+ * Says current class or constructor inherits from another class or contructor.
+ * Looks for "@inherits <i>constructor or class name</i>"
  */
-MVC.Doc.Directive.Inherits = MVC.Class.extend('inherits',{
+MVC.Doc.Directive.Inherits = MVC.Doc.Directive.extend('inherits',{
     add: function(line){
         var m = line.match(/^\s*@\w+ ([\w\.]+)/)
         if(m){
@@ -118,9 +120,10 @@ MVC.Doc.Directive.Inherits = MVC.Class.extend('inherits',{
 })
 /**
  * @hide
- * Describes return data
+ * Describes return data in the format "@return {type} description".
+ * Matches multiple lines.
  */
-MVC.Doc.Directive.Return = MVC.Class.extend('return',{
+MVC.Doc.Directive.Return = MVC.Doc.Directive.extend('return',{
     add: function(line){
         var parts = line.match(/\s*@return\s+(?:\{([\w\.\/]+)\})?\s*(.*)?/);
         
@@ -139,9 +142,9 @@ MVC.Doc.Directive.Return = MVC.Class.extend('return',{
 })
 /**
  * @hide
- * Tells who the author is
+ * Describes who the author of a class is.
  */
-MVC.Doc.Directive.Author = MVC.Class.extend('author',{
+MVC.Doc.Directive.Author = MVC.Doc.Directive.extend('author',{
     add: function(line){
         var m = line.match(/^\s*@author\s*(.*)/)
         if(m){
@@ -153,7 +156,7 @@ MVC.Doc.Directive.Author = MVC.Class.extend('author',{
  * @hide
  * Hides this class or constructor from the left hand side bar.
  */
-MVC.Doc.Directive.Hide = MVC.Class.extend('hide',{
+MVC.Doc.Directive.Hide = MVC.Doc.Directive.extend('hide',{
     add: function(line){
         var m = line.match(/^\s*@hide/)
         if(m){
@@ -163,9 +166,10 @@ MVC.Doc.Directive.Hide = MVC.Class.extend('hide',{
 });
 /**
  * @hide
- * Starts a code block
+ * Starts a code block.  Looks for "@code_start code_type".  Matches
+ * multiple lines.  Must end with "@code_end".
  */
-MVC.Doc.Directive.CodeStart = MVC.Class.extend('code_start',{
+MVC.Doc.Directive.CodeStart = MVC.Doc.Directive.extend('code_start',{
     add: function(line){
         var m = line.match(/^\s*@code_start\s*([\w-]*)\s*(.*)/)
         if(m){
@@ -182,7 +186,7 @@ MVC.Doc.Directive.CodeStart = MVC.Class.extend('code_start',{
  * @hide
  * Stops a code block
  */
-MVC.Doc.Directive.CodeEnd = MVC.Class.extend('code_end',{
+MVC.Doc.Directive.CodeEnd = MVC.Doc.Directive.extend('code_end',{
     add: function(line){
         var m = line.match(/^\s*@code_end/)
         
@@ -195,9 +199,10 @@ MVC.Doc.Directive.CodeEnd = MVC.Class.extend('code_end',{
 });
 /**
  * @hide
- * This Class or Constructor is known by another name.
+ * This Class or Constructor is known by another name. Format: "@alias other_name"
+ * 
  */
-MVC.Doc.Directive.Alias = MVC.Class.extend('alias',{
+MVC.Doc.Directive.Alias = MVC.Doc.Directive.extend('alias',{
     add: function(line){
         var m = line.match(/^\s*@alias\s*([\w\-\.]*)/)
         if(m){
@@ -207,9 +212,9 @@ MVC.Doc.Directive.Alias = MVC.Class.extend('alias',{
 });
 /**
  * @hide
- * Adds to another plugin.
+ * Adds to another plugin. Format: "@plugin plugin_name"
  */
-MVC.Doc.Directive.Plugin = MVC.Class.extend('plugin',{
+MVC.Doc.Directive.Plugin = MVC.Doc.Directive.extend('plugin',{
     add: function(line){
         this.plugin = line.match(/@plugin ([^ ]+)/)[1];
     }
