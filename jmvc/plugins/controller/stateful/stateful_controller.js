@@ -1,9 +1,37 @@
 /**
- * Controller.Stateful provides state for controller instances.  
- * Read the <a href="http://javascriptmvc.com/wiki/index.php?title=Controller.Stateful_Overview">overview page</a> 
- * and <a href="http://docs.javascriptmvc.com/demos/fixedbox.html">fixedbox demo</a>
- * for good descriptions of how to use Controller.Stateful.
- * 
+ * Controller.Stateful provides state for controller instances.  Controller.Stateful is  useful for
+ * creating self-contained widgets or when there are many instances of an object that has complex state.  
+ * Read the <a href="http://docs.javascriptmvc.com/demos/fixedbox.html">fixedbox demo</a>
+ * for good an example of using Controller.Stateful.
+ * <h2>Example</h2>
+ * The following is a a small piece of the SliderController.
+ * @code_start
+ * SliderController = MVC.Controller.Stateful('slider',{
+ *   init : function(element, options){
+ *     this.options = options ||{}
+ *     this._super(MVC.$E(element))
+ *   },
+ *   '.slider dragstart' : function(params){
+ *       params.horizontal()
+ *   },
+ *   '.slider dragging' : function(params){
+ *     //check pos
+ *     this.options.sliding(pos, params) //callback with position
+ *   }
+ * })
+ * @code_end
+ * You would create a new Slider like:
+ * @code_start
+ * new SliderController('element_id',{sliding: function(pos){console.log(pos)});
+ * @code_end
+ * <h2>Naming</h2>
+ * Naming works just similar to regular controllers.  If the Controller's className is plural, it will insert an implicit
+ * <i>.singular_name</i> before this controller's [MVC.Controller.Action.Event|event actions].  If the controller is a singular name
+ * nothing is added to the delegation class name.
+ * <h2>How Stateful works</h2>
+ * New stateful instances create a new delegation listening point on the element passed into the base 
+ * [MVC.Controller.Stateful.prototype.init|init] function.  As events happen on the element or child elements
+ * of the instance, they call back to the controller instance.
  */
 MVC.Controller.Stateful = MVC.Controller.extend(
 /* @Static*/
@@ -16,10 +44,8 @@ MVC.Controller.Stateful = MVC.Controller.extend(
 /* @Prototype */
 {
     /**
-     * Called when a new instance is created.  This looks in params for a suitable id.  If one isn't found,
-     * it creates one.  It saves the instance to the hash of instances.  It is highly suggested that
-     * inheriting classes that overwrite init call _super.
-     * @param {optional:Object} params A hash that might contain params.element.id or params.id to be used as the instance's id.
+     * Called when aa new instance is created.  you must provide 
+     * @param {HTMLElement} element the element this instance operates on.
      */
     init: function(element){
         //needs to go through prototype, and attach events to this instance
@@ -42,7 +68,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
     },
 
     /**
-     * It also removes this.element from the page.
+     * Removes all actions on this instance.
      */
     destroy: function(){
         for(var i = 0; i < this._actions.length; i++){
@@ -61,6 +87,10 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         if(this.element && this.element.parentNode)
             this.element.parentNode.removeChild(this.element);
     },
+    /**
+     * Used to call back to this instance
+     * @param {Object} f_name
+     */
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
             if(!this.element.__jmvc.responding) return;
