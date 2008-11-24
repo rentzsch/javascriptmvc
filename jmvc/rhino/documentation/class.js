@@ -4,6 +4,34 @@
  * MVC Doc can automatically detect classes created with MVC.Class.  However, you can make anything
  * a class with the <b>@class <i>ClassName</i></b> directive.
  * @author Jupiter IT
+ * @code_start
+ * /**
+ *  * Person represents a human with a name.  Read about the 
+ *  * animal class [Animal | here].
+ *  * @init 
+ *  * You must pass in a name.
+ *  * @params {String} name A person's name
+ *  *|
+ * Person = Animal.extend(
+ * /* @Static *|
+ * {
+ *    /* Number of People *|
+ *    count: 0
+ * },
+ * /* @Prototype *|
+ * {
+ *    init : function(name){
+ *      this.name = name
+ *      this._super({warmblood: true})
+ *    },
+ *    /* Returns a formal name 
+ *    * @return {String} the name with "Mrs." added
+ *    *|
+ *   fancy_name : function(){
+ *      return "Mrs. "+this.name;
+ *   }
+ * })
+ * @code_end
  */
 MVC.Doc.Class = MVC.Doc.Pair.extend('class',
 /* @Static */
@@ -24,7 +52,8 @@ MVC.Doc.Class = MVC.Doc.Pair.extend('class',
         this._super();
         
         var ejs = "jmvc/rhino/documentation/templates/file.ejs"
-        this._file_view = new View({text: readFile(ejs), name: ejs });
+        
+        this._file_view =  MVC.Doc.get_template("file")
     }
 },
 /* @Prototype */

@@ -133,7 +133,15 @@ MVC.Doc =
      * A map of the full name of all the objects the application creates and the url to 
      * the documentation for them.
      */
-    objects : {}
+    objects : {},
+    get_template : function(template_name){
+        var temp = readFile("docs/templates/"+template_name+".ejs");
+        if(!temp)
+            temp = readFile("jmvc/rhino/documentation/templates/"+template_name+".ejs");
+        
+        var v = new View({text: temp, name: template_name });
+        return v;
+    }
 };
 
 /**
@@ -192,7 +200,10 @@ MVC.Doc.Application.prototype =
      * @return {string} The left side bar.
      */
     left_side: function(){
-        return MVC.Doc.render("jmvc/rhino/documentation/templates/left_side.ejs" , this)
+
+        return readFile("docs/templates/left_side.ejs") ? 
+            MVC.Doc.render("docs/templates/left_side.ejs", this) : 
+            MVC.Doc.render("jmvc/rhino/documentation/templates/left_side.ejs" , this)
     },
     get_name : function(i){
         var me = this.all_sorted[i].name

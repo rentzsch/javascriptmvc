@@ -61,8 +61,7 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
                 MVC.Doc.Directive.Hide, MVC.Doc.Directive.CodeStart, MVC.Doc.Directive.CodeEnd, MVC.Doc.Directive.Alias,
                 MVC.Doc.Directive.Plugin);
         this._super();
-        var ejs = "jmvc/rhino/documentation/templates/file.ejs"
-        this._file_view = new View({text: readFile(ejs), name: ejs });
+        this._file_view = MVC.Doc.get_template("file")
     }
 },
 /* @Prototype */

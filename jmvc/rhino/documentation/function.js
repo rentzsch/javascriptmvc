@@ -9,12 +9,13 @@
  * @code_end
  * <h3>Directives</h3>
  * Use the following directives to document a function.
-@code_start no-highlight
-@function <i>function_name</i>                  -> Forces a function
-@param {<i>optional:type</i>} <i>param_name</i> <i>Description</i>     -> Describes a parameter
-@return {<i>type</i>} <i>Description</i>               -> Describes the return value
-@code_end
- * Add <i>optional:</i> for optional params.
+<pre>
+[MVC.Doc.Function|@function] <i>function_name</i>                       -> Forces a function
+[MVC.Doc.Directive.Param|@param] {<i>optional:type</i>} <i>param_name</i> <i>Description</i> -> Describes a parameter
+[MVC.Doc.Directive.Return|@return] {<i>type</i>} <i>Description</i>                    -> Describes the return value
+</pre>
+ * Add <i>optional:</i> for optional params.  Other available directives: 
+ * [MVC.Doc.Directive.Plugin|@plugin],[MVC.Doc.Directive.CodeStart|@code_start]
  * <h3>Example</h3>
 @code_start
 /* Adds, Mr. or Ms. before someone's name

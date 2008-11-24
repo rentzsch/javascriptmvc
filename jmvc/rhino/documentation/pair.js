@@ -77,8 +77,7 @@ MVC.Doc.Pair = MVC.Class.extend(
      */
     init : function(){
         if(this.className){
-             var ejs = "jmvc/rhino/documentation/templates/"+this.className+".ejs"
-             this._view = new View({text: readFile(ejs), name: ejs });
+             this._view =  MVC.Doc.get_template(this.className)    
         }
     },
     /**
