@@ -1,16 +1,26 @@
 
-if(typeof Prototype == 'undefined') {
-	include({path: '../lang/standard_helpers.js', shrink_variables: false},
-			"../lang/inflector/inflector",
-			"../dom/event/standard",
-			"../io/ajax/ajax",
-			"../lang/class/setup");
-}else{
+if(typeof Prototype != 'undefined') {
 	MVC.Event = Event;
 	include({path: '../lang/prototype_helpers.js', shrink_variables: false},
 			"../lang/inflector/inflector",
 			"../io/ajax/prototype_ajax",
 			"../lang/class/setup");
+    
+    
+}else if(typeof jQuery != 'undefined'){
+    include({path: '../lang/jquery_helpers.js', shrink_variables: false},
+		"../lang/inflector/inflector",
+		"../dom/event/standard",
+		"../io/ajax/ajax",
+		"../lang/class/setup");
+    
+    
+}else{
+	include({path: '../lang/standard_helpers.js', shrink_variables: false},
+		"../lang/inflector/inflector",
+		"../dom/event/standard",
+		"../io/ajax/ajax",
+		"../lang/class/setup");
 }
 
 if(MVC.Console)
