@@ -12,7 +12,8 @@ include.unit_tests(
     'model',
     'translation',
     'position',
-    'delegation'
+    'delegation',
+    'controller'
 );
 
 include.functional_tests();
