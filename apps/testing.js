@@ -71,7 +71,7 @@ noelement = function(){
 }
 
 include.engines('testing');
-include.plugins('io/ajax','controller','view',
+include.plugins('io/ajax/fixtures','controller','view',
     'dom/element','dom/position',
     'model','lang/timer','view/translation');
 
