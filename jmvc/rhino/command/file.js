@@ -1,5 +1,5 @@
 MVC = {
-	OPTIONS: {},
+	Options: {},
 	Test: {},
 	File: function(path){ this.path = path; },
 	runner: function(f){

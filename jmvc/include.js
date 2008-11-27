@@ -33,8 +33,16 @@ if(typeof include != 'undefined' && typeof include.end != 'undefined'){
  * @class MVC
  * Default values in MVC namespace.
  */
-MVC = {
-	OPTIONS: {},                                                //Default place to store options
+MVC = typeof MVC == 'undefined' ? {} : MVC;
+MVC.Object =  { 
+        /**
+         * Extends the attributes of destination with source and returns the result.
+         * @param {Object} d
+         * @param {Object} s
+         */
+        extend: function(d, s) { for (var p in s) d[p] = s[p]; return d;} 
+    }
+MVC.Object.extend(MVC,{                                   
 	Test: {},        
 	_no_conflict: false,    
     /**
@@ -124,15 +132,14 @@ MVC = {
      * Empty function
      */
     K : function(){},
-    /**
-     * Default encoding for XHR requests.  Default is utf-8.
-     */
-    default_encoding : "utf-8"
-};
+});
 /**
  * A static random number.
  */
 MVC.random = MVC.get_random(6);
+
+
+
 
 
 MVC.Ajax.factory = function(){ return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();};
@@ -292,11 +299,37 @@ for(var i=0; i<scripts.length; i++) {
 }
 
 
-//configurable options -> TODO: cleanup
-var options = {	dont_load_production: typeof MVCOptions == 'object' && MVCOptions.dont_load_production, 
-				env: 'development', 
-				production: '/javascripts/production.js',
-				base62: false, shrink_variables: true};
+/**
+ * @class MVC.Options
+ * Holds config options for JMVC.
+ */
+MVC.Options = {
+    /**
+     * Load the production file in production, set to false if you package include with your project
+     */
+    load_production: true,
+    /**
+     * Development environment, typically gets set automatically
+     */
+    env: 'development',
+    /**
+     * Location of your production file
+     */
+    production: '/javascripts/production.js',
+    /**
+     * Encoding for all requests, default is "utf-8"
+     */
+    encoding : "utf-8",
+    /**
+     * Lets browsers handle loading files if they need to.  Defaults to true, set to false to always
+     * load file.
+     */
+    cache_include : true
+}
+
+
+
+
 
 // variables used while including
 var first = true ,                                 //If we haven't included a file yet
@@ -338,17 +371,6 @@ include = function(){
 };
 
 
-var add_defaults = function(inc){
-	if(typeof inc == 'string') 
-      inc = {path: inc.indexOf('.js') == -1  ? inc+'.js' : inc};
-	if(typeof inc != 'function'){
-        inc.original_path = inc.path;
-        inc = MVC.Object.extend( MVC.Object.extend({},options), inc);
-        //if(force) inc.compress = false
-    }
-	include.add(inc);
-};
-
 MVC.Object.extend(include,
 /* @Static */
 {
@@ -358,7 +380,7 @@ MVC.Object.extend(include,
           inc = {path: inc.indexOf('.js') == -1  ? inc+'.js' : inc};            //add .js to it, if not there
     	if(typeof inc != 'function'){
             inc.original_path = inc.path;
-            inc = MVC.Object.extend( MVC.Object.extend({},options), inc);       //extend with default options
+            inc = MVC.Object.extend( {}, inc);       //extend with default options
             //if(force) inc.compress = false
         }
     	return inc;
@@ -368,25 +390,23 @@ MVC.Object.extend(include,
 	 * @param {Object} o
 	 */
     setup: function(o){
-        MVC.Object.extend(options, o || {});
+        //good place to set other params
+        MVC.Object.extend(MVC.Options, o || {});
 
-		options.production = options.production+(options.production.indexOf('.js') == -1 ? '.js' : '' );
+		MVC.Options.production = MVC.Options.production+(MVC.Options.production.indexOf('.js') == -1 ? '.js' : '' );
 
-		if(options.env == 'compress' && !MVC.Browser.Rhino) 
-            include.compress_window = window.open(MVC.mvc_root+'/compress.html', null, "width=600,height=680,scrollbars=no,resizable=yes");
-		if(options.env == 'test') 
-            include.plugins('test');
-		if(options.env == 'production' && ! MVC.Browser.Opera && ! options.dont_load_production)
+		if(MVC.Options.env == 'test')  include.plugins('test');
+		if(MVC.Options.env == 'production' && ! MVC.Browser.Opera && MVC.Options.load_production)
 			return document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>');
 	},
     /**
      * Returns what the environment is
      */
-	get_env: function() { return options.env;},
+	get_env: function() { return MVC.Options.env;},
     /**
      * Gets the location of the production file
      */
-	get_production_name: function() { return options.production;},
+	get_production_name: function() { return MVC.Options.production;},
 	/**
 	 * Sets the current directory.
 	 * @param {Object} p
@@ -522,7 +542,9 @@ MVC.Object.extend(include,
 	opera: function(){
 		include.opera_called = true;
 		if(MVC.Browser.Opera){
-			options.env == 'production' ? document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>') : include.end();
+			MVC.Options.env == 'production' ? 
+                document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>') : 
+                include.end();
 		}
 	},
 	opera_called : false,
@@ -596,7 +618,7 @@ MVC.Object.extend(include,
      * @param {Object} path
      */
     request: function(path, content_type){
-       var contentType = content_type || "application/x-www-form-urlencoded; charset="+MVC.default_encoding
+       var contentType = content_type || "application/x-www-form-urlencoded; charset="+MVC.Options.encoding
        var request = MVC.Ajax.factory();
        request.open("GET", path, false);
        request.setRequestHeader('Content-type', contentType)
@@ -673,7 +695,7 @@ var insert = function(src){
 		document.body.appendChild(start);
 	}else{
         document.write(
-			(src? '<script type="text/javascript" src="'+src+(true ? '': '?'+MVC.random )+'"></script>':'')+
+			(src? '<script type="text/javascript" src="'+src+(MVC.Options.cache_include ? '': '?'+MVC.random )+'"></script>':'')+
 			call_end()
 		);
 	}
@@ -734,7 +756,7 @@ if(MVC.script_options){
     include.opera();//for opera
 }
 if(MVC.Browser.Opera) 
-    setTimeout(function(){ if(!include.opera_called && !options.dont_load_production){ alert("You forgot include.opera().")}}, 10000);
+    setTimeout(function(){ if(!include.opera_called && MVC.Options.load_production){ alert("You forgot include.opera().")}}, 10000);
     
 
 })();
