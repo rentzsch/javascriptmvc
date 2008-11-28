@@ -168,8 +168,7 @@ MVC.Controller = MVC.Class.extend(
 		},this);
     },
     /**
-     * Calls the Controller prototype function specified by controller and action_name with the given params.
-     * @param {Controller/String} controller The controller class or its className (i.e. 'todos').
+     * Calls the Controller prototype function specified by action_name with the given params.
      * @param {String} action_name The name of the action to be called.
      * @param {Controller.Params} params The params the action will be called with.
      */
