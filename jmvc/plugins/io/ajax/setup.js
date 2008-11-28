@@ -8,5 +8,5 @@ if(typeof jQuery != 'undefined'){
 	include('ajax')
 }
 
-if(include.get_env() == "test" || MVC.Browser.Rhino)
+if(include.get_env() == "test" && MVC.Browser.Rhino)
 	include('fixtures/setup')
