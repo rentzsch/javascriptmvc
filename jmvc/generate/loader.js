@@ -12,6 +12,7 @@ include.get_env = function(){
 
 
 load('jmvc/plugins/lang/standard_helpers.js');
+load('jmvc/plugins/lang/inflector/inflector.js')
 load('jmvc/plugins/view/view.js');
 
 MVC.Ajax = {factory: function(){ return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();}}
