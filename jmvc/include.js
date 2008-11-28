@@ -728,10 +728,14 @@ if(MVC.script_options){
 	MVC.app_name = MVC.script_options[0];
     if(MVC.Browser.Rhino)
         MVC.script_options[1] = MVCOptions.env
-	if(MVC.script_options.length > 1)	
+    if(MVC.script_options.length > 1){
+        if(!MVC.script_options[1].match(/^(?:production|development|test|compress)$/)) 
+            throw "env should be one of: production,development,test,compress";
         include.setup(
             {env: MVC.script_options[1], 
              production: MVC.apps_root+'/'+MVC.script_options[0]+'/production'});
+    }
+        
 	
     include('apps/'+MVC.app_name);
 	
