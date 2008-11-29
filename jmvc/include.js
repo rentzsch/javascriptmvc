@@ -131,7 +131,7 @@ MVC.Object.extend(MVC,{
     /**
      * Empty function
      */
-    K : function(){},
+    K : function(){}
 });
 /**
  * A static random number.
