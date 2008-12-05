@@ -740,6 +740,8 @@ if(MVC.script_options){
     include('apps/'+MVC.app_name);
 	
     if(MVC.script_options[1] == 'test'){
+        // have to include these plugins again (they were included in test already), in case prototype or jquery is included
+        include.plugins('lang','dom/query')
 		var load_test = function(){
 			include('apps/'+MVC.app_name+'/test');
 		}
