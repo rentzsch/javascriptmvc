@@ -66,6 +66,27 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
  * The most important param function is cache_position.  If your drop elements are not
  * changing position after dragstart, use cache_position for large performance improvements.
  * 
+   <h3>Passing data from drag events to drop events</h3>
+   
+ * Drop params include a drag attribute, which contains the contents of the MVC.Draggable object 
+ * that represented the drag.  If you want to pass data to a drop event from your drag, you 
+ * can save it in MVC.Controller.Params.Drag's drag_action attribute, and recover it from 
+ * MVC.Controller.Params.Drop's drag attribute.  For example:
+ * 
+ * <h3>Drag Controller</h3>
+@code_start
+    dragstart: function(params){
+		params.drag_action.data = {some: "data"};
+    }
+@code_end
+ * 
+ * <h3>Drop Controller</h3>
+@code_start
+    dropped: function(params){
+		var data = params.drag.data;
+    }
+@code_end
+ * 
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
