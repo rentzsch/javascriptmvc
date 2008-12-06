@@ -77,11 +77,13 @@ MVC.Vector.prototype =
      * @return {Number}
      */
     x : function(){ return this.array[0] },
+    width : function(){ return this.array[0] },
     /**
      * Returns the first value of the vector
      * @return {Number}
      */
     y : function(){ return this.array[1] },
+	height : function(){ return this.array[1] },
     /**
      * Same as x()
      * @return {Number}
