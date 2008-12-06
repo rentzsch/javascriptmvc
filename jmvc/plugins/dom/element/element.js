@@ -303,6 +303,9 @@ MVC.Object.extend(MVC.Element, {
     */
    dimensions: function(element){
         var display = element.style.display;
+		if(!MVC.Element.has(document.body, element))
+		   return new MVC.Vector(parseInt(element.get_style("width")),
+			parseInt(element.get_style("height")));
         if (display != 'none' && display != null) // Safari bug
           return new MVC.Vector( element.offsetWidth, element.offsetHeight );
         // All *Width and *Height properties give 0 on elements with display none,
