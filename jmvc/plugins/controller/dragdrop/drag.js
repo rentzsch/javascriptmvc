@@ -101,6 +101,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
        if(jmvc.responding == false) return;
        var drag = jmvc.custom.drag
        MVC.Object.extend(params, drag[this.selector()].callbacks)
+       if(MVC.Draggable.current) return;
 	   MVC.Draggable.current = new MVC.Draggable(params);
        params.event.prevent_default();
        MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
