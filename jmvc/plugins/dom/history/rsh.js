@@ -825,22 +825,39 @@ MVC.Path.get_data = function(path) {
 	}
 	return data;
 };
+
 /**
  * @add MVC.Controller Prototype
  */
-//this should convert options to params
-
-MVC.Controller.prototype.
+MVC.Object.extend(MVC.Controller.prototype,{
 /**
  * Redirects to another page.
  * @plugin 'dom/history'
- * @param {Object} options an object that will turned into a url like controller/action&param1=value1
+ * @param {Object} options an object that will turned into a url like #controller/action&param1=value1
+ */
+redirect_to: function(options){
+	var point = this._get_history_point(options);
+	var location = window.location.href.split('#')[0];   
+	window.location = location + point;
+},
+/**
+ * Adds history point to browser history.
+ * @plugin 'dom/history'
+ * @param {Object} options an object that will turned into a url like #controller/action&param1=value1
  * @param {Object} data extra data saved in history
  */
-redirect_to = function(options, data){
+history_add : function(options, data) {
+	var point = this._get_history_point(options);
+	MVC.History.add(point, data)
+},
+/**
+ * Creates a history point from given options. Resultant history point is like #controller/action&param1=value1
+ * @plugin 'dom/history'
+ * @param {Object} options an object that will turned into history point
+ */
+_get_history_point: function(options) {
 	var controller_name = options.controller || this.Class.className;
 	var action_name = options.action || 'index';
-	var lhs = window.location.href.split('#')[0];
    
 	/* Convert the options to parameters (removing controller and action if needed) */
 	if(options.controller)
@@ -851,22 +868,23 @@ redirect_to = function(options, data){
 	var paramString = (options) ? MVC.Object.to_query_string(options) : '';
 	if(paramString.length)
 		paramString = '&' + paramString;
-    //MVC.History.add("#"+controller_name+'/'+action_name + paramString, data)
-	window.location = lhs+"#"+controller_name+'/'+action_name + paramString
-};
+	
+	return '#' + controller_name + '/' + action_name + paramString;
+},
 
 /**
  * Creates MVC.Path wrapper for current window.location
  * @plugin 'dom/history'
  */
-MVC.Controller.prototype.path = function() {
+path : function() {
 	return new MVC.Path(location.href);
-};
+},
 
 /**
  * Provides current window.location parameters as object properties.
  * @plugin 'dom/history'
  */
-MVC.Controller.prototype.path_data = function() {
+path_data :function() {
 	return MVC.Path.get_data(this.path());
 }
+});
