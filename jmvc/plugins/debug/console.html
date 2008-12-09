@@ -19,6 +19,10 @@
 				margin: 0px;
 				padding: 3px 5px 5px 5px;
 			}
+			#reload {
+				float:right;
+				padding:3px;
+			}
 			
 			#types {
 				padding-top: 1px;
@@ -111,6 +115,7 @@
 		</style>
 	</head>
 	<body scroll='no'>
+	<a id="reload" href="#" onclick="opener.location.reload()">Reload</a>
 		<h1>JavaScriptMVC Console</h1>
 		<div id='types'>
 			<h2 class='selected' id='console_button' onclick='show("console");'>Console</h2><h2 id='unit_button' onclick='show("unit");'>Unit</h2><h2 id='functional_button' onclick='show("functional");'>Functional</h2>
