@@ -250,14 +250,16 @@ MVC.Draggable.prototype =
 	 */
     end : function(event){
         //Call drag end
-		var drag_data = { 	element: this.element, 
+		//tell droppables a drop has happened
+		MVC.Droppables.fire(event, this);
+        
+        var drag_data = { 	element: this.element, 
 							event: event, 
 							drag_element: this.drag_element, 
 							drag_action: this };
         this.dragend(new MVC.Controller.Params.Drag(drag_data));
         
-		//tell droppables a drop has happened
-		MVC.Droppables.fire(event, this);
+		
 		
 		//Handle closing animations if necessary
         if(this._revert){
