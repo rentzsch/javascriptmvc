@@ -143,7 +143,7 @@ render = function(options) {
                         MVC.$E.update(options.to , result);
                     else
 					    options.to.innerHTML = result;
-				}else if(locations[l] == 'to'){
+				}else if(locations[l] == 'replace'){
                     MVC.$E.replace(options.replace , result);
                 }
                 else{
