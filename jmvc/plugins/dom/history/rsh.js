@@ -854,3 +854,19 @@ redirect_to = function(options, data){
     //MVC.History.add("#"+controller_name+'/'+action_name + paramString, data)
 	window.location = lhs+"#"+controller_name+'/'+action_name + paramString
 };
+
+/**
+ * Creates MVC.Path wrapper for current window.location
+ * @plugin 'dom/history'
+ */
+MVC.Controller.prototype.path = function() {
+	return new MVC.Path(location.href);
+};
+
+/**
+ * Provides current window.location parameters as object properties.
+ * @plugin 'dom/history'
+ */
+MVC.Controller.prototype.path_data = function() {
+	return MVC.Path.get_data(this.path());
+}
