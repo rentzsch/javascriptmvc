@@ -126,7 +126,7 @@ render = function(options) {
             result = view.render(data_to_render, helpers);
 		}
 		//return result;
-		var locations = ['to', 'before', 'after', 'top', 'bottom'];
+		var locations = ['to', 'before', 'after', 'top', 'bottom','replace'];
 		var element = null;
 		for(var l =0; l < locations.length; l++){
 			if(typeof  options[locations[l]] == 'string'){
@@ -143,7 +143,10 @@ render = function(options) {
                         MVC.$E.update(options.to , result);
                     else
 					    options.to.innerHTML = result;
-				}else{
+				}else if(locations[l] == 'to'){
+                    MVC.$E.replace(options.replace , result);
+                }
+                else{
 					if(!MVC.$E.insert ) throw {message: "Include can't insert "+locations[l]+" without the element plugin.", name: 'ControllerView: Missing Plugin'};
 					var opt = {};
 					opt[locations[l]] = result;
