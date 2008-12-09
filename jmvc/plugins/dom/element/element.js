@@ -92,6 +92,44 @@ MVC.Object.extend(MVC.Element, {
 	    SELECT: ['<select>',               '</select>',                  1]
 	  }
 	},
+    replace: function(element, content) {
+        var element = MVC.$E(element);
+        if (content.nodeType == 1) {
+              element.parentNode.replaceChild(content, element);
+              return element;
+        }
+        if(element.outerHTML){
+            var parent = element.parentNode, tagName = parent.tagName.toUpperCase();
+        
+            if (MVC.Element._insertionTranslations.tags[tagName]) {
+              var nextSibling = element.next();
+              var fragments = MVC.Element._getContentFromAnonymousElement(tagName, content);
+              parent.removeChild(element);
+              if (nextSibling){
+                  for(var i = 0 ; i < fragments.length; i++){
+                      parent.insertBefore(fragments[i], nextSibling)
+                  }
+              }
+              else{
+                  for(var i = 0 ; i < fragments.length; i++){
+                      parent.appendChild(fragments[i])
+                  }
+              }
+            }
+            else element.outerHTML = content
+            return element;
+            
+        }else{
+            if (content.nodeType != 1  ) {
+              var range = element.ownerDocument.createRange();
+              range.selectNode(element);
+              content = range.createContextualFragment(content);
+            }
+            element.parentNode.replaceChild(content, element);
+            return element;
+        }
+        
+    },    
 	_getContentFromAnonymousElement: function(tagName, html) {
 	  var div = document.createElement('div'), t = MVC.$E._insertionTranslations.tags[tagName];
 	  if (t) {
