@@ -48,6 +48,6 @@ MVC.Store = MVC.Class.extend(
         }
     },
     clear : function(){
-        this._data = null;
+        this._data = {};
     }
 });
