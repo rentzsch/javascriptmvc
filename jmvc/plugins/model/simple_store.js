@@ -37,5 +37,17 @@ MVC.Store = MVC.Class.extend(
 	 */
     destroy: function(id){
 		delete this._data[id];
-	}
+	},
+    
+    find : function(f){
+        var instances = [];
+        for(var id in this._data){
+            var inst = this._data[id];
+            if(f(inst))
+                instances.push(inst);
+        }
+    },
+    clear : function(){
+        this._data = null;
+    }
 });
