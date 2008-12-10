@@ -121,7 +121,7 @@ MVC.Native.extend('Function', {
 	bind: function(f) {
 	  var args = MVC.Array.from(arguments);
 	  args.shift();args.shift();
-	  var __method = func, object = arguments[1];
+	  var __method = f, object = arguments[1];
 	  return function() {
 	    return __method.apply(object, args.concat(MVC.Array.from(arguments) )  );
 	  }
