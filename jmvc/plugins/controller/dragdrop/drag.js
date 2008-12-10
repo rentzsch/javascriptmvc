@@ -97,8 +97,9 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
 	 * Gathers all callback functions and creates a new Draggable.
 	 */
 	mousedown : function(element, params){
+       var isLeftButton = params.event.which == 1;
        var jmvc= MVC.Delegator.jmvc(element);
-       if(jmvc.responding == false) return;
+       if(jmvc.responding == false || isLeftButton) return;
        var drag = jmvc.custom.drag
        MVC.Object.extend(params, drag[this.selector()].callbacks)
        if(MVC.Draggable.current) return;
