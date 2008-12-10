@@ -99,14 +99,12 @@ Array.from = function(iterable){
 	return jQuery.makeArray(iterable);
 }
 
-Array.prototype.include = function(thing){
-	return jQuery.inArray(thing, this) != -1;
-};
+
 
 
 MVC.Native.extend('Array',{ 
 	include: function(a, thing){
-		return jQuery.inArray(thing, array) != -1;
+		return jQuery.inArray(thing, a) != -1;
 	},
 	from: function(iterable){
 		 if (!iterable) return [];
