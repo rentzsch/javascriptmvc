@@ -36,10 +36,10 @@ extend = function(class_name, source){
 			if(typeof source[property] == 'function'){
 				var names = MVC.Function.params(source[property]);
     			if( names.length == 0) continue;
-				var first_arg = names[0];
-				if( first_arg.match(class_name.substr(0,1).toLowerCase()  ) || (first_arg == 'func' && class_name == 'Function' )  ){
+				//var first_arg = names[0];
+				//if( first_arg.match(class_name.substr(0,1).toLowerCase()  ) || (first_arg == 'func' && class_name == 'Function' )  ){
 					MVC.Native.set_prototype(class_name, property, source[property]);
-				}
+				//}
 			}
 		}
 	}
@@ -204,20 +204,22 @@ MVC.Native.extend('Array',
 			if(a[i] == item) return true;
 		}
 		return false;
-	},
+	}
+});
+MVC.Array.
     /**
      * Creates an array from another object.  Typically, this is used to give arguments array like properties.
      * @param {Object} iterable an array like object with a length property.
      * @return {Array}
      */
-	from: function(iterable){
+	from= function(iterable){
 		 if (!iterable) return [];
 		var results = [];
 	    for (var i = 0, length = iterable.length; i < length; i++)
 	      results.push(iterable[i]);
 	    return results;
 	}
-});
+
 /* 
  * @class MVC.Native.Function
  * @alias MVC.Function
@@ -272,3 +274,5 @@ MVC.Native.Function = MVC.Function
 MVC.Native.Number = MVC.Number
 MVC.Native.String = MVC.String
 MVC.Object = MVC.Native.Object
+if(!MVC._no_conflict)
+    Array.from = MVC.Array.from
