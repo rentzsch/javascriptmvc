@@ -25,7 +25,7 @@ MVC.Native.extend = function(class_name, source){
 				var names = MVC.Function.params(source[property]);
     			if( names.length == 0) continue;
 				var first_arg = names[0];
-				if( first_arg.match(class_name.toLowerCase()) || (first_arg == 'func' && class_name == 'Function' )  ){
+				if( first_arg.match(class_name.substr(0,1).toLowerCase()  ) || (first_arg == 'func' && class_name == 'Function' )  ){
 					MVC.Native.set_prototype(class_name, property, source[property]);
 				}
 			}
@@ -68,20 +68,20 @@ MVC.Native.extend('String', {
 	capitalize : function(string) {
 		return string.charAt(0).toUpperCase()+string.substr(1).toLowerCase();
 	},
-	include : function(string, pattern){
+	include : function(s, pattern){
 		return string.indexOf(pattern) > -1;
 	},
-	ends_with : function(string, pattern) {
+	ends_with : function(s, pattern) {
 	    var d = string.length - pattern.length;
 	    return d >= 0 && string.lastIndexOf(pattern) === d;
 	},
-	camelize: function(string){
+	camelize: function(s){
 		var parts = string.split(/_|-/);
 		for(var i = 1; i < parts.length; i++)
 			parts[i] = MVC.String.capitalize(parts[i]);
 		return parts.join('');
 	},
-	classize: function(string){
+	classize: function(s){
 		var parts = string.split(/_|-/);
 		for(var i = 0; i < parts.length; i++)
 			parts[i] = MVC.String.capitalize(parts[i]);
@@ -105,7 +105,7 @@ Array.prototype.include = function(thing){
 
 
 MVC.Native.extend('Array',{ 
-	include: function(array, thing){
+	include: function(a, thing){
 		return jQuery.inArray(thing, array) != -1;
 	},
 	from: function(iterable){
@@ -118,7 +118,7 @@ MVC.Native.extend('Array',{
 
 //Function Helpers
 MVC.Native.extend('Function', {
-	bind: function(func) {
+	bind: function(f) {
 	  var args = MVC.Array.from(arguments);
 	  args.shift();args.shift();
 	  var __method = func, object = arguments[1];
