@@ -46,6 +46,7 @@ MVC.Store = MVC.Class.extend(
             if(f(inst))
                 instances.push(inst);
         }
+        return instances;
     },
     clear : function(){
         this._data = {};
