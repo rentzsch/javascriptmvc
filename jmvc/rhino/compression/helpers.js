@@ -1,3 +1,28 @@
+(function(){
+    var URLClassLoader = Packages.java.net.URLClassLoader
+    var URL = java.net.URL
+    var File = java.io.File
+    
+    var ss  = new File("jmvc/rhino/shrinksafe.jar")
+    var ssurl = ss.toURL()
+    //print(ssurl);
+    //quit();
+    var urls = java.lang.reflect.Array.newInstance(URL,1)
+    urls[0] = new URL(ssurl);
+    var clazzLoader = new URLClassLoader(urls);
+    Compressor = clazzLoader.loadClass("org.dojotoolkit.shrinksafe.Compressor")
+    
+    mthds = Compressor.getDeclaredMethods()
+    printms = function(){
+	    for(var i = 0; i < mthds.length; i++){
+      		print(mthds[i].toString())
+      	}
+    }
+    CompressorMethod = mthds[7];
+
+})();
+
+
 MVCOptions.save = function(path, src){
     var out = new java.io.FileWriter( new java.io.File( path )),
             text = new java.lang.String( src || "" );
@@ -10,8 +35,13 @@ MVCOptions.create_folder = function(path){
     out.mkdir();
 };
 
-MVCOptions.compress = function(src, path){
-    return Packages.org.mozilla.javascript.tools.shell.Main.compress(src, path || include.get_production_name() ); 
+MVCOptions.compress = function(src){
+    var zero = new java.lang.Integer(0);
+    var one = new java.lang.Integer(1);
+    var tru = new java.lang.Boolean(true);
+    var script = new java.lang.String(src);
+    return CompressorMethod.invoke(null,script, zero, one, tru );
+    //return Compressor.compressScript(script, zero, one, tru); 
 };
 MVCOptions.collect = function(total){
     var collection = '', txt;
