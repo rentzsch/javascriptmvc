@@ -286,11 +286,13 @@ MVC.Delegator.prototype = {
         var target = event.target, matched = false, ret_value = true,matches = [];
 		var delegation_events = this.element.__jmvc.delegation_events[event.type];
         var parents_path = this.node_path(target);
-		for(var i =0; i < delegation_events.length;  i++){
-			var delegation_event = delegation_events[i];
-			var match_result = delegation_event.match(target, event, parents_path);
-			if(match_result){
-				matches.push(match_result);
+        if (parents_path) {
+			for(var i =0; i < delegation_events.length;  i++){
+				var delegation_event = delegation_events[i];
+				var match_result = delegation_event.match(target, event, parents_path);
+				if(match_result){
+					matches.push(match_result);
+				}
 			}
 		}
 
@@ -314,6 +316,7 @@ MVC.Delegator.prototype = {
         var body = this.element,parents = [],iterator =el;
 		if(iterator == body) return [{tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator}]
         do{
+            if (!iterator) return null;
             parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
         }while((iterator = iterator.parentNode) != body)
         parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
