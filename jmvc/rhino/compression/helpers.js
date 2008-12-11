@@ -10,16 +10,17 @@
     var urls = java.lang.reflect.Array.newInstance(URL,1)
     urls[0] = new URL(ssurl);
     var clazzLoader = new URLClassLoader(urls);
-    Compressor = clazzLoader.loadClass("org.dojotoolkit.shrinksafe.Compressor")
+    //importPackage(Packages.org.dojotoolkit.shrinksafe);
+    //importClass(Packages.org.dojotoolkit.shrinksafe.Compressor)
+    var Compressor = clazzLoader.loadClass("org.dojotoolkit.shrinksafe.Compressor")
     
-    mthds = Compressor.getDeclaredMethods()
-    printms = function(){
-	    for(var i = 0; i < mthds.length; i++){
-      		print(mthds[i].toString())
-      	}
-    }
-    CompressorMethod = mthds[7];
-
+    var mthds = Compressor.getDeclaredMethods()
+    CompressorMethod = null;
+    for(var i = 0; i < mthds.length; i++){
+  		var meth = mthds[i];
+        if(meth.toString().match(/compressScript\(java.lang.String,int,int,boolean\)/))
+        CompressorMethod = meth;
+  	}
 })();
 
 
