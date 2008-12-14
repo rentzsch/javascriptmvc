@@ -89,7 +89,7 @@ render = function(options) {
         else {
             var convert = function(url){
 				var url =  MVC.String.include(url,'/') ? url.split('/').join('/_') : controller_name+'/'+url;
-				var url = url + '.ejs';
+				var url = url + MVC.View.ext;
 				return url;
 			};
 			if(options.plugin){
@@ -103,7 +103,7 @@ render = function(options) {
                 var url = '../views/'+convert(options.partial);
 			}else
             {
-                var url = '../views/'+controller_name+'/'+action_name.replace(/\.|#/g, '').replace(/ /g,'_')+'.ejs';
+                var url = '../views/'+controller_name+'/'+action_name.replace(/\.|#/g, '').replace(/ /g,'_')+MVC.View.ext;
             }
 			var data_to_render = options.using || this;
 			if(options.locals) {

@@ -88,9 +88,9 @@ MVC.View = function( options ){
 	if(options.url || options.absolute_url || options.view_url){
         this.name = this.name ? this.name : options.url || options.absolute_url || "views/"+options.view_url;
         var url = options.absolute_url || 
-                  (options.url ? MVC.root.join( options.url+ (options.url.match(/\.ejs/) ? '' : '.ejs' ) ) : 
-                   MVC.root.join("views/"+options.view_url+ (options.view_url.match(/\.ejs/) ? '' : '.ejs' ))
-                  );
+                  (options.url ? MVC.root.join( options.url+ (options.url.match(this.extMatch) ? '' : this.ext ) ) : 
+                   MVC.root.join("views/"+options.view_url+ (options.view_url.match(this.extMatch) ? '' : this.ext ))
+                   );
         //options.url = options.absolute_url || options.url || options.;
 		var template = MVC.View.get(this.name, this.cache);
 		if (template) return template;
@@ -151,6 +151,8 @@ MVC.View.prototype = {
 		this.cache = options.cache != null ? options.cache : MVC.View.cache;
 		this.text = options.text != null ? options.text : null;
 		this.name = options.name != null ? options.name : null;
+		this.ext = options.ext != null ? options.ext : MVC.View.ext;
+		this.extMatch = new RegExp(this.ext.replace(/\./, '\.'));
 	},
 	// called without options, returns a function that takes the object
 	// called with options being a string, uses that as a url
@@ -460,6 +462,8 @@ MVC.View.Compiler.prototype = {
 MVC.View.config = function(options){
 	MVC.View.cache = options.cache != null ? options.cache : MVC.View.cache;
 	MVC.View.type = options.type != null ? options.type : MVC.View.type;
+	MVC.View.ext = options.ext != null ? options.ext : MVC.View.ext;
+	
 	var templates_directory = {}; //nice and private container
 	MVC.View.templates_directory = templates_directory;
 	MVC.View.get = function(path, cache){
@@ -475,7 +479,7 @@ MVC.View.config = function(options){
 	
 	MVC.View.INVALID_PATH =  -1;
 };
-MVC.View.config( {cache: include.get_env() == 'production', type: '<' } );
+MVC.View.config( {cache: include.get_env() == 'production', type: '<', ext: '.ejs' } );
 
 MVC.View.PreCompiledFunction = function(original_path, path, f){
     
@@ -545,7 +549,7 @@ include.
  */
 views = function(){
 	for(var i=0; i< arguments.length; i++){
-		include.view(arguments[i]+'.ejs');
+		include.view(arguments[i]+MVC.View.ext);
 	}
 };
 
