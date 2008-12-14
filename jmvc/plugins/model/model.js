@@ -184,7 +184,7 @@ MVC.Model = MVC.Class.extend(
      * @param {Object} el
      */
 	find_by_element: function(el){
-		return this._find_by_element(el, this.className, this);
+		return this._find_by_element(MVC.$E(el), this.className, this);
 	},
     _find_by_element: function(ce, modelName, model){
         var matches, id,  matcher = new RegExp("^"+modelName+"_(.*)$");
