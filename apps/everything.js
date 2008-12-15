@@ -5,7 +5,7 @@ include.plugins(
     'dom/query',
     'io/comet','io/jsonp','io/window_name','io/xdoc',
     'lang/date','lang/json',
-    'model','model/ajax','model/cookie','model/jsonp','model/rest_json','model/window_name','model/rest_xml',
+    'model','model/ajax','model/cookie','model/jsonp','model/json_rest','model/window_name','model/xml_rest',
     'test',
     'view','view/helpers',
     'dom/history',
