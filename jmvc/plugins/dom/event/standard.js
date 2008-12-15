@@ -57,7 +57,8 @@ Event.observe($('signinForm'), 'submit', checkForm);
                 altKey: e.altKey, ctrlKey: e.ctrlKey,
                 shiftKey: e.shiftKey, charCode: e.keyCode,
                 stopPropagation: function() {this._event.cancelBubble = true;},
-                preventDefault: function() {this._event.returnValue = false;}
+                preventDefault: function() {this._event.returnValue = false;},
+                which: e.which || (e.button & 1 ? 1 : ( e.button & 2 ? 3 : ( e.button & 4 ? 2 : 0 ) ))
             };
 
             
