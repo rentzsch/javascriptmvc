@@ -315,7 +315,7 @@ MVC.Delegator.prototype = {
 		if(iterator == body) return [{tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator}]
         do{
             parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
-        }while((iterator = iterator.parentNode) != body)
+        }while((iterator = iterator.parentNode) != body && iterator)
         parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
         return parents;
 	},
