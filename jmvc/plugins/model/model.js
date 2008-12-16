@@ -306,10 +306,10 @@ MVC.Model = MVC.Class.extend(
         
     },
     _setAttribute : function(attribute, value) {
-        if (MVC.Array.include(this.Class._associations, attribute))
-          this._setAssociation(attribute, value);
-        else
+        if (MVC.Array.include(['string', 'date', 'array', 'boolean', 'number', undefined], this.Class.attributes[attribute]))
           this._setProperty(attribute, value);
+        else
+          this._setAssociation(attribute, value);
     },
     /**
      * Checks if there is a set_<i>property</i> value.  If it returns true, lets it handle; otherwise
@@ -323,8 +323,6 @@ MVC.Model = MVC.Class.extend(
         }
         //add to cache, this should probably check that the id isn't changing.  If it does, should update the cache
         var old = this[property]
-        
-            
 
         this[property] = MVC.Array.include(['created_at','updated_at'], property) ? MVC.Date.parse(value) :  value;
         if(property == this.Class.id && this[property]){
@@ -340,16 +338,26 @@ MVC.Model = MVC.Class.extend(
             
         }
         //if (!(MVC.Array.include(this._properties,property))) this._properties.push(property);  
-        
+
         this.Class.add_attribute(property, MVC.Object.guess_type(value)  );
     },
     _setAssociation : function(association, values) {
         this[association] = function(){
-            if(! MVC.String.is_singular(association ) ) association = MVC.String.singularize(association);
-            var associated_class = window[MVC.String.classize(association)];
-            if(!associated_class) return values;
-            return associated_class.create_many_as_existing(values);
-        }
+			var class_name = this.Class.attributes[association];
+            if(MVC.String.is_singular(class_name))
+            {
+				var associated_class = window.Model.Ajax.models[class_name];
+				if(!associated_class) return values;
+				return associated_class.create_as_existing(values);
+            }
+            else
+            {
+				class_name = MVC.String.singularize(class_name);
+				var associated_class = window.Model.Ajax.models[class_name];
+				if(!associated_class) return values;
+				return associated_class.create_many_as_existing(values);
+			}
+        }.bind(this)();
         
     },
     /**
