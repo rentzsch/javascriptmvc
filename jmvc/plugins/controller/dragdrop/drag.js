@@ -55,6 +55,11 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
     		MVC.Droppables.clear();
         }
     
+        document.body.onselectstart = MVC.Draggable.current.onselectstart;
+        document.body.unselectable = MVC.Draggable.current.unselectable;
+        document.body.style.MozUserSelect = MVC.Draggable.current.MozUserSelect;
+        document.body.style.KhtmlUserSelect = MVC.Draggable.current.KhtmlUserSelect;
+		
         MVC.Draggable.current = null;
         MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
         MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
@@ -104,7 +109,12 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
        MVC.Object.extend(params, drag[this.selector()].callbacks)
        if(MVC.Draggable.current) return;
 	   MVC.Draggable.current = new MVC.Draggable(params);
-       params.event.prevent_default();
+        
+	   document.body.onselectstart = function() { return false };
+	   document.body.unselectable = 'on';
+	   document.body.style.MozUserSelect = 'none';
+	   document.body.style.KhtmlUserSelect = 'none';
+		
        MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
        MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
 	   return false;
@@ -141,6 +151,11 @@ MVC.Draggable = function(params){
     this.dragstart = params.dragstart || MVC.Draggable.k;
     this.dragend = params.dragend || MVC.Draggable.k;
     this.dragging = params.dragging || MVC.Draggable.k;
+    
+    this.onselectstart = document.body.onselectstart;
+    this.unselectable = document.body.unselectable;
+    this.MozUserSelect = document.body.style.MozUserSelect;
+    this.KhtmlUserSelect = document.body.style.KhtmlUserSelect;
 };
 /* @static */
 MVC.Draggable.
