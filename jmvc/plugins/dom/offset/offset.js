@@ -21,7 +21,7 @@ else
             prevComputedStyle = defaultView.getComputedStyle(elem, null),
             top = elem.offsetTop, left = elem.offsetLeft;
 
-        while ( (elem = elem.parentNode) && elem !== body && elem !== docElem ) {
+        while ( (elem = elem.parentNode) && elem !== body && elem !== docElem && elm !== doc ) {
             computedStyle = defaultView.getComputedStyle(elem, null);
             top -= elem.scrollTop;
             left -= elem.scrollLeft;
