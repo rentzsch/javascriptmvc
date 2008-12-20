@@ -84,7 +84,7 @@ MVC.Element._offset = {
         var top = body.offsetTop, left = body.offsetLeft;
         if ( MVC.Element._offset.doesNotIncludeMarginInBodyOffset )
             top  += parseInt( MVC.Element.get_style(body, 'marginTop'), 10 ) || 0;
-            left += parseInt( jQuery.curCSS(body, 'marginLeft'), 10 ) || 0;
+            left += parseInt( MVC.Element.get_style(body, 'marginLeft'), 10 ) || 0;
         return new MVC.Vector(left, top);
     },
     box_model :!MVC.Browser.IE || document.compatMode == "CSS1Compat"
