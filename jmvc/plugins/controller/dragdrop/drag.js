@@ -215,9 +215,9 @@ MVC.Draggable.prototype =
         MVC.Position.prepare();
 		
 		//Calculate where we should move the drag element to
-
+		this.current_position = MVC.Element.offset(this.drag_element);
 		var pos = 													//Drag element's starting coords on the page if it had top=0, left=0
-				MVC.Element.offset(this.drag_element)	//Drag element's actual coords on the page
+				this.current_position	//Drag element's actual coords on the page
 				.minus(this.currentDelta());						//How far Drag has moved from its starting coords
         
         var p = 													//Drag element's Top/Left that will move the element to be under the mouse in the right spot
@@ -408,5 +408,10 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
         if(newposition)
             this._position = newposition;
         return this._position;
-    }
+    },
+	scrolls : function(elements){
+		for(var i = 0 ; i < elements.length; i++){
+			MVC.Droppables.add(elements[i], new MVC.Scrollable(elements[i]))
+		}
+	}
 })

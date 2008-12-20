@@ -111,13 +111,17 @@ MVC.Object.extend(MVC.Controller.Params.Drop.prototype,
     cancel : function(){
         this._cancel = true;
     }
-})
+});
+
+
+
+
 /**
  * @class MVC.Droppables
  * @hide
  * A collection of all the drop elements.
  */
-MVC.Droppables = 
+MVC.Droppables = MVC.Class.extend('drop',
 /* @static */
 {
 	drops: [],
@@ -125,19 +129,18 @@ MVC.Droppables =
 	/**
 	 * Creates a new droppable and adds it to the list.
 	 * @param {Object} element
-	 * @param {Object} functions - callback functions for drop events
+	 * @param {Object} callbacks callback functions for drop events: dropover, dropped, dropout,dropadd,dropmove
 	 */
-	add: function(element, functions) {
+	add: function(element, callbacks) {
 		element = MVC.$E(element);
 		
-		functions.element = element;
-		var droppable = new MVC.Controller.Params.Drop(functions);
+		callbacks.element = element;
+		var droppable = callbacks; //new MVC.Controller.Params.Drop(callbacks);
 		if(droppable.dropadd) droppable.dropadd(droppable);
 		if(!droppable._canceled){
 		    MVC.Element.make_positioned(element);
 		    this.drops.push(droppable);
 		}
-	    
 	},
 	/**
 	* For a list of affected drops, finds the one that is deepest in
@@ -188,7 +191,7 @@ MVC.Droppables =
 		if(drop.dropover) drop.dropover( {element: drop.element, drag: drag, event: event });
 	},
     dropmove : function(drop, drag, event){
-        if(drop.dropmove) drop.dropmove( {element: drop.element, drag: drag, event: event });
+        if(drop.dropmove) drop.dropmove( {element: drop.element, drag: drag, event: event, position: drop.position_on_element});
     },
 	/**
 	* Gives a point, the object being dragged, and the latest mousemove event.
@@ -202,11 +205,13 @@ MVC.Droppables =
 		var element = drag.drag_element;
 		if(!this.drops.length) return;
 		
-		var drop, affected = [];
-		
+		var drop, affected = [], temp;
 		for(var d =0 ; d < this.drops.length; d++ ){
-		    if(MVC.Droppables.isAffected(point, element, this.drops[d])) 
-				affected.push(this.drops[d]);   
+			if( temp = MVC.Droppables.isAffected(point, element, this.drops[d])  ) {
+				this.drops[d].position_on_element = temp;
+				affected.push(this.drops[d]);
+			}
+				   
 		}
 
 		drop = MVC.Droppables.findDeepestChild(affected);
@@ -245,7 +250,6 @@ MVC.Droppables =
 	* all possible droppable elements and adds them.
 	*/
 	compile : function(){
-	  var elements = [];
 	  for(var selector in MVC.Droppables.selectors){
 	      var sels = MVC.Query(selector)
 	      for(var e= 0; e < sels.length; e++){
@@ -259,4 +263,4 @@ MVC.Droppables =
 	clear : function(){
 	  this.drops = [];
 	}
-};
+},{});
