@@ -132,7 +132,7 @@ MVC.Droppables = MVC.Class.extend('drop',
 	 * @param {Object} callbacks callback functions for drop events: dropover, dropped, dropout,dropadd,dropmove
 	 */
 	add: function(element, callbacks) {
-		element = MVC.$E(element);
+        element = MVC.$E(element);
 		
 		callbacks.element = element;
 		var droppable = callbacks; //new MVC.Controller.Params.Drop(callbacks);
@@ -166,9 +166,9 @@ MVC.Droppables = MVC.Class.extend('drop',
 	 * @param {Object} drop
 	 */
 	isAffected: function(point, element, drop) {
-		return (
+        return (
 		  (drop.element!=element) && 
-		  MVC.Position.withinIncludingScrolloffsets(drop.element, point[0], point[1], drop ) ) ;
+		  MVC.Element.within(drop.element, point[0], point[1], drop._cache ) ) ;
 	},
 	/**
 	 * Calls dropout and sets last active to null
@@ -204,16 +204,15 @@ MVC.Droppables = MVC.Class.extend('drop',
 		
 		var element = drag.drag_element;
 		if(!this.drops.length) return;
-		
 		var drop, affected = [], temp;
-		for(var d =0 ; d < this.drops.length; d++ ){
-			if( temp = MVC.Droppables.isAffected(point, element, this.drops[d])  ) {
+        for(var d =0 ; d < this.drops.length; d++ ){
+			console.log("test"+d)
+            if( (temp = MVC.Droppables.isAffected(point, element, this.drops[d])  )) {
 				this.drops[d].position_on_element = temp;
 				affected.push(this.drops[d]);
 			}
 				   
 		}
-
 		drop = MVC.Droppables.findDeepestChild(affected);
 		
         
@@ -236,7 +235,7 @@ MVC.Droppables = MVC.Class.extend('drop',
 	 */
 	fire: function(event, drag) {
 		if(!this.last_active) return;
-		MVC.Position.prepare();
+		//MVC.Element._prepare();
 		
 		if( this.isAffected(MVC.Event.pointer(event), drag.drag_element, this.last_active) && //last is still activated
 			this.last_active.dropped	){ 											//drop was ok
@@ -253,7 +252,9 @@ MVC.Droppables = MVC.Class.extend('drop',
 	  for(var selector in MVC.Droppables.selectors){
 	      var sels = MVC.Query(selector)
 	      for(var e= 0; e < sels.length; e++){
-	          MVC.Droppables.add(sels[e], MVC.Droppables.selectors[selector])
+	          //make sure we clear the offset cache
+              MVC.Dom.remove_data(sels[e],"offset")
+              MVC.Droppables.add(sels[e], new MVC.Controller.Params.Drop(MVC.Droppables.selectors[selector]))
 	      }
 	  }
 	},

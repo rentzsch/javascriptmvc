@@ -250,7 +250,7 @@ MVC.Object.extend(MVC.Element, {
      * @param {String/HTMLElement} element the element you want the offset of.
      * @return {MVC.Vector} a vector with the top and bottom values.
      */
-    offset: function(element) {
+    /*offset: function(element) {
         var valueT = 0, valueL = 0;
         do {
           valueT += element.offsetTop  || 0;
@@ -258,7 +258,7 @@ MVC.Object.extend(MVC.Element, {
           element = element.offsetParent;
         } while (element);
         return new MVC.Vector( valueL, valueT );
-    },
+    },*/
     /**
      * Returns the the position of the element by taking all of it and its parents'
      * scrollTop and scrollLeft values.
@@ -269,7 +269,7 @@ MVC.Object.extend(MVC.Element, {
      * @param {String/HTMLElement} element the element you want the offset of.
      * @return {MVC.Vector} a vector with the top and bottom values.
      */
-    scroll_offset: function(element) {
+    /*scroll_offset: function(element) {
         var valueT = 0, valueL = 0;
         do {
           valueT += element.scrollTop  || 0;
@@ -277,7 +277,7 @@ MVC.Object.extend(MVC.Element, {
           element = element.parentNode;
         } while (element);
         return new MVC.Vector( valueL, valueT );
-    },
+    },*/
     /**
      * Returns true or false if one element is inside another element.
      * Typically this is called with an element's related target to prevent mouseout from being called

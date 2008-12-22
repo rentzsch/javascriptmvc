@@ -91,7 +91,7 @@ new MVC.Test.Unit('element_test',{
 			return;
 		}
         
-        var off = MVC.$E('insertion_test').scroll_offset();
+        var off = MVC.$E('insertion_test').offset();
         this.assert_equal("number", typeof off.x()  );
         this.assert_equal("number", typeof off.y()  );
     },

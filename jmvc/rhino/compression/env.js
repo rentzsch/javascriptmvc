@@ -698,7 +698,7 @@ var self = window;
             this.readyState = 1;
             if (async == false)
 				this.async = false;
-			this.method = method || "GET";
+			this.method = (method || "GET").toUpperCase();
 			this.url = url;
 			this.onreadystatechange();
 		},

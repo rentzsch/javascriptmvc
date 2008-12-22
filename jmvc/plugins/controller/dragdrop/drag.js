@@ -141,6 +141,7 @@ MVC.Draggable = function(params){
     this.dragstart = params.dragstart || MVC.Draggable.k;
     this.dragend = params.dragend || MVC.Draggable.k;
     this.dragging = params.dragging || MVC.Draggable.k;
+    this.scroll_window = true;
 };
 /* @static */
 MVC.Draggable.
@@ -156,7 +157,8 @@ MVC.Draggable.prototype =
      * @param {Object} event
      */
 	start: function(event){
-		this._start_position = null;        //we no longer care about this
+		//MVC.Element._prepare();
+        this._start_position = null;        //we no longer care about this
         this.moved = true;					//we have been moved
         this.drag_element = this.element;	//drag_element is what people should use to referrer to 
         									//what has been dragged
@@ -212,7 +214,7 @@ MVC.Draggable.prototype =
 		if(this._cancelled) return;
 		
 		//Adjust for scrolling
-        MVC.Position.prepare();
+        
 		
 		//Calculate where we should move the drag element to
 		this.current_position = MVC.Element.offset(this.drag_element);
@@ -368,7 +370,7 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
 	 * @param {Number} offsetY the y position where you want your mouse on the object
 	 */
     representitive : function( element, offsetX, offsetY ){
-        MVC.Position.prepare();
+        
         this._offsetX = offsetX || 0;
 		this._offsetY = offsetY || 0;
 		

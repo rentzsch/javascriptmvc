@@ -206,7 +206,7 @@ MVC.Lasso.prototype =
 		if(this._cancelled) return;
 		
 		//Adjust for scrolling
-        MVC.Position.prepare();
+        //MVC.Element._prepare();
 		
 		//Calculate where we should move the drag element to
 
@@ -249,7 +249,7 @@ MVC.Lasso.prototype =
                 this.drag_element.style.display = 'none';
     },
 	contains: function(selectable){
-		return MVC.Position.withinBoxIncludingScrollingOffsets(selectable.element, 
+		return MVC.Element.within_box(selectable.element, 
 			this.left, this.top, this.width, this.height, selectable);
 	}
 }

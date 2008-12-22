@@ -239,7 +239,7 @@ MVC.Selectables = {
 	 */
 	fire: function(event, lasso) {
 		//if(!this.last_active) return;
-		MVC.Position.prepare();
+		//MVC.Element._prepare();
 		for(var d =0 ; d < this.selectables.length; d++ ){
 			var select = this.selectables[d]
 		    var ef = MVC.Selectables.isAffected(lasso, this.selectables[d])

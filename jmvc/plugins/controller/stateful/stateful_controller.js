@@ -74,11 +74,11 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         for(var i = 0; i < this._actions.length; i++){
             this._actions[i].destroy();
         }
-        
-        if(this.element && this.element.__jmvc){
+        var delegation_events = MVC.Dom.data(this.element).delegation_events;
+        if(this.element && delegation_events){
             //take out any listeners on this guy
-            for(var event_type in this.element.__jmvc.delegation_events){
-                var events = this.element.__jmvc.delegation_events[event_type]
+            for(var event_type in delegation_events){
+                var events = delegation_events[event_type]
                 for(var i = 0; i < events.length; i++){
                     events[i].destroy();
                 }
@@ -93,7 +93,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      */
     dispatch_closure: function(f_name){
         return MVC.Function.bind(function(params){
-            if(!this.element.__jmvc.responding) return;
+            if(! MVC.Dom.data(this.element).responding ) return;
             params = params || {};
             params.action = f_name;
             params.controller = this.Class;
