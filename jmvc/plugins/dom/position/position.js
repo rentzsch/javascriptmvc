@@ -1,6 +1,16 @@
 //From jQuery
+/**
+ * @add MVC.Element Static
+ */
 if ( document.documentElement["getBoundingClientRect"] )
-    MVC.Element.offset = function(element) {
+    
+    MVC.Element.
+    /**
+     * Returns the position of the element on the page.
+     * @plugin dom/position
+     * @param {HTMLElement} element
+     */
+    offset = function(element) {
 	        if ( !element ) return { top: 0, left: 0 };
 	        if ( element === element.ownerDocument.body ) return MVC.Element._offset.bodyOffset( element );
 	        var box  = element.getBoundingClientRect(), doc = element.ownerDocument, body = doc.body, docElem = doc.documentElement,
@@ -94,30 +104,13 @@ MVC.Element._offset = {
 
 
 MVC.Object.extend(MVC.Element, {
-    /**
-   * Needs to be called once before any calculations are made, but after
-   * all CSS has been applied.  Sets deltaX and deltaY
-   * @return {Boolean} true if scrolling hasn't been changed
-   */
-  /*_prepare: function() {
-    var oldx = this.deltaX, oldy = this.deltaY;
-	this.deltaX =  window.pageXOffset
-                || document.documentElement.scrollLeft
-                || document.body.scrollLeft
-                || 0;
-    this.deltaY =  window.pageYOffset
-                || document.documentElement.scrollTop
-                || document.body.scrollTop
-                || 0;
-	this._static = ((oldx - this.deltaX)==0) && ((oldy - this.deltaY) == 0);
-	return this._static;
-  },*/
   /**
    * Returns if a coordinate is within an element taking scrolling into account.
+   * @plugin dom/position
    * @param {HTMLElement} element
    * @param {Number} x pixels on the screen
    * @param {Number} y pixels on the screen
-   * @param {Object} cache If present, an object that will be used to cache position lookups
+   * @param {Boolean} cache If present, an object that will be used to cache position lookups
    * @return {Boolean} true if x, y is inside the element, false if otherwise.
    */
   within: function(element, x, y, cache) {
@@ -130,6 +123,17 @@ MVC.Object.extend(MVC.Element, {
 		                    offset[0],offset[1],
 		                    element.offsetWidth,  element.offsetHeight )
   },
+  /**
+   * Returns if an element is within a box.
+   * @plugin dom/position
+   * @param {HTMLElement} element
+   * @param {Number} left
+   * @param {Number} top
+   * @param {Number} width
+   * @param {Number} height
+   * @param {Boolean} cache
+   * @return {Boolean} true if at least part of the element is within the box, false if otherwise.
+   */
   within_box : function(element, left, top, width, height, cache){
   	var offset = cache ? 
              MVC.Dom.data(element,"offset") ||  MVC.Dom.data(element,"offset", MVC.Element.offset(element)) :
@@ -158,6 +162,11 @@ MVC.Object.extend(MVC.Element, {
      
      return new MVC.Vector(xcomp -offset[0] , ycomp - offset[1]);
   },
+  /**
+   * Returns an object with important position and dimension information on the document and window.
+   * @plugin dom/position
+   * @return {Object}
+   */
   window_dimensions: function(){
          var de = document.documentElement, 
              st = window.pageYOffset ? window.pageYOffset : de.scrollTop,
@@ -186,6 +195,7 @@ MVC.Object.extend(MVC.Element, {
      * relative to each other.  You can expect it to return the same results as 
      * [http://www.w3.org/TR/DOM-Level-3-Core/core.html#Node3-compareDocumentPosition | compareDocumentPosition].
      * Parts of this documentation and source come from [http://ejohn.org/blog/comparing-document-position | John Resig].
+     * @plugin dom/position
      * @param {HTMLElement} a the first node
      * @param {HTMLElement} b the second node
      * @return {Number} A bitmap with the following digit values:
