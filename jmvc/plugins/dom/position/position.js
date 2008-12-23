@@ -117,8 +117,8 @@ MVC.Object.extend(MVC.Element, {
     var offset = cache ? 
              MVC.Dom.data(element,"offset") ||  MVC.Dom.data(element,"offset", MVC.Element.offset(element)) :
              MVC.Element.offset(element);
-    console.log(x, y, 
-		                    offset[0],offset[1])
+    //console.log(x, y, 
+	//	                    offset[0],offset[1])
     return this._within_box(x, y, 
 		                    offset[0],offset[1],
 		                    element.offsetWidth,  element.offsetHeight )

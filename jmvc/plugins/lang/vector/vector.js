@@ -126,10 +126,11 @@ MVC.Event.
  * @return {MVC.Vector}
  */
 pointer = function(event){
+	
 	return new MVC.Vector( 
-        event.pageX || (event.clientX +
+(event.clientX +
           (document.documentElement.scrollLeft || document.body.scrollLeft)),
-          event.pageY || (event.clientY +
+(event.clientY +
           (document.documentElement.scrollTop || document.body.scrollTop)
          )
     );

@@ -13,7 +13,8 @@ MVC.Scrollable = MVC.Class.extend({
 		}
 	}, 
 	dropout : function(params){
-        if(this.interval){
+        //console.log("out!!!!!")
+		if(this.interval){
             //MVC.$E('part').innerHTML = "o "+MVC.$E('part').innerHTML
 			clearTimeout(this.interval)
 			this.interval = null;
@@ -23,7 +24,7 @@ MVC.Scrollable = MVC.Class.extend({
 		
 	},
 	dropmove: function(params){
-        //console.log("move")
+        //console.log("dropmove")
         if(this.interval){
             //MVC.$E('part').innerHTML = "c "+MVC.$E('part').innerHTML
 			//console.log("moved")
@@ -53,14 +54,13 @@ MVC.Scrollable = MVC.Class.extend({
 		var window_dimensions = MVC.Element.window_dimensions();
 
         var diff =20 - (window_dimensions.window_bottom - mouse.y());
-        
+        //console.log("difference = "+ (mouse.minus( params.drag.drag_element.offset() )) )
         //console.log("checking mouse="+ mouse+", offset="+params.drag.drag_element.offset()+", scrollTop="+document.documentElement.scrollTop+", distance ="+(window_dimensions.window_bottom - mouse.y()) )
         
         if(diff > 0 ){
             var scrollset =  mouse.y()+diff - window_dimensions.window_height;
-            //MVC.$E('part').innerHTML = "s "+MVC.$E('part').innerHTML
-			this.interval =  setTimeout( MVC.Function.bind(this.check, this, dimension, diff, params.drag.drag_element,params.event.clientX, params.event.clientY), 10);
-            //this.event = MVC.Object.extend({}, event);
+			//console.log("calling with",params.event.clientX, params.event.clientY)
+			this.interval =  setTimeout( MVC.Function.bind(this.check, this, diff, params.drag.drag_element,params.event.clientX, params.event.clientY),20);
 		}else if(mouse.y() - window_dimensions.scroll_top < 10){
 			//diff = 10 - (window_dimensions.scroll_top - mouse.y());
             //document.documentElement.scrollTop = mouse.y() - diff;
@@ -69,13 +69,13 @@ MVC.Scrollable = MVC.Class.extend({
 		}
         
     },
-	check : function(type, diff, el, x,y){
+	check : function(diff,el, x,y){
         var ds = MVC.Element.window_dimensions();
 		//var top = parseInt( params.drag.drag_element.get_style("top"))
         if(ds.window_bottom +diff <= ds.document_height ){
             //params.drag.drag_element.style.top = (top+diff)+"px"
             document.documentElement.scrollTop = document.documentElement.scrollTop + 2;
-            //console.log("Synthetic Event before "+diff );
+            //console.log("Synthetic Event before "+diff,x,y );
             new MVC.Synthetic("mousemove",{clientX: x, clientY: y} ).send(el); //don't need to change position as it is screen
             //console.log("Synthetic Event after" )
         }

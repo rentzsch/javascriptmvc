@@ -206,7 +206,6 @@ MVC.Droppables = MVC.Class.extend('drop',
 		if(!this.drops.length) return;
 		var drop, affected = [], temp;
         for(var d =0 ; d < this.drops.length; d++ ){
-			console.log("test"+d)
             if( (temp = MVC.Droppables.isAffected(point, element, this.drops[d])  )) {
 				this.drops[d].position_on_element = temp;
 				affected.push(this.drops[d]);

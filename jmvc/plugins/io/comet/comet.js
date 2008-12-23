@@ -88,7 +88,6 @@ MVC.Comet = function(url, options)
      */
     this.poll_now = MVC.Function.bind(function(){
         // if we aren't waiting, kill the timer that says wait and go right now
-        //console.log('no wait called')
         if(this.is_polling()) return;
         
         //console.log('not waiting so kill!')
