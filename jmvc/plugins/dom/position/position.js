@@ -114,14 +114,19 @@ MVC.Object.extend(MVC.Element, {
    * @return {Boolean} true if x, y is inside the element, false if otherwise.
    */
   within: function(element, x, y, cache) {
+  	if(element == document.documentElement) return true;
     var offset = cache ? 
              MVC.Dom.data(element,"offset") ||  MVC.Dom.data(element,"offset", MVC.Element.offset(element)) :
              MVC.Element.offset(element);
-    //console.log(x, y, 
-	//	                    offset[0],offset[1])
-    return this._within_box(x, y, 
+    if(element == document.documentElement) return true;
+	//var width = element == document.documentElement ? element.scrollWidth : element.offsetWidth;
+	var res = this._within_box(x, y, 
 		                    offset[0],offset[1],
-		                    element.offsetWidth,  element.offsetHeight )
+		                    width,  element.offsetHeight )
+	
+	//console.log("width ",cache,  
+	//	                    offset[0],offset[1], width,  element.offsetHeight, res )
+    return res;
   },
   /**
    * Returns if an element is within a box.
@@ -185,6 +190,8 @@ MVC.Object.extend(MVC.Element, {
              document_width: MVC.Browser.IE ? document.body.offsetWidth :de.offsetWidth,
              scroll_left: sl,
              scroll_top: st,
+			 scroll_height: document.documentElement.scrollHeight,
+			 scroll_width: document.documentElement.scrollWidth,
              window_right: sl+ ww,
              window_bottom: st+ wh
          }
