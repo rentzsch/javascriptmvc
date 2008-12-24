@@ -119,10 +119,9 @@ MVC.Object.extend(MVC.Element, {
              MVC.Dom.data(element,"offset") ||  MVC.Dom.data(element,"offset", MVC.Element.offset(element)) :
              MVC.Element.offset(element);
     if(element == document.documentElement) return true;
-	//var width = element == document.documentElement ? element.scrollWidth : element.offsetWidth;
 	var res = this._within_box(x, y, 
 		                    offset[0],offset[1],
-		                    width,  element.offsetHeight )
+		                    element.offsetWidth,  element.offsetHeight )
 	
 	//console.log("width ",cache,  
 	//	                    offset[0],offset[1], width,  element.offsetHeight, res )
