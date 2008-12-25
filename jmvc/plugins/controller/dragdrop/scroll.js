@@ -50,7 +50,7 @@ MVC.Scrollable = MVC.Class.extend({
 									  this,  
 									  params.drag.drag_element, 
 									  dx, dy, 
-									  params.event.clientX, params.event.clientY),15);
+									  params.event.clientX, params.event.clientY),20);
 			}
 
 		}else{

@@ -49,13 +49,16 @@ else
             prevComputedStyle = computedStyle;
         }
 
-        if ( prevComputedStyle.position === "relative" || prevComputedStyle.position === "static" )
+        if ( prevComputedStyle.position === "relative" || prevComputedStyle.position === "static" ){
             top  += body.offsetTop;
             left += body.offsetLeft;
+        }
 
-        if ( prevComputedStyle.position === "fixed" )
+        if ( prevComputedStyle.position === "fixed" ){
             top  += Math.max(docElem.scrollTop, body.scrollTop);
             left += Math.max(docElem.scrollLeft, body.scrollLeft);
+        }
+            
 
         return new MVC.Vector(left, top);
     };
