@@ -12,6 +12,7 @@ if ( document.documentElement["getBoundingClientRect"] )
      */
     offset = function(element) {
 	        if ( !element ) return { top: 0, left: 0 };
+            if ( element == window ) return MVC.Element._offset.window_offset();
 	        if ( element === element.ownerDocument.body ) return MVC.Element._offset.bodyOffset( element );
 	        var box  = element.getBoundingClientRect(), doc = element.ownerDocument, body = doc.body, docElem = doc.documentElement,
 	            clientTop = docElem.clientTop || body.clientTop || 0, clientLeft = docElem.clientLeft || body.clientLeft || 0,
@@ -22,6 +23,7 @@ if ( document.documentElement["getBoundingClientRect"] )
 else
     MVC.Element.offset = function(element) {
         if ( !element ) return { top: 0, left: 0 };
+        if ( element == window ) return MVC.Element._offset.window_offset();
         if ( element === element.ownerDocument.body ) return MVC.Element._offset.bodyOffset( element );
         MVC.Element._offset.initialized || MVC.Element._offset.initialize();
 
@@ -100,7 +102,11 @@ MVC.Element._offset = {
             left += parseInt( MVC.Element.get_style(body, 'marginLeft'), 10 ) || 0;
         return new MVC.Vector(left, top);
     },
-    box_model :!MVC.Browser.IE || document.compatMode == "CSS1Compat"
+    box_model :!MVC.Browser.IE || document.compatMode == "CSS1Compat",
+    window_offset : function(){
+        return new MVC.Vector(window.pageXOffset ? window.pageXOffset : document.documentElement.scrollLeft,
+                              window.pageYOffset ? window.pageYOffset : document.documentElement.scrollTop)
+    }
 };
 
 

@@ -321,14 +321,19 @@ MVC.Object.extend(MVC.Element, {
     * @return {MVC.Vector} vector element.
     */
    dimensions: function(element){
-        var display = element.style.display;
+        if(element === window) 
+            return new MVC.Vector(window.innerWidth ? window.innerWidth :document.documentElement.clientWidth,
+                                  window.innerHeight ? window.innerHeight : document.documentElement.clientHeight);
+       
 		if(!MVC.Element.has(document.body, element))
 		   return new MVC.Vector(parseInt(element.get_style("width")),
 			parseInt(element.get_style("height")));
+        var display = element.style.display;
         if (display != 'none' && display != null) // Safari bug
           return new MVC.Vector( element.offsetWidth, element.offsetHeight );
         // All *Width and *Height properties give 0 on elements with display none,
         // so enable the element temporarily
+       
         var els = element.style;
         var originalVisibility = els.visibility;
         var originalPosition = els.position;

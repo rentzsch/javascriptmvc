@@ -37,6 +37,10 @@ MVC.Synthetic.prototype =
 		if(MVC.Browser.Gecko && element.nodeName.toLowerCase() == 'input' && element.getAttribute('autocomplete') != 'off')
 			element.setAttribute('autocomplete','off');
 	},
+    /**
+     * Picks how to create the event
+     * @param {Object} element
+     */
 	create_event: function(element){
 		if(document.createEvent) {
 			this.createEvent(element);
@@ -46,6 +50,10 @@ MVC.Synthetic.prototype =
 			throw "Your browser doesn't support dispatching events";
 		return this.event;
 	},
+    /**
+     * Most browsers do this
+     * @param {Object} element
+     */
 	createEvent : function(element) {
 		if(MVC.Array.include(['keypress','keyup','keydown'], this.type))
 			this.createKeypress(element, this.options.character);
@@ -54,8 +62,13 @@ MVC.Synthetic.prototype =
 		else if(MVC.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
 			this.createMouse(element);
 	},
+    /**
+     * For IE
+     * @param {Object} element
+     */
 	createEventObject : function(element) {
-		if(MVC.Array.include(['keypress','keyup','keydown'],this.type))
+		this.event = document.createEventObject();
+        if(MVC.Array.include(['keypress','keyup','keydown'],this.type))
 			this.createKeypressObject(element, this.options.character);
 		else if(this.type == 'submit')
 			this.createSubmitObject(element);
@@ -96,7 +109,6 @@ MVC.Synthetic.prototype =
 		} else {
 			// if not using controller, fire event normally 
 			//   - should trigger event handlers not using event delegation
-	        this.event = document.createEventObject();
 	        this.simulateEvent(element);
 		}
 	},
@@ -148,7 +160,6 @@ MVC.Synthetic.prototype =
             this.options.keyCode = 8;
 			character = 0;
 		}
-		this.event = document.createEventObject();
 		
   		this.event.charCode = (character? character.charCodeAt(0) : 0);
   		this.event.keyCode = this.options.keyCode || (character? character.charCodeAt(0) : 0);
@@ -161,7 +172,6 @@ MVC.Synthetic.prototype =
 	},
     create_mouse_options : function(element){
         var center = MVC.Synthetic.center(element);
-        
         var defaults =MVC.Object.extend({
 			bubbles : true,
 			cancelable : true,
@@ -176,8 +186,9 @@ MVC.Synthetic.prototype =
         return defaults;
     },
 	createMouse : function(element){
-		this.event = document.createEvent('MouseEvents');
+        this.event = document.createEvent('MouseEvents');
 		var defaults = this.create_mouse_options(element)
+        
 		this.event.initMouseEvent(this.type, 
 			defaults.bubbles, defaults.cancelable, 
 			defaults.view, 
@@ -185,11 +196,12 @@ MVC.Synthetic.prototype =
 			defaults.screenX, defaults.screenY,defaults.clientX,defaults.clientY,
 			defaults.ctrlKey,defaults.altKey,defaults.shiftKey,defaults.metaKey,
 			defaults.button,defaults.relatedTarget);
-		this.simulateEvent(element);
+        this.simulateEvent(element);
 	},
 	createMouseObject : function(element){
-		MVC.Object.extend(this.event, this.create_mouse_options(element));
-		if(!MVC.Browser.Gecko && 
+        MVC.Object.extend(this.event, this.create_mouse_options(element));
+		
+        if(!MVC.Browser.Gecko && 
 			(element.nodeName.toLowerCase() == 'input' || 
 			(element.type && element.type.toLowerCase() == 'checkbox'))) 
 			element.checked = (element.checked ? false : true);

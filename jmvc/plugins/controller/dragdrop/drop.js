@@ -154,7 +154,7 @@ MVC.Droppables = MVC.Class.extend('drop',
 		var deepest = drops[0];
 		  
 		for (i = 1; i < drops.length; ++i)
-		  if (MVC.Element.has(drops[i].element, deepest.element))
+		  if (  MVC.Element.has(deepest.element,drops[i].element))
 		    deepest = drops[i];
 		
 		return deepest;
