@@ -245,6 +245,9 @@ var self = window;
 		createElement: function(name){
 			return makeNode( this._dom.createElement(name.toLowerCase()) );
 		},
+        createComment : function(text){
+            return makeNode( this._dom.createComment(text) );
+        },
 		getElementsByTagName: function(name){
 			return new DOMNodeList( this._dom.getElementsByTagName(
 				name.toLowerCase()) );

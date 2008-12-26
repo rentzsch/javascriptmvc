@@ -13,7 +13,8 @@ include.unit_tests(
     'translation',
     'position',
     'delegation',
-    'controller'
+    'controller',
+    'query'
 );
 
 include.functional_tests();
