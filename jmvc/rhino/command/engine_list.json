@@ -1,4 +1,5 @@
 {
 	"modalmvc" : "http://modalmvc.googlecode.com/svn/trunk/",
-	"slider" : "http://javascriptmvc.googlecode.com/svn/engines/trunk/slider/"
+	"slider" : "http://javascriptmvc.googlecode.com/svn/engines/trunk/slider/",
+	"splitter" : "http://javascriptmvc.googlecode.com/svn/engines/trunk/splitter/"
 }
