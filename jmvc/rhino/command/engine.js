@@ -27,7 +27,7 @@ Engine.prototype = {
 	check_engine_list : function(){
         print("  Looking for engine ...")
         
-        var plugin_list_source = readUrl("http://javascriptmvc.googlecode.com/svn/trunk/jmvc/rhino/command/engine_list.json");
+        var plugin_list_source = readUrl("http://javascriptmvc.googlecode.com/svn/branches/1_5/jmvc/rhino/command/engine_list.json");
         var plugin_list;
         eval("plugin_list = "+plugin_list_source);
         this.uri = plugin_list[this.name]
