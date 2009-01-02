@@ -65,7 +65,7 @@ MVC.Controller.scaffold.functions = {
         this.render({to: this[this.Class.singular_name].View().element_id(), action: 'edit', plugin: 'controller/scaffold/edit'}); //!
     },
     '.cancel click': function(params){
-        this.show(params.object_data());
+        this.show(params.element_instance());
     },
     '.save click': function(params){
         this[this.Class.singular_name] = params.element_instance();
