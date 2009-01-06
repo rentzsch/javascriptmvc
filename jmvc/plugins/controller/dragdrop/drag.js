@@ -131,7 +131,8 @@ MVC.Draggable = function(params){
     this.moved = false;					//if a mousemove has come after the click
     this._cancelled = false;			//if the drag has been cancelled
 	this._start_position =              //starting position, used to make sure a move happens
-        MVC.Event.pointer(params.event)
+        MVC.Event.pointer(params.event);
+    this._compile = true;
 	//used to know where to position element relative to the mouse.
 	this.mouse_position_on_element = 
 		MVC.Event.pointer(params.event).
@@ -195,7 +196,8 @@ MVC.Draggable.prototype =
         this.drag_element.style.zIndex = 1000;
         
 		//Get the list of Droppables.  
-        MVC.Droppables.compile(); 
+        if(this._compile)
+            MVC.Droppables.compile(); 
     },
     /**
      * Returns the position of the drag_element by taking its top and left.
@@ -415,5 +417,8 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
 		for(var i = 0 ; i < elements.length; i++){
 			MVC.Droppables.add(elements[i], new MVC.Scrollable(elements[i]))
 		}
-	}
+	},
+    only_drag : function(){
+        this.drag_action._compile = false;
+    }
 })
