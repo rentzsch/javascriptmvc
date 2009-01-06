@@ -418,7 +418,7 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
 			MVC.Droppables.add(elements[i], new MVC.Scrollable(elements[i]))
 		}
 	},
-    only_drag : function(){
+    drag_only : function(){
         this.drag_action._compile = false;
     }
 })
