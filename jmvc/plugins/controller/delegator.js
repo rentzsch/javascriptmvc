@@ -125,8 +125,8 @@ MVC.Delegator.prototype = {
 		}
 		delegation_events[e].push(this);
     },
-    _remove_from_delegator : function(){
-        var event = this.event();
+    _remove_from_delegator : function(event_type){
+        var event = event_type || this.event();
         var events = MVC.Dom.data(this.element,"delegation_events")[event];
         for(var i = 0; i < events.length;i++ ){
             if(events[i] == this){
@@ -322,10 +322,19 @@ MVC.Delegator.prototype = {
 	},
     destroy : function(){
         //remove from events
-        //if(this._event == 'contextmenu' && MVC.Browser.Opera) return this.destroy_context_for_opera();
-        //if(this._event == 'submit' && MVC.Browser.IE) return this.destroy_submit_for_ie();
-    	//if(this._event == 'change' && MVC.Browser.IE) return this.destroy_change_for_ie();
-    	//if(this._event == 'change' && MVC.Browser.WebKit) return this.destroy_change_for_webkit();
+        if(this._event == 'contextmenu' && MVC.Browser.Opera){
+            return this._remove_from_delegator("click");
+        }
+        if(this._event == 'submit' && MVC.Browser.IE) {
+            this._remove_from_delegator("keypress");
+            return this._remove_from_delegator("click");
+        }
+    	if(this._event == 'change' && MVC.Browser.IE){
+            return this._remove_from_delegator("click");
+        } 
+    	//if(this._event == 'change' && MVC.Browser.WebKit){
+        //    return this._remove_from_delegator();
+        //}
         this._remove_from_delegator()
     }
 };
