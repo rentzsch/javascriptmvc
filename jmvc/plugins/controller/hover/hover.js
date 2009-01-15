@@ -120,30 +120,32 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
         this.element = element
         this.css_and_event();
         var selector = this.selector();
-        if(! this.Class.hovers[this.selector()]){
-            this.Class.hovers[this.selector()] = {};
-            new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind(this.mouseover , this));
-            new MVC.Delegator(this.selector(), 'mouseout', MVC.Function.bind( this.mouseout, this));
+        var data = MVC.Dom.data(element);
+        if(!data.custom) data.custom = {}
+        if(!data.custom.hovers) data.custom.hovers = {};
+        
+        if(! data.custom.hovers[ this.selector() ]){
+            data.custom.hovers[ this.selector() ] = {};
+            new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind(this.mouseover , this), element );
+            new MVC.Delegator(this.selector(), 'mouseout', MVC.Function.bind( this.mouseout, this), element);
         }
-        this.Class.hovers[this.selector()][this.event_type] = this;
+        data.custom.hovers[this.selector()][this.event_type] = this;
     },
     /**
      * Calls hoverenter if there is one.
      * @param {Object} params
      */
 	hoverenter : function(params){
-		 var hoverenter = this.Class.hovers[this.selector()]["hoverenter"];
-         if(hoverenter)
-            hoverenter.callback(params);
+         var hoverenter = MVC.Dom.data(params.delegate).custom.hovers[this.selector()]["hoverenter"];
+         if(hoverenter) hoverenter.callback(params);
 	},
      /**
      * Calls hoverleave if there is one.
      * @param {Object} params
      */
 	hoverleave : function(params){
-		var hoverleave = this.Class.hovers[this.selector()]["hoverleave"];
-        if(hoverleave)
-            hoverleave.callback(params);
+		var hoverleave = MVC.Dom.data(params.delegate).custom.hovers[this.selector()]["hoverleave"];
+        if(hoverleave) hoverleave.callback(params);
 	},
     /**
      * Checks if 2 mouse moves are within sensitivity
@@ -154,7 +156,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
         if(size < this.Class.sensitivity){
             //fire hover and set as called
             this.called = true;
-            this.hoverenter({element: this.element, mouseover_event: this.mouseover_event}) 
+            this.hoverenter({element: this.element, mouseover_event: this.mouseover_event, delegate: this.delegate}) 
             MVC.Event.stop_observing(this.element, "mousemove", this.mousemove);
         }else{
             this.starting_position = this.current_position
@@ -177,6 +179,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
 		this.called = false;
         this.starting_position = MVC.Event.pointer(params.event);
         this.element = params.element;
+        this.delegate = params.delegate;
         this.mouseover_event = params.event;
         this.mousemove_function = MVC.Function.bind(this.mousemove , this)
         MVC.Event.observe(params.element, "mousemove", this.mousemove_function);
@@ -210,7 +213,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
         clearTimeout(this.timer);
         MVC.Event.stop_observing(params.element, "mousemove", this.mousemove_function);
         if(this.called){ //call hoverleave
-            this.hoverleave({element: this.element, event: params.event})
+            this.hoverleave({element: this.element, event: params.event, delegate: params.delegate})
         }
     }
 });
