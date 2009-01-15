@@ -91,6 +91,9 @@ var self = window;
             },
             get search(){
                 return curLocation.getQuery() ? "?"+curLocation.getQuery() : "";
+            },
+            get hash(){
+                return this.href.match(/#.*/) || ""
             }
 		};
 	});
