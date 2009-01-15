@@ -804,6 +804,10 @@ if(MVC.script_options){
 	MVC.app_name = MVC.script_options[0];
     if(MVC.Browser.Rhino)
         MVC.script_options[1] = MVCOptions.env
+    var hash_match = window.location.hash.match(/&jmvc\[env\]=(\w+)/)
+    if(hash_match){
+        MVC.script_options[1] = hash_match[1];
+    }
     if(MVC.script_options.length > 1){
         if(!MVC.script_options[1].match(/^(?:production|development|test|compress)$/)) 
             throw "env should be one of: production,development,test,compress";
