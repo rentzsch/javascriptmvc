@@ -156,7 +156,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
         if(size < this.Class.sensitivity){
             //fire hover and set as called
             this.called = true;
-            this.hoverenter({element: this.save_element, mouseover_event: this.mouseover_event, delegate: this.delegate}) 
+            this.hoverenter({element: this.save_element, event: this.mouseover_event, delegate: this.delegate}) 
             MVC.Event.stop_observing(this.save_element, "mousemove", this.mousemove);
         }else{
             this.starting_position = this.current_position
