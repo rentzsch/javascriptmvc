@@ -91,7 +91,7 @@ include.plugins('controller/hover')
 MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
 /* @static */
 {
-    match: new RegExp("(.*?)\\s?(hoverenter|hoverleave)$"),
+    match: new RegExp("(.*?)\\s?(hoverenter|hoverleave|hovermove)$"),
     /**
      * How many pixels the mouse can move and still trigger a hoverenter
      */
@@ -147,73 +147,78 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
 		var hoverleave = MVC.Dom.data(params.delegate).custom.hovers[this.selector()]["hoverleave"];
         if(hoverleave) hoverleave.callback(params);
 	},
+    hovermove : function(params){
+        var hovermove = MVC.Dom.data(params.delegate).custom.hovers[this.selector()]["hovermove"];
+        if(hovermove) hovermove.callback(params);
+    },
+    
     /**
      * Checks if 2 mouse moves are within sensitivity
      */
     check :function(){
-        var diff = this.starting_position.minus(this.current_position);
-        var size = Math.abs( diff.x() ) + Math.abs( diff.y() );
-        if(size < this.Class.sensitivity){
+        //var diff = this.starting_position.minus(this.current_position);
+        //var size = Math.abs( diff.x() ) + Math.abs( diff.y() );
+        //if(size < this.Class.sensitivity){
             //fire hover and set as called
             this.called = true;
-            this.hoverenter({element: this.save_element, event: this.mouseover_event, delegate: this.delegate}) 
+            this.hoverenter({element: this.save_element, event: this.mousemove_event, delegate: this.delegate}) 
             MVC.Event.stop_observing(this.save_element, "mousemove", this.mousemove);
-        }else{
-            this.starting_position = this.current_position
-            this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
-        }
+        //}else{
+        //    this.starting_position = this.current_position
+        //    this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
+        //}
     },
     /**
      * Called on the mouseover. Sets up the check.
      * @param {Object} params
      */
     mouseover : function(params){
-        //set a timeout and compare position
-        //if(this.event_type == "hoverenter"){
 		var related_target = params.event.relatedTarget;
-		if(params.element == related_target || MVC.$E(params.element).has(related_target))
-			return true;
-		//}
-		
-		
+		if(params.element == related_target 
+           || MVC.$E(params.element).has(related_target)) return true;
+
 		this.called = false;
+        
         this.starting_position = MVC.Event.pointer(params.event);
         this.save_element = params.element;
         this.delegate = params.delegate;
-        this.mouseover_event = params.event;
-        this.mousemove_function = MVC.Function.bind(this.mousemove , this)
-        MVC.Event.observe(params.element, "mousemove", this.mousemove_function);
+        this.mousemove_event = params.event;
+        this.mousemove_function = MVC.Function.bind(this.mousemove , this);
+        MVC.Event.observe(params.element, "mousemove", this.mousemove_function  );
 
         this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
         
     },
     /**
-     * Updates the current_position of the mosuemove.
+     * Updates the current_position of the mosuemove.  Calls hovermove if it's been moved
      * @param {Object} event
      */
     mousemove : function(event){
+        if(this.called){
+            this.hovermove({element: this.save_element, event: event, delegate: this.delegate})
+        }else{
+            clearTimeout(this.timer);
+            //save event and position
             this.mousemove_event = event;
             this.current_position = MVC.Event.pointer(event);
+            //check again 
+            this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
+        }
+        
     },
     /**
      * 
      * @param {Object} params
      */
     mouseout : function(params){
-        //the other mouse out, if there is one, will be handled
-        //check if hoverover has been called, if it has fire hoverout, otherwise, do nothing
-        //cancel timeout
-        //unbind mousemove
-        //run if only where you are going is right
-		//if(this.event_type == "hoverenter"){
 		var related_target = params.event.relatedTarget;
-        if(params.element == related_target || MVC.$E(params.element).has(related_target))
-			return true;
-		//}
+        if(params.element == related_target 
+           || MVC.$E(params.element).has(related_target)) return true;
+           
         clearTimeout(this.timer);
         MVC.Event.stop_observing(params.element, "mousemove", this.mousemove_function);
         if(this.called){ //call hoverleave
-            this.hoverleave({element: this.element, event: params.event, delegate: params.delegate})
+            this.hoverleave({element: this.save_element, event: params.event, delegate: params.delegate})
         }
     }
 });
