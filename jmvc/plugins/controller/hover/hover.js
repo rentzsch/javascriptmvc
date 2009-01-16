@@ -117,7 +117,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
         this.action = action_name;
         this.callback = callback;
         this.className = className;
-        this.element = element
+        this.element = element;
         this.css_and_event();
         var selector = this.selector();
         var data = MVC.Dom.data(element);
@@ -156,8 +156,8 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
         if(size < this.Class.sensitivity){
             //fire hover and set as called
             this.called = true;
-            this.hoverenter({element: this.element, mouseover_event: this.mouseover_event, delegate: this.delegate}) 
-            MVC.Event.stop_observing(this.element, "mousemove", this.mousemove);
+            this.hoverenter({element: this.save_element, mouseover_event: this.mouseover_event, delegate: this.delegate}) 
+            MVC.Event.stop_observing(this.save_element, "mousemove", this.mousemove);
         }else{
             this.starting_position = this.current_position
             this.timer = setTimeout(MVC.Function.bind(this.check, this), this.Class.interval);
@@ -178,7 +178,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
 		
 		this.called = false;
         this.starting_position = MVC.Event.pointer(params.event);
-        this.element = params.element;
+        this.save_element = params.element;
         this.delegate = params.delegate;
         this.mouseover_event = params.event;
         this.mousemove_function = MVC.Function.bind(this.mousemove , this)
