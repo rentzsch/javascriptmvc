@@ -116,6 +116,6 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      * @param {Boolean} respond true to respond to events, false to repond to nothing.
      */
     respond: function(respond){
-        this.element.__jmvc.responding = respond;
+		MVC.Dom.data(this.element).responding = respond;
     }
 });
