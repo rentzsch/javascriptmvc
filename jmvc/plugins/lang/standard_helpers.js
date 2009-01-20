@@ -219,6 +219,15 @@ MVC.Array.
 	      results.push(iterable[i]);
 	    return results;
 	}
+MVC.Array.
+    /**
+     * Returns if the object is an array
+     * @param {Object} array a possible array object
+     * @return {Boolean}
+     */
+    is = function(array){
+        return Object.prototype.toString.call(a) === '[object Array]';
+    }
 
 /* 
  * @class MVC.Native.Function

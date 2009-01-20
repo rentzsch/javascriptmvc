@@ -63,6 +63,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
                 }
             }
 	    }
+        this._children = [];
         this.action_name = "init";
         this.element = element;
     },
@@ -83,6 +84,10 @@ MVC.Controller.Stateful = MVC.Controller.extend(
                     events[i].destroy();
                 }
             }
+        }
+        //remove if we've been added to the parent
+        if(this._parent){
+            this._parent.remove(this);
         }
         if(this.element && this.element.parentNode)
             this.element.parentNode.removeChild(this.element);
@@ -117,5 +122,24 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      */
     respond: function(respond){
 		MVC.Dom.data(this.element).responding = respond;
+    },
+    /**
+     * Adds child Statefuls to this Stateful.  They will be destroyed when this parent is destroyed.
+     * @param {Child}
+     */
+    add_child : function(child){
+        child._parent = this;
+        this._children.push(child);
+    },
+    /**
+     * Removes children Statefuls from this Stateful.
+     */
+    remove_child : function(child){
+        for(var i = 0; i < this._children.length;i++ ){
+            if(this._children[i] === child){
+                this._children[i].splice(i, 1);
+                break;
+            }
+        }
     }
 });
