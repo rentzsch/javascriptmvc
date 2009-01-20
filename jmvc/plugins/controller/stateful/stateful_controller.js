@@ -125,11 +125,13 @@ MVC.Controller.Stateful = MVC.Controller.extend(
     },
     /**
      * Adds child Statefuls to this Stateful.  They will be destroyed when this parent is destroyed.
-     * @param {Child}
+     * @param {MVC.Controller.Stateful} child
+     * @return {MVC.Controller.Stateful} 
      */
     add_child : function(child){
         child._parent = this;
         this._children.push(child);
+        return child;
     },
     /**
      * Removes children Statefuls from this Stateful.
