@@ -2,18 +2,22 @@
  * A model for Cookies
  */
 MVC.Model.Cookie = MVC.Model.extend(
-//Class functions
+/* @class */
 {
     init : function(){
           this._working = null;  
           this._super();
     },
     days: null,
+    /**
+     * Finds a single instance if it is in the cookie.
+     * @param {Object} params
+     */
     find_one : function(params){
         var insts = this.find_class_data().instances;
         if(!params){  for(var id in insts){ return insts[id]} return null;  }
-        if(params.id){
-            return insts[id];
+        if(params[this.id]){
+            return insts[params[this.id]];
         }
         for(var id in insts){
             var inst = insts[id];
@@ -23,6 +27,9 @@ MVC.Model.Cookie = MVC.Model.extend(
         }
         return null;
     },
+    /**
+     * Finds all instances of the model saved in the cookies.
+     */
     find_all : function(){
         var insts =  this.find_class_data().instances;
         var ret = [];
@@ -78,6 +85,10 @@ MVC.Model.Cookie = MVC.Model.extend(
         instances[id] = attributes;
         this.create_cookie(this.className, MVC.Object.to_json(cd), this.days );
     },
+    /**
+     * Destroys an instance represented by this cookie.
+     * @param {Object} id
+     */
     destroy : function(id){
         var cd = this.find_class_data();
         var instances = cd.instances;
@@ -86,9 +97,16 @@ MVC.Model.Cookie = MVC.Model.extend(
         this.create_cookie(this.className, MVC.Object.to_json(cd), this.days );
         return attrs;
     },
+    /**
+     * Destroys a named cookie
+     * @param {Object} cookie
+     */
     destroy_cookie : function(cookie){
         this.create_cookie(cookie,"",-1);
     },
+    /**
+     * Destroys all instances in this cookie
+     */
     destroy_all : function(){
         this.destroy_cookie(this.className)
         return true;
