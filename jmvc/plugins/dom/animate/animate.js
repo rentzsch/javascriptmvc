@@ -37,30 +37,7 @@ MVC.Animate = function(element, params, duration, easing, callback){
     this.timer.start();
     
 }
-
-MVC.Animate.prototype = {
-    get_starting_value : function(val){
-        var parts = val.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/), start = e.cur(true) || 0;
-		if ( parts ) {
-			var end = parseFloat(parts[2]), unit = parts[3] || "px";
-
-			// We need to compute starting value
-			if ( unit != "px" ) {
-				self.style[ name ] = (end || 1) + unit;
-				start = ((end || 1) / e.cur(true)) * start;
-				self.style[ name ] = start + unit;
-			}
-
-			// If a +=/-= token was provided, we're doing a relative animation
-			if ( parts[1] )
-				end = ((parts[1] == "-=" ? -1 : 1) * end) + start;
-
-			e.custom( start, end, unit );
-		} else
-			e.custom( start, val, "" );
-    }
-    
-};
+MVC.Animate.exclude = /z-?index|font-?weight|opacity|zoom|line-?height/i
 MVC.Animate.Value = function(element, style, end){
     this.style = style;
     this.start = parseFloat( MVC.Element.get_style( element, style )) || 0;
@@ -79,7 +56,7 @@ MVC.Animate.Value = function(element, style, end){
         
     }else{
         this.end = end;
-        this.unit = "px";
+        this.unit =  MVC.Animate.exclude.test(style) ? "" : "px";
     }
     this.distance = this.end - this.start;
 }
