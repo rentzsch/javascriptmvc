@@ -48,7 +48,7 @@ MVC.Animate.Value = function(element, style, end){
         this.unit = parts[3] || (MVC.Animate.exclude.test(style) ? "" : "px");
         if ( this.unit != "px" ) {
 				element.style[ style ] = (end || 1) + this.unit;
-				this.start = ((end || 1) / MVC.Element.get_style( element, style )) * start;
+				this.start = ((end || 1) / MVC.Element.get_style( element, style )) * this.start;
 				element.style[ style ] = start + this.unit;
 		}
         if ( parts[1] )
