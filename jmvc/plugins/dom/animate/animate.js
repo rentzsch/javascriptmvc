@@ -3,13 +3,14 @@
  * Provides simple animation functionality for JavaScriptMVC.
  * @init
  * Starts a new animation.
- * @param {HTMLElemnet} element the element to animation
+ * @param {HTMLElement|String} element the element to animation
  * @param {Object} params css properties to change and their value
  * @param {Nuber} duration how long the animation should take place in milliseconds
  * @param {optional:Object} easing function for the object's motion.
  * @param {optional:Function} callback calls when animation has completed
  */
 MVC.Animate = function(element, params, duration, easing, callback){
+    element = MVC.$E(element);
     callback = callback || function(){}
     //get starting values.
     var starting_values = {};
