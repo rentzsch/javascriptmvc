@@ -72,6 +72,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      * Removes all actions on this instance.
      */
     destroy: function(){
+        if(this._destroyed) throw this.Class.className+" controller instance has already been deleted";
         for(var i = 0; i < this._actions.length; i++){
             this._actions[i].destroy();
         }
@@ -91,6 +92,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         }
         if(this.element && this.element.parentNode)
             this.element.parentNode.removeChild(this.element);
+        this._destroyed = true;
     },
     /**
      * Used to call back to this instance
