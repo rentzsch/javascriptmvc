@@ -11,12 +11,15 @@ Engine =  function(uri, name){
 }
 Engine.prototype = {
     install_using_http: function(options){
+        this.install_dependancies();
+        
+        
         options = options || {};
         new File("engines/"+this.name).mkdir();
         var fetcher = new RecursiveHTTPFetcher(this.uri, -1, "engines/"+this.name)
         fetcher.quiet = options.quiet || true
         fetcher.fetch();
-        print("  Engine downloaded.")
+        print("\n  "+this.name+" engine downloaded.")
     },
     guess_name: function(url){
       this.name = new MVC.File(url).basename();
@@ -37,6 +40,49 @@ Engine.prototype = {
         }
         print("  Engine found.")
         
+    },
+    install_dependancies : function(){
+        print("  Checking dependencies ...")
+        var depend_url = this.uri + (this.uri.lastIndexOf("/") == this.uri.length - 1 ? "" : "/" )+"dependencies.json"
+        var depend_text;
+        try{
+           depend_text = readUrl(depend_url);
+        }catch(e){};
+        if(!depend_text ) {
+            print("  No dependancies")
+            return;
+        }
+        print("  Found dependancies ...")
+        var dependancies = JSONparse( depend_text )
+        /*if(dependancies.plugins){
+            
+            for(var plug_name in dependancies.plugins){
+                var response = "";
+                while(! response.match(/$\s*[yn]\s*^/i)){
+                    response = prompt("Install dependancy "+plug_name+"? (yN):")
+                }
+                if(response.toLowerCase() == "y"){
+                    var engine = new Engine(dependancies.plugins[plug_name] , plug_name);
+                    engine.install_using_http();
+                }
+            }
+        }*/
+        
+        if(dependancies.engines){
+            
+            for(var plug_name in dependancies.engines){
+                var response = "";
+                while(! response.match(/^\s*[yn]\s*$/i)){
+                    response = prompt("Install dependancy "+plug_name+"? (yN):")
+                }
+                if(response.toLowerCase() == "y"){
+                    print("Installing "+plug_name+"...")
+                    var engine = new Engine(dependancies.engines[plug_name] , plug_name);
+                    engine.install_using_http();
+                }
+            }
+        }
+        print("  Installed all dependencies for "+this.name)
     }
 }
 
