@@ -9,3 +9,15 @@ prompt = function(question){
     }
     return response;
 }
+/**
+ * 
+ * @param {String} question
+ * @param {Boolean} true or false
+ */
+prompt.yesno = function(question){
+    var response = "";
+    while(! response.match(/^\s*[yn]\s*$/i)){
+        response = prompt("Install dependancy "+plug_name+"? (yN):")
+    }
+    return response.match(/[yn]/i)[0].toLowerCase() == "y";
+}

@@ -5,6 +5,7 @@ if(_args < 2 || _args[0]!="install"){
 load('jmvc/rhino/command/prompt.js')
 load('jmvc/rhino/command/parse.js')
 load('jmvc/rhino/command/engine.js')
+load('jmvc/rhino/command/plugin.js')
 load('jmvc/rhino/command/file.js')
 load('jmvc/rhino/command/recursive_http_fetcher.js');
 

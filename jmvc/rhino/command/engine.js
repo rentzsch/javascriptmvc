@@ -54,28 +54,19 @@ Engine.prototype = {
         }
         print("  Found dependancies ...")
         var dependancies = JSONparse( depend_text )
-        /*if(dependancies.plugins){
-            
+        if(dependancies.plugins){
             for(var plug_name in dependancies.plugins){
-                var response = "";
-                while(! response.match(/$\s*[yn]\s*^/i)){
-                    response = prompt("Install dependancy "+plug_name+"? (yN):")
-                }
-                if(response.toLowerCase() == "y"){
-                    var engine = new Engine(dependancies.plugins[plug_name] , plug_name);
-                    engine.install_using_http();
+                if(prompt.yesno("Install dependancy "+plug_name+"? (yN):")){
+                    print("Installing "+plug_name+"...")
+                    var plugin = new Plugin(dependancies.plugins[plug_name] , plug_name);
+                    plugin.install_using_http();
                 }
             }
-        }*/
+        }
         
         if(dependancies.engines){
-            
             for(var plug_name in dependancies.engines){
-                var response = "";
-                while(! response.match(/^\s*[yn]\s*$/i)){
-                    response = prompt("Install dependancy "+plug_name+"? (yN):")
-                }
-                if(response.toLowerCase() == "y"){
+                if(prompt.yesno("Install dependancy "+plug_name+"? (yN):")){
                     print("Installing "+plug_name+"...")
                     var engine = new Engine(dependancies.engines[plug_name] , plug_name);
                     engine.install_using_http();
