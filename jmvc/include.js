@@ -633,7 +633,7 @@ MVC.Object.extend(include,
     engine : function(engine_name){
         var current_path = include.get_path();
 		include.set_path("");
-		include('jmvc/engines/'+ engine_name+'/apps/'+engine_name+".js");
+		include('engines/'+ engine_name+'/apps/'+engine_name+".js");
 		include.set_path(current_path);
     },
     /**
