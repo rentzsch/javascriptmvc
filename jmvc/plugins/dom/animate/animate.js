@@ -60,8 +60,9 @@ get_vector = function(style){
 MVC.Animate.exclude = /z-?index|font-?weight|opacity|zoom|line-?height/i
 MVC.Animate.Value = function(element, style, end){
     this.style = style;
-    this.vector_start =  MVC.Animate.is_color(style);
-    this.start = parseFloat( MVC.Element.get_style( element, style )) || 0;
+    this.start_style = MVC.Element.get_style( element, style )
+    this.vector_start =  MVC.Animate.is_color(this.start_style)
+    this.start = parseFloat(this.start_style ) || 0;
     var parts = end.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/);
     
     if ( parts ) {
