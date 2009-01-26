@@ -89,7 +89,7 @@ MVC.Animate.Value = function(element, style, end){
 MVC.Animate.Value.prototype = {
     get: function(percent){
         if(this.vector_start){
-            var nv = this.start.plus( this.distance.app(function(d){ percent*d })   );
+            var nv = this.vector_start.plus( this.vector_distance.app(function(d){ percent*d })   );
             return "rgb("+nv[0]+","+nv[1]+","+nv[2]+")";
             
         }else{
