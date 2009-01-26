@@ -89,8 +89,13 @@ MVC.Animate.Value = function(element, style, end){
 MVC.Animate.Value.prototype = {
     get: function(percent){
         if(this.vector_start){
-            var nv = this.vector_start.plus( this.vector_distance.app(function(d){ percent*d })   );
-            return "rgb("+nv[0]+","+nv[1]+","+nv[2]+")";
+            var nv = this.vector_start.plus( 
+                this.vector_distance.app(
+                    function(d){ 
+                        return percent*d 
+                    }) 
+                );
+            return "rgb("+ parseInt(nv[0]) +","+ parseInt( nv[1] )+","+ parseInt( nv[2] )+")";
             
         }else{
             return (this.start+percent*this.distance)+this.unit;
@@ -98,7 +103,9 @@ MVC.Animate.Value.prototype = {
     },
     last: function(){
         return this.vector_start ?  
-            "rgb("+this.vector_end[0]+","+this.vector_end[1]+","+this.vector_end[2]+")"   : 
+            "rgb("+ parseInt( this.vector_end[0] )+
+               ","+ parseInt(this.vector_end[1] )+ 
+               ","+ parseInt( this.vector_end[2] )+")"   : 
             (this.end)+this.unit;
     }
 }
