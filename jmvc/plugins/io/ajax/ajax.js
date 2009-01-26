@@ -135,7 +135,7 @@
 			this.transport.open(this.options.method, this.url, true);
 		    this.set_request_headers(options.headers);
 			
-			this.transport.send(parameters);
+			this.transport.send(parameters  || " ");
 		}
 	};
 	MVC.Ajax.factory = factory;
