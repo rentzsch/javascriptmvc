@@ -25,7 +25,7 @@ if(document.addEventListener) {
  * <h3>Example</h3>
 The following calls checkForm on the form element with id 'signinForm' being submitted.
 @code_start
-Event.observe($('signinForm'), 'submit', checkForm);
+MVC.Event.observe(MVC.$E('signinForm'), 'submit', checkForm);
 @code_end
  * 
  */
