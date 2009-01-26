@@ -37,9 +37,30 @@ MVC.Animate = function(element, params, duration, easing, callback){
     this.timer.start();
     
 }
+
+MVC.Animate.
+/**
+ * 
+ */
+is_color = function(style){
+   var matches; 
+   if( (matches = style.toString().match(/#(\w\w)(\w\w)(\w\w)/))    ){
+       return new MVC.Vector(parseInt(matches[1],16) , parseInt(matches[2],16) ,parseInt(matches[3],16) )
+   }else if((matches = style.toString().match(/rgb\(\s*(\w+)\s*,\s*(\w+)\s*,\s*(\w+)\s*\)/i)) ){
+       return new MVC.Vector(parseInt(matches[1],10) , parseInt(matches[2],10) ,parseInt(matches[3],10) )
+   }
+   return null;
+}
+MVC.Animate.
+get_vector = function(style){
+     var is_color = MVC.Animate.is_color(style);
+     return is_color ? is_color : new MVC.Vector(  parseFloat( style ) || 0   )
+}
+
 MVC.Animate.exclude = /z-?index|font-?weight|opacity|zoom|line-?height/i
 MVC.Animate.Value = function(element, style, end){
     this.style = style;
+    this.vector_start =  MVC.Animate.is_color(style);
     this.start = parseFloat( MVC.Element.get_style( element, style )) || 0;
     var parts = end.toString().match(/^([+-]=)?([\d+-.]+)(.*)$/);
     
@@ -55,17 +76,28 @@ MVC.Animate.Value = function(element, style, end){
 			this.end = ((parts[1] == "-=" ? -1 : 1) * this.end) + this.start;
         
     }else{
+        this.vector_end = MVC.Animate.is_color(end);
         this.end = end;
         this.unit =  MVC.Animate.exclude.test(style) ? "" : "px";
     }
+    if(this.vector_start)
+        this.vector_distance = this.vector_end.minus(this.vector_start)
     this.distance = this.end - this.start;
 }
 
 MVC.Animate.Value.prototype = {
     get: function(percent){
-        return (this.start+percent*this.distance)+this.unit;
+        if(this.vector_start){
+            var nv = this.start.plus( this.distance.app(function(d){ percent*d })   );
+            return "rgb("+nv[0]+","+nv[1]+","+nv[2]+")";
+            
+        }else{
+            return (this.start+percent*this.distance)+this.unit;
+        }  
     },
     last: function(){
-        return (this.end)+this.unit;
+        return this.vector_start ?  
+            "rgb("+this.vector_end[0]+","+this.vector_end[1]+","+this.vector_end[2]+")"   : 
+            (this.end)+this.unit;
     }
 }
