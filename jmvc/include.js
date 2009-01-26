@@ -630,11 +630,23 @@ MVC.Object.extend(include,
 		include('jmvc/plugins/'+ plugin_name+'/setup');
 		include.set_path(current_path);
 	},
+    engine : function(engine_name){
+        var current_path = include.get_path();
+		include.set_path("");
+		include('jmvc/engines/'+ plugin_name+'/apps/'+plugin_name+".js");
+		include.set_path(current_path);
+    },
     /**
      * Includes a list of plugins
      */
 	plugins: function(){
 		for(var i=0; i < arguments.length; i++) include.plugin(arguments[i]);
+	},
+    /**
+     * Includes a list of engines
+     */
+    engines: function(){
+		for(var i=0; i < arguments.length; i++) include.engine(arguments[i]);
 	},
     // Returns a function that applies a function to a list of arguments.  Then includes those
     // arguments.
@@ -734,10 +746,7 @@ include.models = include.app(function(i){return '../models/'+i});
  * @function resources
  */
 include.resources = include.app(function(i){return '../resources/'+i});
-/**
- * @function engines
- */
-include.engines = include.app(function(i){ return '../engines/'+i+"/apps/"+i+".js"} );
+
 
 
 
