@@ -239,11 +239,23 @@ MVC.Native.extend('Function',
 {
 	/**
 	 * Binds a function to another object.  The object the function is binding
-	 * to is the second argument.
-	 * @param {Object} func The function that is being bound.
-	 * @return {Function} 
+	 * to is the second argument.  Additional params are added to the callback function.
+	 * @code_start
+	 * //basic example
+	 * var callback1 = MVC.Function.bind(function(){alert(this.library)}, {library: "jmvc"});
+	 * //shows with prepended args
+	 * var callback2 = MVC.Function.bind(
+	 *     function(version, os){
+	 *         alert(this.library+", "+version+", "+os);
+	 *     },
+	 *     {library: "jmvc"},
+	 *     "1.5")
+	 * @code_end
+	 * @param {Function} f The function that is being bound.
+	 * @param {Object} obj The object you want to bind to.
+	 * @return {Function} the wrapping function.
 	 */
-    bind: function(f) {
+    bind: function(f, obj) {
 	  var args = MVC.Array.from(arguments);
 	  args.shift();args.shift();
 	  var __method = f, object = arguments[1];
