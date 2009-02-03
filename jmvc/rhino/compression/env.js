@@ -91,6 +91,9 @@ var self = window;
             },
             get search(){
                 return curLocation.getQuery() ? "?"+curLocation.getQuery() : "";
+            },
+            get hash(){
+                return this.href.match(/#.*/) || ""
             }
 		};
 	});
@@ -245,6 +248,9 @@ var self = window;
 		createElement: function(name){
 			return makeNode( this._dom.createElement(name.toLowerCase()) );
 		},
+        createComment : function(text){
+            return makeNode( this._dom.createComment(text) );
+        },
 		getElementsByTagName: function(name){
 			return new DOMNodeList( this._dom.getElementsByTagName(
 				name.toLowerCase()) );
@@ -698,7 +704,7 @@ var self = window;
             this.readyState = 1;
             if (async == false)
 				this.async = false;
-			this.method = method || "GET";
+			this.method = (method || "GET").toUpperCase();
 			this.url = url;
 			this.onreadystatechange();
 		},

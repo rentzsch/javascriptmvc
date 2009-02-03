@@ -11,6 +11,7 @@ Plugin =  function(uri, name){
 }
 Plugin.prototype = {
     install_using_http: function(options){
+        this.install_dependancies();
         options = options || {};
         new File("jmvc/plugins/"+this.name).mkdirs();
         var fetcher = new RecursiveHTTPFetcher(this.uri, -1, "jmvc/plugins/"+this.name);
@@ -39,5 +40,5 @@ Plugin.prototype = {
         
     }
 }
-
+Plugin.prototype.install_dependancies = Engine.prototype.install_dependancies;
 
