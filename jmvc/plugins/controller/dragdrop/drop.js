@@ -213,19 +213,20 @@ MVC.Droppables = MVC.Class.extend('drop',
 				   
 		}
 		drop = MVC.Droppables.findDeepestChild(affected);
-		
+		//if we have something, dropover it
+        if (drop && drop != this.last_active) 
+          this.activate(drop, drag, event);
+          
+        //call move on everyone
+        for (var i = 0; i < affected.length; i++) {
+            this.dropmove(affected[i], drag, event)
+        }
         
 		//if we've activated something, but it is not this drop, deactivate (dropout)
 		if(this.last_active && this.last_active != drop) 
 		    this.deactivate(this.last_active, drag, event);
-		
-		//if we have something, dropover it
-		if (drop && drop != this.last_active) 
-		  this.activate(drop, drag, event);
-		
-        if(drop && this.last_active){
-          this.dropmove(drop, drag, event);
-        }
+        
+        
 	},
 	/**
 	 * Called on mouse up of a dragged element.
