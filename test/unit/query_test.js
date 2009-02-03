@@ -1,4 +1,4 @@
-new MVC.Test.Unit('ajax',{
+new MVC.Test.Unit('query',{
    test_truth: function() {
       this.assert(true);
    }
