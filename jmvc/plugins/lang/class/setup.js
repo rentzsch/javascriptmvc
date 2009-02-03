@@ -124,6 +124,9 @@
         proto = klass;
         klass = null;
     }
+    
+    
+    
     proto = proto || {};
     var _super_class = this;
     var _super = this.prototype;
@@ -194,7 +197,17 @@
      * @attribute className 
      * The name of the class provided for [#introspection|introspection] purposes.
      */
-    if(className) Class.className = className;
+    
+    if (className) {
+	  	var current = window
+        var parts = className.split(/\./)
+        for(var i =0; i < parts.length-1; i++){
+            current = current[parts[i]] || ( current[parts[i]] = {} )
+        }
+        current[parts[parts.length - 1]] = Class
+        Class.className = parts[parts.length - 1]
+        Class.fullName = className
+	}
     /*
      * @function init
      * Called when a new Class is created
@@ -219,7 +232,3 @@
      */
   };
 })();
-
-if(!MVC._no_conflict && typeof Class == 'undefined'){
-	Class = MVC.Class;
-}

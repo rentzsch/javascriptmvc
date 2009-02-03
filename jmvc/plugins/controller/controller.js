@@ -159,38 +159,36 @@ MVC.Controller = MVC.Class.extend(
 	    }
     },
     dispatch_closure: function(f_name){
-        return MVC.Function.bind(function(params){
-            params = params || {};
-            params.action = f_name;
-            params.controller = this;
-            params = params.constructor == MVC.Controller.Params ? params : new MVC.Controller.Params(params)
-			return this.dispatch(f_name,  params );
-		},this);
+        var self = this;
+        
+        return function(){
+            var args = jQuery.makeArray(arguments);
+            args.unshift(f_name);
+			return self.dispatch.apply(self,args);
+		};
     },
     /**
      * Calls the Controller prototype function specified by action_name with the given params.
      * @param {String} action_name The name of the action to be called.
      * @param {Controller.Params} params The params the action will be called with.
      */
-    dispatch: function(action_name, params){
-		if(!action_name) action_name = 'index';
-		
-		if(typeof action_name == 'string'){
-			if(!(action_name in this.prototype) ) throw 'No action named '+action_name+' was found for '+this.Class.className+' controller.';
-		}else{ //action passed TODO:  WHERE IS THIS USED?
-			action_name = action_name.name;
-		}
-        var instance = this._get_instance(action_name , params);
-		return this._dispatch_action(instance,action_name, params );
+    dispatch: function(){
+		var args = jQuery.makeArray(arguments);
+        var action_name = args.shift();
+
+		if(!(action_name in this.prototype) ) throw 'No action named '+action_name+' was found for '+this.Class.className+' controller.';
+
+        var instance = this._get_instance(action_name , args);
+		return this._dispatch_action(instance,action_name, args );
 	},
-    _get_instance : function(action_name,  params){
-          return new this(action_name, params);
+    _get_instance : function(action_name,  args){
+          return new this(action_name, args);
     },
-	_dispatch_action: function(instance, action_name, params){
+	_dispatch_action: function(instance, action_name, args){
         if(!this._listening) return;
-        instance.params = params;
+        instance.args = args;
 		instance.action_name = action_name;
-        return instance[action_name](params);
+        return instance[action_name].apply(instance, args);
 	},
     controllers : {},
     actions: [],
@@ -405,7 +403,13 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
         
         var selector = this.selector();
         if(selector != null){
-            this.delegator = new MVC.Delegator(selector, this.event_type, callback, element );
+            this.delegator = new MVC.Delegator(selector, this.event_type, this.get_callback(), element );
+        }
+    },
+    get_callback : function(){
+        var cb = this.callback
+        return function(event){
+            cb.call(null, jQuery(this), event);
         }
     },
     /*
@@ -421,9 +425,14 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     main_controller: function(){
 	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, MVC.Function.bind(function(event){
-                this.callback({event: event, element: window})
-            }, this))
+            //todo
+            var self = this;
+            jQuery.event.add( window , this.event_type , 
+                function(event){
+                    self.callback($(window), event  )
+                }
+            );
+            
             return;
         }
         return this.css;
@@ -464,15 +473,17 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     selector : function(){
         if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, MVC.Function.bind(function(event){
-                this.callback({event: event, element: window})
-            }, this));
+            jQuery.event.add( window , this.event_type , 
+                function(event){
+                    self.callback($(window), event  )
+                }
+            );
             return;
         }
         //if(!this.className){
         //    this.css_selector = this.css
         //}else 
-        if(this.className == 'main') 
+        if(this.className.toLowerCase() == 'main') 
             this.css_selector = this.main_controller();
         else
             this.css_selector = MVC.String.is_singular(this.className) ? 

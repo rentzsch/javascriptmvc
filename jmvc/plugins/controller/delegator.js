@@ -6,21 +6,20 @@
  * @param {String} event a dom event
  * @param {Function} f a function to call
  */
-
-
-
 jQuery.fn.delegate = function(selector, event, callback) {
   return this.each(function(){
     new MVC.Delegator(selector, event, callback, this);
   });
 };
 
+
 MVC.Delegator = function(selector, event, f, element){
     this._event = event;
     this._selector = selector
     this._func = f;
     this.element = element || document.documentElement;
-    MVC.Delegator.jmvc(this.element)
+    if(! jQuery.data(this.element, "delegates") )
+        jQuery.data(this.element, "delegates",{})
     if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
     if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
 	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
@@ -32,17 +31,6 @@ MVC.Delegator = function(selector, event, f, element){
 MVC.Object.extend(MVC.Delegator,
 /* @Static*/
 {
-    /**
-     * Adds _jmvc to elements to keep track of delegation events.
-     * @param {Object} element
-     * @return {Object} the jmvc object.
-     */
-    jmvc : function(element){
-        if(!element.__jmvc) element.__jmvc = {};
-        if(!element.__jmvc.delegation_events) element.__jmvc.delegation_events = {};
-        if(element.__jmvc.responding == null) element.__jmvc.responding = true;
-        return element.__jmvc;
-    },
     /**
      * Adds kill() on an event.
      * @param {Object} event
@@ -113,21 +101,18 @@ MVC.Delegator.prototype = {
         var s = selector || this._selector;
         var e = event || this.event();
         var f = func || this._func;
-        
-        if(!this.element.__jmvc.delegation_events[e] || this.element.__jmvc.delegation_events[e].length == 0){
+        var delegation_events = jQuery.data(this.element,"delegates");
+        if(!delegation_events[e] || delegation_events[e].length == 0){
             var bind_function = MVC.Function.bind(this.dispatch_event, this)
-            
-            jQuery.event.add( this.element , e, bind_function, null, this.capture() )
-            //$(this.element)[e](bind_function, this.capture())
-            //MVC.Event.observe(this.element, e, bind_function,  );
-            this.element.__jmvc.delegation_events[e] = [];
-            this.element.__jmvc.delegation_events[e]._bind_function = bind_function;
+            jQuery.event.add( this.element , e, bind_function, null, this.capture() );
+            delegation_events[e] = [];
+            delegation_events[e]._bind_function = bind_function;
 		}
-		this.element.__jmvc.delegation_events[e].push(this);
+		delegation_events[e].push(this);
     },
-    _remove_from_delegator : function(){
-        var event = this.event();
-        var events = this.element.__jmvc.delegation_events[event];
+    _remove_from_delegator : function(event_type){
+        var event = event_type || this.event();
+        var events = jQuery.data(this.element,"delegates")[event];
         for(var i = 0; i < events.length;i++ ){
             if(events[i] == this){
                 events.splice(i, 1);
@@ -284,15 +269,13 @@ MVC.Delegator.prototype = {
      */
 	dispatch_event: function(event){
         var target = event.target, matched = false, ret_value = true,matches = [];
-		var delegation_events = this.element.__jmvc.delegation_events[event.type];
+		var delegation_events = jQuery.data(this.element,"delegates")[event.type];
         var parents_path = this.node_path(target);
-        if (parents_path) {
-			for(var i =0; i < delegation_events.length;  i++){
-				var delegation_event = delegation_events[i];
-				var match_result = delegation_event.match(target, event, parents_path);
-				if(match_result){
-					matches.push(match_result);
-				}
+		for(var i =0; i < delegation_events.length;  i++){
+			var delegation_event = delegation_events[i];
+			var match_result = delegation_event.match(target, event, parents_path);
+			if(match_result){
+				matches.push(match_result);
 			}
 		}
 
@@ -316,18 +299,27 @@ MVC.Delegator.prototype = {
         var body = this.element,parents = [],iterator =el;
 		if(iterator == body) return [{tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator}]
         do{
-            if (!iterator) return null;
             parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
-        }while((iterator = iterator.parentNode) != body)
-        parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
+        }while(((iterator = iterator.parentNode) != body )&& iterator)
+        if(iterator)
+            parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
         return parents;
 	},
     destroy : function(){
         //remove from events
-        //if(this._event == 'contextmenu' && MVC.Browser.Opera) return this.destroy_context_for_opera();
-        //if(this._event == 'submit' && MVC.Browser.IE) return this.destroy_submit_for_ie();
-    	//if(this._event == 'change' && MVC.Browser.IE) return this.destroy_change_for_ie();
-    	//if(this._event == 'change' && MVC.Browser.WebKit) return this.destroy_change_for_webkit();
+        if(this._event == 'contextmenu' && MVC.Browser.Opera){
+            return this._remove_from_delegator("click");
+        }
+        if(this._event == 'submit' && MVC.Browser.IE) {
+            this._remove_from_delegator("keypress");
+            return this._remove_from_delegator("click");
+        }
+    	if(this._event == 'change' && MVC.Browser.IE){
+            return this._remove_from_delegator("click");
+        } 
+    	//if(this._event == 'change' && MVC.Browser.WebKit){
+        //    return this._remove_from_delegator();
+        //}
         this._remove_from_delegator()
     }
 };
