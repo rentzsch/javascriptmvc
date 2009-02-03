@@ -346,8 +346,84 @@ var first = true ,                                 //If we haven't included a fi
 
 /**
  * @class include
- * Used to include JavaScript files.
- * 
+ * Include is used to load and compress JavaScript files. 
+ * You can load files relative to your current file and compress all your application 
+ * files into one with no extra coding.
+ * <h2>How to Use</h2>
+ * <h3>Create an application</h3>
+ * Create an application by running:
+ * @code_start no-highlight
+ * js jmvc\generate\app APP_NAME
+ * @code_end
+ * <h3>Add to your page</h3>
+ * In your HTML, right before the closing &lt;/body> tag add a script tag like:
+ * @code_start no-highlight
+ * &lt;script src="include.js?APP_NAME,development" type="text/javascript">
+ * &lt;/script>
+ * @code_end
+ * The parameters after the include are the application name and the development mode.
+ * You can also create a page that loads your app by running:
+ * @code_start no-highlight
+ * js jmvc\generate\page APP_NAME location\to\page.html
+ * @code_end
+ * <h3>Include JavaScript files</h3>
+ * In your application file at <i>'apps\APP_NAME.js'</i>, include the files you need 
+ * in your project.
+ * @code_start
+ * include('../resources/', 'javascripts/myapplication');
+ * @code_end
+ * Includes are performed relative to the including file. 
+ * Files are included last-in-first-out after the current file has been loaded and run.
+ * <h3>Compress your application</h3>
+ * Run
+ * @code_start no-highlight
+ * js apps\APP_NAME\compress.js
+ * @code_end
+ * <h3>Run in proudction</h3>
+ * Switch to the production mode by changing development to production:
+ * @code_start no-highlight
+ * &lt;script src="include.js?APP_NAME,production" type="text/javascript">
+ * &lt;/script>
+ * @code_end
+ * <h2>Script Load Order</h2>
+ * The load order for your scripts follows a consistent last-in first-out order across all browsers. 
+ * This is the same way the following document.write would work in IE, Firefox, or Safari:
+ * @code_start
+ * document.write('<script type="text/javascript" src="some_script.js"></script>')
+ * @code_end
+ * An example helps illustrate this.
+ * <img src='http://javascriptmvc.com/images/last_in_first_out.png'/>
+ * <table class="options">
+				<tr class="top">
+					<th>Load Order</th>
+					<th class="right">File</th>
+				</tr>
+				<tbody>
+				<tr>
+					<td>1</td>
+					<td class="right">1.js</td>
+				</tr>
+				<tr>
+					<td>2</td>
+					<td class="right">3.js</td>
+				</tr>
+				<tr>
+					<td>3</td>
+					<td class="right">4.js</td>
+				</tr>
+				<tr>
+					<td>4</td>
+					<td class="right">2.js</td>
+				</tr>
+				<tr>
+					<td>5</td>
+					<td class="right">5.js</td>
+				</tr>
+				<tr class="bottom">
+					<td>6</td>
+					<td class="right">6.js</td>
+				</tr>
+	</tbody></table>
  */
 include = function(){
 	if(include.get_env().match(/development|compress|test/)){
@@ -554,11 +630,23 @@ MVC.Object.extend(include,
 		include('jmvc/plugins/'+ plugin_name+'/setup');
 		include.set_path(current_path);
 	},
+    engine : function(engine_name){
+        var current_path = include.get_path();
+		include.set_path("");
+		include('engines/'+ engine_name+'/apps/'+engine_name+".js");
+		include.set_path(current_path);
+    },
     /**
      * Includes a list of plugins
      */
 	plugins: function(){
 		for(var i=0; i < arguments.length; i++) include.plugin(arguments[i]);
+	},
+    /**
+     * Includes a list of engines
+     */
+    engines: function(){
+		for(var i=0; i < arguments.length; i++) include.engine(arguments[i]);
 	},
     // Returns a function that applies a function to a list of arguments.  Then includes those
     // arguments.
@@ -658,10 +746,7 @@ include.models = include.app(function(i){return '../models/'+i});
  * @function resources
  */
 include.resources = include.app(function(i){return '../resources/'+i});
-/**
- * @function engines
- */
-include.engines = include.app(function(i){ return '../engines/'+i+"/apps/"+i+".js"} );
+
 
 
 
@@ -728,6 +813,10 @@ if(MVC.script_options){
 	MVC.app_name = MVC.script_options[0];
     if(MVC.Browser.Rhino)
         MVC.script_options[1] = MVCOptions.env
+    var hash_match = window.location.hash.match(/&jmvc\[env\]=(\w+)/)
+    if(hash_match){
+        MVC.script_options[1] = hash_match[1];
+    }
     if(MVC.script_options.length > 1){
         if(!MVC.script_options[1].match(/^(?:production|development|test|compress)$/)) 
             throw "env should be one of: production,development,test,compress";
