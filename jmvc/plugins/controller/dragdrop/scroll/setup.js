@@ -1,3 +1,5 @@
+include.plugins("dom/synthetic");
+
 MVC.Scrollable = MVC.Class.extend({
 	init : function(element){
 		this.element = element;
