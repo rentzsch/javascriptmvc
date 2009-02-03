@@ -6,6 +6,15 @@
  * @param {String} event a dom event
  * @param {Function} f a function to call
  */
+
+
+
+jQuery.fn.delegate = function(selector, event, callback) {
+  return this.each(function(){
+    new MVC.Delegator(selector, event, callback, this);
+  });
+};
+
 MVC.Delegator = function(selector, event, f, element){
     this._event = event;
     this._selector = selector
@@ -38,29 +47,17 @@ MVC.Object.extend(MVC.Delegator,
      * Adds kill() on an event.
      * @param {Object} event
      */
-    add_kill_event: function(event){ //this should really be in event
-		if(!event.kill){
-			if(!event) event = window.event;
+    addStopDelegation: function(event){ //this should really be in event
+		if(!event.stopDelegation){
             var killed = false;
-			event.kill = function(){
+			event.stopDelegation = function(){
 				killed = true;
 			    try{
-				    if (event.stopPropagation)  event.stopPropagation(); 
-				    if (event.preventDefault)  event.preventDefault();
+				    event.stopPropagation(); 
+				    event.preventDefault();
 			    }catch(e){}
 			};
-			event.is_killed = function(){return killed;};
-            event.stop_propagation = function(){
-                killed = true;
-                try{
-			        if (event.stopPropagation)  event.stopPropagation(); 
-			    }catch(e){}
-            }
-            event.prevent_default = function(){
-                try{
-			        if (event.preventDefault)  event.preventDefault(); 
-			    }catch(e){}
-            }
+			event.isDelegationStopped = function(){return killed;};
 		}	
 	},
     /**
@@ -119,7 +116,10 @@ MVC.Delegator.prototype = {
         
         if(!this.element.__jmvc.delegation_events[e] || this.element.__jmvc.delegation_events[e].length == 0){
             var bind_function = MVC.Function.bind(this.dispatch_event, this)
-            MVC.Event.observe(this.element, e, bind_function, this.capture() );
+            
+            jQuery.event.add( this.element , e, bind_function, null, this.capture() )
+            //$(this.element)[e](bind_function, this.capture())
+            //MVC.Event.observe(this.element, e, bind_function,  );
             this.element.__jmvc.delegation_events[e] = [];
             this.element.__jmvc.delegation_events[e]._bind_function = bind_function;
 		}
@@ -286,22 +286,24 @@ MVC.Delegator.prototype = {
         var target = event.target, matched = false, ret_value = true,matches = [];
 		var delegation_events = this.element.__jmvc.delegation_events[event.type];
         var parents_path = this.node_path(target);
-		for(var i =0; i < delegation_events.length;  i++){
-			var delegation_event = delegation_events[i];
-			var match_result = delegation_event.match(target, event, parents_path);
-			if(match_result){
-				matches.push(match_result);
+        if (parents_path) {
+			for(var i =0; i < delegation_events.length;  i++){
+				var delegation_event = delegation_events[i];
+				var match_result = delegation_event.match(target, event, parents_path);
+				if(match_result){
+					matches.push(match_result);
+				}
 			}
 		}
 
 		if(matches.length == 0) return true;
-		MVC.Delegator.add_kill_event(event);
+		MVC.Delegator.addStopDelegation(event);
 		matches.sort(MVC.Delegator.sort_by_order);
         var match;
 		for(var m = 0; m < matches.length; m++){
             match = matches[m];
-            ret_value = match.delegation_event._func( {event: event, element: MVC.$E(match.node)} ) && ret_value;
-			if(event.is_killed()) return false;
+            ret_value = match.delegation_event._func.call(this.element,  event)
+			if(event.isDelegationStopped()) return false;
 		}
 	},
     /**
@@ -314,6 +316,7 @@ MVC.Delegator.prototype = {
         var body = this.element,parents = [],iterator =el;
 		if(iterator == body) return [{tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator}]
         do{
+            if (!iterator) return null;
             parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
         }while((iterator = iterator.parentNode) != body)
         parents.unshift({tag: iterator.nodeName, className: iterator.className, id: iterator.id, element: iterator});
