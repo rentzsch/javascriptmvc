@@ -285,7 +285,7 @@ MVC.Delegator.prototype = {
         var match;
 		for(var m = 0; m < matches.length; m++){
             match = matches[m];
-            ret_value = match.delegation_event._func.call(this.element,  event)
+            ret_value = match.delegation_event._func.call(match.node,  event)
 			if(event.isDelegationStopped()) return false;
 		}
 	},

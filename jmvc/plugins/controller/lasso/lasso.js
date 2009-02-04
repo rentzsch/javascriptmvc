@@ -261,16 +261,14 @@ MVC.Lasso.current = null;
 
 
 //Observe all mousemoves and mouseups.
-MVC.Event.observe(document, 'mousemove', function(event){
+jQuery.event.add( document , 'mousemove', function(event){
     if(!MVC.Lasso.current ) return;  //do nothing if nothing is being dragged.
-    MVC.Delegator.add_kill_event(event);
-    event.kill();
+    event.stopPropagation();
     MVC.Lasso.current.draw(MVC.Event.pointer(event), event); //update draw
     return false;
 });
 
-MVC.Event.observe(document, 'mouseup', function(event){
-    MVC.Delegator.add_kill_event(event);
+jQuery.event.add(document, 'mouseup', function(event){
     //if there is a current, we should call its dragstop
     if(MVC.Lasso.current && MVC.Lasso.current.moved){
         MVC.Lasso.current.end(event);

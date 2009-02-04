@@ -118,7 +118,7 @@ MVC.Vector.prototype =
 /**
  * @add MVC.Event Static
  */
-MVC.Event.
+jQuery.Event.
 /**
  * Returns the position of the event
  * @plugin dom/element

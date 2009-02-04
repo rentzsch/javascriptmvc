@@ -1,7 +1,3 @@
-// submitted by kangax
-MVC.Object.is_number = function(o){
-    return o &&(  typeof o == 'number' || ( typeof o == 'string' && !isNaN(o) ) );
-};
 
 /* 
  * Controllers respond to events. If something happens in your application, be it a click, or
@@ -118,26 +114,26 @@ MVC.Controller = MVC.Class.extend(
      */
     init: function(){
         if(!this.className) return;
-        this.singularName =  MVC.String.singularize(this.className);
-        if(!MVC.Controller.controllers[this.className]) MVC.Controller.controllers[this.className] = [];
-        MVC.Controller.controllers[this.className].unshift(this);
+        this.underscoreName = MVC.String.underscore(this.className.replace(/controller/i,""))
+        this.singularName =  MVC.String.singularize(this.underscoreName);
+        if(!MVC.Controller.controllers[this.underscoreName]) MVC.Controller.controllers[this.underscoreName] = [];
+        MVC.Controller.controllers[this.underscoreName].unshift(this);
         var val, act;
-        
         if(!this.modelName)
-            this.modelName = MVC.String.is_singular(this.className) ? this.className : MVC.String.singularize(this.className)
+            this.modelName = MVC.String.is_singular(this.underscoreName) ? this.underscoreName : MVC.String.singularize(this.underscoreName)
+        
         if(this._should_attach_actions)
             this._create_actions();
         //load tests
         if(include.get_env() == 'test'){
-            var path = MVC.root.join('test/functional/'+this.className+'_controller_test.js');
-    		
+            var path = MVC.root.join('test/functional/'+this.underscoreName+'_controller_test.js');
     		var exists = include.check_exists(path);
     		if (exists) {
-				MVC.Console.log('Loading: "test/functional/' + this.className + '_controller_test.js"');
-                include('../test/functional/'+this.className+'_controller_test.js');
+				MVC.Console.log('Loading: "test/functional/' + this.underscoreName + '_controller_test.js"');
+                include('../test/functional/'+this.underscoreName+'_controller_test.js');
 			}
 			else {
-				MVC.Console.log('Test Controller not found at "test/functional/' + this.className + '_controller_test.js"');
+				MVC.Console.log('Test Controller not found at "test/functional/' + this.underscoreName + '_controller_test.js"');
 			}
         }
         this._path =  include.get_path().match(/(.*?)controllers/)[1]+"controllers";
@@ -152,7 +148,7 @@ MVC.Controller = MVC.Class.extend(
                     act = MVC.Controller.actions[a];
                     if(act.matches(action_name)){
                         var callback = this.dispatch_closure(action_name);
-                        this.actions[action_name] =new act(action_name, callback, this.className, this._element, this._events);
+                        this.actions[action_name] =new act(action_name, callback, this.underscoreName, this._element, this);
                     }
                 }
             }
@@ -160,7 +156,6 @@ MVC.Controller = MVC.Class.extend(
     },
     dispatch_closure: function(f_name){
         var self = this;
-        
         return function(){
             var args = jQuery.makeArray(arguments);
             args.unshift(f_name);
@@ -176,7 +171,7 @@ MVC.Controller = MVC.Class.extend(
 		var args = jQuery.makeArray(arguments);
         var action_name = args.shift();
 
-		if(!(action_name in this.prototype) ) throw 'No action named '+action_name+' was found for '+this.Class.className+' controller.';
+		if(!(action_name in this.prototype) ) throw 'No action named '+action_name+' was found for '+this.Class.underscoreName+' controller.';
 
         var instance = this._get_instance(action_name , args);
 		return this._dispatch_action(instance,action_name, args );
@@ -192,13 +187,8 @@ MVC.Controller = MVC.Class.extend(
 	},
     controllers : {},
     actions: [],
-    publish: function(message, params){
-        //var subscribers = MVC.Controller.Action.Subscribe.events[message];
-        //if(!subscribers) return;
-        //for(var i =0 ; i < subscribers.length; i++){
-        //    subscribers[i](params);
-        //}
-        OpenAjax.hub.publish(message, params);
+    publish: function(){
+        OpenAjax.hub.publish.apply(null, arguments);
     },
     get_controller_with_name_and_action: function(controller_name, action) {
         var controllers = MVC.Controller.controllers[controller_name];
@@ -243,7 +233,7 @@ Controller('todos',{
      * @param {String} action Name of prototype function you want called
      * @return {Function} function that when called, directs to another controller function
      */
-    continue_to :function(action){
+    callback :function(action){
 		var args = MVC.Array.from(arguments)
         var action = args.shift();
 		if(typeof this[action] != 'function'){ throw 'There is no action named '+action+'. ';}
@@ -256,13 +246,15 @@ Controller('todos',{
      * Calls an action after some delay
      * @param {Object} delay
      * @param {Object} action_name
-     * @param {Object} params
      */
-    delay: function(delay, action_name, params){
+    delay: function(action_name, delay){
+        var args = MVC.Array.from(arguments)
+        var action_name = args.shift();
+        var delay = args.shift() || 1000;
 		if(typeof this[action_name] != 'function'){ throw 'There is no action named '+action_name+'. ';}
 		
         return setTimeout(MVC.Function.bind(function(){
-			this.Class._dispatch_action(this, action_name ,  params )
+			this.Class._dispatch_action(this, action_name ,  args )
 		}, this), delay );
     },
     /**
@@ -270,8 +262,8 @@ Controller('todos',{
      * @param {String} message
      * @param {Object} data
      */
-    publish: function(message, data){
-        this.Class.publish(message,data);
+    publish: function(){
+        OpenAjax.hub.publish.apply(null, arguments);
     }
 });
 
@@ -307,11 +299,12 @@ MVC.Controller.Action = MVC.Class.extend(
      * @param {Function} f
      * @param {MVC.Controller} controller
      */
-    init: function(action_name, callback, className, element){
+    init: function(action_name, callback, className, element, controller){
         this.action = action_name;
         this.callback = callback;
-        this.className = className;
-        this.element = element
+        this.underscoreName = className;
+        this.element = element;
+        this.controller = controller;
     },
     /**
      * Disables an action.
@@ -352,8 +345,8 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
      * @param {Object} f
      * @param {Object} controller
      */
-    init: function(action_name, callback, className, element){
-        this._super(action_name, callback, className, element);
+    init: function(action_name, callback, className, element, controller){
+        this._super(action_name, callback, className, element, controller);
         this.message();
         this.subscription = OpenAjax.hub.subscribe(this.message_name, MVC.Function.bind(this.subscribe, this) );
     },
@@ -397,8 +390,8 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
 },
 /* @Prototype*/
 {    
-    init: function(action_name, callback, className, element){
-        this._super(action_name, callback, className, element);
+    init: function(action_name, callback, className, element, controller){
+        this._super(action_name, callback, className, element, controller);
         this.css_and_event();
         
         var selector = this.selector();
@@ -407,9 +400,12 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
         }
     },
     get_callback : function(){
-        var cb = this.callback
+        var controller = this.controller;
+        var cb = this.callback;
         return function(event){
-            cb.call(null, jQuery(this), event);
+            var jq = jQuery(this);
+            jq.controller = controller;
+            cb.call(null,  jq, event);
         }
     },
     /*
@@ -445,13 +441,13 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
 		if(this.css == "#" || this.css.substring(0,2) == "# "){
 			var newer_action_name = this.css.substring(2,this.css.length)
             if(this.element == document.documentElement){
-                return '#'+this.className + (newer_action_name ?  ' '+newer_action_name : '') ;
+                return '#'+this.underscoreName + (newer_action_name ?  ' '+newer_action_name : '') ;
             }else{
                 return (newer_action_name ?  ' '+newer_action_name : '') ;
             }
 		}else{
             //if(this.element == document.documentElement){
-			    return '.'+MVC.String.singularize(this.className)+(this.css? ' '+this.css : '' );
+			    return '.'+MVC.String.singularize(this.underscoreName)+(this.css? ' '+this.css : '' );
             //}else{
             //    return this.css;
             //}
@@ -463,7 +459,7 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     singular_selector : function(){
         if(this.element == document.documentElement)
-            return '#'+this.className+(this.css? ' '+this.css : '' );
+            return '#'+this.underscoreName+(this.css? ' '+this.css : '' );
         else
             return this.css;
     },
@@ -473,6 +469,7 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     selector : function(){
         if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
+            var self = this;
             jQuery.event.add( window , this.event_type , 
                 function(event){
                     self.callback($(window), event  )
@@ -480,13 +477,13 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
             );
             return;
         }
-        //if(!this.className){
+        //if(!this.underscoreName){
         //    this.css_selector = this.css
         //}else 
-        if(this.className.toLowerCase() == 'main') 
+        if(this.underscoreName.toLowerCase() == 'main') 
             this.css_selector = this.main_controller();
         else
-            this.css_selector = MVC.String.is_singular(this.className) ? 
+            this.css_selector = MVC.String.is_singular(this.underscoreName) ? 
                 this.singular_selector() : this.plural_selector();
         return this.css_selector;
     },
@@ -496,135 +493,15 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
     }
 });
 
-/* @Constructor
- * Instances of Controller.Params are passed to Event based actions.
- * 
- * <h3>Example</h3>
-@code_start
-MVC.Controller.extend('todos', {
-   mouseover : function(params){ 
-      <span class="magic">params</span>.element.style.backgroundColor = 'Red';
-   },
-   mouseout : function(params){
-      <span class="magic">params</span>.element.style.backgroundColor = '';
-      <span class="magic">params</span>.event.stop();
-   },
-   "img click" : function(params){
-   	  <span class="magic">params</span>.class_element().parentNode.removeSibiling(params.class_element());
-   }
-})
-@code_end
- * @init Creates a new Controller.Params object.
- * @param {Object} params An object you want to pass to a controller
- */
 
-MVC.Controller.Params = function(params){
-	var params = params || {};
-    var killed = false;
-	this.kill = function(){
-		killed = true;
-        if(params.event && params.event.kill) params.event.kill();
-	};
-	this.is_killed = function(){return params.event.is_killed ?  params.event.is_killed() :  killed ;};
-    
-    for(var thing in params){
-		if( params.hasOwnProperty(thing) ) this[thing] = params[thing];
-	}
-    this.constructor = MVC.Controller.Params;
-};
 
-/* @Prototype*/
-MVC.Controller.Params.prototype = {
-	/*
-	 * Returns data in a hash for a form.
-	 * @return {Object} Nested form data.
-	 */
-    form_params : function(){
-		var data = {};
-		if(this.element.nodeName.toLowerCase() != 'form') return data;
-		var els = this.element.elements, uri_params = [];
-		for(var i=0; i < els.length; i++){
-			var el = els[i];
-			if(el.type.toLowerCase()=='submit') continue;
-			var key = el.name || el.id, key_components = key.match(/(\w+)/g), value;
-            if(!key) continue;     
-			/* Check for checkbox and radio buttons */
-			switch(el.type.toLowerCase()) {
-				case 'checkbox':
-				case 'radio':
-					value = !!el.checked;
-					break;
-				default:
-					value = el.value;
-					break;
-			}
-			//if( MVC.Object.is_number(value) ) value = parseFloat(value);
-			if( key_components.length > 1 ) {
-				var last = key_components.length - 1;
-				var nested_key = key_components[0].toString();
-				if(! data[nested_key] ) data[nested_key] = {};
-				var nested_hash = data[nested_key];
-				for(var k = 1; k < last; k++){
-					nested_key = key_components[k];
-					if( ! nested_hash[nested_key] ) nested_hash[nested_key] ={};
-					nested_hash = nested_hash[nested_key];
-				}
-				nested_hash[ key_components[last] ] = value;
-			} else {
-		        if (key in data) {
-		        	if (typeof data[key] == 'string' ) data[key] = [data[key]];
-		         	data[key].push(value);
-		        }
-		        else data[key] = value;
-			}
-		}
-		return data;
-	},
-    /*
-     * Returns the class element for the element selected
-     * @return {HTMLElement} the element that shares the controller's id or classname
-     */
-	class_element : function(){
-		var start = this.element;
-		var className = this._className();
-        var has_class = function(el){
-            var parts = el.className.split(" ")
-            for(var i =0; i < parts.length; i++){
-                if(parts[i] == className) return true;
-            }
-            return false;
-        }
-        while(start && !has_class(start) ){
-			start = start.parentNode;
-			if(start == document) return null;
-		}
-		return MVC.$E(start);
-	},
-    /*
-     * Returns if the event happened directly on the element in the params.
-     * @return {Boolean} true if the event's target is the element, false if otherwise.
-     */
-	is_event_on_element : function(){ return this.event.target == this.element; },
-    _className : function(){
-		return this.controller.singularName;
-	},
-    /**
-     * Returns the model instance associated with dom this action acted on.  
-     * It finds the class_element, then looks if it has an id that matches
-     * <i>modelName</i>_<i>instanceId</i>.  It uses instanceID to look
-     * up the instnace in the model's [MVC.Store store].
-     * If you change the controller's [MVC.Controller.static.modelName modelName]
-     * it will use a different model to look up the data.
-     */
-    element_instance : function(){
-        var ce, matches, model, modelName = this.controller.modelName, id,  matcher = new RegExp("^"+modelName+"_(.*)$");
-        if(! (model=MVC.Model.models[modelName])  ) throw "No model for the "+ this.controller.className+ " controller!";
-        ce = this.class_element();
-        //first check the class
-        return Model._find_by_element(ce, modelName, model)
-    }
-};
-
-if(!MVC._no_conflict && typeof Controller == 'undefined'){
-	Controller = MVC.Controller
+jQuery.fn.controllerParent = function(){
+    return this.parent("."+this.controller.singularName)
 }
+jQuery.fn.instance = function(){
+    var el = this[0];
+    var model, modelName = this.controller.modelName; 
+    if(! (model=MVC.Model.models[this.controller.modelName])  ) throw "No model for "+ this.controller.fullName+ "!";
+    return Model._find_by_element(el, modelName, model)
+}
+

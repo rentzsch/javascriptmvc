@@ -206,7 +206,7 @@
         }
         current[parts[parts.length - 1]] = Class
         Class.className = parts[parts.length - 1]
-        Class.fullName = className
+        Class.fullName = className;
 	}
     /*
      * @function init
