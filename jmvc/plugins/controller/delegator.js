@@ -229,6 +229,7 @@ MVC.Delegator.prototype = {
 		this.add_to_delegator(null, 'change');
 		this.end_filters= {
 			change : function(el, event){
+                if(el.nodeName.toLowerCase() == 'input') return true;
 				if(typeof el.value == 'undefined') return false; //sometimes it won't exist yet
 				var old = el.getAttribute('_old_value');
 				el.setAttribute('_old_value', el.value);
