@@ -65,9 +65,12 @@ MVC.Object.extend(MVC.Delegator,
     /**
      * Stores all delegated events
      */
-    events: {}
+    events: {},
+    onload_called : false
 })
-
+$(window).load(function(){
+  MVC.Delegator.onload = true;
+})
 /* @Prototype*/
 MVC.Delegator.prototype = {
     /*
@@ -155,19 +158,53 @@ MVC.Delegator.prototype = {
      */
 	change_for_ie : function(){
 		this.add_to_delegator(null, 'click');
+        this.add_to_delegator(null, 'keyup');
+        this.add_to_delegator(null, 'beforeactivate')
+        //return if right or not
         this.end_filters= {
 			click : function(el, event){
-				if(typeof el.selectedIndex == 'undefined' || el.nodeName.toUpperCase() != 'SELECT') return false; //sometimes it won't exist yet
-				var old = el.getAttribute('_old_value');
-				if( old == null){
-					el.setAttribute('_old_value', el.selectedIndex);
+				switch(el.nodeName.toLowerCase()){
+                    case "select":
+                        if(typeof el.selectedIndex == 'undefined') return false;
+                        var data = jQuery.data(el, "_change_data", jQuery.data(el, "_change_data") || {} );
+                        if( data._change_old_value == null){
+        					data._change_old_value = el.selectedIndex.toString();
+        					return false;
+        				}else{
+        					if(data._change_old_value == el.selectedIndex.toString()) return false;
+        					data._change_old_value = el.selectedIndex.toString();
+        					return true;
+        				}
+                        break;
+                     case "input":
+                         if(el.type.toLowerCase() =="checkbox" ) return true;
+                         return false;
+                     
+                }
+                return false;
+			},
+            keyup : function(el, event){
+                if(el.nodeName.toLowerCase() != "select") return false;
+                if(typeof el.selectedIndex == 'undefined') return false;
+                var data = jQuery.data(el, "_change_data", jQuery.data(el, "_change_data") || {} );
+                if( data._change_old_value == null){
+                    data._change_old_value = el.selectedIndex.toString();
 					return false;
 				}else{
-					if(old == el.selectedIndex.toString()) return false;
-					el.setAttribute('_old_value', null);
+					if(data._change_old_value == el.selectedIndex.toString()){
+                        return false;
+                    }
+					data._change_old_value = el.selectedIndex.toString();
 					return true;
 				}
-			}
+            },
+            beforeactivate : function(el, event){
+                //we should probably check that onload has been called.
+                return el.nodeName.toLowerCase() == 'input' 
+                    && el.type.toLowerCase() =="radio" 
+                    && !el.checked
+                    && MVC.Delegator.onload_called  //IE selects this on the start
+            }
 		};
 	},
     /*
@@ -177,7 +214,8 @@ MVC.Delegator.prototype = {
 		this.add_to_delegator(null, 'change');
 		this.end_filters= {
 			change : function(el, event){
-				if(typeof el.value == 'undefined') return false; //sometimes it won't exist yet
+				if(el.nodeName.toLowerCase() == 'input') return true;
+                if(typeof el.value == 'undefined') return false; //sometimes it won't exist yet
 				var old = el.getAttribute('_old_value');
 				el.setAttribute('_old_value', el.value);
 				return el.value != old;
@@ -315,6 +353,8 @@ MVC.Delegator.prototype = {
             return this._remove_from_delegator("click");
         }
     	if(this._event == 'change' && MVC.Browser.IE){
+            this._remove_from_delegator("keyup");
+            this._remove_from_delegator("beforeactivate");
             return this._remove_from_delegator("click");
         } 
     	//if(this._event == 'change' && MVC.Browser.WebKit){
