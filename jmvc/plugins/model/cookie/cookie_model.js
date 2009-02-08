@@ -73,7 +73,7 @@ MVC.Model.Cookie = MVC.Model.extend(
     destroy_cookie : function(name){
         this.create_cookie(name,"",-1);
     },
-    create : function(attributes){
+    create : function(attributes, callbacks){
         var cd = this.find_class_data();
         var instances = cd.instances;
         instances[attributes[this.id]] = attributes;
