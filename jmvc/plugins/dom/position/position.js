@@ -117,8 +117,8 @@ MVC.Object.extend(MVC.Element, {
    * Returns if a coordinate is within an element taking scrolling into account.
    * @plugin dom/position
    * @param {HTMLElement} element
-   * @param {Number} x pixels on the screen
-   * @param {Number} y pixels on the screen
+   * @param {Number} x pixels on the page
+   * @param {Number} y pixels on the page
    * @param {Boolean} cache If present, an object that will be used to cache position lookups
    * @return {Boolean} true if x, y is inside the element, false if otherwise.
    */
