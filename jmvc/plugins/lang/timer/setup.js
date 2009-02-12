@@ -14,9 +14,9 @@ MVC.Timer = function(options){
     this.complete_callback = options.onComplete || function(){};
     this.distance = this.to - this.from;
     if(options.easing){
-        this.easing = typeof options.easing == 'string' ? MVC.Timer.easings[options.easing] : options.easing;
+        this.easing = typeof options.easing == 'string' ? MVC.Timer.Easings[options.easing] : options.easing;
     }else{
-        this.easing = MVC.Timer.easings.swing
+        this.easing = MVC.Timer.Easings.swing
     }
 }
 
@@ -48,7 +48,7 @@ MVC.Timer.prototype = {
     }
 }
 
-MVC.Timer.easings = {
+MVC.Timer.Easings = {
 	linear: function( p, n, firstNum, diff ) {
 		return firstNum + diff * p;
 	},

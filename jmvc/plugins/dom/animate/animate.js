@@ -1,11 +1,20 @@
+//Parts of this code come from jQuery
 /**
  * @constructor
  * Provides simple animation functionality for JavaScriptMVC.
+ * @code_start
+ * new MVC.Animate('element_id',
+ *                {color: "#00FF00", width: "20px"}, 
+ *                2000, 
+ *                MVC.Timer.Easings.linear, 
+ *                function(){  alert('done!')}
+ *                );
+ * @code_end
  * @init
  * Starts a new animation.
- * @param {optional:HTMLElement|String} element the element or element id to animate
- * @param {Object} params css properties to change and their value
- * @param {Nuber} duration how long the animation should take place in milliseconds
+ * @param {optional:HTMLElement|String} element the element or element id to animate.
+ * @param {Object} params css properties to change and their value.  Color values must be given like "#1289EF".
+ * @param {optional:Number} duration how long the animation should take place in milliseconds.  Default is 500.
  * @param {optional:Object} easing function for the object's motion.
  * @param {optional:Function} callback calls when animation has completed
  */
@@ -40,7 +49,9 @@ MVC.Animate = function(element, params, duration, easing, callback){
 
 MVC.Animate.
 /**
- * 
+ * For a given value, can determine if it is a color value like "#1289EF" or rgb(0,127,254).
+ * @param {String} style a string containing a style value of an element.
+ * @return {MVC.Vector} a vector representing the RGB value of color.
  */
 is_color = function(style){
    var matches; 
