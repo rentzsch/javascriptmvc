@@ -106,8 +106,9 @@ MVC.Doc.Constructor = MVC.Doc.Pair.extend('constructor',
      */
     signiture : function(){
             var res = [];
-            for(var n in this.params){
-                res.push(n)
+            var ordered = this.ordered_params();
+            for(var n = 0; n < ordered.length; n++){
+                res.push(ordered[n].name)
             }
             var n = this.alias ? this.alias : this.name;
             //if(this.parent.Class.className == 'static')

@@ -44,10 +44,12 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         if(!parts){
             parts = this.code.match(/\s*function\s+([\w\.\$]+)\s*(~)?\(([^\)]*)/)
         }
+        
         this.name = parts[1] ? parts[1].replace(/^this\./,"") : parts[2];
         this.params = {};
         this.ret = {type: 'undefined',description: ""}
-        var params = parts[3].match(/\w+/);
+        var params = parts[3].match(/\w+/g);
+
         if(!params) return;
         
         for(var i = 0 ; i < params.length; i++){
@@ -71,8 +73,7 @@ MVC.Doc.Function = MVC.Doc.Pair.extend('function',
         var res = [];
         var ordered = this.ordered_params();
         for(var n = 0; n < ordered.length; n++){
-            var param = ordered[n];
-            res.push(param.name)
+            res.push(ordered[n].name)
         }
         
         var n = this.name;
