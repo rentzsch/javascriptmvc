@@ -207,7 +207,6 @@ MVC.Model.Ajax = MVC.Model.extend(
      * Gets the id of a response from the responseHeader.  This is commonly used in REST
      * based calls
      * @param {Object} transport
-     * @param {Number}
      */
     get_id : function(transport){
         var loc = transport.responseText;

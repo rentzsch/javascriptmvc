@@ -146,7 +146,6 @@ MVC.Doc.Pair = MVC.Class.extend(
         return this.Class.starts_scope ? this : this.parent
     },
     code_setup: function(){},
-    comment_setup: function(){},
     
     toHTML : function(){
        return this.Class._view.render(this)

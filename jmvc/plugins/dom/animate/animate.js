@@ -3,7 +3,7 @@
  * Provides simple animation functionality for JavaScriptMVC.
  * @init
  * Starts a new animation.
- * @param {HTMLElement|String} element the element to animation
+ * @param {optional:HTMLElement|String} element the element or element id to animate
  * @param {Object} params css properties to change and their value
  * @param {Nuber} duration how long the animation should take place in milliseconds
  * @param {optional:Object} easing function for the object's motion.
