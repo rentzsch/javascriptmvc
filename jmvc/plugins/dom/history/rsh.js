@@ -416,7 +416,6 @@ MVC.History = {
 	handle an important edge case: if a user manually types in a new hash value into their IE location bar and press enter, we want to
 	to intercept this and notify any history listener.*/
 	checkLocation: function() {
-		
 		//Ignore any location changes that we made ourselves for browsers other than IE
 		if (!this.isIE && this.ignoreLocationChange) {
 			this.ignoreLocationChange = false;
@@ -430,7 +429,7 @@ MVC.History = {
 		
 		/*Get hash location*/
 		var hash = this.getCurrentLocation();
-
+        //log("checking location "+hash+"="+this.currentLocation);
 		/*Do nothing if there's been no change*/
 		if (hash == this.currentLocation) {
 			return;
@@ -443,9 +442,9 @@ MVC.History = {
 
 		if (this.isIE && this.getIframeHash() != hash) {
 			this.iframe.src = this.blank_html_path+"blank.html?" + hash;
+            this.ignoreManual = true;
 		}
 		else if (this.isIE) {
-			/*the iframe is unchanged*/
 			return;
 		}
 
@@ -453,7 +452,7 @@ MVC.History = {
 		this.currentLocation = hash;
 
 		this.ieAtomicLocationChange = false;
-
+        //log('fire check location')
 		/*Notify listeners of the change*/
 		this.fireHistoryEvent(hash);
 	},
@@ -510,9 +509,11 @@ MVC.History = {
 		}
 		/*Keep the browser location bar in sync with the iframe hash*/
 		window.location.hash = hash;
-
+        //log("iframe loaded")
 		/*Notify listeners of the change*/
-		//this.fireHistoryEvent(hash);
+       if(!this.ignoreManual)
+		    this.fireHistoryEvent(hash);
+        this.ignoreManual = false;
 	}
 
 };
@@ -708,7 +709,7 @@ MVC.Controller.test_dispatch = function(controller, action){
 	if(!controller) return false;
 	return MVC.Controller.get_controller_with_name_and_action(controller, action ) != null;
 };
-
+_history = 0;
 
 MVC.History.
 /**
@@ -717,7 +718,7 @@ MVC.History.
  * @param {Object} historyData
  */
 historyChange = function(newLocation, historyData) {
-
+    //log('history change '+( _history++ ))
 	var path = new MVC.Path(location.href);
 	var data = MVC.Path.get_data(path);
 	var folders = path.folder();
