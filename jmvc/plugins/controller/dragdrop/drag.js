@@ -52,7 +52,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.extend(
         //if there is a current, we should call its dragstop
         if(MVC.Draggable.current && MVC.Draggable.current.moved){
             MVC.Draggable.current.end(event);
-    		MVC.Droppables.clear();
+    		MVC.Droppable.clear();
         }
     
         MVC.Draggable.current = null;
@@ -86,7 +86,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.extend(
         var self  = this;
         drag[selector] = new MVC.Delegator(selector, 'mousedown', 
            function(event){
-                self.mousedown(element, this, event)
+                self.mousedown.call(self,element, this, event)
            }, element);
         drag[selector].callbacks = {};
         drag[selector].callbacks[this.event_type] = callback;
@@ -98,7 +98,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.extend(
 	mousedown : function(element, el, event){
        var isLeftButton = event.which == 1;
        //var jmvc= jQuery.data(this.element,"jmvc");
-       var callbacks = this.delegates().drag[this.selector()];
+       var callbacks = this.delegates().drag[this.selector()].callbacks;
 
        if(MVC.Draggable.current || !isLeftButton) return;
 	   
@@ -201,7 +201,7 @@ MVC.Draggable.prototype =
         this.drag_element.css('zIndex',1000);
         
 		//Get the list of Droppables.  
-        MVC.Droppables.compile(); 
+        MVC.Droppable.compile(event); 
     },
     /**
      * Returns the position of the drag_element by taking its top and left.
@@ -223,8 +223,7 @@ MVC.Draggable.prototype =
         
         var off = this.drag_element.offset();
         var vec = new MVC.Vector(off.left, off.top);
-        console.log(vec, this.currentDelta(), pointer )
-        
+
 		var pos = 													//Drag element's starting coords on the page if it had top=0, left=0
 				vec	//Drag element's actual coords on the page
 				.minus(this.currentDelta());						//How far Drag has moved from its starting coords
@@ -234,7 +233,7 @@ MVC.Draggable.prototype =
 				minus(pos)											//Drag element's starting coords.
 				.minus( this.mouse_position_on_element ); 			//the position relative to the container
 
-        console.log(p)
+
         /*var params = new MVC.Controller.Params.Drag(
 				{ event: event, 
 				  element: this.element, 
@@ -243,7 +242,6 @@ MVC.Draggable.prototype =
                   _position: p});*/
         this.dragmove(this.element, event, this);
         
-        console.log(p)
         if(!this._horizontal)    this.drag_element.css( "top", p.top()+"px" );
         if(!this._vertical)      this.drag_element.css("left", p.left()+ "px" );		
         
@@ -251,7 +249,7 @@ MVC.Draggable.prototype =
         
 		
 		//Tell dropables where mouse is
-		MVC.Droppables.show(pointer, this, event);  
+		MVC.Droppable.show(pointer, this, event);  
     },
 	/**
 	 * Called on drag up
@@ -260,7 +258,7 @@ MVC.Draggable.prototype =
     end : function(event){
         //Call drag end
 		//tell droppables a drop has happened
-		MVC.Droppables.fire(event, this);
+		MVC.Droppable.fire(event, this);
         
         //var drag_data = { 	element: this.element, 
 		//					event: event, 
@@ -290,6 +288,75 @@ MVC.Draggable.prototype =
     cleanup : function(){
         if(this.drag_element != this.element)
                 this.drag_element.style.display = 'none';
+    },
+    /**
+	 * Stops drag from running.
+	 */
+	cancel_drag: function() {
+        this.drag_action._cancelled = true;
+		this.drag_action.end(this.event);
+		MVC.Droppable.clear();
+		MVC.Draggable.current = null;
+    },
+    /**
+	 * Clones an element and uses it as the representitive element.
+	 * @param {Function} callback
+	 */
+    ghost: function(callback) {
+        // create a ghost by cloning the source element and attach the clone to the dom after the source element
+        var ghost = this.element.cloneNode(true);
+        MVC.Element.insert(this.element, { after: ghost });
+        
+        // store the original element and make the ghost the dragged element
+        this.drag_element = ghost;
+    },
+	/**
+	 * Use a representitive element, instead of the drag_element.
+	 * @param {HTMLElement} element the element you want to actually drag
+	 * @param {Number} offsetX the x position where you want your mouse on the object
+	 * @param {Number} offsetY the y position where you want your mouse on the object
+	 */
+    representitive : function( element, offsetX, offsetY ){
+
+        this._offsetX = offsetX || 0;
+		this._offsetY = offsetY || 0;
+		
+		var p = MVC.Event.pointer(this.event);
+        
+        this.drag_element = MVC.$E(element);
+        var s = this.drag_element.style;
+        s.top =  (p.top()-offsetY)+"px";
+        s.left =  (p.left()-offsetX)+"px";
+        s.display = '';
+		this.drag_action.mouse_position_on_element = new MVC.Vector(offsetX, offsetY)
+    },
+	/**
+	 * Makes the drag_element go back to its original position after drop.
+	 */
+    revert : function(){
+        //this.drag_action._revert = true;
+    },
+    /**
+     * Isolates the drag to vertical movement.
+     */
+    vertical : function(){
+        this.drag_action._vertical = true;
+    },
+    /**
+     * Isolates the drag to horizontal movement.
+     */
+    horizontal : function(){
+        this.drag_action._horizontal = true;
+    },
+    /**
+     * Gets or sets the new position
+     * @param {MVC.Vector} newposition
+     * @param {MVC.Vector} the position the page will be updated to
+     */
+    position: function(newposition){
+        if(newposition)
+            this._position = newposition;
+        return this._position;
     }
 }
 MVC.Draggable.selectors = {};
@@ -342,79 +409,4 @@ MVC.Draggable.current = null;
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
-//MVC.Controller.Params.Drag = MVC.Controller.Params
 
-//MVC.Controller.Params.Drag.prototype = new MVC.Controller.Params();
-//MVC.Object.extend(MVC.Controller.Params.Drag.prototype, 
-/* @prototype */
-MVC.Controller.Drag = {
-	/**
-	 * Stops drag from running.
-	 */
-	cancel_drag: function() {
-        this.drag_action._cancelled = true;
-		this.drag_action.end(this.event);
-		MVC.Droppables.clear();
-		MVC.Draggable.current = null;
-    },
-	/**
-	 * Clones an element and uses it as the representitive element.
-	 * @param {Function} callback
-	 */
-    ghost: function(callback) {
-        // create a ghost by cloning the source element and attach the clone to the dom after the source element
-        var ghost = this.element.cloneNode(true);
-        MVC.Element.insert(this.element, { after: ghost });
-        
-        // store the original element and make the ghost the dragged element
-        this.drag_element = ghost;
-    },
-	/**
-	 * Use a representitive element, instead of the drag_element.
-	 * @param {HTMLElement} element the element you want to actually drag
-	 * @param {Number} offsetX the x position where you want your mouse on the object
-	 * @param {Number} offsetY the y position where you want your mouse on the object
-	 */
-    representitive : function( element, offsetX, offsetY ){
-
-        this._offsetX = offsetX || 0;
-		this._offsetY = offsetY || 0;
-		
-		var p = MVC.Event.pointer(this.event);
-        
-        this.drag_element = MVC.$E(element);
-        var s = this.drag_element.style;
-        s.top =  (p.top()-offsetY)+"px";
-        s.left =  (p.left()-offsetX)+"px";
-        s.display = '';
-		this.drag_action.mouse_position_on_element = new MVC.Vector(offsetX, offsetY)
-    },
-	/**
-	 * Makes the drag_element go back to its original position after drop.
-	 */
-    revert : function(){
-        this.drag_action._revert = true;
-    },
-    /**
-     * Isolates the drag to vertical movement.
-     */
-    vertical : function(){
-        this.drag_action._vertical = true;
-    },
-    /**
-     * Isolates the drag to horizontal movement.
-     */
-    horizontal : function(){
-        this.drag_action._horizontal = true;
-    },
-    /**
-     * Gets or sets the new position
-     * @param {MVC.Vector} newposition
-     * @param {MVC.Vector} the position the page will be updated to
-     */
-    position: function(newposition){
-        if(newposition)
-            this._position = newposition;
-        return this._position;
-    }
-}

@@ -31,7 +31,7 @@ Drop actions are called with [MVC.Controller.Params.Drop].  Use Params.Drop to a
 include.plugins('controller/dragdrop')
 @code_end
  */
-MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
+MVC.Controller.Action.Drop = MVC.Controller.Action.extend(
 /* @static */
 {
     /**
@@ -48,16 +48,19 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
      * @param {Object} controller
      */
     init: function(action_name, callback, className, element){
-        this.action = action_name;
-        this.callback = callback;
-        this.className = className;
-        this.element = element
+        this._super(action_name, callback, className, element)
         this.css_and_event();
         var selector = this.selector();
         
+        var delegates = this.delegates();
+        if(!delegates.drops) delegates.drops = {};
+        var drops = delegates.drops;
+        
+        MVC.Droppable.addElement(element);
+        
 		// add selector to list of selectors:
-        if(! MVC.Droppables.selectors[selector]) MVC.Droppables.selectors[selector] = {};
-        MVC.Droppables.selectors[selector][this.event_type] = callback; 
+        if(! drops[selector]) drops[selector] = {};
+        drops[selector][this.event_type] = callback; 
     }
 });
 /**
@@ -90,51 +93,47 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
-//MVC.Controller.Params.Drop = MVC.Controller.Params
 
-//MVC.Controller.Params.Drop.prototype = new MVC.Controller.Params();
-//.Object.extend(MVC.Controller.Params.Drop.prototype, 
-/* @prototype */
-MVC.Controller.Drop ={
-    /**
-     * Caches positions of draggable elements.  This should be called in dropadd.  For example:
-     * @code_start
-     * dropadd : function(params){ params.cache_position() }
-     * @code_end
-     */
-	cache_position: function(value){
-        this._cache = value != null ? value : true;
-    },
-	/**
-	 * cancels this drop
-	 */
-    cancel : function(){
-        this._cancel = true;
-    }
-}
+
 /**
- * @class MVC.Droppables
+ * @class MVC.Droppable
  * @hide
  * A collection of all the drop elements.
  */
-MVC.Droppables = 
-/* @static */
+MVC.Class.extend('MVC.Droppable',
+/* @Class */
 {
-	drops: [],
-	selectors: {},
+    drops: [],
+	_elements: [],
+    addElement : function(el){
+        //check other elements
+        for(var i =0; i < this._elements.length ; i++  ){
+            if(el ==this._elements[i]) return;
+        }
+        this._elements.push(el);
+    },
+    removeElement : function(el){
+         for(var i =0; i < this._elements.length ; i++  ){
+            if(el == this._elements[i]){
+                this._elements.splice(i,1)
+                return;
+            }
+        }
+    },
 	/**
 	 * Creates a new droppable and adds it to the list.
 	 * @param {Object} element
-	 * @param {Object} functions - callback functions for drop events
+	 * @param {Object} callbacks - callback functions for drop events
 	 */
-	add: function(element, functions) {
-		element = MVC.$E(element);
+	add: function(element, callbacks, event) {
+		element = jQuery(element);
+        
+		var droppable = new MVC.Droppable(callbacks, element);
 		
-		functions.element = element;
-		var droppable = new MVC.Controller.Params.Drop(functions);
-		if(droppable.dropadd) droppable.dropadd(droppable);
-		if(!droppable._canceled){
-		    MVC.Element.make_positioned(element);
+        if(droppable.dropadd) droppable.dropadd(element, event, droppable);
+		
+        if(!droppable._canceled){
+		    element.makePositioned();
 		    this.drops.push(droppable);
 		}
 	    
@@ -147,11 +146,12 @@ MVC.Droppables =
 	*/
 	findDeepestChild: function(drops) {
 		//return right away if there are no drops
-		if(drops.length == 0) return null;
+		
+        if(drops.length == 0) return null;
 		var deepest = drops[0];
-		  
+
 		for (i = 1; i < drops.length; ++i)
-		  if (MVC.Element.has(drops[i].element, deepest.element))
+		  if (drops[i].element.compare( deepest.element) & 16 )
 		    deepest = drops[i];
 		
 		return deepest;
@@ -163,9 +163,8 @@ MVC.Droppables =
 	 * @param {Object} drop
 	 */
 	isAffected: function(point, element, drop) {
-		return (
-		  (drop.element!=element) && 
-		  MVC.Position.withinIncludingScrolloffsets(drop.element, point[0], point[1], drop ) ) ;
+        return (
+		  (drop.element!=element) && drop.element.within(point[0], point[1], drop).length == 1 ) ;
 	},
 	/**
 	 * Calls dropout and sets last active to null
@@ -175,7 +174,7 @@ MVC.Droppables =
 	 */
 	deactivate: function(drop, drag, event) {
 		this.last_active = null;
-		if(drop.dropout) drop.dropout( {element: drop.element, drag: drag, event: event });
+		if(drop.dropout) drop.dropout(drop.element, event, drop, drag);
 	}, 
 	/**
 	 * Calls dropover
@@ -184,11 +183,11 @@ MVC.Droppables =
 	 * @param {Object} event
 	 */
 	activate: function(drop, drag, event) { //this is where we should call over
-		this.last_active = drop;
-		if(drop.dropover) drop.dropover( {element: drop.element, drag: drag, event: event });
+        this.last_active = drop;
+        if(drop.dropover) drop.dropover( drop.element, event, drop, drag);
 	},
     dropmove : function(drop, drag, event){
-        if(drop.dropmove) drop.dropmove( {element: drop.element, drag: drag, event: event });
+        if(drop.dropmove) drop.dropmove( drop.element, event, drop, drag);
     },
 	/**
 	* Gives a point, the object being dragged, and the latest mousemove event.
@@ -205,11 +204,11 @@ MVC.Droppables =
 		var drop, affected = [];
 		
 		for(var d =0 ; d < this.drops.length; d++ ){
-		    if(MVC.Droppables.isAffected(point, element, this.drops[d])) 
+		    if(MVC.Droppable.isAffected(point, element, this.drops[d])) 
 				affected.push(this.drops[d]);   
 		}
 
-		drop = MVC.Droppables.findDeepestChild(affected);
+		drop = MVC.Droppable.findDeepestChild(affected);
 		
         
 		//if we've activated something, but it is not this drop, deactivate (dropout)
@@ -231,9 +230,8 @@ MVC.Droppables =
 	 */
 	fire: function(event, drag) {
 		if(!this.last_active) return;
-		MVC.Position.prepare();
-		
-		if( this.isAffected(MVC.Event.pointer(event), drag.drag_element, this.last_active) && //last is still activated
+        var pointer = new MVC.Vector(event.pageX, event.pageY);
+		if( this.isAffected(pointer, drag.drag_element, this.last_active) && //last is still activated
 			this.last_active.dropped	){ 											//drop was ok
 			
             this.last_active.dropped({drag: drag, event: event, element: this.last_active.element}); 
@@ -244,14 +242,17 @@ MVC.Droppables =
 	* Called when the user first starts to drag.  Uses query to get
 	* all possible droppable elements and adds them.
 	*/
-	compile : function(){
-	  var elements = [];
-	  for(var selector in MVC.Droppables.selectors){
-	      var sels = MVC.Query(selector)
-	      for(var e= 0; e < sels.length; e++){
-	          MVC.Droppables.add(sels[e], MVC.Droppables.selectors[selector])
-	      }
+	compile : function(event){
+      for(var i=0; i < MVC.Droppable._elements.length; i++){
+          var drops = jQuery.data(MVC.Droppable._elements[i], "delegates").drops;
+          for(var selector in drops){
+    	      var sels = jQuery(selector)
+    	      for(var e= 0; e < sels.length; e++){
+    	          MVC.Droppable.add(sels[e], drops[selector], event)
+    	      }
+    	  }
 	  }
+
 	},
 	/**
 	* Called after dragging has stopped.
@@ -259,4 +260,29 @@ MVC.Droppables =
 	clear : function(){
 	  this.drops = [];
 	}
-};
+},
+/* @Prototype */
+{
+    init : function(callbacks, element){
+        MVC.Object.extend(this,callbacks);
+        this.element = element;
+    },
+    
+    /**
+     * Caches positions of draggable elements.  This should be called in dropadd.  For example:
+     * @code_start
+     * dropadd : function(params){ params.cache_position() }
+     * @code_end
+     */
+	cache_position: function(value){
+        this._cache = value != null ? value : true;
+    },
+	/**
+	 * cancels this drop
+	 */
+    cancel : function(){
+        this._cancel = true;
+    }
+})
+
+

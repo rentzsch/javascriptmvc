@@ -13,8 +13,10 @@ $().delegate("#two","click",function(e){
 })*/
 
 
-MVC.Controller.extend("Controllers.Main", {
+MVC.Controller.extend("Controllers.Tests", {
     "a click" : function(element, event){
-        console.log(element, event)
+        var i = 0;
+        var el = element.controllerParent();
+        var b = 1;
     }
 })
