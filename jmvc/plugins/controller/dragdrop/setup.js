@@ -1,2 +1,2 @@
-include.plugins('controller','dom/element','dom/query','dom/position','dom/animate','dom/offset')
+include.plugins('controller','dom','dom/position')
 include('drag','drop')

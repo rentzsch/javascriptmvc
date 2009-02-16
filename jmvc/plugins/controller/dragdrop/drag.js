@@ -2,7 +2,7 @@
  * Adds drag functionality to controller actions with the following events:
 <ul>
     <li><b>dragstart</b> - called when a drag is first moved.</li>
-    <li><b>dragging</b> -  called everytime the drag moves</li>
+    <li><b>dragmove</b> -  called everytime the drag moves</li>
     <li><b>dragend</b> - called when someone releases a dragable object (mouseup)</li>
 </ul>
  * Drags actions are called with [MVC.Controller.Params.Drag].  Use the drag params to change the behavior
@@ -21,7 +21,7 @@ TasksController = MVC.Controller.extend('tasks',{
       params.representitive(MVC.$E('dragitem'), 15, 15);
       params.revert();
   },
-  ".handle dragging" : function(params){
+  ".handle dragmove" : function(params){
   
   },
   ".handle dragend" : function(params){
@@ -30,25 +30,25 @@ TasksController = MVC.Controller.extend('tasks',{
 }
 @code_end
  */
-MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
+MVC.Controller.Action.Drag = MVC.Controller.Action.extend(
 /* @static */
 {
     /**
-     * Matches "(.*?)\\s?(dragstart|dragend|dragging)$"
+     * Matches "(.*?)\\s?(dragstart|dragend|dragmove)$"
      */
-    match: new RegExp("(.*?)\\s?(dragstart|dragend|dragging)$"),
+    match: new RegExp("(.*?)\\s?(dragstart|dragend|dragmove)$"),
     mousemove : function(event){
         if(!MVC.Draggable.current ) return;  //do nothing if nothing is being dragged.
         var current = MVC.Draggable.current;
-        var pointer = MVC.Event.pointer(event);
+        
+        var pointer = new MVC.Vector(event.pageX, event.pageY);
         if(current._start_position && current._start_position.equals(pointer)) return;
-        MVC.Delegator.add_kill_event(event);
-        event.kill();
+
+        event.preventDefault();
         MVC.Draggable.current.draw(pointer, event); //update draw
         return false;
     },
     mouseup : function(event){
-        MVC.Delegator.add_kill_event(event);
         //if there is a current, we should call its dragstop
         if(MVC.Draggable.current && MVC.Draggable.current.moved){
             MVC.Draggable.current.end(event);
@@ -56,8 +56,8 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
         }
     
         MVC.Draggable.current = null;
-        MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
-        MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
+        jQuery(document).unbind('mousemove', MVC.Controller.Action.Drag.mousemove);
+        jQuery(document).unbind('mouseup', MVC.Controller.Action.Drag.mouseup);
     }
 },
 /* @prototype */
@@ -70,25 +70,24 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
      * @param {MVC.Controller} controller the controller this action belongs to
      */
     init: function(action_name, callback, className, element){
-		//can't use init, so set default members
-        this.action = action_name;
-        this.callback = callback;
-        this.className = className;
-        this.element = element
+		this._super(action_name, callback, className, element)
         this.css_and_event();
         var selector = this.selector();
-		var jmvc = MVC.Delegator.jmvc(this.element)
-        if(!jmvc.custom) jmvc.custom = {};
-        if(!jmvc.custom.drag) jmvc.custom.drag = {};
-        var drag = jmvc.custom.drag;
+        var delegates = this.delegates();
+        if(!delegates.drag) delegates.drag = {};
+        var drag = delegates.drag;
+
         //If the selector has already been added, just add this action to its list of possible action callbacks
 		if(drag[selector]) {
             drag[selector].callbacks[this.event_type] = callback;
             return;
         }
 		//create a new mousedown event for selectors that match our mouse event
-        drag[selector] = 
-			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this, element), element);
+        var self  = this;
+        drag[selector] = new MVC.Delegator(selector, 'mousedown', 
+           function(event){
+                self.mousedown(element, this, event)
+           }, element);
         drag[selector].callbacks = {};
         drag[selector].callbacks[this.event_type] = callback;
     },
@@ -96,17 +95,18 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
 	 * Called when someone mouses down on a draggable object.
 	 * Gathers all callback functions and creates a new Draggable.
 	 */
-	mousedown : function(element, params){
-       var isLeftButton = params.event.which == 1;
-       var jmvc= MVC.Delegator.jmvc(element);
-       if(jmvc.responding == false || !isLeftButton) return;
-       var drag = jmvc.custom.drag
-       MVC.Object.extend(params, drag[this.selector()].callbacks)
-       if(MVC.Draggable.current) return;
-	   MVC.Draggable.current = new MVC.Draggable(params);
-       params.event.prevent_default();
-       MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
-       MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
+	mousedown : function(element, el, event){
+       var isLeftButton = event.which == 1;
+       //var jmvc= jQuery.data(this.element,"jmvc");
+       var callbacks = this.delegates().drag[this.selector()];
+
+       if(MVC.Draggable.current || !isLeftButton) return;
+	   
+  
+       MVC.Draggable.current = new MVC.Draggable(callbacks, el, event);
+       event.preventDefault();
+       jQuery(document).bind('mousemove', MVC.Controller.Action.Drag.mousemove);
+       jQuery(document).bind('mouseup', MVC.Controller.Action.Drag.mouseup);
 	   return false;
 	}
 });
@@ -124,23 +124,25 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
  * dragging at that point.
  * @init
  * Takes a mousedown even params
- * @param {MVC.Controller.Params} params a mousedown event, the element it is on, and dragstart, dragend, and dragging
+ * @param {MVC.Controller.Params} params a mousedown event, the element it is on, and dragstart, dragend, and dragmove
  */
-MVC.Draggable = function(params){
-    this.element = params.element; 		//the element that has been clicked on
+MVC.Draggable = function(callbacks, element, event){
+    this.element = jQuery(element); 		//the element that has been clicked on
     this.moved = false;					//if a mousemove has come after the click
     this._cancelled = false;			//if the drag has been cancelled
-	this._start_position =              //starting position, used to make sure a move happens
-        MVC.Event.pointer(params.event)
+	
+    this._start_position = new MVC.Vector(event.pageX, event.pageY)
+    //this._start_position =              //starting position, used to make sure a move happens
+    //    MVC.Event.pointer(params.event)
 	//used to know where to position element relative to the mouse.
-	this.mouse_position_on_element = 
-		MVC.Event.pointer(params.event).
-			minus( MVC.Element.offset(params.element) );
+	var off = this.element.offset();
+    var vec = new MVC.Vector(off.left, off.top);
+    this.mouse_position_on_element = this._start_position.minus( vec );
 	
 	//Add default functions to be called.
-    this.dragstart = params.dragstart || MVC.Draggable.k;
-    this.dragend = params.dragend || MVC.Draggable.k;
-    this.dragging = params.dragging || MVC.Draggable.k;
+    this.dragstart = callbacks.dragstart || MVC.K;
+    this.dragend = callbacks.dragend || MVC.K;
+    this.dragmove = callbacks.dragmove || MVC.K;
 };
 /* @static */
 MVC.Draggable.
@@ -151,7 +153,7 @@ MVC.Draggable.prototype =
 /* @prototype */
 {
     /**
-     * Called the first time we start dragging.
+     * Called the first time we start dragmove.
      * This will call drag start with MVC.Controller.Params.Drag
      * @param {Object} event
      */
@@ -161,22 +163,28 @@ MVC.Draggable.prototype =
         this.drag_element = this.element;	//drag_element is what people should use to referrer to 
         									//what has been dragged
 		
+        
+        
 		//Call the Controller's drag start if they have one.
-		var params = new MVC.Controller.Params.Drag({
+		/*var params = new MVC.Controller.Params.Drag({
             event: event,
             element: this.element,
             drag_element: this.drag_element,
             drag_action: this
-        });
-        this.dragstart(params);
+        });*/
+        this.dragstart(this.element, event, this  );
         
 		//Check what they have set and respond accordingly
         if(this._cancelled == true) return;
         
-        this.drag_element = params.drag_element;  //if they have set the drag element, update it
+        //this.drag_element = params.drag_element;  //if they have set the drag element, update it
         
-		//style the drag element for dragging
-        MVC.Element.make_positioned(this.drag_element);
+		//style the drag element for dragmove
+        //MVC.Element.make_positioned(this.drag_element);
+        
+        
+        this.drag_element.makePositioned();
+        
         //if it is something else (absolutely positioned on the page)
         //this should probably get it's offset minus its left top
         if(this.drag_element != this.element){
@@ -190,7 +198,7 @@ MVC.Draggable.prototype =
         else
             this.start_position = this.currentDelta(); //if it is us
             
-        this.drag_element.style.zIndex = 1000;
+        this.drag_element.css('zIndex',1000);
         
 		//Get the list of Droppables.  
         MVC.Droppables.compile(); 
@@ -200,10 +208,10 @@ MVC.Draggable.prototype =
      * @return {Vector}
      */
     currentDelta: function() {
-        return new MVC.Vector( parseInt(MVC.Element.get_style(this.drag_element,'left') || '0'), 
-                            parseInt(MVC.Element.get_style(this.drag_element,'top') || '0'))   ;
+        return new MVC.Vector( parseInt( this.element.css('left') ) || 0 , 
+                            parseInt( this.element.css('top') )  || 0 )  ;
     },
-    //draws the position of the dragging object
+    //draws the position of the dragmove object
     draw: function(pointer, event){
         //on first move, call start
 		if (!this.moved) this.start(event) 
@@ -211,13 +219,14 @@ MVC.Draggable.prototype =
 		// only drag if we haven't been cancelled;
 		if(this._cancelled) return;
 		
-		//Adjust for scrolling
-        MVC.Position.prepare();
-		
 		//Calculate where we should move the drag element to
-
+        
+        var off = this.drag_element.offset();
+        var vec = new MVC.Vector(off.left, off.top);
+        console.log(vec, this.currentDelta(), pointer )
+        
 		var pos = 													//Drag element's starting coords on the page if it had top=0, left=0
-				MVC.Element.offset(this.drag_element)	//Drag element's actual coords on the page
+				vec	//Drag element's actual coords on the page
 				.minus(this.currentDelta());						//How far Drag has moved from its starting coords
         
         var p = 													//Drag element's Top/Left that will move the element to be under the mouse in the right spot
@@ -225,21 +234,20 @@ MVC.Draggable.prototype =
 				minus(pos)											//Drag element's starting coords.
 				.minus( this.mouse_position_on_element ); 			//the position relative to the container
 
-        var s = this.drag_element.style;
-        
-        var params = new MVC.Controller.Params.Drag(
+        console.log(p)
+        /*var params = new MVC.Controller.Params.Drag(
 				{ event: event, 
 				  element: this.element, 
 				  drag_action: this, 
 				  drag_element: this.drag_element,
-                  _position: p});
-        this.dragging(params);
+                  _position: p});*/
+        this.dragmove(this.element, event, this);
         
+        console.log(p)
+        if(!this._horizontal)    this.drag_element.css( "top", p.top()+"px" );
+        if(!this._vertical)      this.drag_element.css("left", p.left()+ "px" );		
         
-        if(!this._horizontal)    s.top  =  params._position.top()+"px";
-        if(!this._vertical)      s.left =  params._position.left()+"px";		
-        
-		//Call back to dragging
+		//Call back to dragmove
         
 		
 		//Tell dropables where mouse is
@@ -254,14 +262,14 @@ MVC.Draggable.prototype =
 		//tell droppables a drop has happened
 		MVC.Droppables.fire(event, this);
         
-        var drag_data = { 	element: this.element, 
-							event: event, 
-							drag_element: this.drag_element, 
-							drag_action: this };
-        this.dragend(new MVC.Controller.Params.Drag(drag_data));
+        //var drag_data = { 	element: this.element, 
+		//					event: event, 
+		//					drag_element: this.drag_element, 
+		//					drag_action: this };
+        this.dragend(this.element, event, this);
         
 		
-		
+		/*
 		//Handle closing animations if necessary
         if(this._revert){
             new MVC.Animate(this.drag_element, 
@@ -274,7 +282,7 @@ MVC.Draggable.prototype =
             }
             if(this.drag_element != this.element)
                 this.drag_element.style.display = 'none';
-        }
+        }*/
     },
 	/**
 	 * Cleans up drag element after drag drop.
@@ -323,7 +331,7 @@ MVC.Draggable.current = null;
     </tr>
     <tr>
         <td>event</td>
-        <td>On dragstart+dragging, this is a mousemove event. On dragend, it is a mouseup.</td>
+        <td>On dragstart+dragmove, this is a mousemove event. On dragend, it is a mouseup.</td>
     </tr>
 </table>
    <h3>Adding to drag params</h3>
@@ -334,12 +342,12 @@ MVC.Draggable.current = null;
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
-MVC.Controller.Params.Drag = MVC.Controller.Params
+//MVC.Controller.Params.Drag = MVC.Controller.Params
 
-MVC.Controller.Params.Drag.prototype = new MVC.Controller.Params();
-MVC.Object.extend(MVC.Controller.Params.Drag.prototype, 
+//MVC.Controller.Params.Drag.prototype = new MVC.Controller.Params();
+//MVC.Object.extend(MVC.Controller.Params.Drag.prototype, 
 /* @prototype */
-{
+MVC.Controller.Drag = {
 	/**
 	 * Stops drag from running.
 	 */
@@ -368,7 +376,7 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
 	 * @param {Number} offsetY the y position where you want your mouse on the object
 	 */
     representitive : function( element, offsetX, offsetY ){
-        MVC.Position.prepare();
+
         this._offsetX = offsetX || 0;
 		this._offsetY = offsetY || 0;
 		
@@ -409,4 +417,4 @@ MVC.Object.extend(MVC.Controller.Params.Drag.prototype,
             this._position = newposition;
         return this._position;
     }
-})
+}

@@ -283,6 +283,10 @@ Controller('todos',{
 MVC.Controller.Action = MVC.Class.extend(
 /* @Static */
 {
+    matches: function(action_name){
+        if(!this.match) return null;
+        return this.match.exec(action_name);
+    },
     /**
      * If the class has provided a matches function, adds this class to the list of 
      * controller actions.
@@ -305,12 +309,48 @@ MVC.Controller.Action = MVC.Class.extend(
         this.underscoreName = className;
         this.element = element;
         this.controller = controller;
+        
     },
     /**
      * Disables an action.
      */
     destroy: function(){
         
+    },
+    /*
+     * Splits the action name into its css and event parts.
+     */
+    css_and_event: function(){
+        this.parts = this.action.match(this.Class.match);
+        this.css = this.parts[1] || "";
+        this.event_type = this.parts[2];
+    },
+    selector : function(){
+        if(this.underscoreName.toLowerCase() == 'main') 
+            return this.css;
+        else{
+            if(MVC.String.is_singular(this.underscoreName)){
+                
+                if(this.element == document.documentElement)
+                    return '#'+this.underscoreName+(this.css ? ' '+this.css : '' );
+                else
+                    return this.css;
+            }else{
+                if(this.css == "#" || this.css.substring(0,2) == "# "){
+        			var newer_action_name = this.css.substring(2,this.css.length)
+                    if(this.element == document.documentElement){
+                        return '#'+this.underscoreName + (newer_action_name ?  ' '+newer_action_name : '') ;
+                    }else{
+                        return (newer_action_name ?  ' '+newer_action_name : '') ;
+                    }
+        		}else{
+    			    return '.'+MVC.String.singularize(this.underscoreName)+(this.css? ' '+this.css : '' );
+        		}
+            }
+        }
+    },
+    delegates : function(){
+        return jQuery.data(this.element, "delegates") || jQuery.data(this.element, "delegates",{});
     }
 });
 /**
@@ -329,14 +369,7 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
 /* @Static*/
 {
     
-    match: new RegExp("(.*?)\\s?(subscribe)$"),
-    /**
-     * Matches "(.*?)\\s?(subscribe)$"
-     * @param {String} action_name
-     */
-    matches: function(action_name){
-        return this.match.exec(action_name);
-    }
+    match: new RegExp("(.*?)\\s?(subscribe)$")
 },
 /* @Prototype*/
 {
@@ -378,15 +411,6 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      * @param {Object} action_name
      */
     match: new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
-    /*
-     * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, 
-     * mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, 
-     * focus, blur, load, unload
-     * @return {Boolean} true if a prototype function name matches an action.
-     */
-    matches: function(action_name){
-        return this.match.exec(action_name);
-    }
 },
 /* @Prototype*/
 {    
@@ -408,14 +432,7 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
             cb.call(null,  jq, event);
         }
     },
-    /*
-     * Splits the action name into its css and event parts.
-     */
-    css_and_event: function(){
-        this.parts = this.action.match(this.Class.match);
-        this.css = this.parts[1] || "";
-        this.event_type = this.parts[2];
-    },
+    
     /*
      * Deals with main controller specific delegation (blur and focus)
      */

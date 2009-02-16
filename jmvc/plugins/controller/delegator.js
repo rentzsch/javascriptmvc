@@ -11,25 +11,7 @@ jQuery.fn.delegate = function(selector, event, callback) {
     new MVC.Delegator(selector, event, callback, this);
   });
 };
-
-
-MVC.Delegator = function(selector, event, f, element){
-    this._event = event;
-    this._selector = selector
-    this._func = f;
-    this.element = element || document.documentElement;
-    if(! jQuery.data(this.element, "delegates") )
-        jQuery.data(this.element, "delegates",{})
-    if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
-    if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
-	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
-	if(event == 'change' && MVC.Browser.WebKit) return this.change_for_webkit();
-	
-    this.add_to_delegator();
-};
-
-MVC.Object.extend(MVC.Delegator,
-/* @Static*/
+MVC.Class.extend('MVC.Delegator',
 {
     /**
      * Adds kill() on an event.
@@ -67,12 +49,25 @@ MVC.Object.extend(MVC.Delegator,
      */
     events: {},
     onload_called : false
-})
-$(window).load(function(){
-  MVC.Delegator.onload = true;
-})
-/* @Prototype*/
-MVC.Delegator.prototype = {
+},
+{
+    init : function(selector, event, f, element){
+        this._event = event;
+        this._selector = selector
+        this._func = f;
+        this.element = element || document.documentElement;
+        if(! jQuery.data(this.element, "delegates") ) jQuery.data(this.element, "delegates",{})
+        
+        //check if custom
+
+        
+        if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
+        if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
+    	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
+    	if(event == 'change' && MVC.Browser.WebKit) return this.change_for_webkit();
+    	
+        this.add_to_delegator();
+    },
     /*
      * returns the event that should actually be used.  In practice, this is just used to switch focus/blur
      * to activate/deactivate for ie.
@@ -362,4 +357,4 @@ MVC.Delegator.prototype = {
         //}
         this._remove_from_delegator()
     }
-};
+})

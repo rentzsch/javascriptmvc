@@ -90,12 +90,12 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
-MVC.Controller.Params.Drop = MVC.Controller.Params
+//MVC.Controller.Params.Drop = MVC.Controller.Params
 
-MVC.Controller.Params.Drop.prototype = new MVC.Controller.Params();
-MVC.Object.extend(MVC.Controller.Params.Drop.prototype, 
+//MVC.Controller.Params.Drop.prototype = new MVC.Controller.Params();
+//.Object.extend(MVC.Controller.Params.Drop.prototype, 
 /* @prototype */
-{
+MVC.Controller.Drop ={
     /**
      * Caches positions of draggable elements.  This should be called in dropadd.  For example:
      * @code_start
@@ -111,7 +111,7 @@ MVC.Object.extend(MVC.Controller.Params.Drop.prototype,
     cancel : function(){
         this._cancel = true;
     }
-})
+}
 /**
  * @class MVC.Droppables
  * @hide
