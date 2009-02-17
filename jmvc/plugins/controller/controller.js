@@ -496,7 +496,7 @@ MVC.Controller.extend('todos', {
    },
    mouseout : function(params){
       <span class="magic">params</span>.element.style.backgroundColor = '';
-      <span class="magic">params</span>.event.stop();
+      <span class="magic">params</span>.event.kill();
    },
    "img click" : function(params){
    	  <span class="magic">params</span>.class_element().parentNode.removeSibiling(params.class_element());
