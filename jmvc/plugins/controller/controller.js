@@ -203,6 +203,7 @@ MVC.Controller = MVC.Class.extend(
         OpenAjax.hub.publish(message, params);
     },
     get_controller_with_name_and_action: function(controller_name, action) {
+        if(!controller_name || !action) return null;
         var controllers = MVC.Controller.controllers[controller_name];
         if(!controllers) return null;
 		for(var i = 0; i < controllers.length; i++) {

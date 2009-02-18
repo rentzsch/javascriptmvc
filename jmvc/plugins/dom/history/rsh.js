@@ -722,8 +722,9 @@ historyChange = function(newLocation, historyData) {
 	var path = new MVC.Path(location.href);
 	var data = MVC.Path.get_data(path);
 	var folders = path.folder();
-	var action_part = null, controller_part;
-	if(!folders){folders = 'index'};
+	var action_part = null, controller_part, result;
+	
+    if(!folders){folders = 'index'};
 	
 	var first_s = folders.indexOf('/');
 	
@@ -735,13 +736,8 @@ historyChange = function(newLocation, historyData) {
 	}else if( MVC.Controller.test_dispatch('main',folders) ){
 		controller_part = 'main';
 		action_part = folders;
-	}else{
-		if(MVC.History.throwErrors)
-            throw "Can't dispatch location "+folders;
-        return;
 	}
 	var controller = MVC.Controller.get_controller_with_name_and_action(controller_part, action_part )
-	var result = null;
 	if(!controller){
 		if(MVC.History.throwErrors)
             throw "Can't dispatch location "+folders;
