@@ -17,7 +17,7 @@ prompt = function(question){
 prompt.yesno = function(question){
     var response = "";
     while(! response.match(/^\s*[yn]\s*$/i)){
-        response = prompt("Install dependancy "+plug_name+"? (yN):")
+        response = prompt(question)
     }
     return response.match(/[yn]/i)[0].toLowerCase() == "y";
 }
