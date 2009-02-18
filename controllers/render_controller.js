@@ -1,15 +1,15 @@
 RenderController = MVC.Controller.extend('render',{
 	"render_to subscribe" : function(params){
 		this.data = 'HelloWorld'
-		this.render({to: 'render_here'});
+		this.render({to: 'testarea'});
 	},
 	to_element : function(params){
 		this.data = 'HelloWorld'
-		this.render({to: document.getElementById('render_here')});
+		this.render({to: document.getElementById('testarea')});
 	},
 	after : function(params){
 		this.data = 'HelloWorld'
-		this.render({after: 'render_here'});
+		this.render({after: 'testarea'});
 	},
     click : function(){
         RENDER_CONTROLLER_CLICKED = true
@@ -22,6 +22,9 @@ RenderController = MVC.Controller.extend('render',{
     },
     "#id click" : function(){
         RENDER_ID_CLICKED = true
+    },
+    render_partial : function(){
+        this.render({to: 'testarea', action: "outer"});
     }
 });
 ThingsController = MVC.Controller.extend('things',{

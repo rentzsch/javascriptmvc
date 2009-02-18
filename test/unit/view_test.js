@@ -9,5 +9,8 @@ new MVC.Test.Unit('view',{
     test_nested : function(){
         secondTemplate = new MVC.View({url: 'views/second'});
         this.assert_equal('<div><p>1</p>2</div>', new MVC.View({url: 'views/first'}).render({x: 1, y: 2})  )
+    },
+    test_partials : function(){
+        this.assert_equal('<h1>HelloWorld</h1>', new MVC.View({url: 'views/outer'}).render()  );
     }
 })
