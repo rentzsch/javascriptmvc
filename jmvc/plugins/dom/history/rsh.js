@@ -748,7 +748,7 @@ historyChange = function(newLocation, historyData) {
 	}else{
 		result = controller.dispatch(action_part,params);
 	}
-    OpenAjax.hub.publish("history."+folders.replace(/\//g,"_"), params );
+    OpenAjax.hub.publish("history."+folders.replace(/\//,"."), params );
 	return result;
 };
 
