@@ -34,7 +34,7 @@ MVC.Controller.prototype.
 						<td>null</td>
 						<td>A string value that looks like: 'folder/template' or 'template'.  If a folder is present,
 						    it looks for a template in app/views/<i>folder</i>/_<i>template</i>.ejs; otherwise,
-							it looks for a template in app/views/<i>controller_name</i>/_<i>template</i>.ejs.
+							it looks for a template in app/views/<i>controller_name</i>/<i>template</i>.ejs.
 						</td>
 					</tr>
 					<tr>
