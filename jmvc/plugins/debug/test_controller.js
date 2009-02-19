@@ -76,7 +76,7 @@ opener.OpenAjax.hub.subscribe("jmvc.test.created", function(called, test){
 		'<td class="result">&nbsp;</td></tr>'
 	}
 	txt+= "</tbody></table></div>";
-	if(this.added_helpers){
+	if(test.added_helpers){
 		txt+= "<div class='helpers'>Helpers: "
 		var helpers = [];
 		for(var h in test.added_helpers)
