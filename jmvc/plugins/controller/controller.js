@@ -425,6 +425,7 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
             MVC.Event.observe(window, this.event_type, MVC.Function.bind(function(event){
                 this.callback({event: event, element: window})
             }, this))
+            this.css_selector = "";
             return;
         }
         return this.css;
@@ -468,6 +469,7 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
             MVC.Event.observe(window, this.event_type, MVC.Function.bind(function(event){
                 this.callback({event: event, element: window})
             }, this));
+            this.css_selector = "";
             return;
         }
         //if(!this.className){
