@@ -44,7 +44,10 @@ new MVC.Test.Functional('TestCaseName',{
 			if(typeof options == 'number') 		 number = options || 0;
 			else if (typeof options == 'object') number = options.number || 0;
 			
-			var element = typeof selector == 'string' ? MVC.Query(selector)[number] : selector; //if not a selector assume element
+			var element = typeof selector == 'string' ? 
+                selector == "" ? document.documentElement : MVC.Query(selector)[number] 
+                : 
+                selector; //if not a selector assume element
 			
 			if((event_type == 'focus' || event_type == 'write' || event_type == 'click') && !this._do_blur_back){
 				MVC.Browser.Gecko ? MVC.Console.window.blur() : window.focus();
