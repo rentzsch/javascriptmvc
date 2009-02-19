@@ -19,7 +19,7 @@ MVC.Test.Controller = MVC.Test.Functional.extend({
 		for(var action_name in actions){
 			if(!actions.hasOwnProperty(action_name) || 
 				!actions[action_name].event_type || 
-				actions[action_name].css_selector != null) 
+				actions[action_name].css_selector == null) 
 					continue;
 			var event_type = actions[action_name].event_type;
 			var cleaned_name = actions[action_name].css_selector.replace(/\.|#/g, '')+' '+event_type;
