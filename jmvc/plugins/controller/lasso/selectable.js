@@ -131,7 +131,7 @@ MVC.Selectables = {
 		var selectable = new MVC.Selectable(functions);
 		if(selectable.selectadd) selectable.selectadd(selectable);
 		if(!selectable._canceled){
-		    MVC.Element.make_positioned(element);
+		    //MVC.Element.make_positioned(element);
 		    this.selectables.push(selectable);
 		}
 	    

@@ -138,7 +138,7 @@ MVC.Droppables = MVC.Class.extend('drop',
 		var droppable = callbacks; //new MVC.Controller.Params.Drop(callbacks);
 		if(droppable.dropadd) droppable.dropadd(droppable);
 		if(!droppable._canceled){
-		    MVC.Element.make_positioned(element);
+		    //MVC.Element.make_positioned(element);
 		    this.drops.push(droppable);
 		}
 	},
