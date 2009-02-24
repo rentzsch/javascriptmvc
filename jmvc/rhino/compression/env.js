@@ -83,6 +83,9 @@ var self = window;
             get domain(){
                 return curLocation.getHost();
             },
+            get host(){
+                return curLocation.getHost();
+            },
 			toString: function(){
 				return this.href;
 			},
