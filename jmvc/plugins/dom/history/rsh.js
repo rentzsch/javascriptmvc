@@ -409,7 +409,8 @@ MVC.History = {
 		//extract the value from our history storage for this hash
 		var historyData = historyStorage.get(newHash);
 		//call our listener
-		this.listener.call(null, newHash, historyData);
+		if(this.listener)
+			this.listener.call(null, newHash, historyData);
 	},
 	
 	/*Private: See if the browser has changed location. This is the primary history mechanism for Firefox. For IE, we use this to
