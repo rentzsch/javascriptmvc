@@ -85,7 +85,6 @@ MVC.JsonP.prototype = {
     },
     _remove_scripts : function(){
         var scripts = document.getElementsByTagName('script');
-        var search = new RegExp(this.url);
         for(var s = 0; s < scripts.length; s++){
             var script = scripts[s];
             if(MVC.String.include( script.src.toLowerCase() ,this.url.toLowerCase())) script.parentNode.removeChild(script);
