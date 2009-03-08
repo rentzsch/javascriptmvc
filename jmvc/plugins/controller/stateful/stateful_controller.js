@@ -86,6 +86,11 @@ MVC.Controller.Stateful = MVC.Controller.extend(
                 }
             }
         }
+		//remove children
+		for (var i = 0; i < this._children.length; i++) {
+			if(!this._children[i]._destroyed)
+				this._children[i].destroy();
+		}
         //remove if we've been added to the parent
         if(this._parent){
             this._parent.remove(this);
@@ -93,6 +98,8 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         if(this.element && this.element.parentNode)
             this.element.parentNode.removeChild(this.element);
         this._destroyed = true;
+		//clear element
+		this.element = null;
     },
     /**
      * Used to call back to this instance
