@@ -1,0 +1,96 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="../../jmvc/rhino/documentation/style.css" type="text/css" />
+        <title><%= this.name%></title>
+		<style>
+			/* Style for changes */
+			#header, #footer {
+				background:#324B13 url(http://javascriptmvc.com/images/header_background.png) repeat-x scroll center top;
+				border-bottom:1px solid #A1A6B1;
+				height:40px;
+				position:relative;
+				z-index:1;
+			}
+			#jmvc {
+				color:white;
+				left:20px;
+				position:relative;
+				text-decoration:none;
+				top:10px;
+			}
+			#header ul, #footer ul {
+				border-left:1px solid #6E8F2E;
+				border-right:1px solid #2E3B13;
+				list-style-image:none;
+				list-style-position:outside;
+				list-style-type:none;
+				margin:0;
+				padding:0;
+				position:absolute;
+				right:20px;
+				top:0;
+			}
+			#header li, #footer li {
+				display:block;
+				float:left;
+				margin:0;
+				padding:0;
+			}
+			
+			#header ul, #footer ul {
+				list-style-image:none;
+				list-style-position:outside;
+				list-style-type:none;
+			}
+			#header a:hover, #footer a:hover {
+				text-decoration:underline;
+			}
+			#header ul a, #footer ul a {
+				border-left:1px solid #2E3B13;
+				border-right:1px solid #6E8F2E;
+				color:white;
+				display:block;
+				float:left;
+				font-family:verdana;
+				font-size:10pt;
+				height:16px;
+				padding:12px 10px 9pt;
+				text-decoration:none;
+			}
+			#left_side {
+				margin-top:20px;
+			}
+			#left_side h3 {
+				font-size:20px;
+				line-height:60px;
+				margin:0 0 10px 20px;
+			}
+		</style>
+    </head>
+    <body>
+    	<div id="header"><a href="../../index.html" id="jmvc">JavaScriptMVC</a>
+		<ul>
+			<li><a href="http://javascriptmvc.com/wiki/index.php?title=Downloads">Download</a></li>
+			<li><a href="/wiki/">Learning Center</a></li>
+			<li><a href="http://javascriptmvc.com/wiki/index.php?title=Contribute">Contribute</a></li>
+			<li><a href="http://groups.google.com/group/javascriptmvc">Discuss</a></li>
+			<li><a href="http://javascriptmvc.com/blog/">Blog</a></li>
+			<li><a href="http://javascriptmvc.googlecode.com/">Google Code</a></li>
+		</ul>
+		</div>
+        <div id='left_side'><%= summary %></div>
+        <div id='right_side'><%= this.toHTML() %></div>
+        <script type="text/javascript" src="../../jmvc/rhino/documentation/highlight/highlight.js"></script>
+        <script type="text/javascript">
+          hljs.initHighlightingOnLoad('html', 'css','javascript');
+        </script>
+        <script type="text/javascript">
+            //select someone
+            parts = window.location.href.split("/")
+            var selected = document.getElementById(parts.pop().replace(/[#|?].*/,""))
+            if(selected){
+                selected.className = "selected";
+            }
+        </script>
+    </body>
+</html>
