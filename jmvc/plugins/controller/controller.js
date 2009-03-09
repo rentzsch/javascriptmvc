@@ -422,9 +422,11 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     main_controller: function(){
 	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, MVC.Function.bind(function(event){
+            this.bound_event = MVC.Function.bind(function(event){
                 this.callback({event: event, element: window})
-            }, this))
+            }, this)
+			
+			MVC.Event.observe(window, this.event_type, MVC.Function.bind(this.bound_event) );
             this.css_selector = "";
             return;
         }
@@ -466,9 +468,10 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
      */
     selector : function(){
         if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
-            MVC.Event.observe(window, this.event_type, MVC.Function.bind(function(event){
+            this.bound_event = MVC.Function.bind(function(event){
                 this.callback({event: event, element: window})
-            }, this));
+            }, this)
+			MVC.Event.observe(window, this.event_type, this.bound_event);
             this.css_selector = "";
             return;
         }
@@ -484,6 +487,7 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
     },
     destroy : function(){
         if(this.delegator) this.delegator.destroy();
+		if(this.bound_event) MVC.Event.stop_observing(window, this.event_type, this.bound_event);
         this._super();
     }
 });
