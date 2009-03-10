@@ -87,7 +87,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
             return;
         }
 		//create a new mousedown event for selectors that match our mouse event
-        drag[selector] = 
+        this.delegator =drag[selector] = 
 			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this, element), element);
         drag[selector].callbacks = {};
         drag[selector].callbacks[this.event_type] = callback;

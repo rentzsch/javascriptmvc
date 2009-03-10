@@ -54,11 +54,17 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
         this.element = element
         this.css_and_event();
         var selector = this.selector();
-        
+        var jmvc = MVC.Delegator.jmvc(this.element)
+		if(!jmvc.delegation_events.drops) jmvc.delegation_events.drops = {};
 		// add selector to list of selectors:
-        if(! MVC.Droppables.selectors[selector]) MVC.Droppables.selectors[selector] = {};
-        MVC.Droppables.selectors[selector][this.event_type] = callback; 
-    }
+        if(! jmvc.delegation_events.drops[selector]) jmvc.delegation_events.drops[selector] = {};
+        jmvc.delegation_events.drops[selector][this.event_type] = callback; 
+		MVC.Droppables.add_element(element);
+    },
+	destroy : function(){
+		MVC.Droppables.remove_element(this.element);
+		this._super();
+	}
 });
 /**
  * @constructor MVC.Controller.Params.Drop
@@ -126,6 +132,22 @@ MVC.Droppables = MVC.Class.extend('drop',
 {
 	drops: [],
 	selectors: {},
+	_elements: [],
+    add_element : function(el){
+        //check other elements
+        for(var i =0; i < this._elements.length ; i++  ){
+            if(el ==this._elements[i]) return;
+        }
+        this._elements.push(el);
+    },
+    remove_element : function(el){
+         for(var i =0; i < this._elements.length ; i++  ){
+            if(el == this._elements[i]){
+                this._elements.splice(i,1)
+                return;
+            }
+        }
+    },
 	/**
 	 * Creates a new droppable and adds it to the list.
 	 * @param {Object} element
@@ -252,14 +274,21 @@ MVC.Droppables = MVC.Class.extend('drop',
 	* all possible droppable elements and adds them.
 	*/
 	compile : function(){
-	  for(var selector in MVC.Droppables.selectors){
-	      var sels = MVC.Query(selector)
-	      for(var e= 0; e < sels.length; e++){
-	          //make sure we clear the offset cache
-              MVC.Dom.remove_data(sels[e],"offset")
-              MVC.Droppables.add(sels[e], new MVC.Controller.Params.Drop(MVC.Droppables.selectors[selector]))
-	      }
+	  for(var i=0; i < MVC.Droppables._elements.length; i++){ //for each element
+		  var el = MVC.Droppables._elements[i]
+		  var drops =  MVC.Delegator.jmvc(el).delegation_events.drops ;//  jQuery.data(MVC.Droppable._elements[i], "delegation_events").drops;
+          for(var selector in drops){ //find the selectors
+    	      
+			  var sels = MVC.Query(selector, el);
+    	      console.log("Selector = "+selector, el, sels.length)
+			  for(var e= 0; e < sels.length; e++){ //for each found element, create a drop point
+    	          MVC.Dom.remove_data(sels[e],"offset")
+              	  MVC.Droppables.add(sels[e], new MVC.Controller.Params.Drop(drops[selector]))
+    	      }
+    	  }
 	  }
+	  
+	  
 	},
 	/**
 	* Called after dragging has stopped.
