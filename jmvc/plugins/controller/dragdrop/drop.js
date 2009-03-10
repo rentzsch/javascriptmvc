@@ -280,7 +280,6 @@ MVC.Droppables = MVC.Class.extend('drop',
           for(var selector in drops){ //find the selectors
     	      
 			  var sels = MVC.Query(selector, el);
-    	      console.log("Selector = "+selector, el, sels.length)
 			  for(var e= 0; e < sels.length; e++){ //for each found element, create a drop point
     	          MVC.Dom.remove_data(sels[e],"offset")
               	  MVC.Droppables.add(sels[e], new MVC.Controller.Params.Drop(drops[selector]))
