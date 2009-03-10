@@ -281,7 +281,7 @@ MVC.Droppables = MVC.Class.extend('drop',
 		  var drops =  MVC.Delegator.jmvc(el).delegation_events.drops ;//  jQuery.data(MVC.Droppable._elements[i], "delegation_events").drops;
           for(var selector in drops){ //find the selectors
     	      
-			  var sels = MVC.Query(selector, el);
+			  var sels = selector ? MVC.Query(selector, el) : [el];
 			  for(var e= 0; e < sels.length; e++){ //for each found element, create a drop point
     	          MVC.Dom.remove_data(sels[e],"offset")
               	  MVC.Droppables.add(sels[e], new MVC.Controller.Params.Drop(drops[selector]))
