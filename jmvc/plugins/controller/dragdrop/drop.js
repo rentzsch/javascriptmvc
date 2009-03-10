@@ -261,13 +261,15 @@ MVC.Droppables = MVC.Class.extend('drop',
 	fire: function(event, drag) {
 		if(!this.last_active) return;
 		//MVC.Element._prepare();
-		this.last_active = null;
+		
 		if( this.isAffected(MVC.Event.pointer(event), drag.drag_element, this.last_active) && //last is still activated
 			this.last_active.dropped	){ 											//drop was ok
 			
             this.last_active.dropped({drag: drag, event: event, element: this.last_active.element}); 
-		    return true; 
+		    this.last_active = null;
+			return true; 
 		}
+		this.last_active = null;
 	},
 	/**
 	* Called when the user first starts to drag.  Uses query to get
