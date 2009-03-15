@@ -1,10 +1,7 @@
-/**
- * Unit tests are Used for testing lower level functionality, like a method or class.
- * 
- */
-MVC.Test.Unit = MVC.Test.extend(
-/* @Prototype*/
+
+MVC.Test.extend("MVC.Test.Unit",
 {
+    tests: [],
     /**
      * Called when a new unit test case is created. A test case is a collection of test functions and helpers.
      * 
@@ -14,24 +11,17 @@ MVC.Test.Unit = MVC.Test.extend(
      * functions the same name as the test provided helpers and assertions 
      * such as assert or assertEqual as your functions will override these functions.
      */
-	init: function(name , tests ){
-		this._super(  name, tests, 'unit');
-		MVC.Test.Unit.tests.push(this)
-	}
+    init : function(){
+        if(MVC.String.include(this.fullName,"MVC.Test"  )) return;
+        
+        MVC.Test.Unit.tests.push(this);
+        this._super();
+    }  
+},
+/* @Prototype*/
+{
+    
 });
 
 
 MVC.Test.Unit.tests = [];
-
-
-MVC.Test.Runner(MVC.Test.Unit, "tests", {
-	start : function(){
-		this.passes = 0;
-	},
-	after : function(number ){
-		if(this.tests[number].failures == 0 ) this.passes++;
-	},
-	done: function(){
-		OpenAjax.hub.publish("jmvc.test.unit.complete", this);
-	}
-})

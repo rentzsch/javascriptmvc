@@ -103,6 +103,9 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.extend(
 MVC.Class.extend('MVC.Droppable',
 /* @Class */
 {
+    init : function(){
+        MVC.Drag.responder = this;  
+    },
     drops: [],
 	_elements: [],
     addElement : function(el){
@@ -228,7 +231,7 @@ MVC.Class.extend('MVC.Droppable',
 	 * @param {Object} event
 	 * @param {Object} element
 	 */
-	fire: function(event, drag) {
+	end: function(event, drag) {
 		if(!this.last_active) return;
         var pointer = new MVC.Vector(event.pageX, event.pageY);
 		if( this.isAffected(pointer, drag.drag_element, this.last_active) && //last is still activated

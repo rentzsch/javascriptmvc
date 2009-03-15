@@ -149,6 +149,7 @@ MVC.Controller = MVC.Class.extend(
                     if(act.matches(action_name)){
                         var callback = this.dispatch_closure(action_name);
                         this.actions[action_name] =new act(action_name, callback, this.underscoreName, this._element, this);
+                        continue; // no need to check others
                     }
                 }
             }
@@ -280,7 +281,7 @@ Controller('todos',{
  * The action is responsible to callback the function when appropriate.  It typically uses
  * dispatch_closure to call functions appropriately.  
  */
-MVC.Controller.Action = MVC.Class.extend(
+MVC.Class.extend("MVC.Controller.Action",
 /* @Static */
 {
     matches: function(action_name){
@@ -365,7 +366,7 @@ TasksController = MVC.Controller.extend('tasks',
 });
 @code_end
  */
-MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
+MVC.Controller.Action.extend("MVC.Controller.Action.Subscribe",
 /* @Static*/
 {
     
@@ -399,18 +400,18 @@ MVC.Controller.Action.Subscribe = MVC.Controller.Action.extend(
         OpenAjax.hub.unsubscribe(this.subscription)
         this._super();
     }
-})
+});
 /*
  * Default event delegation based actions
  */
-MVC.Controller.Action.Event = MVC.Controller.Action.extend(
+MVC.Controller.Action.extend("MVC.Controller.Action.Event",
 /* @Static*/
 {
     /**
      * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, focus, blur, load, unload
      * @param {Object} action_name
      */
-    match: new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$"),
+    match: new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$")
 },
 /* @Prototype*/
 {    

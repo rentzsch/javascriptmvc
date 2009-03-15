@@ -27,7 +27,7 @@ include.plugins('controller/lasso')
  * <h3>Potential Issues</h3>
  * If IE lasso area isn't responding, try setting its position to relative.
  */
-MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
+MVC.Controller.Action.Lasso = MVC.Controller.Action.extend(
 /* @static */
 {
     /**
@@ -37,24 +37,24 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
     mousemove : function(event){
         if(!MVC.Lasso.current ) return;  //do nothing if nothing is being dragged.
         var current = MVC.Lasso.current;
-        var pointer = MVC.Event.pointer(event);
+        
+        var pointer = event.pointer();
         if(current._start_position && current._start_position.equals(pointer)) return;
-        MVC.Delegator.add_kill_event(event);
-        event.kill();
+
+        event.preventDefault();
         MVC.Lasso.current.draw(pointer, event); //update draw
         return false;
     },
     mouseup : function(event){
-        MVC.Delegator.add_kill_event(event);
         //if there is a current, we should call its dragstop
         if(MVC.Lasso.current && MVC.Lasso.current.moved){
             MVC.Lasso.current.end(event);
-    		MVC.Droppables.clear();
+    		MVC.Droppable.clear();
         }
     
         MVC.Lasso.current = null;
-        MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Lasso.mousemove)
-        MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Lasso.mouseup);
+        jQuery(document).unbind('mousemove', MVC.Controller.Action.Drag.mousemove);
+        jQuery(document).unbind('mouseup', MVC.Controller.Action.Drag.mouseup);
     }
 },
 /* @prototype */
@@ -66,25 +66,23 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
      * @param {Object} controller
      */
     init: function(action_name, callback, className, element){
-		//can't use init, so set default members
-        this.action = action_name;
-        this.callback = callback;
-        this.className = className;
-        this.element = element
+		this._super(action_name, callback, className, element)
         this.css_and_event();
         var selector = this.selector();
-		var jmvc = MVC.Delegator.jmvc(this.element)
-        if(!jmvc.custom) jmvc.custom = {};
-        if(!jmvc.custom.lasso) jmvc.custom.lasso = {};
-        var lasso = jmvc.custom.lasso;
-        //If the selector has already been added, just add this action to its list of possible action callbacks
-		if(lasso[selector]) {
+        var delegates = this.delegates();
+        if(!delegates.lasso) delegates.lasso = {};
+        var lasso = delegates.lasso;
+        
+        if(lasso[selector]) {
             lasso[selector].callbacks[this.event_type] = callback;
             return;
         }
 		//create a new mousedown event for selectors that match our mouse event
-        lasso[selector] = 
-			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this, element), element);
+        var self  = this;
+        lasso[selector] = new MVC.Delegator(selector, 'mousedown', 
+           function(event){
+                self.mousedown.call(self,element, this, event)
+           }, element);
         lasso[selector].callbacks = {};
         lasso[selector].callbacks[this.event_type] = callback;
     },
@@ -92,15 +90,18 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
 	 * Called when someone mouses down on a draggable object.
 	 * Gathers all callback functions and creates a new Lasso.
 	 */
-	mousedown : function(element, params){
-       var jmvc= MVC.Delegator.jmvc(element);
-       if(jmvc.responding == false) return;
-       var lasso = jmvc.custom.lasso
-       MVC.Object.extend(params, lasso[this.selector()].callbacks)
-	   MVC.Lasso.current = new MVC.Lasso(params);
-       params.event.prevent_default();
-       MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Lasso.mousemove)
-       MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Lasso.mouseup);
+	mousedown : function(element, el, event){
+       var isLeftButton = event.which == 1;
+       //var jmvc= jQuery.data(this.element,"jmvc");
+       var callbacks = this.delegates().lasso[this.selector()].callbacks;
+
+       if(MVC.Lasso.current || !isLeftButton) return;
+	   
+  
+       MVC.Lasso.current = new MVC.Lasso(callbacks, el, event);
+       event.preventDefault();
+       jQuery(document).bind('mousemove', MVC.Controller.Action.Lasso.mousemove);
+       jQuery(document).bind('mouseup', MVC.Controller.Action.Lasso.mouseup);
 	   return false;
 	}
 });
@@ -110,20 +111,18 @@ MVC.Controller.Action.Lasso = MVC.Controller.Action.Event.extend(
  * @hide 
  * @init abc
  */
-MVC.Lasso = function(params){
-    this.element = params.element; 		//the element that has been clicked on
+MVC.Lasso = function(callbacks, element, event){
+    this.element = jQuery(element); 		//the element that has been clicked on
     this.moved = false;					//if a mousemove has come after the click
     this._cancelled = false;			//if the drag has been cancelled
 	
-
-	
 	//Add default functions to be called.
-    this.lassostart = params.lassostart || MVC.Lasso.k;
-    this.lassoend = params.lassoend || MVC.Lasso.k;
-    this.lassomove = params.lassomove || MVC.Lasso.k;
+    this.lassostart = callbacks.dragstart || MVC.K;
+    this.lassoend = callbacks.dragend || MVC.K;
+    this.lassomove = callbacks.dragmove || MVC.K;
+    
 };
 
-MVC.Lasso.k = function(){};
 
 MVC.Lasso.prototype = 
 /* @prototype */
@@ -132,29 +131,30 @@ MVC.Lasso.prototype =
      * 
      */
     style_element : function(){
-		var s = this.lasso_element.style;
-		s.position = 'absolute';
-		//s.display = 'none'
-		s.border="dotted 1px Gray";
-		s.zIndex = 1000;
+		this.lasso_element.css("position",'absolute').
+            css("border","dotted 1px Gray").
+            css("zIndex",1000)
 	},
     /**
      * 
      * @param {Object} event
      */
 	position_lasso : function(event){
-		var current = MVC.Event.pointer(event);
+		console.log("position")
+        
+        var current = event.pointer();
 		//find the top left event
 		this.top = current.top() < this.start_position.top() ? current.top() : this.start_position.top();
 		this.left = current.left() < this.start_position.left() ? current.left() : this.start_position.left();
 		this.height = Math.abs( current.top() - this.start_position.top()  );
 		this.width = Math.abs( current.left() - this.start_position.left()  );
+        
+        this.lasso_element.css("top",this.top+"px").
+                           css("left",this.left+"px").
+                           css("width",this.width+"px").
+                           css("height",this.height+"px")
+        
 
-		var s = this.lasso_element.style;
-        s.top =  this.top+"px";
-        s.left =  this.left+"px";	
-		s.width = this.width+"px"
-		s.height = this.height+"px"
 	},
 	/**
      * Called the first time we start dragging.
@@ -163,13 +163,12 @@ MVC.Lasso.prototype =
      */
 	start: function(event){
 		this.moved = true;					//we have been moved
-        this.lasso_element = document.createElement('div');
-		
-		document.body.appendChild(this.lasso_element)
+        this.lasso_element = jQuery(document.createElement('div'));
+		jQuery(document.body).append(this.lasso_element)
+
 		this.style_element();
-		MVC.Element.make_positioned(this.lasso_element);
-		
-		this.start_position = MVC.Event.pointer(event);
+
+		this.start_position = event.pointer();
 
 		
 		//Call the Controller's drag start if they have one.
@@ -205,9 +204,7 @@ MVC.Lasso.prototype =
 		// only drag if we haven't been cancelled;
 		if(this._cancelled) return;
 		
-		//Adjust for scrolling
-        MVC.Position.prepare();
-		
+
 		//Calculate where we should move the drag element to
 
 		this.position_lasso(event);
@@ -234,19 +231,12 @@ MVC.Lasso.prototype =
 							lasso_element: this.lasso_element, 
 							lasso_action: this };
         this.lassoend(drag_data);
-        document.body.removeChild(this.lasso_element);
+        this.lasso_element.remove();
 		//tell droppables a drop has happened
 		//MVC.Droppables.fire(event, this);
 		
 		//Handle closing animations if necessary
         
-    },
-	/**
-	 * Cleans up drag element after drag drop.
-	 */
-    cleanup : function(){
-        if(this.drag_element != this.element)
-                this.drag_element.style.display = 'none';
     },
 	contains: function(selectable){
 		return MVC.Position.withinBoxIncludingScrollingOffsets(selectable.element, 
@@ -261,22 +251,6 @@ MVC.Lasso.current = null;
 
 
 //Observe all mousemoves and mouseups.
-jQuery.event.add( document , 'mousemove', function(event){
-    if(!MVC.Lasso.current ) return;  //do nothing if nothing is being dragged.
-    event.stopPropagation();
-    MVC.Lasso.current.draw(MVC.Event.pointer(event), event); //update draw
-    return false;
-});
 
-jQuery.event.add(document, 'mouseup', function(event){
-    //if there is a current, we should call its dragstop
-    if(MVC.Lasso.current && MVC.Lasso.current.moved){
-        MVC.Lasso.current.end(event);
-		MVC.Selectables.fire(event, MVC.Lasso.current);
-		MVC.Selectables.clear();
-    }
-
-    MVC.Lasso.current = null;
-});
 
 

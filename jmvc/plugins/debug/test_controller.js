@@ -1,7 +1,7 @@
-
+tests = {};
 find_and_run = function(t,s){
 	//opener.focus();	
-	var t = opener.MVC.Tests[t]
+	var t = tests[t]
 	if(s) t.run_test(s);
 	else t.run();
 };
@@ -24,24 +24,23 @@ opener.MVC.Console.log('You are running '+
 		'"'+opener.MVC.app_name+'" ' +'in the '+opener.include.get_env()+' environment.')
 
 
-opener.OpenAjax.hub.subscribe("jmvc.test.assertions.update", function(called, assertions){
+opener.OpenAjax.hub.subscribe("jmvc.test.case.complete", function(called, instance){
 
-    var controller = assertions._test;
-    var test_name = assertions._test_name
-    var step = document.getElementById('step_'+controller.name+'_'+test_name);
+    var test_name = instance._testName
+    var step = document.getElementById('step_'+instance.Class.fullName+'_'+test_name);
 	var result = step.childNodes[1];
 	
-	if(assertions.failures == 0 && assertions.errors == 0){
+	if(instance.failures == 0 && instance.errors == 0){
 		step.className = 'passed'
-		result.innerHTML = 'Passed: '+assertions.assertions+' assertion'+add_s(assertions.assertions)+' <br/>'+
-			clean_messages(assertions.messages).join("<br/>")
+		result.innerHTML = 'Passed: '+instance.assertions+' assertion'+add_s(instance.assertions)+' <br/>'+
+			clean_messages(instance.messages).join("<br/>")
 		
 	}else{
 		step.className = 'failure'
-		result.innerHTML = 'Failed: '+assertions.assertions+' assertion'+add_s(assertions.assertions)+
-		', '+assertions.failures+' failure'+add_s(assertions.failures)+
-		', '+assertions.errors+' error'+add_s(assertions.errors)+' <br/>'+
-			clean_messages(assertions.messages).join("<br/>")
+		result.innerHTML = 'Failed: '+instance.assertions+' assertion'+add_s(instance.assertions)+
+		', '+instance.failures+' failure'+add_s(instance.failures)+
+		', '+instance.errors+' error'+add_s(instance.errors)+' <br/>'+
+			clean_messages(instance.messages).join("<br/>")
 	}
 });
 
@@ -54,6 +53,7 @@ opener.OpenAjax.hub.subscribe("jmvc.test.running", function(called, assertions){
 });
 
 opener.OpenAjax.hub.subscribe("jmvc.test.created", function(called, test){
+    tests[test.fullName] = test;
     prepare_page = function(type) {
 		document.getElementById(type+'_explanation').style.display = 'none';
 		document.getElementById(type+'_test_runner').style.display = 'block';
@@ -64,15 +64,14 @@ opener.OpenAjax.hub.subscribe("jmvc.test.created", function(called, test){
 		else
 			prepare_page('functional');
 	var insert_into = document.getElementById(test.type+'_tests');
-	var txt = "<h3><img alt='run' src='playwhite.png' onclick='find_and_run(\""+test.name+"\")'/>"+test.name+" <span id='"+test.name+"_results'></span></h3>";
+	var txt = "<h3><img alt='run' src='playwhite.png' onclick='find_and_run(\""+test.fullName+"\")'/>"+test.className+" <span id='"+test.fullName+"_results'></span></h3>";
 	txt += "<div class='table_container'><table cellspacing='0px'><thead><tr><th>tests</th><th>result</th></tr></thead><tbody>";
-	for(var t in test.tests ){
-		if(! test.tests.hasOwnProperty(t) ) continue;
-		if(t.indexOf('test') != 0 ) continue;
-		var name = t.substring(5)
-		txt+= '<tr class="step" id="step_'+test.name+'_'+t+'">'+
+	for(var i = 0; i < test.testNames.length; i++ ){
+		var test_name = test.testNames[i];
+        var name = test_name.substring(5);
+		txt+= '<tr class="step" id="step_'+test.fullName+'_'+test_name+'">'+
 		"<td class='name'>"+
-		"<a href='javascript: void(0);' onclick='find_and_run(\""+test.name+"\",\""+t+"\")'>"+name+'</a></td>'+
+		"<a href='javascript: void(0);' onclick='find_and_run(\""+test.fullName+"\",\""+test_name+"\")'>"+name+'</a></td>'+
 		'<td class="result">&nbsp;</td></tr>'
 	}
 	txt+= "</tbody></table></div>";
@@ -91,13 +90,19 @@ opener.OpenAjax.hub.subscribe("jmvc.test.created", function(called, test){
 });
 
 opener.OpenAjax.hub.subscribe("jmvc.test.test.complete", function(called, test){
-	var el = document.getElementById(test.name+"_results")
-	el.innerHTML = '('+test.passes+'/'+test.test_names.length+ ')'
+	var el = document.getElementById(test.fullName+"_results")
+	el.innerHTML = '('+test.passes+'/'+test.testNames.length+ ')'
 });
 
-opener.OpenAjax.hub.subscribe("jmvc.test.unit.complete", function(called, runner){
+opener.OpenAjax.hub.subscribe("mvc.test.unit.complete", function(called, superTest){
+    //get ones with failures
+    var fails = 0;
+    for(var i=0; i < superTest.tests.length; i++){
+        if( superTest.tests[i].failures ) fails++;
+    }
+    var passes = superTest.tests.length - fails;
     document.getElementById('unit_result').innerHTML = 
-	'('+runner.passes+'/'+runner.tests.length+')' + (runner.passes == runner.tests.length ? ' Wow!' : '');
+	'('+(passes)+'/'+superTest.tests.length+')' + (passes == superTest.tests.length ? ' Wow!' : '');
 });
 
 

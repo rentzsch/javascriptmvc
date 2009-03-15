@@ -1,19 +1,23 @@
 include.unit_tests(
+    'class',
+    'testing' ,
+    'view',
+    'delegation'/*,
+    'controller',
     'file',
     'engine',
     'helpers', 
     'inflector',
     'element',
     'ajax', 
-    'view',
+    
     'controller_view',
     'vector',
     'timer',
     'model',
     'translation',
-    'position',
-    'delegation',
-    'controller'
+    'position'*/
+    
 );
 
 include.functional_tests();

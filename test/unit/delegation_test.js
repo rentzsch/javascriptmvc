@@ -1,37 +1,38 @@
-new MVC.Test.Unit('delegation',{
-   setup: function(){
-          MVC.$E('testarea').innerHTML = new MVC.View({url: 'views/delegation'}).render( )
+MVC.Test.Unit.extend("Test.Delegate",{
+   init: function(){
+          $('#testarea').html({view: 'views/delegation'});
    },
-   teardown : function(){
-          MVC.$E('testarea').innerHTML = "";
+   destroy : function(){
+          $('#testarea').html("");
    },
    test_document_click: function() {
       var self = this;
-      var delegate = new MVC.Delegator('','click',
-          function(params){
-              self.assert_equal("html", params.element.tagName.toLowerCase())
-              self.assert(params.event.target, MVC.$E('first'));
-          }
-      );
-      new MVC.SyntheticEvent('click').send(MVC.$E('first')); //synchronous@
-      delegate.destroy();
+      var fn = function(event){
+              self.assertEqual(9, this.nodeType)
+              self.assert(event.target, $('#first')[0] );
+      }
+      $().delegate('','click', fn );
+
+      $("#first").synthetic('click')
+      $().kill('','click', fn );
    },
    test_id_matching : function(){
        var self = this;
-       var delegate = new MVC.Delegator('#first','click',function(params){
-              self.assert_equal("first", params.element.id)
-              self.assert(params.event.target, MVC.$E('first'));
-       });
-       new MVC.SyntheticEvent('click').send(MVC.$E('first'))
-       delegate.destroy();
+       var fn = function(event){
+              self.assertEqual("first", this.id)
+              self.assert(event.target, $('#first')[0]);
+       }
+       var delegate = new MVC.Delegator('#first','click',fn);
+       $("#first").synthetic('click')
+       $().kill('#first','click', fn );
    },
    test_delegating_internal : function(){
        var self = this;
-       
-       delegate = new MVC.Delegator('.todo','click',function(params){
-              self.assert_equal("second_todo", params.element.id)
-       }, MVC.$E('nested') , {} );
-       new MVC.SyntheticEvent('click').send(MVC.$E('second_todo'))
-       delegate.destroy();
+       var fn = function(params){
+              self.assertEqual("second_todo", this.id)
+       }
+       $('#nested').delegate(".todo",'click', fn);
+       $("#second_todo").synthetic('click')
+       $('#nested').kill(".todo",'click', fn);
    }
 });

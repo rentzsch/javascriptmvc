@@ -1,9 +1,7 @@
 // we don't include the plugin file because thats done after the app file (in case jquery is loaded)
-include(
-    '../lang/standard_helpers',
-    '../dom/query/standard')
 
-include.plugins('lang/class','lang/openajax')
+
+include.plugins("jquery","dom",'lang/class','lang/openajax','dom/synthetic')
 
 if(!window._rhino){
     include.plugins('debug')
@@ -20,5 +18,4 @@ include(
     'assertions',
     'unit',
     'functional',
-    'controller',
-    'synthetic_events')
+    'controller')

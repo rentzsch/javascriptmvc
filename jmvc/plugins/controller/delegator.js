@@ -11,7 +11,46 @@ jQuery.fn.delegate = function(selector, event, callback) {
     new MVC.Delegator(selector, event, callback, this);
   });
 };
-MVC.Class.extend('MVC.Delegator',
+
+jQuery.fn.kill = function(selector, event, callback) {
+  return this.each(function(){
+    //go through delegates remove delegate
+    var delegates = jQuery.data(this, "delegates")[event];
+    var i =0;
+    while(i < delegates.length){
+        if(delegates[i]._func == callback){
+            delegates[i].destroy();
+            delegates.splice(i, 1)
+        }
+        else
+            i++;
+    }
+  });
+};
+
+MVC.Delegator = function(selector, event, f, element){
+        this._event = event;
+        this._selector = selector
+        this._func = f;
+        this.element = element || document.documentElement;
+        if(! jQuery.data(this.element, "delegateEvents") ) jQuery.data(this.element, "delegateEvents",{})
+        
+        //check if custom
+
+        
+        if(event == 'contextmenu' && MVC.Browser.Opera) this.context_for_opera();
+        else if(event == 'submit' && MVC.Browser.IE) this.submit_for_ie();
+    	else if(event == 'change' && MVC.Browser.IE) this.change_for_ie();
+    	else if(event == 'change' && MVC.Browser.WebKit) this.change_for_webkit();
+    	else this.add_to_delegator();
+        var delegates = jQuery.data(this.element, "delegates") || jQuery.data(this.element, "delegates",{})
+        if(!delegates[event]){
+            delegates[event]=[]
+		}
+		delegates[event].push(this);
+}
+
+MVC.Object.extend(MVC.Delegator,
 {
     /**
      * Adds kill() on an event.
@@ -49,25 +88,9 @@ MVC.Class.extend('MVC.Delegator',
      */
     events: {},
     onload_called : false
-},
+})
+MVC.Object.extend(MVC.Delegator.prototype,
 {
-    init : function(selector, event, f, element){
-        this._event = event;
-        this._selector = selector
-        this._func = f;
-        this.element = element || document.documentElement;
-        if(! jQuery.data(this.element, "delegates") ) jQuery.data(this.element, "delegates",{})
-        
-        //check if custom
-
-        
-        if(event == 'contextmenu' && MVC.Browser.Opera) return this.context_for_opera();
-        if(event == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
-    	if(event == 'change' && MVC.Browser.IE) return this.change_for_ie();
-    	if(event == 'change' && MVC.Browser.WebKit) return this.change_for_webkit();
-    	
-        this.add_to_delegator();
-    },
     /*
      * returns the event that should actually be used.  In practice, this is just used to switch focus/blur
      * to activate/deactivate for ie.
@@ -99,7 +122,7 @@ MVC.Class.extend('MVC.Delegator',
         var s = selector || this._selector;
         var e = event || this.event();
         var f = func || this._func;
-        var delegation_events = jQuery.data(this.element,"delegates");
+        var delegation_events = jQuery.data(this.element,"delegateEvents");
         if(!delegation_events[e] || delegation_events[e].length == 0){
             var bind_function = MVC.Function.bind(this.dispatch_event, this)
             jQuery.event.add( this.element , e, bind_function, null, this.capture() );
@@ -110,7 +133,7 @@ MVC.Class.extend('MVC.Delegator',
     },
     _remove_from_delegator : function(event_type){
         var event = event_type || this.event();
-        var events = jQuery.data(this.element,"delegates")[event];
+        var events = jQuery.data(this.element,"delegateEvents")[event];
         for(var i = 0; i < events.length;i++ ){
             if(events[i] == this){
                 events.splice(i, 1);
@@ -118,7 +141,7 @@ MVC.Class.extend('MVC.Delegator',
             }
         }
         if(events.length == 0){
-            MVC.Event.stop_observing(this.element, event, events._bind_function, this.capture() );
+            jQuery.event.remove(this.element, event, events._bind_function, this.capture() );
         }
     },
     /*
@@ -302,7 +325,7 @@ MVC.Class.extend('MVC.Delegator',
      */
 	dispatch_event: function(event){
         var target = event.target, matched = false, ret_value = true,matches = [];
-		var delegation_events = jQuery.data(this.element,"delegates")[event.type];
+		var delegation_events = jQuery.data(this.element,"delegateEvents")[event.type];
         var parents_path = this.node_path(target);
 		for(var i =0; i < delegation_events.length;  i++){
 			var delegation_event = delegation_events[i];

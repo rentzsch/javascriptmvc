@@ -85,13 +85,13 @@ MVC.View = function( options ){
 		MVC.View.update(this.name, this);
 		return;
 	}
-	if(options.url || options.absolute_url || options.view_url){
-        this.name = this.name ? this.name : options.url || options.absolute_url || "views/"+options.view_url;
+	if(options.view || options.absolute_url || options.view_url){
+        this.name = this.name ? this.name : options.view || options.absolute_url || "views/"+options.view_url;
         var url = options.absolute_url || 
-                  (options.url ? MVC.root.join( options.url+ (options.url.match(this.extMatch) ? '' : this.ext ) ) : 
+                  (options.view ? MVC.root.join( options.view+ (options.view.match(this.extMatch) ? '' : this.ext ) ) : 
                    MVC.root.join("views/"+options.view_url+ (options.view_url.match(this.extMatch) ? '' : this.ext ))
                    );
-        //options.url = options.absolute_url || options.url || options.;
+        //options.view = options.absolute_url || options.view || options.;
 		var template = MVC.View.get(this.name, this.cache);
 		if (template) return template;
 	    if (template == MVC.View.INVALID_PATH) return null;
@@ -183,14 +183,14 @@ MVC.View.prototype = {
 		}
 		if(typeof options == 'string'){
 			params = {};
-			params.url = options;
+			params.view = options;
 			_template = this;
 			params.onComplete = function(request){
 				var object = eval( "("+ request.responseText+")" );
 				MVC.View.prototype.update.call(_template, element, object);
 			};
             if(!MVC.Ajax) alert('You must include the Ajax plugin to use this feature');
-			new MVC.Ajax(params.url, params);
+			new MVC.Ajax(params.view, params);
 		}else
 		{
 			element.innerHTML = this.render(options);
@@ -425,8 +425,8 @@ MVC.View.Compiler.prototype = {
 					var e = new Error();
 					e.lineNumber = error.line;
 					e.message = error.reason;
-					if(options.url)
-						e.fileName = options.url;
+					if(options.view)
+						e.fileName = options.view;
 					throw e;
 				}
 			}
@@ -605,4 +605,29 @@ MVC.Native.extend('String', {
     chop: function(string){
         return string.substr(0, string.length - 1);
     }
-})
+});
+
+(function($){
+    var funcs = ["prepend","append","insertBefore","insertAfter","replaceWith","text","html"]
+    var convert = function(func_name){
+        var old = jQuery.fn[func_name]
+        jQuery.fn[func_name] = function(content){
+            if(typeof content ==  "undefined" || typeof content == "string" || content.nodeType){
+                return old.call(this,content);
+            }else{
+                return old.call( this , new MVC.View(content).render(content.data, content.helpers) )
+            }
+        }
+    }
+    
+    for(var i=0; i < funcs.length; i++){
+        convert(funcs[i]);
+    }
+    
+    
+    
+})(jQuery);
+
+
+
+

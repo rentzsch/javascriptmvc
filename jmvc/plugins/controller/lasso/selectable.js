@@ -50,7 +50,7 @@ TasksController = MVC.Controller.extend('tasks',{
  * <h3>Install</h3>
  * <pre>include.plugins('controller/lasso')</pre>
  */
-MVC.Controller.Action.Selectable = MVC.Controller.Action.Event.extend(
+MVC.Controller.Action.Selectable = MVC.Controller.Action.extend(
 /* @static */
 {
     /**
@@ -67,11 +67,7 @@ MVC.Controller.Action.Selectable = MVC.Controller.Action.Event.extend(
      * @param {Object} controller
      */
     init: function(action_name, callback, className, element){
-		//can't use init, so set default members
-        this.action = action_name;
-        this.callback = callback;
-        this.className = className;
-        this.element = element
+		this._super(action_name, callback, className, element)
         this.css_and_event();
         var selector = this.selector();
         
