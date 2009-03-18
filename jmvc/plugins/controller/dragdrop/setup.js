@@ -1,2 +1,2 @@
-include.plugins('controller','dom','dom/position','controller/moveable')
+include.plugins('controller','dom','controller/moveable')
 include('drag','drop')
