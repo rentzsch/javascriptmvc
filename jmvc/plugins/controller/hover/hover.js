@@ -32,7 +32,7 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend(
 		//can't use init, so set default members
         this.action = action_name;
         this.callback = callback;
-        this.className = className;
+        this.underscoreName = className;
         this.element = element
         this.css_and_event();
         var selector = this.selector();
@@ -116,7 +116,7 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
     init: function(action_name, callback, className, element){
         this.action = action_name;
         this.callback = callback;
-        this.className = className;
+        this.underscoreName = className;
         this.element = element
         this.css_and_event();
         var selector = this.selector();
