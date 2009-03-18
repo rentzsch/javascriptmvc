@@ -264,7 +264,7 @@ Controller('todos',{
      * @param {Object} data
      */
     publish: function(){
-        OpenAjax.hub.publish.apply(null, arguments);
+        OpenAjax.hub.publish.apply(OpenAjax.hub, arguments);
     }
 });
 
