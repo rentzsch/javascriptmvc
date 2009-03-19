@@ -50,7 +50,7 @@ MVC.Controller.scaffold.functions = {
             this[this.Class.className] = [object];
             this.objects = [object];
             this.singular_name = this.Class.singular_name;
-            this.render({bottom: 'recipe_list', plugin: 'controller/scaffold/list', action: 'list'});//?
+            this.render({bottom: this.Class.className, plugin: 'controller/scaffold/list', action: 'list'});//?
             
 		}
     },
