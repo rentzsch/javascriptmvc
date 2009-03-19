@@ -7,7 +7,7 @@ if(location.href.indexOf('no_conflict') != -1){
 }
 //jquery
 if(location.href.indexOf('jquery') != -1){
-	include.resources('jquery-1.2.3')
+	include.plugins('jquery')
     document.getElementById('jq_el').style.backgroundColor = '#ddffdd';
 }else{
 	document.getElementById('nojq_el').style.backgroundColor = '#ddffdd';
@@ -72,7 +72,7 @@ noelement = function(){
 
 include.engines('testing');
 include.plugins('io/ajax/fixtures','controller','view',
-    'dom/element','dom/position',
+    'dom/element','dom/position','dom/synthetic',
     'model','lang/timer','view/translation');
 
 

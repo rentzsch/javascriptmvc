@@ -1,17 +1,27 @@
 load('jmvc/rhino/compression/env.js');
+
 if(typeof MVC == 'undefined')
     MVC ={ Included: {} };
 else
     MVC.Included = {};
+
 var window = this;
 var self = window;
+
 include = function(){}
 include.get_env = function(){
 	return 'development'
 }
 
+window._rhino = __env__.platform == 'Rhino ';
+window.location = 'jmvc/generate/empty.html';
 
-load('jmvc/plugins/lang/standard_helpers.js');
+MVC.Object = { 
+	extend: function(d, s) { for (var p in s) d[p] = s[p]; return d;} 
+}
+
+load('jmvc/plugins/jquery/setup.js');
+load('jmvc/plugins/lang/setup.js');
 load('jmvc/plugins/lang/inflector/inflector.js')
 load('jmvc/plugins/view/view.js');
 
