@@ -52,10 +52,10 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         MVC.Delegator.jmvc(element)
         this._actions = [];
         for(var action_name in this){
-    		val = this[action_name];
+    		var val = this[action_name];
     		if( typeof val == 'function' && action_name != 'Class'){
                 for(var a = 0 ; a < MVC.Controller.actions.length; a++){
-                    act = MVC.Controller.actions[a];
+                    var act = MVC.Controller.actions[a];
                     if(act.matches(action_name)){
                         var callback = this.dispatch_closure(action_name);
                         this._actions.push(new act(action_name, callback, this.Class.className,element ));

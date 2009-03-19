@@ -146,10 +146,10 @@ MVC.Controller = MVC.Class.extend(
     _create_actions : function(){
         this.actions = {};
         for(var action_name in this.prototype){
-    		val = this.prototype[action_name];
+    		var val = this.prototype[action_name];
     		if( typeof val == 'function' && action_name != 'Class'){
                 for(var a = 0 ; a < MVC.Controller.actions.length; a++){
-                    act = MVC.Controller.actions[a];
+                    var act = MVC.Controller.actions[a];
                     if(act.matches(action_name)){
                         var callback = this.dispatch_closure(action_name);
                         this.actions[action_name] =new act(action_name, callback, this.className, this._element, this._events);
