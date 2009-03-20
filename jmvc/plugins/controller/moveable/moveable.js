@@ -268,5 +268,3 @@ MVC.Class.extend("MVC.Move",{
         return this._position;
     }
 });
-
-console.log(MVC.Controller.Action.Move.match)
