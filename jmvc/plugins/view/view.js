@@ -526,13 +526,13 @@ include.view = function(path){
 	if(include.get_env() == 'development'){
         //should convert path
         
-		new MVC.View({url: new MVC.File("../"+path).join_current()});
+		new MVC.View({view: new MVC.File("../"+path).join_current()});
 	}else if(include.get_env() == 'compress'){
 		//var oldp = include.get_path();
         //include.set_path(MVC.root.path);
         include({path: "../"+path, process: MVC.View.process_include, ignore: true});
 		//include.set_path(oldp);
-		new MVC.View({url: new MVC.File("../"+path).join_current()});
+		new MVC.View({view: new MVC.File("../"+path).join_current()});
 	}else{
 		//production, do nothing!, it will be loaded by process
 	}

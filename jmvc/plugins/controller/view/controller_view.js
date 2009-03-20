@@ -81,7 +81,7 @@ render = function(options) {
         }
         
 		if(typeof options == 'string'){
-			result = new MVC.View({url:  options  }).render(this, helpers);
+			result = new MVC.View({view:  options  }).render(this, helpers);
 		}
 		else if(options.text) {
             result = options.text;
@@ -113,14 +113,14 @@ render = function(options) {
 			}
             var view;
             if(!plugin_url){
-                view = new MVC.View({url:  new MVC.File(url).join_from(this.Class._path)  }); //what about controllers in other folders?
+                view = new MVC.View({view:  new MVC.File(url).join_from(this.Class._path)  }); //what about controllers in other folders?
             }else{
                 //load plugin if it has been included
                 try{
-                    var view = new MVC.View({url:  MVC.View.get(plugin_url) ? plugin_url :  url  });
+                    var view = new MVC.View({view:  MVC.View.get(plugin_url) ? plugin_url :  url  });
                 }catch(e){
                     if(e.type !='JMVC') throw e;
-                    var view = new MVC.View({url:  plugin_url  });
+                    var view = new MVC.View({view:  plugin_url  });
                 }
             }
             result = view.render(data_to_render, helpers);
