@@ -40,7 +40,7 @@ var __env__ = {};
         if(m&&m.length>1){
             return new java.net.URL(path).toString();
         }else if(base){
-          return new java.net.URL(base + '/' + path).toString();
+		  return new java.net.URL( new java.net.URL(base), path).toString();
         }else{
             //return an absolute url from a relative to the file system
             return new java.io.File( path).toURL().toString();
@@ -214,18 +214,29 @@ var __env__ = {};
         "text/envjs"        :true
     };
     
-    $env.loadLocalScript = function(script){
+    $env.loadLocalScript = function(script, p){
         print("loading script ");
         var types, type, src, i, base;
         try{
-            if(script.type){
+			if(script.type){
                 types = script.type?script.type.split(";"):[];
                 for(i=0;i<types.length;i++){
                     if($env.scriptTypes[types[i]]){
-                        if(script.src){
+						if(script.src){
                             print("loading allowed external script :" + script.src);
                             base = "" + window.location;
-                            load($env.location(script.src, base.substring(0, base.lastIndexOf("/"))));
+                            
+							var docWrites = [];
+							document.write = function(text){
+								docWrites.push(text);
+							}
+							
+							load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
+							if(p){
+								var start = p.m_xml.slice(0,p.m_iP);
+								var end = p.m_xml.slice(p.m_iP);
+								p.m_xml = start+docWrites.join('')+end;
+							}
                         }else{
                             $env.loadInlineScript(script);
                         }
@@ -3785,13 +3796,20 @@ function __parseLoop__(impl, doc, p) {
       if (iNodeParent.nodeType == DOMNode.DOCUMENT_NODE) {
         iNodeParent.documentElement = iNode;        // register this Element as the Document.documentElement
       }
-
+	  
       iNodeParent.appendChild(iNode);               // attach Element to parentNode
       iNodeParent = iNode;                          // descend one level of the DOM Tree
     }
 
     else if(iEvt == XMLP._ELM_E) {                  // End-Element Event
-      iNodeParent = iNodeParent.parentNode;         // ascend one level of the DOM Tree
+      
+	  var oldParent = iNodeParent;
+	  iNodeParent = iNodeParent.parentNode;         // ascend one level of the DOM Tree
+	  //handle script tag
+	  if(oldParent.nodeName.toLowerCase() == 'script'){
+			$policy.loadScript(oldParent, p);
+	  }
+	  
     }
 
     else if(iEvt == XMLP._ELM_EMP) {                // Empty Element Event
@@ -4172,6 +4190,11 @@ __extend__(DOMDocument.prototype, {
         
         // create DOM Document
         var doc = new HTMLDocument(this.implementation);
+		
+		if(this === $document){
+            $log("Setting internal window.document");
+            $document = doc;
+        }
         // populate Document with Parsed Nodes
         try {
             __parseLoop__(this.implementation, doc, parser);
@@ -4184,10 +4207,7 @@ __extend__(DOMDocument.prototype, {
 
         // set parseComplete flag, (Some validation Rules are relaxed if this is false)
         doc._parseComplete = true;
-        if(this === $document){
-            $log("Setting internal window.document");
-            $document = doc;
-        }
+        
         return doc;
     },
     load: function(url){
@@ -4208,14 +4228,14 @@ __extend__(DOMDocument.prototype, {
             }
             _this._url = url;
             
-        	$log("Loading scripts.");
-            scripts = document.getElementsByTagName('script');
+        	//$log("Loading scripts.");
+            //scripts = document.getElementsByTagName('script');
             /*for(var prop in $policy){
                 $log("$policy."+prop+" ="+$policy[prop]);
             }*/
-            for(var i=0;i<scripts.length;i++){
+            /*for(var i=0;i<scripts.length;i++){
                 $policy.loadScript(scripts[i]);
-            }
+            }*/
         	$log("Sucessfully loaded document.");
         	var event = document.createEvent();
         	event.initEvent("load");
