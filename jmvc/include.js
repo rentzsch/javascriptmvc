@@ -1,3 +1,4 @@
+print(" a b ");
 /*
  * JavaScriptMVC - include
  * (c) 2008 Jupiter ITS
