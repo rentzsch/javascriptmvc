@@ -1,4 +1,3 @@
-print(" a b ");
 /*
  * JavaScriptMVC - include
  * (c) 2008 Jupiter ITS
@@ -74,7 +73,7 @@ MVC.Object.extend(MVC,{
 	    WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1,
 	    Gecko:  navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.indexOf('KHTML') == -1,
 	    MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/),
-        Rhino : !!window._rhino
+        Rhino : navigator.appCodeName && navigator.appCodeName =="EnvJS"
 	},
     /**
      * Where the jmvc folder is.
@@ -287,6 +286,7 @@ MVC.page_dir = new File(window.location.href).dir();
 
 //find include
 var scripts = document.getElementsByTagName("script");
+print("scripts ",scripts.length)
 for(var i=0; i<scripts.length; i++) {
 	var src = scripts[i].src;
 	if(src.match(/include\.js/)){  //if script has include.js
@@ -812,8 +812,8 @@ if(MVC.script_options){
 	first = false;
     MVC.apps_root =  MVC.root.join('apps')
 	MVC.app_name = MVC.script_options[0];
-    if(MVC.Browser.Rhino)
-        MVC.script_options[1] = MVCOptions.env
+    //if(MVC.Browser.Rhino)
+    //    MVC.script_options[1] = MVCOptions.env
     var hash_match = window.location.hash.match(/&jmvc\[env\]=(\w+)/)
     if(hash_match){
         MVC.script_options[1] = hash_match[1];
