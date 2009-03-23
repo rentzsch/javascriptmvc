@@ -531,8 +531,7 @@ include.view = function(path){
         //include.set_path(MVC.root.path);
         include({path: "../"+path, process: MVC.View.process_include, ignore: true});
         //include.set_path(oldp);
-        var view_path = new MVC.File("../"+path).join_current();
-        new MVC.View({view: view_path, absolute_url: view_path});
+        new MVC.View({view: new MVC.File("../"+path).join_current()});
 	}else{
 		//production, do nothing!, it will be loaded by process
 	}
