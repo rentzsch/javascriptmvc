@@ -1,9 +1,7 @@
 
 if(typeof load != 'undefined' && ! MVC.load_doc){
-    load('jmvc/plugins/lang/standard_helpers.js');
     load('jmvc/plugins/view/view.js');
     load('jmvc/plugins/lang/class/setup.js');
-        
     
     load('jmvc/rhino/documentation/application.js');
     load('jmvc/rhino/documentation/pair.js');
