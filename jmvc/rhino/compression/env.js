@@ -7657,7 +7657,7 @@ XMLHttpRequest.prototype = {
 			this.async = false;
 		}else{ this.async = true; }
 		this.method = method || "GET";
-		this.url = $env.location(url);
+		this.url = $env.location(url, '' + window.location);
 		this.onreadystatechange();
 	},
 	setRequestHeader: function(header, value){
