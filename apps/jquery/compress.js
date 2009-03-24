@@ -17,4 +17,6 @@ MVCOptions = {
     env: "compress"
 }
 load('jmvc/rhino/compression/setup.js');
+__env__.scriptTypes["text/javascript"] = true;
+window._rhino = __env__.platform == 'Rhino ';
 window.location = 'apps/jquery/index.html';

@@ -2,7 +2,7 @@ MVCOptions = {
     onload: true,
     env: "test",
     done_loading : function(){
-        print('\n\nRUNNING UNIT TESTS\nremember to update apps/jquery/index.html\n');
+        print('\n\nRUNNING UNIT TESTS\nremember to update apps/engine/index.html\n');
         OpenAjax.hub.subscribe("jmvc.test.case.complete", this.report);
         OpenAjax.hub.subscribe("jmvc.test.test.complete", this.update_test);
         OpenAjax.hub.subscribe("jmvc.test.unit.complete", this.unit_results);
@@ -58,5 +58,5 @@ MVCOptions = {
 load('jmvc/rhino/compression/setup.js');
 __env__.scriptTypes["text/javascript"] = true;
 window._rhino = __env__.platform == 'Rhino ';
-window.location = 'apps/jquery/index.html';
+window.location = 'apps/engine/index.html';
 
