@@ -1,7 +1,8 @@
-
 MVC.Test.extend("MVC.Test.Unit",
+/* @Static */
 {
     tests: [],
+
     /**
      * Called when a new unit test case is created. A test case is a collection of test functions and helpers.
      * 
@@ -12,16 +13,13 @@ MVC.Test.extend("MVC.Test.Unit",
      * such as assert or assertEqual as your functions will override these functions.
      */
     init : function(){
-        if(MVC.String.include(this.fullName,"MVC.Test"  )) return;
+        if (MVC.String.include(this.fullName, "MVC.Test")) return;
         
-        MVC.Test.Unit.tests.push(this);
+        this.tests.push(this);
         this._super();
     }  
 },
-/* @Prototype*/
+/* @Prototype */
 {
     
 });
-
-
-MVC.Test.Unit.tests = [];
