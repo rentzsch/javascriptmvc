@@ -1,24 +1,24 @@
-if(!_args[0]){
+if (!_args[0]) {
 	print("Usage: js jmvc/generate/engine engine_name")
 	quit();
 }
+
 load('jmvc/generate/loader.js');
 
-var data = {class_name: _args[0], application_name: _args[0]}
+var data = {
+	class_name: _args[0], 
+	application_name: _args[0]
+};
 
+var root_path = "engines/" + data.class_name;
 
-
-
-MVCOptions.create_folder("engines/"+_args[0]);
-MVCOptions.create_folder("engines/"+_args[0]+"/apps");
-MVCOptions.create_folder("engines/"+_args[0]+"/controllers");
-MVCOptions.create_folder("engines/"+_args[0]+"/models");
-MVCOptions.create_folder("engines/"+_args[0]+"/resources");
-MVCOptions.create_folder("engines/"+_args[0]+"/images");
-MVCOptions.create_folder("engines/"+_args[0]+"/stylesheets");
-MVCOptions.create_folder("engines/"+_args[0]+"/views");
-
-render_to("engines/"+_args[0]+"/apps/"+_args[0]+".js", "jmvc/rhino/command/templates/application.ejs", data);
-
-
-print("\nMake sure to add new engines to your application files!\n");
+create_folder(root_path);
+create_folder(root_path + "/apps");
+create_folder(root_path + "/controllers");
+create_folder(root_path + "/models");
+create_folder(root_path + "/resources");
+create_folder(root_path + "/images");
+create_folder(root_path + "/stylesheets");
+create_folder(root_path + "/views");
+render_to(root_path + "/apps/" + data.class_name + ".js", "../rhino/command/templates/application.ejs", data);
+print_post_generation_message();

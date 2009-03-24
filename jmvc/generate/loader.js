@@ -38,13 +38,49 @@ include.request = function(path){
 MVCOptions = {};
 load('jmvc/rhino/compression/helpers.js');
 
-var first = true;
-render_to = function(file, ejs, data){
-    var v = new View({absolute_url: ejs });
+var generation_message_state = {
+	first: true,
+	indent: "             "
+};
+
+var print_generating_message = function(path) {
+	if (generation_message_state.first)
+		print("Generating...\n");
+	
+	print(generation_message_state.indent + path);
+	generation_message_state.first = false;
+};
+
+render_to = function(file, ejs, data) {
+    print_generating_message(file);
     
-    MVCOptions.save(file,  v.render(data)  );
-    
-    print( (first ? "Generating ...":"              ") + " "+file);
-    
-    first = false;
-}
+    try {
+		MVCOptions.save(file, new View({ absolute_url : ejs }).render(data));
+	} catch(e) {
+		print("  ERROR! Unable to render to " + file + ". Make sure the folder exists!");
+	}
+};
+
+render_text_to = function(file, text) {
+	print_generating_message(file);
+	
+	try {
+		MVCOptions.save(file, text);
+	} catch(e) {
+		print("  ERROR! Unable to render to " + file + ". Make sure the folder exists!");
+	}
+};
+
+create_folder = function(path) {
+	print_generating_message(path);
+	
+	try {
+		MVCOptions.create_folder(path);
+	} catch(e) {
+		print("  ERROR! Unable to create folder: " + path);
+	}
+};
+
+print_post_generation_message = function() {
+	print("\n" + generation_message_state.indent + "Make sure to add new files to your application and test file!\n");
+};
