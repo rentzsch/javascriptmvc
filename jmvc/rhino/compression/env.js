@@ -17,12 +17,12 @@ var __env__ = {};
     
     $env.log = function(){};
     //uncomment this if you want to get some internal log statementes
-    $env.log = print;
+    //$env.log = print;
     $env.log("Initializing Rhino Platform Env");
     
     $env.error = function(msg, e){
-        print("ERROR! : " + msg);
-        print(e||"");
+        $env.log("ERROR! : " + msg);
+        $env.log(e||"");
     };
     
     $env.lineSource = function(e){
@@ -71,7 +71,7 @@ var __env__ = {};
     //Used in the XMLHttpRquest implementation to run a
     // request in a seperate thread
     $env.runAsync = function(fn){
-        print("running async");
+        $env.log("running async");
         (new java.lang.Thread(new java.lang.Runnable({
             run: fn
         }))).start();
@@ -79,7 +79,7 @@ var __env__ = {};
     
     //Used to write to a local file
     $env.writeToFile = function(text, url){
-        print("writing text to url : " + url);
+        $env.log("writing text to url : " + url);
         var out = new java.io.FileWriter( 
             new java.io.File( 
                 new java.net.URI(url.toString())));	
@@ -90,7 +90,7 @@ var __env__ = {};
     
     //Used to write to a local file
     $env.writeToTempFile = function(text, suffix){
-        print("writing text to temp url : " + suffix);
+        $env.log("writing text to temp url : " + suffix);
         // Create temp file.
         var temp = java.io.File.createTempFile("envjs-tmp", suffix);
     
@@ -215,7 +215,7 @@ var __env__ = {};
     };
     
     $env.loadLocalScript = function(script, p){
-        print("loading script ");
+        $env.log("loading script ");
         var types, type, src, i, base;
         try{
 			if(script.type){
@@ -223,7 +223,7 @@ var __env__ = {};
                 for(i=0;i<types.length;i++){
                     if($env.scriptTypes[types[i]]){
 						if(script.src){
-                            print("loading allowed external script :" + script.src);
+                            $env.log("loading allowed external script :" + script.src);
                             base = "" + window.location;
                             
 							var docWrites = [];
@@ -253,16 +253,16 @@ var __env__ = {};
                 }
             }
         }catch(e){
-            print("Error loading script.");
-            print(e);
+            $env.log("Error loading script.");
+            $env.log(e);
         }
     };
     
     $env.loadInlineScript = function(script){
-        print("loading inline script :" + script.text);
+        $env.log("loading inline script :" + script.text);
         var tmpFile = $env.writeToTempFile(script.text, 'js') ;
         $env.writeToFile(script.text, tmpFile);
-        print("loading ",tmpFile);
+        $env.log("loading ",tmpFile);
         load(tmpFile);
     };
     
