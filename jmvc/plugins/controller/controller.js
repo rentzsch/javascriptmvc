@@ -189,7 +189,7 @@ MVC.Controller = MVC.Class.extend(
     controllers : {},
     actions: [],
     publish: function(){
-        OpenAjax.hub.publish.apply(null, arguments);
+        OpenAjax.hub.publish.apply(OpenAjax.hub, arguments);
     },
     get_controller_with_name_and_action: function(controller_name, action) {
         var controllers = MVC.Controller.controllers[controller_name];

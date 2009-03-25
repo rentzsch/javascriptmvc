@@ -47,7 +47,7 @@ MVC.Controller.prototype.
 						<td>before, after, top, bottom</td>
 						<td>null</td>
 						<td>If present, the content will be placed relative to 
-						the HTMLElement or element ID.  The dom/element plugin is required for this functionality.
+						the HTMLElement or element ID.
 						</td>
 					</tr>
 					<tr>
@@ -125,36 +125,67 @@ render = function(options) {
             }
             result = view.render(data_to_render, helpers);
 		}
-		//return result;
-		var locations = ['to', 'before', 'after', 'top', 'bottom','replace'];
-		var element = null;
-		for(var l =0; l < locations.length; l++){
-			if(typeof  options[locations[l]] == 'string'){
-				var id = options[locations[l]];
-				options[locations[l]] = MVC.$E(id);
-				if(!options[locations[l]]) 
-					throw {message: "Can't find element with id: "+id, name: 'ControllerView: Missing Element'};
+		
+		var locations = [{
+			name: 'to',
+			action: function(destination, content) {
+				destination.html(content);
 			}
-			
-			if(options[locations[l]]){
-				element = options[locations[l]];
-				if(locations[l] == 'to'){
-                    if(MVC.$E.update)
-                        MVC.$E.update(options.to , result);
-                    else
-					    options.to.innerHTML = result;
-				}else if(locations[l] == 'replace'){
-                    MVC.$E.replace(options.replace , result);
-                }
-                else{
-					if(!MVC.$E.insert ) throw {message: "Include can't insert "+locations[l]+" without the element plugin.", name: 'ControllerView: Missing Plugin'};
-					var opt = {};
-					opt[locations[l]] = result;
-					MVC.$E.insert(element, opt );
-				}
-			} 
+		}, {
+			name: 'before',
+			action: function(destination, content) {
+				destination.before(content);
+			}
+		}, {
+			name: 'after',
+			action: function(destination, content) {
+				destination.after(content);
+			}
+		}, {
+			name: 'top',
+			action: function(destination, content) {
+				destination.prepend(content);
+			}
+		}, {
+			name: 'bottom',
+			action: function(destination, content) {
+				destination.append(content);
+			}
+		}, {
+			name: 'replace',
+			action: function(destination, content) {
+				destination.replaceWith(content);
+			}
+		}];
+		
+		var location;
+		var destination;
+		var l = 0;
+		
+		do {
+			location = locations[l];
+			destination = options[location.name];
+			l++;
+		} while((l < locations.length) && !destination);
+		
+		if (!destination) {
+			location = locations[0];	// default to "to"
+			destination = controller_name;
 		}
-		return result;
 
+		var option_location_is_an_id = typeof destination == 'string';
+		destination = $(option_location_is_an_id ? '#' + destination : destination);
+	
+		if (destination.length == 0)
+			// is it necessary to throw an exception here or can we silently continue?
+			throw { 
+				message: option_location_is_an_id
+					? "Can't find any element with id: " + destination.selector
+					: "Can't find HTMLElement",
+				name: 'ControllerView: Missing Element'
+			};
+
+		location.action(destination, result);
+		
+		return result;
 };
-//MVC.Controller.Stateful.prototype.render = MVC.Controller.prototype.render; // this needs to go

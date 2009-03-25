@@ -2,7 +2,8 @@ include.unit_tests(
     'class',
     'testing' ,
     'view',
-    'delegation'/*,
+    'delegation',	
+    'controller_view'/*,
     'controller',
     'file',
     'engine',
@@ -11,7 +12,6 @@ include.unit_tests(
     'element',
     'ajax', 
     
-    'controller_view',
     'vector',
     'timer',
     'model',
