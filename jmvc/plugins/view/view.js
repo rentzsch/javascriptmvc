@@ -608,14 +608,14 @@ MVC.Native.extend('String', {
 
 (function($){
     var funcs = ["prepend","append","insertBefore","insertAfter","replaceWith","text","html"]
-    var convert = function(func_name){
+    var convert = function(func_name) {
         var old = jQuery.fn[func_name]
-        jQuery.fn[func_name] = function(content){
-            if(typeof content ==  "undefined" || typeof content == "string" || content.nodeType){
-                return old.call(this,content);
-            }else{
-                return old.call( this , new MVC.View(content).render(content.data, content.helpers) )
-            }
+        
+        jQuery.fn[func_name] = function(content) {
+			return old.call(this, 
+				(typeof content ==  "undefined" || typeof content == "string" || content.nodeType || content.jquery)
+					? content
+					: new MVC.View(content).render(content.data, content.helpers));
         }
     }
     
