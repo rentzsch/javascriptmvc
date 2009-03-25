@@ -53,6 +53,7 @@ MVC.Inflector = {
     ['sex',    'sexes'   ],
     ['child',  'children'],
     ['man',    'men'     ],
+    ['woman',  'women'   ],
     ['foreman', 'foremen'],
     ['person', 'people'  ]
     ],
