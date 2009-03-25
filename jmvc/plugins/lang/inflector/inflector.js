@@ -110,6 +110,7 @@ MVC.Inflector = {
         return word.replace(regex, replace_string);
       }
     }
+    return word;
   }
 };
 /**
@@ -152,7 +153,7 @@ MVC.Native.extend('String', {
    * @return {Boolean}
    */
   is_singular: function(string){
-    if(MVC.String.singularize(string) == null && string)
+    if(MVC.String.singularize(string) == string && string)
         return true;
     return false;
   }
