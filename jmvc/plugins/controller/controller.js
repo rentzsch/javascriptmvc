@@ -427,11 +427,16 @@ MVC.Controller.Action.extend("MVC.Controller.Action.Event",
     get_callback : function(){
         var controller = this.controller;
         var cb = this.callback;
+        var jquery_element = this.jquery_element;
         return function(event){
-            var jq = jQuery(this);
-            jq.controller = controller;
-            cb.call(null,  jq, event);
+            cb.call(null, jquery_element(this, controller), event);
         }
+       },
+
+	jquery_element: function(element, controller) {
+		var jq = jQuery(element);
+		jq.controller = controller;
+		return jq;
     },
     
     /*

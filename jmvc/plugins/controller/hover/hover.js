@@ -35,32 +35,18 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend(
         this.underscoreName = className;
         this.element = element
         this.css_and_event();
+        
         var selector = this.selector();
-        this[this.event_type]()
-    },
-    /**
-     * Attaches a mouseover event, but checks that the related target is not within the outer element.
-     */
-    mouseenter : function(){
-        new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind( function(params){
-            //set a timeout and compare position
-			var related_target = params.event.relatedTarget;
-			if(params.element == related_target || MVC.$E(params.element).has(related_target)) return true;
-			this.callback(params);
-            
-        }, this));
-    },
-    /**
-     * Attaches a mouseout event, but checks that the related target is not within the outer element.
-     */
-    mouseleave : function(){
-        //add myself to hover outs to be called on the mouseout
-        new MVC.Delegator(this.selector(), 'mouseout', MVC.Function.bind( function(params){
-            //set a timeout and compare position
-			var related_target = params.event.relatedTarget;
-			if(params.element == related_target || MVC.$E(params.element).has(related_target)) return true;
-			this.callback(params);
-        }, this));
+        var jquery_element = this.jquery_element;
+        var controller = this.controller;
+        
+        new MVC.Delegator(
+			selector, 
+			this.event_type == 'mouseenter' ? 'mouseover' : 'mouseout', 
+			function(event) {
+				if (this == event.relatedTarget || ($.inArray(this, $(event.relatedTarget).parents().get())) >= 0) return true;
+				callback(jquery_element(this, controller), event);
+			});
     }
 });
 
