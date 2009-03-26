@@ -77,16 +77,6 @@ MVC.Controller.Stateful = MVC.Controller.extend(
             this._actions[i].destroy();
         }
 		delete this._actions;
-        /*var delegation_events = MVC.Dom.data(this.element).delegation_events;
-        if(this.element && delegation_events){
-            //take out any listeners on this guy
-            for(var event_type in delegation_events){
-                var events = delegation_events[event_type]
-                for(var i = 0; i < events.length; i++){
-                    events[i].destroy();
-                }
-            }
-        }*/
 		//remove children
 		for (var i = 0; i < this._children.length; i++) {
 			if(!this._children[i]._destroyed)
@@ -101,6 +91,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         //MVC.Dom.remove_data(this.element)
 		this._destroyed = true;
 		//clear element
+		MVC.Dom.remove_data(this.element);
 		this.element = null;
 		
     },
