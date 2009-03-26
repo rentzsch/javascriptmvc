@@ -77,7 +77,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
         this.element = element
         this.css_and_event();
         var selector = this.selector();
-		var jmvc = MVC.Delegator.jmvc(this.element)
+		var jmvc = MVC.Dom.data(this.element);
         if(!jmvc.custom) jmvc.custom = {};
         if(!jmvc.custom.drag) jmvc.custom.drag = {};
         var drag = jmvc.custom.drag;
@@ -108,6 +108,15 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
        MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
        MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
 	   return false;
+	},
+	destroy : function(){
+		//remove selector if it is there
+		var jmvc = MVC.Dom.data(this.element);
+		var selector = this.selector();
+		//just remove all callbacks for the selector if they exist
+		if(jmvc.custom.drag[selector])
+			delete jmvc.custom.drag[selector];
+		this._super();
 	}
 });
 

@@ -76,6 +76,7 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         for(var i = 0; i < this._actions.length; i++){
             this._actions[i].destroy();
         }
+		delete this._actions;
         /*var delegation_events = MVC.Dom.data(this.element).delegation_events;
         if(this.element && delegation_events){
             //take out any listeners on this guy
@@ -97,9 +98,11 @@ MVC.Controller.Stateful = MVC.Controller.extend(
         }
         if(this.element && this.element.parentNode)
             this.element.parentNode.removeChild(this.element);
-        this._destroyed = true;
+        //MVC.Dom.remove_data(this.element)
+		this._destroyed = true;
 		//clear element
 		this.element = null;
+		
     },
     /**
      * Used to call back to this instance

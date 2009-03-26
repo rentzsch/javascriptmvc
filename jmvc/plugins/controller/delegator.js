@@ -138,6 +138,7 @@ MVC.Delegator.prototype = {
             }
         }
         if(events.length == 0){
+			MVC.Dom.data(this.element,"delegation_events")[event] = null;
             MVC.Event.stop_observing(this.element, event, events._bind_function, this.capture() );
         }
     },
