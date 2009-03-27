@@ -42,7 +42,7 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend(
      * Attaches a mouseover event, but checks that the related target is not within the outer element.
      */
     mouseenter : function(){
-        new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind( function(params){
+        this.delegator = new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind( function(params){
             //set a timeout and compare position
 			var related_target = params.event.relatedTarget;
 			if(params.element == related_target || MVC.$E(params.element).has(related_target)) return true;
@@ -55,7 +55,7 @@ MVC.Controller.Action.EnterLeave = MVC.Controller.Action.Event.extend(
      */
     mouseleave : function(){
         //add myself to hover outs to be called on the mouseout
-        new MVC.Delegator(this.selector(), 'mouseout', MVC.Function.bind( function(params){
+        this.delegator = new MVC.Delegator(this.selector(), 'mouseout', MVC.Function.bind( function(params){
             //set a timeout and compare position
 			var related_target = params.event.relatedTarget;
 			if(params.element == related_target || MVC.$E(params.element).has(related_target)) return true;
@@ -119,37 +119,44 @@ MVC.Controller.Action.Hover = MVC.Controller.Action.Event.extend(
         this.className = className;
         this.element = element;
         this.css_and_event();
-        var selector = this.selector();
-        var data = MVC.Dom.data(element);
-        if(!data.custom) data.custom = {}
-        if(!data.custom.hovers) data.custom.hovers = {};
-        
-        if(! data.custom.hovers[ this.selector() ]){
-            data.custom.hovers[ this.selector() ] = {};
-            new MVC.Delegator(this.selector(), 'mouseover', MVC.Function.bind(this.mouseover , this), element );
-            new MVC.Delegator(this.selector(), 'mouseout', MVC.Function.bind( this.mouseout, this), element);
-        }
-        data.custom.hovers[this.selector()][this.event_type] = this;
+        this._selector = this.selector();
+		var hovers = MVC.Dom.get_or_set_data(element, "hover_callbacks:"+this._selector,{})
+        hovers[this.event_type] = callback;
+		if(!hovers.delegated){
+			this.mouseover_delegator = new MVC.Delegator(this._selector, 'mouseover', MVC.Function.bind(this.mouseover , this), element );
+			this.mouseout_delegator = new MVC.Delegator(this._selector, 'mouseout', MVC.Function.bind( this.mouseout, this), element);
+			hovers.delegated = true
+		}
     },
+	destroy : function(){
+		var hovers = MVC.Dom.remove_data(this.element, "hover_callbacks:"+this._selector)
+		if(this.mouseover_delegator){
+			this.mouseover_delegator.destroy();
+			this.mouseout_delegator.destroy();
+			delete this.mouseover_delegator;
+			delete this.mouseout_delegator;
+		}
+		this._super();
+	},
     /**
      * Calls hoverenter if there is one.
      * @param {Object} params
      */
 	hoverenter : function(params){
-         var hoverenter = MVC.Dom.data(params.delegate).custom.hovers[this.selector()]["hoverenter"];
-         if(hoverenter) hoverenter.callback(params);
+         var hoverenter = MVC.Dom.data(params.delegate, "hover_callbacks:"+this._selector)["hoverenter"]
+         if(hoverenter) hoverenter(params);
 	},
      /**
      * Calls hoverleave if there is one.
      * @param {Object} params
      */
 	hoverleave : function(params){
-		var hoverleave = MVC.Dom.data(params.delegate).custom.hovers[this.selector()]["hoverleave"];
-        if(hoverleave) hoverleave.callback(params);
+		var hoverleave = MVC.Dom.data(params.delegate, "hover_callbacks:"+this._selector)["hoverleave"];
+        if(hoverleave) hoverleave(params);
 	},
     hovermove : function(params){
-        var hovermove = MVC.Dom.data(params.delegate).custom.hovers[this.selector()]["hovermove"];
-        if(hovermove) hovermove.callback(params);
+        var hovermove = MVC.Dom.data(params.delegate, "hover_callbacks:"+this._selector)["hovermove"];
+        if(hovermove) hovermove(params);
     },
     
     /**

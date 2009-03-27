@@ -31,6 +31,10 @@ MVC.Dom ={
 			MVC.Dom.cache[ id ][ name ] :
 			MVC.Dom.cache[ id ];
 	},
+	get_or_set_data : function(elem, name, data){
+		var got = MVC.Dom.data(elem, name);
+		return got ? got :  MVC.Dom.data(elem, name, data);
+	},
 	remove_data: function( elem, name ) {
 		elem = elem == window ?
 			MVC.Dom.window_data :

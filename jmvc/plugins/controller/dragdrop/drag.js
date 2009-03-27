@@ -76,21 +76,13 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
         this.className = className;
         this.element = element
         this.css_and_event();
-        var selector = this.selector();
-		var jmvc = MVC.Dom.data(this.element);
-        if(!jmvc.custom) jmvc.custom = {};
-        if(!jmvc.custom.drag) jmvc.custom.drag = {};
-        var drag = jmvc.custom.drag;
-        //If the selector has already been added, just add this action to its list of possible action callbacks
-		if(drag[selector]) {
-            drag[selector].callbacks[this.event_type] = callback;
-            return;
-        }
-		//create a new mousedown event for selectors that match our mouse event
-        this.delegator =drag[selector] = 
-			new MVC.Delegator(selector, 'mousedown', MVC.Function.bind(this.mousedown, this, element), element);
-        drag[selector].callbacks = {};
-        drag[selector].callbacks[this.event_type] = callback;
+        this._selector = this.selector();
+	
+		var drag_callbacks = MVC.Dom.get_or_set_data(this.element,"drag_callbacks:"+this._selector,{}) ;
+        drag_callbacks[this.event_type] = callback;
+		if(!drag_callbacks.delegator)
+		this.delegator = drag_callbacks.delegator = 
+				new MVC.Delegator(this._selector, 'mousedown', MVC.Function.bind(this.mousedown, this, element), element)
     },
 	/**
 	 * Called when someone mouses down on a draggable object.
@@ -98,10 +90,9 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
 	 */
 	mousedown : function(element, params){
        var isLeftButton = params.event.which == 1;
-       var jmvc= MVC.Delegator.jmvc(element);
-       if(jmvc.responding == false || !isLeftButton) return;
-       var drag = jmvc.custom.drag
-       MVC.Object.extend(params, drag[this.selector()].callbacks)
+       var drag_callbacks = MVC.Dom.data(this.element,"drag_callbacks:"+this._selector);
+       if(!isLeftButton) return;
+       MVC.Object.extend(params,drag_callbacks)
        if(MVC.Draggable.current) return;
 	   MVC.Draggable.current = new MVC.Draggable(params);
        params.event.prevent_default();
@@ -111,11 +102,7 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
 	},
 	destroy : function(){
 		//remove selector if it is there
-		var jmvc = MVC.Dom.data(this.element);
-		var selector = this.selector();
-		//just remove all callbacks for the selector if they exist
-		if(jmvc.custom.drag[selector])
-			delete jmvc.custom.drag[selector];
+		MVC.Dom.remove_data(this.element,"drag_callbacks:"+this._selector);
 		this._super();
 	}
 });

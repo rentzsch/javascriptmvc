@@ -54,15 +54,16 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
         this.element = element
         this.css_and_event();
         var selector = this.selector();
-        var jmvc = MVC.Delegator.jmvc(this.element)
-		if(!jmvc.delegation_events.drops) jmvc.delegation_events.drops = {};
-		// add selector to list of selectors:
-        if(! jmvc.delegation_events.drops[selector]) jmvc.delegation_events.drops[selector] = {};
-        jmvc.delegation_events.drops[selector][this.event_type] = callback; 
+		
+		var drop_callbacks = MVC.Dom.get_or_set_data(this.element,"drop_callbacks",{});
+		if(!drop_callbacks[selector]) drop_callbacks[selector] = {};
+		drop_callbacks[selector][this.event_type] = callback;
 		MVC.Droppables.add_element(element);
     },
 	destroy : function(){
 		MVC.Droppables.remove_element(this.element);
+		var drop_callbacks = MVC.Dom.data(this.element,"drop_callbacks");
+		delete drop_callbacks[this.selector()];
 		this._super();
 	}
 });
@@ -276,15 +277,15 @@ MVC.Droppables = MVC.Class.extend('drop',
 	* all possible droppable elements and adds them.
 	*/
 	compile : function(){
+	  var el, drops, selector, sels;
 	  for(var i=0; i < MVC.Droppables._elements.length; i++){ //for each element
-		  var el = MVC.Droppables._elements[i]
-		  var drops =  MVC.Delegator.jmvc(el).delegation_events.drops ;//  jQuery.data(MVC.Droppable._elements[i], "delegation_events").drops;
-          for(var selector in drops){ //find the selectors
-    	      
-			  var sels = selector ? MVC.Query(selector, el) : [el];
+		  el = MVC.Droppables._elements[i]
+		  drops = MVC.Dom.data(el,"drop_callbacks")
+          for(selector in drops){ //find the selectors
+			  sels = selector ? MVC.Query(selector, el) : [el];
 			  for(var e= 0; e < sels.length; e++){ //for each found element, create a drop point
-    	          MVC.Dom.remove_data(sels[e],"offset")
-              	  MVC.Droppables.add(sels[e], new MVC.Controller.Params.Drop(drops[selector]))
+    	          MVC.Dom.remove_data(sels[e],"offset");
+              	  MVC.Droppables.add(sels[e], new MVC.Controller.Params.Drop(drops[selector]));
     	      }
     	  }
 	  }
