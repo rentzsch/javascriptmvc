@@ -28,17 +28,21 @@ java -jar jmvc\rhino\js.jar -e _args=%ARGS% -e load('%FILENAME%')
 GOTO END
 
 :PRINT_HELP
+echo.
 echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
 echo Available commands:
+echo.
 echo js				Opens a command line JavaScript environment
-echo js	-d			Opens the Rhino debugger
+echo js -d				Opens the Rhino debugger
 echo js [FILE]			Runs FILE in the Rhino environment
-
+echo.
 echo JavaScriptMVC script usage:
-echo js jmvc/generate/app [NAME]	Creates a new JavaScriptMVC application
+echo.
+echo js jmvc/generate/app [NAME]		Creates a new JavaScriptMVC application
 echo js jmvc/generate/page [APP] [PAGE]	Generates a page for the application
 echo js jmvc/generate/controller [NAME]	Generates a Controller file
 echo js jmvc/generate/model [TYPE] [NAME]	Generates a Model file
-echo js apps/[NAME]/compress.js	Compress your application and generate documentation
-
+echo js jmvc/generate/engine [NAME]		Generates a set of Engine files
+echo js apps/[NAME]/compress.js		Compress your application and generate documentation
+echo.
 :END
