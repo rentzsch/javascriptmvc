@@ -49,7 +49,10 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      */
     init: function(element){
         //check that this already isn't being delegated on:
-        if(element._mvc_controlled) throw "Element in "+this.Class.className+" controller is already wrapped by another controller."
+        if(element._mvc_controlled){
+            throw "Element in "+this.Class.className+" controller is already wrapped by another controller."
+        }
+            
         element._mvc_controlled = true;
         
         //needs to go through prototype, and attach events to this instance
