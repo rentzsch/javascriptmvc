@@ -607,19 +607,17 @@ MVC.Native.extend('String', {
 });
 
 (function($){
-    var funcs = ["prepend","append","insertBefore","insertAfter","replaceWith","text","html"]
-    var convert = function(func_name) {
-        var old = jQuery.fn[func_name]
-        
-        jQuery.fn[func_name] = function(content) {
-			return old.call(this, 
-				(typeof content ==  "undefined" || typeof content == "string" || content.nodeType || content.jquery)
-					? content
-					: new MVC.View(content).render(content.data, content.helpers));
-        }
-    }
-    
-    for(var i=0; i < funcs.length; i++){
-        convert(funcs[i]);
-    }
+	var funcs = ["prependTo","appendTo","insertBefore","insertAfter","replaceWith","text","html"]
+	var convert = function(func_name) {
+		var old = jQuery.fn[func_name];
+
+		jQuery.fn[func_name] = function(content) {
+			var useViewTemplate = !(typeof content == "undefined" || typeof content == "string" || content.nodeType || content.jquery);
+			return old.call(this, useViewTemplate ? new MVC.View(content).render(content.data, content.helpers) : content);
+		}
+	}
+
+	for(var i=0; i < funcs.length; i++){
+		convert(funcs[i]);
+	}
 })(jQuery);
