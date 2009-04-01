@@ -97,8 +97,9 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.Event.extend(
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
-MVC.Controller.Params.Drop = MVC.Controller.Params
-
+MVC.Controller.Params.Drop = function(){
+    MVC.Controller.Params.apply(this, arguments);
+}
 MVC.Controller.Params.Drop.prototype = new MVC.Controller.Params();
 MVC.Object.extend(MVC.Controller.Params.Drop.prototype, 
 /* @prototype */
@@ -201,7 +202,7 @@ MVC.Droppables = MVC.Class.extend('drop',
 	 */
 	deactivate: function(drop, drag, event) {
 		this.last_active = null;
-		if(drop.dropout) drop.dropout( {element: drop.element, drag: drag, event: event });
+		if(drop.dropout) drop.dropout(new MVC.Controller.Params.Drop( {element: drop.element, drag: drag, event: event }));
 	}, 
 	/**
 	 * Calls dropover
@@ -211,10 +212,10 @@ MVC.Droppables = MVC.Class.extend('drop',
 	 */
 	activate: function(drop, drag, event) { //this is where we should call over
 		this.last_active = drop;
-		if(drop.dropover) drop.dropover( {element: drop.element, drag: drag, event: event });
+		if(drop.dropover) drop.dropover( new MVC.Controller.Params.Drop( {element: drop.element, drag: drag, event: event }));
 	},
     dropmove : function(drop, drag, event){
-        if(drop.dropmove) drop.dropmove( {element: drop.element, drag: drag, event: event, position: drop.position_on_element});
+        if(drop.dropmove) drop.dropmove( new MVC.Controller.Params.Drop( {element: drop.element, drag: drag, event: event, position: drop.position_on_element}));
     },
 	/**
 	* Gives a point, the object being dragged, and the latest mousemove event.
@@ -266,7 +267,9 @@ MVC.Droppables = MVC.Class.extend('drop',
 		if( this.isAffected(MVC.Event.pointer(event), drag.drag_element, this.last_active) && //last is still activated
 			this.last_active.dropped	){ 											//drop was ok
 			
-            this.last_active.dropped({drag: drag, event: event, element: this.last_active.element}); 
+            this.last_active.dropped( 
+                new MVC.Controller.Params.Drop( {drag: drag, event: event, element: this.last_active.element})
+            ); 
 		    this.last_active = null;
 			return true; 
 		}

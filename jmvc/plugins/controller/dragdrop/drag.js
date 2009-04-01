@@ -334,7 +334,9 @@ MVC.Draggable.current = null;
  * @init
  * Same functionality as [MVC.Controller.Params]
  */
-MVC.Controller.Params.Drag = MVC.Controller.Params
+MVC.Controller.Params.Drag = function(){
+    MVC.Controller.Params.apply(this, arguments);
+}
 
 MVC.Controller.Params.Drag.prototype = new MVC.Controller.Params();
 MVC.Object.extend(MVC.Controller.Params.Drag.prototype, 

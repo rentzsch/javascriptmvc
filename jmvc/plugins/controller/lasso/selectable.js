@@ -86,8 +86,9 @@ MVC.Controller.Action.Selectable = MVC.Controller.Action.Event.extend(
  * @hide
  * @init abc
  */
-MVC.Selectable = MVC.Controller.Params
-
+MVC.Selectable = function(){
+    MVC.Controller.Params.apply(this, arguments);
+}
 MVC.Selectable.prototype = new MVC.Controller.Params();
 MVC.Object.extend(MVC.Selectable.prototype, 
 /* @prototype */
