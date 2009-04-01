@@ -492,12 +492,7 @@ MVC.Controller.Action.extend("MVC.Controller.Action.Event",
      */
     selector : function(){
         if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
-            var self = this;
-            jQuery.event.add( window , this.event_type , 
-                function(event){
-                    self.callback($(window), event  )
-                }
-            );
+            this.attach_window_event_handler(this.event_type);
             return;
         }
         //if(!this.underscoreName){
@@ -510,6 +505,17 @@ MVC.Controller.Action.extend("MVC.Controller.Action.Event",
                 this.singular_selector() : this.plural_selector();
         return this.css_selector;
     },
+    
+    attach_window_event_handler: function(event_type) {
+        var self = this;
+        
+        jQuery.event.add(window, event_type,
+            function(event) {
+                self.callback($(window), event);
+            }
+        );
+    },
+    
     destroy : function(){
         if(this.delegator) this.delegator.destroy();
         this._super();
