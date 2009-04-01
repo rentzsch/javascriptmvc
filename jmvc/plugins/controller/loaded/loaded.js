@@ -54,7 +54,7 @@
 
 	MVC.Controller.Action.Event.prototype.attach_window_event_handler = function(event_type) {
 		if (event_type != 'load') {
-			standard_attach_window_event_handler(event_type);
+			standard_attach_window_event_handler.apply(this, [event_type]);
 			return;
 		}
 		
