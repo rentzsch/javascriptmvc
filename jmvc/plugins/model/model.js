@@ -187,11 +187,12 @@ MVC.Model = MVC.Class.extend(
 		return this._find_by_element(MVC.$E(el), this.className, this);
 	},
     _find_by_element: function(ce, modelName, model){
-        var matches, id,  matcher = new RegExp("^"+modelName+"_(.*)$");
+        var matches, match, id,  matcher = new RegExp("^"+modelName+"_(.*)$");
         if(ce && ce.id && (matches= ce.id.match(matcher) ) && matches.length > 1){
             id = matches[1]
         }else{
-            id = ce.has_class(matcher)[1]
+			match = ce.has_class(matcher);
+            id = (match == undefined? match: match[1]);
         }
         return model.store.find_one(id);
     },
