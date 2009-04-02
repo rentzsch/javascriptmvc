@@ -192,6 +192,16 @@
         })(name, klass[name]) :
         klass[name];
 	};
+    
+    Class.createInstance = function(){
+        initializing = true;
+        var inst = new Class();
+        initializing = false;
+        if ( inst.init )
+            inst.init.apply(inst, arguments);
+    }
+    
+    
     Class.extend = arguments.callee;
     /**
      * @attribute className 
