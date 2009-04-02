@@ -33,13 +33,49 @@
  * [MVC.Controller.Stateful.prototype.init|init] function.  As events happen on the element or child elements
  * of the instance, they call back to the controller instance.
  */
-MVC.Controller.Stateful = MVC.Controller.extend(
+jQuery.Controller = MVC.Class.extend(
 /* @Static*/
 {
-    _should_attach_actions: false,
+    init : function(){
+        if(!this.className) return;
+        this.underscoreName = MVC.String.underscore(this.className.replace(/controller/i,""))
+        this.singularName =  MVC.String.singularize(this.underscoreName);
+        if(!MVC.Controller.controllers[this.underscoreName]) MVC.Controller.controllers[this.underscoreName] = [];
+        MVC.Controller.controllers[this.underscoreName].unshift(this);
+        var val, act;
+        if(!this.modelName)
+            this.modelName = MVC.String.is_singular(this.underscoreName) ? this.underscoreName : MVC.String.singularize(this.underscoreName)
 
-    _events : null,
-    _element : null
+        //load tests
+        if(include.get_env() == 'test'){
+            var path = MVC.root.join('test/functional/'+this.underscoreName+'_controller_test.js');
+    		var exists = include.check_exists(path);
+    		if (exists) {
+				MVC.Console.log('Loading: "test/functional/' + this.underscoreName + '_controller_test.js"');
+                include('../test/functional/'+this.underscoreName+'_controller_test.js');
+			}
+			else {
+				MVC.Console.log('Test Controller not found at "test/functional/' + this.underscoreName + '_controller_test.js"');
+			}
+        }
+        this._path =  include.get_path().match(/(.*?)controllers/)[1]+"controllers";
+        var controller = this;
+        jQuery.fn[MVC.String.underscore(this.fullName)] = function(){
+            var instances = [];
+            var args = jQuery.makeArray(arguments);
+            for(var i =0; i < this.length; i++){
+                args.unshift(this[i]);
+                var inst = jQuery.data(this[i], self.fullName);
+                instances.push( isNaN(inst) ? 
+                                inst :
+                                controller.createInstance.apply(controller, args)
+                )
+                args.shift();
+            }
+            return instances;
+        }
+        //add a helper for jQuery
+    }
 },
 /* @Prototype */
 {
@@ -49,13 +85,13 @@ MVC.Controller.Stateful = MVC.Controller.extend(
      */
     init: function(element){
         //needs to go through prototype, and attach events to this instance
-        MVC.Delegator.jmvc(element)
+
         this._actions = [];
         for(var action_name in this){
-    		val = this[action_name];
+    		var val = this[action_name];
     		if( typeof val == 'function' && action_name != 'Class'){
                 for(var a = 0 ; a < MVC.Controller.actions.length; a++){
-                    act = MVC.Controller.actions[a];
+                    var act = MVC.Controller.actions[a];
                     if(act.matches(action_name)){
                         var callback = this.dispatch_closure(action_name);
                         this._actions.push(new act(action_name, callback, this.Class.className,element ));
@@ -65,57 +101,54 @@ MVC.Controller.Stateful = MVC.Controller.extend(
 	    }
         this.action_name = "init";
         this.element = element;
+        jQuery.data(this.element, this.Class.fullName, this);
     },
 
     /**
      * Removes all actions on this instance.
      */
     destroy: function(){
+        if(this._destroyed) throw this.Class.className+" controller instance has already been deleted";
         for(var i = 0; i < this._actions.length; i++){
             this._actions[i].destroy();
         }
-        
-        if(this.element && this.element.__jmvc){
-            //take out any listeners on this guy
-            for(var event_type in this.element.__jmvc.delegation_events){
-                var events = this.element.__jmvc.delegation_events[event_type]
-                for(var i = 0; i < events.length; i++){
-                    events[i].destroy();
-                }
-            }
-        }
-        if(this.element && this.element.parentNode)
-            this.element.parentNode.removeChild(this.element);
+		delete this._actions;
+		this._destroyed = true;
+		//clear element
+        jQuery.removeData(this.element, this.Class.fullName);
+		this.element = null;
     },
     /**
      * Used to call back to this instance
      * @param {Object} f_name
      */
     dispatch_closure: function(f_name){
-        return MVC.Function.bind(function(params){
-            if(!this.element.__jmvc.responding) return;
-            params = params || {};
-            params.action = f_name;
-            params.controller = this.Class;
-            params = params.constructor == MVC.Controller.Params ? params : new MVC.Controller.Params(params)
-			
-            //this.params = params;
-    		this.action_name = f_name;
-            return this[f_name](params);
-		},this);
+        var self = this;
+        return MVC.Function.bind(function(){
+            self.args = arguments;
+    		self.called = f_name;
+            return self[f_name].apply(self, arguments);
+        })
+
     },
     /**
      * Queries from the current element.
      * @param {Object} selector
      */
-    query: function(selector){
-        return MVC.Query.descendant(this.element, selector)
-    },
-    /**
-     * Can 'shut' down this controller, preventing it from responding to any event.
-     * @param {Boolean} respond true to respond to events, false to repond to nothing.
-     */
-    respond: function(respond){
-        this.element.__jmvc.responding = respond;
+    find: function(selector){
+        return $(this.element).find(selector);
     }
 });
+
+
+jQuery.fn.controller = function(){
+    var controllerNames = MVC.Array.from(arguments);
+    //check if arguments
+    var instances = [];
+    var instance_data = jQuery.data(this[0], "instances");
+    for(var i =0; i < controllerNames.length; i++){
+        //check if there is an instance
+        if(!instance_data[ controllerNames[i] ])
+            instance_data[ controllerNames[i] ]
+    }
+};
