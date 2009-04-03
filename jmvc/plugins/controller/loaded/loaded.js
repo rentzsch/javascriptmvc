@@ -6,7 +6,7 @@
 	MVC.Controller.Action.Event.extend("MVC.Controller.Action.Loaded",
 	/* @Static */
 	{
-		match: new RegExp("(.*?)\\s?(loaded)$"),
+		match: new RegExp("^(?:(.*?)\\s)?(loaded)$"),
 		
 		callbacks: {
 			load: [],
