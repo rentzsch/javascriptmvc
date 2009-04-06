@@ -76,7 +76,7 @@ render = function(options) {
         if(options.helpers){
             for(var h =0; h < options.helpers.length; h++){
                 var n = MVC.String.classize( options.helpers[h] );
-                MVC.Object.extend(helpers, window[n] ? window[n].View().helpers : {} );
+                jQuery.extend(helpers, window[n] ? window[n].View().helpers : {} );
             }
         }
         

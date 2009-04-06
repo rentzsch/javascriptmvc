@@ -14,7 +14,7 @@ MVC.Test.Controller = MVC.Test.Functional.extend({
 	},
 	helpers : function(){
 		var helpers = this._super();
-		var actions = MVC.Object.extend({}, this.controller.actions) ;
+		var actions = jQuery.extend({}, this.controller.actions) ;
 		this.added_helpers = {};
 		for(var action_name in actions){
 			if(!actions.hasOwnProperty(action_name) || 

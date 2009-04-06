@@ -290,7 +290,7 @@ MVC.History = {
 	/*Constant for our own internal history event called when the page is loaded*/
 	PAGELOADEDSTRING: "DhtmlHistory_pageLoaded",
 	
-	blank_html_path: MVC.mvc_root+'/plugins/dom/history/',
+	blank_html_path: MVC.mvcRoot+'/plugins/dom/history/',
 	
 	/*Our history change listener.*/
 	listener: null,
@@ -829,7 +829,7 @@ MVC.Path.get_data = function(path) {
 /**
  * @add MVC.Controller Prototype
  */
-MVC.Object.extend(MVC.Controller.prototype,{
+jQuery.extend(MVC.Controller.prototype,{
 /**
  * Redirects to another page.
  * @plugin 'dom/history'

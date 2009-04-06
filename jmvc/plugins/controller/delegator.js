@@ -50,7 +50,7 @@ MVC.Delegator = function(selector, event, f, element){
 		delegates[event].push(this);
 }
 
-MVC.Object.extend(MVC.Delegator,
+jQuery.extend(MVC.Delegator,
 {
     /**
      * Adds kill() on an event.
@@ -89,7 +89,7 @@ MVC.Object.extend(MVC.Delegator,
     events: {},
     onload_called : false
 })
-MVC.Object.extend(MVC.Delegator.prototype,
+jQuery.extend(MVC.Delegator.prototype,
 {
     /*
      * returns the event that should actually be used.  In practice, this is just used to switch focus/blur

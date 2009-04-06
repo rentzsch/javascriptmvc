@@ -112,7 +112,7 @@ MVC.Selectables = {
 	 */
 	add: function(element, functions) {
 		element = MVC.$E(element);
-		functions = MVC.Object.extend({
+		functions = jQuery.extend({
 			selectover: MVC.Lasso.k,
 			selected:MVC.Lasso.k,
 			selectout:MVC.Lasso.k,

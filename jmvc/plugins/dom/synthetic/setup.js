@@ -124,7 +124,7 @@
     			this.options.keyCode = 8;
     			character = 0;
     		}
-    		var options = MVC.Object.extend({
+    		var options = jQuery.extend({
     			ctrlKey: false,
     			altKey: false,
     			shiftKey: false,
@@ -144,7 +144,7 @@
     				this.event = document.createEvent("UIEvents");
     			} finally {
     				this.event.initEvent(this.type, true, true);
-    				MVC.Object.extend(this.event, options);
+    				jQuery.extend(this.event, options);
     			}
     		}
     		var fire_event = this.simulateEvent(element);
@@ -175,7 +175,7 @@
     	},
         create_mouse_options : function(element){
             var center = jQuery(element).centerv();
-            var defaults =MVC.Object.extend({
+            var defaults =jQuery.extend({
     			bubbles : true,
     			cancelable : true,
     			view : window,
@@ -202,7 +202,7 @@
             this.simulateEvent(element);
     	},
     	createMouseObject : function(element){
-            MVC.Object.extend(this.event, this.create_mouse_options(element));
+            jQuery.extend(this.event, this.create_mouse_options(element));
     		
             if(!jQuery.browser.mozilla && 
     			(element.nodeName.toLowerCase() == 'input' || 

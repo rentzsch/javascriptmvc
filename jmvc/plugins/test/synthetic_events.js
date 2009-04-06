@@ -109,7 +109,7 @@ MVC.SyntheticEvent.prototype =
 			this.options.keyCode = 8;
 			character = 0;
 		}
-		var options = MVC.Object.extend({
+		var options = jQuery.extend({
 			ctrlKey: false,
 			altKey: false,
 			shiftKey: false,
@@ -129,7 +129,7 @@ MVC.SyntheticEvent.prototype =
 				this.event = document.createEvent("UIEvents");
 			} finally {
 				this.event.initEvent(this.type, true, true);
-				MVC.Object.extend(this.event, options);
+				jQuery.extend(this.event, options);
 			}
 		}
 		var fire_event = this.simulateEvent(element);
@@ -162,7 +162,7 @@ MVC.SyntheticEvent.prototype =
 	createMouse : function(element){
 		this.event = document.createEvent('MouseEvents');
 		var center = MVC.Test.center(element);
-		var defaults = MVC.Object.extend({
+		var defaults = jQuery.extend({
 			bubbles : true,cancelable : true,
 			view : window,
 			detail : 1,
@@ -184,7 +184,7 @@ MVC.SyntheticEvent.prototype =
 	createMouseObject : function(element){
 		this.event = document.createEventObject();
 		var center = MVC.Test.center(element);
-		var defaults =MVC.Object.extend({
+		var defaults =jQuery.extend({
 			bubbles : true,
 			cancelable : true,
 			view : window,
@@ -196,7 +196,7 @@ MVC.SyntheticEvent.prototype =
 			relatedTarget : null
 		}, this.options);
 		
-		MVC.Object.extend(this.event, defaults);
+		jQuery.extend(this.event, defaults);
 		if(!jQuery.browser.mozilla && 
 			(element.nodeName.toLowerCase() == 'input' || 
 			(element.type && element.type.toLowerCase() == 'checkbox'))) 

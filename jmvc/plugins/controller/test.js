@@ -8,7 +8,7 @@
         c(model, actions);
 		
 	};
-	MVC.Object.extend(MVC.Controller, c);
+	jQuery.extend(MVC.Controller, c);
 	
 	if(!MVC._no_conflict) Controller = MVC.Controller;
 })();
