@@ -4,7 +4,7 @@
 include.plugins("jquery","dom",'lang/class','lang/openajax','dom/synthetic')
 
 if(!window._rhino){
-    include.plugins('debug')
+    include.plugins('console')
 }else{
     MVC.Console = {log: function(txt){
         print(txt);
