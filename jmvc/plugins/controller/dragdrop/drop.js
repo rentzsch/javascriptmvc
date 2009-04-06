@@ -136,7 +136,7 @@ jQuery.Class.extend('jQuery.Droppable',
         if(droppable.dropadd) droppable.dropadd(element, event, droppable);
 		
         if(!droppable._canceled){
-		    element.makePositioned();
+		    //element.makePositioned();
 		    this.drops.push(droppable);
 		}
 	    

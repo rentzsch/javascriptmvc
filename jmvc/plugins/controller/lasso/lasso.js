@@ -193,7 +193,7 @@ MVC.Lasso.prototype =
      * @return {Vector}
      */
     currentDelta: function() {
-        return new MVC.Vector( parseInt(MVC.Element.get_style(this.lasso_element,'left') || '0'), 
+        return new jQuery.Vector( parseInt(MVC.Element.get_style(this.lasso_element,'left') || '0'), 
                             parseInt(MVC.Element.get_style(this.lasso_element,'top') || '0'))   ;
     },
     //draws the position of the dragging object

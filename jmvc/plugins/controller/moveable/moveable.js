@@ -134,7 +134,7 @@ jQuery.Class.extend("jQuery.Move",{
         }
         else
             this.start_position = this.currentDelta(); //if it is us
-            
+        this.element.makePositioned();
         this.element.css('zIndex',1000);
         this.Class.responder.compile(event, this);
     },

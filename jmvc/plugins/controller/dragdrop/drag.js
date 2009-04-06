@@ -17,8 +17,8 @@ jQuery.Move.extend("jQuery.Drag",
 
 },
 {
-    draw : function(event){
-        if (!this.moved) this.start(event) 
+    draw : function(pointer, event){
+		if (!this.moved) this.start(event) 
 		
 		// only drag if we haven't been cancelled;
 		if(this._cancelled) return;
@@ -39,7 +39,8 @@ jQuery.Move.extend("jQuery.Drag",
         	
         
 		//Call back to dragmove
-        
+        if(!this._horizontal)    this.element.css( "top", p.top()+"px" );
+        if(!this._vertical)      this.element.css("left", p.left()+ "px" );
 		
 		//Tell dropables where mouse is
 		this.Class.responder.show(pointer, this, event);  
