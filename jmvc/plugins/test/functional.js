@@ -57,7 +57,7 @@ new MVC.Test.Functional('TestCaseName',{
 		}
 		for(var e = 0; e < MVC.Test.Functional.events.length; e++){
 			var event_name = MVC.Test.Functional.events[e];
-			helpers[MVC.String.capitalize(event_name)] = helpers.Action.curry(event_name)
+			helpers[jQuery.String.capitalize(event_name)] = helpers.Action.curry(event_name)
 		}
 		return helpers;
 	}

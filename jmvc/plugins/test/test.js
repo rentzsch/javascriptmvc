@@ -3,12 +3,12 @@
  * Test.Unit, Test.Functional, and Test.Controller. 
  * Typically Test is not used directly but its functions are available in inheriting classes.
  */
-MVC.Class.extend("MVC.Test",
+jQuery.Class.extend("MVC.Test",
 {
     init : function(){
         
         this.clear();
-        if(MVC.String.include(this.fullName,"MVC.Test"  )) return;
+        if(jQuery.String.include(this.fullName,"MVC.Test"  )) return;
         this.testNames = []
         
 		for(var test_name in this.prototype) {

@@ -24,14 +24,14 @@
     </tr>
 </table>
 
-Drop actions are called with [MVC.Controller.Params.Drop].  Use Params.Drop to adjust drop functionality
- * and cache drop points.  For more information on how Drops work read [MVC.Droppables]
+Drop actions are called with [jQuery.Controller.Params.Drop].  Use Params.Drop to adjust drop functionality
+ * and cache drop points.  For more information on how Drops work read [jQuery.Droppables]
  * <h3>Install</h3>
 @code_start
 include.plugins('controller/dragdrop')
 @code_end
  */
-MVC.Controller.Action.Drop = MVC.Controller.Action.extend(
+jQuery.Controller.Action.Drop = jQuery.Controller.Action.extend(
 /* @static */
 {
     /**
@@ -56,7 +56,7 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.extend(
         if(!delegates.drops) delegates.drops = {};
         var drops = delegates.drops;
         
-        MVC.Droppable.addElement(element);
+        jQuery.Droppable.addElement(element);
         
 		// add selector to list of selectors:
         if(! drops[selector]) drops[selector] = {};
@@ -64,17 +64,17 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.extend(
     }
 });
 /**
- * @constructor MVC.Controller.Params.Drop
- * [MVC.Controller.Action.Drop Drop actions] are called with Params.Drop.  
+ * @constructor jQuery.Controller.Params.Drop
+ * [jQuery.Controller.Action.Drop Drop actions] are called with Params.Drop.  
  * The most important param function is cache_position.  If your drop elements are not
  * changing position after dragstart, use cache_position for large performance improvements.
  * 
    <h3>Passing data from drag events to drop events</h3>
    
- * Drop params include a drag attribute, which contains the contents of the MVC.Draggable object 
+ * Drop params include a drag attribute, which contains the contents of the jQuery.Draggable object 
  * that represented the drag.  If you want to pass data to a drop event from your drag, you 
- * can save it in MVC.Controller.Params.Drag's drag_action attribute, and recover it from 
- * MVC.Controller.Params.Drop's drag attribute.  For example:
+ * can save it in jQuery.Controller.Params.Drag's drag_action attribute, and recover it from 
+ * jQuery.Controller.Params.Drop's drag attribute.  For example:
  * 
  * <h3>Drag Controller</h3>
 @code_start
@@ -91,20 +91,20 @@ MVC.Controller.Action.Drop = MVC.Controller.Action.extend(
 @code_end
  * 
  * @init
- * Same functionality as [MVC.Controller.Params]
+ * Same functionality as [jQuery.Controller.Params]
  */
 
 
 /**
- * @class MVC.Droppable
+ * @class jQuery.Droppable
  * @hide
  * A collection of all the drop elements.
  */
-MVC.Class.extend('MVC.Droppable',
+jQuery.Class.extend('jQuery.Droppable',
 /* @Class */
 {
     init : function(){
-        MVC.Drag.responder = this;  
+        jQuery.Drag.responder = this;  
     },
     drops: [],
 	_elements: [],
@@ -131,7 +131,7 @@ MVC.Class.extend('MVC.Droppable',
 	add: function(element, callbacks, event) {
 		element = jQuery(element);
         
-		var droppable = new MVC.Droppable(callbacks, element);
+		var droppable = new jQuery.Droppable(callbacks, element);
 		
         if(droppable.dropadd) droppable.dropadd(element, event, droppable);
 		
@@ -145,7 +145,7 @@ MVC.Class.extend('MVC.Droppable',
 	* For a list of affected drops, finds the one that is deepest in
 	* the dom.
 	* @param {Object} drops
-	* @return {MVC.Controller.Params.Drop} deepest
+	* @return {jQuery.Controller.Params.Drop} deepest
 	*/
 	findDeepestChild: function(drops) {
 		//return right away if there are no drops
@@ -207,11 +207,11 @@ MVC.Class.extend('MVC.Droppable',
 		var drop, affected = [];
 		
 		for(var d =0 ; d < this.drops.length; d++ ){
-		    if(MVC.Droppable.isAffected(point, element, this.drops[d])) 
+		    if(jQuery.Droppable.isAffected(point, element, this.drops[d])) 
 				affected.push(this.drops[d]);   
 		}
 
-		drop = MVC.Droppable.findDeepestChild(affected);
+		drop = jQuery.Droppable.findDeepestChild(affected);
 		
         
 		//if we've activated something, but it is not this drop, deactivate (dropout)
@@ -233,7 +233,7 @@ MVC.Class.extend('MVC.Droppable',
 	 */
 	end: function(event, drag) {
 		if(!this.last_active) return;
-        var pointer = new MVC.Vector(event.pageX, event.pageY);
+        var pointer = new jQuery.Vector(event.pageX, event.pageY);
 		if( this.isAffected(pointer, drag.drag_element, this.last_active) && //last is still activated
 			this.last_active.dropped	){ 											//drop was ok
 			
@@ -246,12 +246,12 @@ MVC.Class.extend('MVC.Droppable',
 	* all possible droppable elements and adds them.
 	*/
 	compile : function(event){
-      for(var i=0; i < MVC.Droppable._elements.length; i++){
-          var drops = jQuery.data(MVC.Droppable._elements[i], "delegates").drops;
+      for(var i=0; i < jQuery.Droppable._elements.length; i++){
+          var drops = jQuery.data(jQuery.Droppable._elements[i], "delegates").drops;
           for(var selector in drops){
     	      var sels = jQuery(selector)
     	      for(var e= 0; e < sels.length; e++){
-    	          MVC.Droppable.add(sels[e], drops[selector], event)
+    	          jQuery.Droppable.add(sels[e], drops[selector], event)
     	      }
     	  }
 	  }
@@ -267,7 +267,7 @@ MVC.Class.extend('MVC.Droppable',
 /* @Prototype */
 {
     init : function(callbacks, element){
-        MVC.Object.extend(this,callbacks);
+        jQuery.Object.extend(this,callbacks);
         this.element = element;
     },
     

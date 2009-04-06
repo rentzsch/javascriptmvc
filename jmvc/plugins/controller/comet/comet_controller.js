@@ -80,8 +80,8 @@ MVC.Controller.Comet = MVC.Controller.extend(
                     objects = MVC.Model.models[className.toLowerCase()].create_many_as_existing(objects);
                 }
                 //now pass to controller
-                //var controller = window[MVC.String.pluralize(className)+'controller']
-                var controller_name = this.controller_map[className] ? this.controller_map[className] : MVC.String.pluralize(className).toLowerCase();
+                //var controller = window[jQuery.String.pluralize(className)+'controller']
+                var controller_name = this.controller_map[className] ? this.controller_map[className] : jQuery.String.pluralize(className).toLowerCase();
                 MVC.Controller.publish(controller_name+"."+action, {
 					data: objects
 				});

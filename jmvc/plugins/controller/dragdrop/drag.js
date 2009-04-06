@@ -1,6 +1,6 @@
 
 
-MVC.Controller.Action.Move.extend("MVC.Controller.Action.Drag",
+jQuery.Controller.Action.Move.extend("jQuery.Controller.Action.Drag",
 /* @static */
 {
     /**
@@ -12,7 +12,7 @@ MVC.Controller.Action.Move.extend("MVC.Controller.Action.Drag",
 {});
 
 
-MVC.Move.extend("MVC.Drag",
+jQuery.Move.extend("jQuery.Drag",
 {
 
 },

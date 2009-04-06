@@ -21,7 +21,7 @@
  * 
  * 
  */
-MVC.Doc.Directive = MVC.Class.extend(
+MVC.Doc.Directive = jQuery.Class.extend(
 /* @prototype */
 {
     /**

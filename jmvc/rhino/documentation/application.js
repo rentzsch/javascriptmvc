@@ -21,7 +21,7 @@ MVC.render_to = function(file, ejs, data){
  *     <li>[MVC.Doc.Attribute | @attribute] -  values on an object.</li>
  *     <li>[MVC.Doc.Function | @function] - functions on an object.</li>
  *     <li>[MVC.Doc.Constructor | @constructor] - functions you call like: new Thing()</li>
- *     <li>[MVC.Doc.Class| @class] - normal JS Objects and source that uses [MVC.Class]</li>
+ *     <li>[MVC.Doc.Class| @class] - normal JS Objects and source that uses [jQuery.Class]</li>
  * </ul>
  * <p>You can also specifify the scope of where your functions and attributes are being added with: </p>
  * <ul>

@@ -1,7 +1,7 @@
 // based on the Inflector class found on a DZone snippet contributed by Todd Sayre
 // http://snippets.dzone.com/posts/show/3205
 
-MVC.Inflector = {
+jQuery.Inflector = {
   Inflections: {
     plural: [
     [/(quiz)$/i,               "$1zes"  ],
@@ -69,55 +69,54 @@ MVC.Inflector = {
     ]
   },
   pluralize: function(word) {
-    for (var i = 0; i < MVC.Inflector.Inflections.uncountable.length; i++) {
-      var uncountable = MVC.Inflector.Inflections.uncountable[i];
+    for (var i = 0; i < jQuery.Inflector.Inflections.uncountable.length; i++) {
+      var uncountable = jQuery.Inflector.Inflections.uncountable[i];
       if (word.toLowerCase() == uncountable) {
         return uncountable;
       }
     }
-    for (var i = 0; i < MVC.Inflector.Inflections.irregular.length; i++) {
-      var singular = MVC.Inflector.Inflections.irregular[i][0];
-      var plural   = MVC.Inflector.Inflections.irregular[i][1];
+    for (var i = 0; i < jQuery.Inflector.Inflections.irregular.length; i++) {
+      var singular = jQuery.Inflector.Inflections.irregular[i][0];
+      var plural   = jQuery.Inflector.Inflections.irregular[i][1];
       if ((word.toLowerCase() == singular) || (word == plural)) {
         return word.substring(0,1)+plural.substring(1);
       }
     }
-    for (var i = 0; i < MVC.Inflector.Inflections.plural.length; i++) {
-      var regex          = MVC.Inflector.Inflections.plural[i][0];
-      var replace_string = MVC.Inflector.Inflections.plural[i][1];
+    for (var i = 0; i < jQuery.Inflector.Inflections.plural.length; i++) {
+      var regex          = jQuery.Inflector.Inflections.plural[i][0];
+      var replace_string = jQuery.Inflector.Inflections.plural[i][1];
       if (regex.test(word)) {
         return word.replace(regex, replace_string);
       }
     }
   },
   singularize: function(word) {
-    for (var i = 0; i < MVC.Inflector.Inflections.uncountable.length; i++) {
-      var uncountable = MVC.Inflector.Inflections.uncountable[i];
+    for (var i = 0; i < jQuery.Inflector.Inflections.uncountable.length; i++) {
+      var uncountable = jQuery.Inflector.Inflections.uncountable[i];
       if (word.toLowerCase() == uncountable) {
         return uncountable;
       }
     }
-    for (var i = 0; i < MVC.Inflector.Inflections.irregular.length; i++) {
-      var singular = MVC.Inflector.Inflections.irregular[i][0];
-      var plural   = MVC.Inflector.Inflections.irregular[i][1];
+    for (var i = 0; i < jQuery.Inflector.Inflections.irregular.length; i++) {
+      var singular = jQuery.Inflector.Inflections.irregular[i][0];
+      var plural   = jQuery.Inflector.Inflections.irregular[i][1];
       if ((word.toLowerCase() == singular) || (word.toLowerCase() == plural)) {
         return word.substring(0,1)+singular.substring(1);
       }
     }
-    for (var i = 0; i < MVC.Inflector.Inflections.singular.length; i++) {
-      var regex          = MVC.Inflector.Inflections.singular[i][0];
-      var replace_string = MVC.Inflector.Inflections.singular[i][1];
+    for (var i = 0; i < jQuery.Inflector.Inflections.singular.length; i++) {
+      var regex          = jQuery.Inflector.Inflections.singular[i][0];
+      var replace_string = jQuery.Inflector.Inflections.singular[i][1];
       if (regex.test(word)) {
         return word.replace(regex, replace_string);
       }
     }
-    return word;
   }
 };
 /**
- *  @add  MVC.Native.String  Static
+ *  @add  jQuery.Native.String  Static
  */
-MVC.Native.extend('String', {
+jQuery.Native.extend('String', {
   /**
    * Pluralizes a string
    * @plugin lang/inflector
@@ -128,9 +127,9 @@ MVC.Native.extend('String', {
    */
   pluralize: function(string, count, plural) {
     if (typeof count == 'undefined') {
-      return MVC.Inflector.pluralize(string);
+      return jQuery.Inflector.pluralize(string);
     } else {
-      return count + ' ' + (1 == parseInt(count) ? string : plural || MVC.Inflector.pluralize(string));
+      return count + ' ' + (1 == parseInt(count) ? string : plural || jQuery.Inflector.pluralize(string));
     }
   },
   /**
@@ -142,9 +141,9 @@ MVC.Native.extend('String', {
    */
   singularize: function(string, count) {
     if (typeof count == 'undefined') {
-      return MVC.Inflector.singularize(string);
+      return jQuery.Inflector.singularize(string);
     } else {
-      return count + " " + MVC.Inflector.singularize(string);
+      return count + " " + jQuery.Inflector.singularize(string);
     }
   },
   /**
@@ -154,7 +153,7 @@ MVC.Native.extend('String', {
    * @return {Boolean}
    */
   is_singular: function(string){
-    if(MVC.String.singularize(string) == string && string)
+    if(jQuery.String.singularize(string) == string && string)
         return true;
     return false;
   }

@@ -2,50 +2,50 @@
 //  Prototype JavaScript framework, version 1.6.0.1
 //  (c) 2005-2007 Sam Stephenson
 
-MVC.String = {};
-MVC.String.strip = function(string){
+jQuery.String = {};
+jQuery.String.strip = function(string){
 	return string.replace(/^\s+/, '').replace(/\s+$/, '');
 };
 
 
-MVC.Function = {};
-MVC.Function.params = function(func){
+jQuery.Function = {};
+jQuery.Function.params = function(func){
 	var ps = func.toString().match(/^[\s\(]*function[^(]*\((.*?)\)/)[1].split(",");
 	if( ps.length == 1 && !ps[0]) return [];
-	for(var i = 0; i < ps.length; i++) ps[i] = MVC.String.strip(ps[i]);
+	for(var i = 0; i < ps.length; i++) ps[i] = jQuery.String.strip(ps[i]);
 	return ps;
 };
 
 /**
- * @class MVC.Native
+ * @class jQuery.Native
  */
-MVC.Native ={};
-MVC.Native.
+jQuery.Native ={};
+jQuery.Native.
 /**
  * 
  * @param {Object} class_name
  * @param {Object} source
  */
 extend = function(class_name, source){
-	if(!MVC[class_name]) MVC[class_name] = {};
-	var dest = MVC[class_name];
+	if(!jQuery[class_name]) jQuery[class_name] = {};
+	var dest = jQuery[class_name];
 	for (var property in source){
 		dest[property] = source[property];
-		if(!MVC._no_conflict){
+		if(!jQuery._no_conflict){
 			window[class_name][property] = source[property];
 			if(typeof source[property] == 'function'){
-				var names = MVC.Function.params(source[property]);
+				var names = jQuery.Function.params(source[property]);
     			if( names.length == 0) continue;
 				//var first_arg = names[0];
 				//if( first_arg.match(class_name.substr(0,1).toLowerCase()  ) || (first_arg == 'func' && class_name == 'Function' )  ){
-					MVC.Native.set_prototype(class_name, property, source[property]);
+					jQuery.Native.set_prototype(class_name, property, source[property]);
 				//}
 			}
 		}
 	}
 };
-MVC.Native.set_prototype = function(class_name, property_name, func){
-	if(!func) func = MVC[class_name][property_name];
+jQuery.Native.set_prototype = function(class_name, property_name, func){
+	if(!func) func = jQuery[class_name][property_name];
     window[class_name].prototype[property_name] = function(){
 		var args = [this];
 		for (var i = 0, length = arguments.length; i < length; i++) args.push(arguments[i]);
@@ -55,11 +55,11 @@ MVC.Native.set_prototype = function(class_name, property_name, func){
 
 
 /* 
- * @class MVC.Native.String
- * @alias MVC.String
+ * @class jQuery.Native.String
+ * @alias jQuery.String
  * When not in no-conflict mode, JMVC adds the following helpers to string
  */
-MVC.Native.extend('String', 
+jQuery.Native.extend('String', 
 /* @Static*/
 {
     /*
@@ -92,7 +92,7 @@ MVC.Native.extend('String',
     /**
      * Capitalizes a string from something undercored. Examples:
      * @code_start
-     * MVC.String.camelize("one_two") //-> "oneTwo"
+     * jQuery.String.camelize("one_two") //-> "oneTwo"
      * "three-four".camelize() //-> threeFour
      * @code_end
      * @param {String} s
@@ -101,7 +101,7 @@ MVC.Native.extend('String',
 	camelize: function(s){
 		var parts = s.split(/_|-/);
 		for(var i = 1; i < parts.length; i++)
-			parts[i] = MVC.String.capitalize(parts[i]);
+			parts[i] = jQuery.String.capitalize(parts[i]);
 		return parts.join('');
 	},
     /**
@@ -112,27 +112,27 @@ MVC.Native.extend('String',
 	classize: function(s){
 		var parts = s.split(/_|-/);
 		for(var i = 0; i < parts.length; i++)
-			parts[i] = MVC.String.capitalize(parts[i]);
+			parts[i] = jQuery.String.capitalize(parts[i]);
 		return parts.join('');
 	},
     /*
      * @function strip
      * @param {String} s returns a string with leading and trailing whitespace removed.
      */
-	strip : MVC.String.strip,
+	strip : jQuery.String.strip,
     underscore : function(s){
-        return s.replace(/::/, '/').replace(/([A-Z]+)([A-Z][a-z])/,'#{1}_#{2}').replace(/([a-z\d])([A-Z])/,'#{1}_#{2}').replace(/-/,'_').toLowerCase()
+        return s.replace(/::/, '/').replace(/([A-Z]+)([A-Z][a-z])/,'$1_$2').replace(/([a-z\d])([A-Z])/,'$1_$2').replace(/-/,'_').toLowerCase()
     }
 });
 
 //Date Helpers, probably should be moved into its own class
 
 /* 
- * @class MVC.Native.Array
- * @alias MVC.Array
+ * @class jQuery.Native.Array
+ * @alias jQuery.Array
  * When not in no-conflict mode, JMVC adds the following helpers to array
  */
-MVC.Native.extend('Array',
+jQuery.Native.extend('Array',
 /* @static*/
 { 
 	/**
@@ -148,7 +148,7 @@ MVC.Native.extend('Array',
 		return false;
 	}
 });
-MVC.Array.
+jQuery.Array.
     /**
      * Creates an array from another object.  Typically, this is used to give arguments array like properties.
      * @param {Object} iterable an array like object with a length property.
@@ -161,7 +161,7 @@ MVC.Array.
 	      results.push(iterable[i]);
 	    return results;
 	}
-MVC.Array.
+jQuery.Array.
     /**
      * Returns if the object is an array
      * @param {Object} array a possible array object
@@ -172,11 +172,11 @@ MVC.Array.
     }
 
 /* 
- * @class MVC.Native.Function
- * @alias MVC.Function
+ * @class jQuery.Native.Function
+ * @alias jQuery.Function
  * When not in no-conflict mode, JMVC adds the following helpers to function
  */
-MVC.Native.extend('Function', 
+jQuery.Native.extend('Function', 
 /* @static*/
 {
 	/**
@@ -184,9 +184,9 @@ MVC.Native.extend('Function',
 	 * to is the second argument.  Additional params are added to the callback function.
 	 * @code_start
 	 * //basic example
-	 * var callback1 = MVC.Function.bind(function(){alert(this.library)}, {library: "jmvc"});
+	 * var callback1 = jQuery.Function.bind(function(){alert(this.library)}, {library: "jmvc"});
 	 * //shows with prepended args
-	 * var callback2 = MVC.Function.bind(
+	 * var callback2 = jQuery.Function.bind(
 	 *     function(version, os){
 	 *         alert(this.library+", "+version+", "+os);
 	 *     },
@@ -198,21 +198,21 @@ MVC.Native.extend('Function',
 	 * @return {Function} the wrapping function.
 	 */
     bind: function(f, obj) {
-	  var args = MVC.Array.from(arguments);
+	  var args = jQuery.Array.from(arguments);
 	  args.shift();args.shift();
 	  var __method = f, object = arguments[1];
 	  return function() {
-	    return __method.apply(object, args.concat(MVC.Array.from(arguments) )  );
+	    return __method.apply(object, args.concat(jQuery.Array.from(arguments) )  );
 	  }
 	},
-	params: MVC.Function.params
+	params: jQuery.Function.params
 });
 /* 
- * @class MVC.Native.Number
- * @alias MVC.Number
+ * @class jQuery.Native.Number
+ * @alias jQuery.Number
  * When not in no-conflict mode, JMVC adds the following helpers to number
  */
-MVC.Native.extend('Number', 
+jQuery.Native.extend('Number', 
 /* @static*/
 {
     /**
@@ -232,10 +232,10 @@ MVC.Native.extend('Number',
     }
 })
 
-MVC.Native.Array = MVC.Array
-MVC.Native.Function = MVC.Function
-MVC.Native.Number = MVC.Number
-MVC.Native.String = MVC.String
-//MVC.Object = MVC.Native.Object
-if(!MVC._no_conflict)
-    Array.from = MVC.Array.from
+jQuery.Native.Array = jQuery.Array
+jQuery.Native.Function = jQuery.Function
+jQuery.Native.Number = jQuery.Number
+jQuery.Native.String = jQuery.String
+//jQuery.Object = jQuery.Native.Object
+if(!jQuery._no_conflict)
+    Array.from = jQuery.Array.from

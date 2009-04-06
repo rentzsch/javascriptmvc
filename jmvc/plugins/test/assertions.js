@@ -8,7 +8,7 @@ this.assert_null(this.obj, "Expected to be null");
 this.assert(x_value > 200);
 @code_end
  */
-MVC.Test.Assertions =  MVC.Class.extend(
+MVC.Test.Assertions =  jQuery.Class.extend(
 /* @Prototype*/
 {
 	/**

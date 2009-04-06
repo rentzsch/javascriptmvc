@@ -1,4 +1,4 @@
-//MVC.Class 
+//jQuery.Class 
 // This is a modified version of John Resig's class
 // It provides class level inheritence and callbacks.
 
@@ -7,7 +7,7 @@
   // The base Class implementation (does nothing)
   
   /**
-   * @constructor MVC.Class
+   * @constructor jQuery.Class
    * Class provides simple simulated inheritance in JavaScript. 
    * It is based off John Resig's [http://ejohn.org/blog/simple-javascript-inheritance/|Simple Class] 
    * Inheritance library.  Besides prototypal inheritance, it adds a few important features:
@@ -20,7 +20,7 @@
    * <h3>Basic example</h3>
    * Creates a class with a className (used for introspection), static, and prototype members:
    * @code_start
-   * Monster = MVC.Class.extend('monster',
+   * Monster = jQuery.Class.extend('monster',
    * /* @static *|
    * {
    *   count: 0
@@ -42,7 +42,7 @@
    * <h3>Static property inheritance</h3>
    * Demonstrates inheriting a class poperty.
    * @code_start
-   * First = MVC.Class.extend(
+   * First = jQuery.Class.extend(
    * {
    *     static_method : function(){ return 1;}
    * },{})
@@ -60,7 +60,7 @@
    * For example, Documentation's [MVC.Doc.Directive|directives] use their className to be added to
    * different [MVC.Doc.Pair|comment-code pairs] in the appropriate way.  Just by defining:
    * @code_start
-   * MVC.Doc.Directive.Author = MVC.Class.extend('author');
+   * MVC.Doc.Directive.Author = jQuery.Class.extend('author');
    * @code_end
    * you tell the documentation engine to look for @author and whatever comes after it as this.author.
    * className is saved as a static property.  You can access it from instance methods like:
@@ -70,7 +70,7 @@
    * <h3>Construtors</h3>
    * Class uses static and class initialization constructor functions.  
    * @code_start
-   * MyClass = MVC.Class.extend(
+   * MyClass = jQuery.Class.extend(
    * {
    *   init: function(){} //static constructor
    * },
@@ -79,21 +79,21 @@
    * })
    * @code_end
    * The static init constructor is called after
-   * a class has been created, but before [MVC.Class.static.extended|extended] is called on its base class.  
+   * a class has been created, but before [jQuery.Class.static.extended|extended] is called on its base class.  
    * This is a good place to add introspection and similar class setup code.
    * 
    * The prototype callback is called whenever a new instance of the class is created.
    * 
    * 
-   * @init Creating a new instance of an object that has extended MVC.Class 
+   * @init Creating a new instance of an object that has extended jQuery.Class 
         calls the init prototype function and returns a new instance of the class.
    * 
    */
   
-  MVC.Class = function(){};
+  jQuery.Class = function(){};
   // Create a new Class that inherits from the current class.
   /* @Static*/
-  MVC.Class.
+  jQuery.Class.
     /**
      * Extends a class with new static and prototype functions.  There are a variety of ways
      * to use extend:
@@ -112,7 +112,7 @@
      * @param {optional:String} className the classes name (used for classes w/ introspection)
      * @param {optional:Object} klass the new classes static/class functions
      * @param {optional:Object} proto the new classes prototype functions
-     * @return {MVC.Class} returns the new class
+     * @return {jQuery.Class} returns the new class
      */
     extend = function(className, klass, proto) {
     if(typeof className != 'string'){
@@ -221,13 +221,13 @@
     /*
      * @function init
      * Called when a new Class is created
-     * @param {MVC.Class} class the new class
+     * @param {jQuery.Class} class the new class
      */
     if(Class.init) Class.init(Class);
     /*
      * @function extended
      * Called with whatever classes extend your class
-     * @param {MVC.Class} Class the extending class.
+     * @param {jQuery.Class} Class the extending class.
      */
     if(_super_class.extended) _super_class.extended(Class);
     /* @Prototype*/

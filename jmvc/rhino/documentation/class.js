@@ -1,7 +1,7 @@
 /**
  * @hide
  * Documents a 'Class'.  A class is typically a collection of static and prototype functions.
- * MVC Doc can automatically detect classes created with MVC.Class.  However, you can make anything
+ * MVC Doc can automatically detect classes created with jQuery.Class.  However, you can make anything
  * a class with the <b>@class <i>ClassName</i></b> directive.
  * @author Jupiter IT
  * @code_start

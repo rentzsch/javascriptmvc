@@ -3,28 +3,28 @@
  * A vector class
  * @init creates a new vector instance from the arguments.  Example:
  * @code_start
- * new MVC.Vector(1,2)
+ * new jQuery.Vector(1,2)
  * @code_end
  * 
  */
 
-MVC.Vector = function(){
-    this.update( MVC.Array.from(arguments) );
+jQuery.Vector = function(){
+    this.update( jQuery.makeArray(arguments) );
 };
-MVC.Vector.prototype = 
+jQuery.Vector.prototype = 
 /* @Prototype*/
 {
     /**
      * Applys the function to every item in the vector.  Returns the new vector.
      * @param {Function} f
-     * @return {MVC.Vector} new vector class.
+     * @return {jQuery.Vector} new vector class.
      */
     app: function(f){
           var newArr = [];
           
           for(var i=0; i < this.array.length; i++)
               newArr.push( f(  this.array[i] ) );
-          var vec = new MVC.Vector();
+          var vec = new jQuery.Vector();
           return vec.update(newArr);
     },
     /**
@@ -33,27 +33,27 @@ MVC.Vector.prototype =
      * new Vector(1,2).plus(2,3) //-> &lt;3,5>
      * new Vector(3,5).plus(new Vector(4,5)) //-> &lt;7,10>
      * @code_end
-     * @return {MVC.Vector}
+     * @return {jQuery.Vector}
      */
     plus: function(){
-        var args = arguments[0] instanceof MVC.Vector ? 
+        var args = arguments[0] instanceof jQuery.Vector ? 
                  arguments[0].array : 
-                 MVC.Array.from(arguments), 
+                 jQuery.makeArray(arguments), 
             arr=this.array.slice(0), 
-            vec = new MVC.Vector();
+            vec = new jQuery.Vector();
         for(var i=0; i < args.length; i++)
             arr[i] = (arr[i] ? arr[i] : 0) + args[i];
         return vec.update(arr);
     },
     /**
      * Like plus but subtracts 2 vectors
-     * @return {MVC.Vector}
+     * @return {jQuery.Vector}
      */
     minus: function(){
-         var args = arguments[0] instanceof MVC.Vector ? 
+         var args = arguments[0] instanceof jQuery.Vector ? 
                  arguments[0].array : 
-                 MVC.Array.from(arguments), 
-             arr=this.array.slice(0), vec = new MVC.Vector();
+                 jQuery.makeArray(arguments), 
+             arr=this.array.slice(0), vec = new jQuery.Vector();
          for(var i=0; i < args.length; i++)
             arr[i] = (arr[i] ? arr[i] : 0) - args[i];
          return vec.update(arr);
@@ -61,13 +61,13 @@ MVC.Vector.prototype =
     /**
      * Returns the current vector if it is equal to the vector passed in.  
      * False if otherwise.
-     * @return {MVC.Vector}
+     * @return {jQuery.Vector}
      */
     equals : function(){
-        var args = arguments[0] instanceof MVC.Vector ? 
+        var args = arguments[0] instanceof jQuery.Vector ? 
                  arguments[0].array : 
-                 MVC.Array.from(arguments), 
-             arr=this.array.slice(0), vec = new MVC.Vector();
+                 jQuery.makeArray(arguments), 
+             arr=this.array.slice(0), vec = new jQuery.Vector();
          for(var i=0; i < args.length; i++)
             if(arr[i] != args[i]) return null;
          return vec.update(arr);
@@ -115,22 +115,3 @@ MVC.Vector.prototype =
     }
 };
 
-/**
- * @add MVC.Event Static
- */
-jQuery.Event.
-/**
- * Returns the position of the event
- * @plugin dom/element
- * @param {Event} event
- * @return {MVC.Vector}
- */
-pointer = function(event){
-	return new MVC.Vector( 
-        event.pageX || (event.clientX +
-          (document.documentElement.scrollLeft || document.body.scrollLeft)),
-          event.pageY || (event.clientY +
-          (document.documentElement.scrollTop || document.body.scrollTop)
-         )
-    );
-};

@@ -2,9 +2,9 @@ MVC.Controller.scaffold = function(){
     //go through list of prototype functions, if one doesn't exist copy
     if(!this.className) return;
     
-    var class_name = MVC.String.singularize( MVC.String.classize(this.className)  );
+    var class_name = jQuery.String.singularize( jQuery.String.classize(this.className)  );
     this.scaffold_model = window[class_name];
-    this.singular_name = MVC.String.singularize(this.className);
+    this.singular_name = jQuery.String.singularize(this.className);
     for(var action_name in MVC.Controller.scaffold.functions){
         if(this.prototype[action_name]) continue;
         this.prototype[action_name] = MVC.Controller.scaffold.functions[action_name]

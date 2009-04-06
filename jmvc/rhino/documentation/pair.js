@@ -2,7 +2,7 @@
  * A base class for a comment and the line of code following it.
  * @hide
  */
-MVC.Doc.Pair = MVC.Class.extend(
+MVC.Doc.Pair = jQuery.Class.extend(
 /* @Static */
 {
     code_match: function(){ return null},

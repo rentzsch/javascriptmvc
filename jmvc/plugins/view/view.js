@@ -1,10 +1,12 @@
+(function($){
+
 // Copyright (c) 2007 Edward Benson http://www.edwardbenson.com/projects/ejs
 
 /**
  * @constructor
  * View provides client side templates.  Typically they work with controller to render data in HTML form.
- * Typically, you should not be creating and rendering a view with MVC.View, you should be using 
- * [MVC.Controller.prototype.render] to create and render templates from your [MVC.Controller | controllers].
+ * Typically, you should not be creating and rendering a view with $.View, you should be using 
+ * [jQuery.Controller.prototype.render] to create and render templates from your [jQuery.Controller | controllers].
  *
  * <h3>Install</h3>
  * @code_start
@@ -12,7 +14,7 @@
  * include.plugins('view/helpers') //for HTML helpers
  * @code_end
  * <h3>Including views</h3>
- * MVC can package processed views in the production file.  After including the include plugin, you
+ * jQuery can package processed views in the production file.  After including the include plugin, you
  * can use include.views wrapped in an include callback function.  Because included views are already
  * processed, they don't rely on eval.  Here's how to include them:
  * @code_start
@@ -25,9 +27,9 @@
  * Read more about [include.static.views include.views].
  * <h3>View Helpers</h3>
  * View Helpers create html code.  View by default only comes with 
- * [MVC.View.Helpers.prototype.partial partial] and [MVC.View.Helpers.prototype.to_text to_text].
+ * [$.View.Helpers.prototype.partial partial] and [$.View.Helpers.prototype.to_text to_text].
  * You can include more with the view/helpers plugin.  But, you can easily make your own!
- * Learn how in the [MVC.View.Helpers Helpers] page.
+ * Learn how in the [$.View.Helpers Helpers] page.
  * 
  * @init Creates a new view
  * @param {Object} options A hash with the following options
@@ -36,13 +38,13 @@
 				<tr>
 					<td>url</td>
 					<td>&nbsp;</td>
-					<td>loads the template from a file.  This path should be relative to <i>[MVC.root]</i>.
+					<td>loads the template from a file.  This path should be relative to <i>[jQuery.root]</i>.
 					</td>
 				</tr>
 				<tr>
 					<td>view_url</td>
 					<td>&nbsp;</td>
-					<td>loads the template from a file.  This path should be relative to <i>[MVC.root]/views</i>.
+					<td>loads the template from a file.  This path should be relative to <i>[jQuery.root]/views</i>.
 					</td>
 				<tr>
 					<td>text</td>
@@ -77,24 +79,24 @@
 				
 			</tbody></table>
  */
-MVC.View = function( options ){
+$.View = function( options ){
     this.set_options(options);
 	if(options.precompiled){
 		this.template = {};
 		this.template.process = options.precompiled;
-		MVC.View.update(this.name, this);
+		$.View.update(this.name, this);
 		return;
 	}
 	if(options.view || options.absolute_url || options.view_url){
         this.name = this.name ? this.name : options.view || options.absolute_url || "views/"+options.view_url;
         var url = options.absolute_url || 
-                  (options.view ? MVC.root.join( options.view+ (options.view.match(this.extMatch) ? '' : this.ext ) ) : 
-                   MVC.root.join("views/"+options.view_url+ (options.view_url.match(this.extMatch) ? '' : this.ext ))
+                  (options.view ? jQuery.root.join( options.view+ (options.view.match(this.extMatch) ? '' : this.ext ) ) : 
+                   jQuery.root.join("views/"+options.view_url+ (options.view_url.match(this.extMatch) ? '' : this.ext ))
                    );
         //options.view = options.absolute_url || options.view || options.;
-		var template = MVC.View.get(this.name, this.cache);
+		var template = $.View.get(this.name, this.cache);
 		if (template) return template;
-	    if (template == MVC.View.INVALID_PATH) return null;
+	    if (template == $.View.INVALID_PATH) return null;
         this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
 		
 		if(this.text == null){
@@ -106,7 +108,7 @@ MVC.View = function( options ){
 	{
         if(typeof options.element == 'string'){
 			var name = options.element;
-			options.element = MVC.$E(  options.element );
+			options.element = jQuery.$E(  options.element );
 			if(options.element == null) throw name+'does not exist!';
 		}
 		if(options.element.value){
@@ -117,16 +119,16 @@ MVC.View = function( options ){
 		this.name = options.element.id;
 		this.type = '[';
 	}
-	var template = new MVC.View.Compiler(this.text, this.type);
+	var template = new $.View.Compiler(this.text, this.type);
 
 	template.compile(options);
 
 	
-	MVC.View.update(this.name, this);
+	$.View.update(this.name, this);
 	this.template = template;
 };
 /* @Prototype*/
-MVC.View.prototype = {
+$.View.prototype = {
 	/**
 	 * Renders an object with extra view helpers attached to the view.
 	 * @param {Object} object data to be rendered
@@ -135,8 +137,8 @@ MVC.View.prototype = {
 	 */
     render : function(object, extra_helpers){
 		object = object || {};
-		var v = new MVC.View.Helpers(object);
-        MVC.Object.extend(v, extra_helpers || {} );
+		var v = new $.View.Helpers(object);
+        jQuery.Object.extend(v, extra_helpers || {} );
 		return this.template.process.call(object, object,v);
 	},
 	out : function(){
@@ -147,11 +149,11 @@ MVC.View.prototype = {
      * @param {Object} options
      */
 	set_options : function(options){
-		this.type = options.type != null ? options.type : MVC.View.type;
-		this.cache = options.cache != null ? options.cache : MVC.View.cache;
+		this.type = options.type != null ? options.type : $.View.type;
+		this.cache = options.cache != null ? options.cache : $.View.cache;
 		this.text = options.text != null ? options.text : null;
 		this.name = options.name != null ? options.name : null;
-		this.ext = options.ext != null ? options.ext : MVC.View.ext;
+		this.ext = options.ext != null ? options.ext : $.View.ext;
 		this.extMatch = new RegExp(this.ext.replace(/\./, '\.'));
 	},
 	// called without options, returns a function that takes the object
@@ -173,12 +175,12 @@ MVC.View.prototype = {
      */
 	update : function(element, options){
         if(typeof element == 'string'){
-			element = MVC.$E(element);
+			element = jQuery.$E(element);
 		}
 		if(options == null){
 			_template = this;
 			return function(object){
-				MVC.View.prototype.update.call(_template, element, object);
+				$.View.prototype.update.call(_template, element, object);
 			};
 		}
 		if(typeof options == 'string'){
@@ -187,10 +189,10 @@ MVC.View.prototype = {
 			_template = this;
 			params.onComplete = function(request){
 				var object = eval( "("+ request.responseText+")" );
-				MVC.View.prototype.update.call(_template, element, object);
+				$.View.prototype.update.call(_template, element, object);
 			};
-            if(!MVC.Ajax) alert('You must include the Ajax plugin to use this feature');
-			new MVC.Ajax(params.view, params);
+            if(!jQuery.Ajax) alert('You must include the Ajax plugin to use this feature');
+			new jQuery.Ajax(params.view, params);
 		}else
 		{
 			element.innerHTML = this.render(options);
@@ -203,7 +205,7 @@ MVC.View.prototype = {
 
 
 /* @Static*/
-MVC.View.Scanner = function(source, left, right) {
+$.View.Scanner = function(source, left, right) {
 	this.left_delimiter = 	left +'%';	//<%
 	this.right_delimiter = 	'%'+right;	//>
 	this.double_left = 		left+'%%';
@@ -220,7 +222,7 @@ MVC.View.Scanner = function(source, left, right) {
 	this.lines = 0;
 };
 
-MVC.View.Scanner.to_text = function(input){
+$.View.Scanner.to_text = function(input){
 	if(input == null || input === undefined)
         return '';
     if(input instanceof Date)
@@ -230,13 +232,13 @@ MVC.View.Scanner.to_text = function(input){
 	return '';
 };
 
-MVC.View.Scanner.prototype = {
+$.View.Scanner.prototype = {
   scan: function(block) {
      scanline = this.scanline;
 	 regex = this.SplitRegexp;
 	 if (! this.source == '')
 	 {
-	 	 var source_split = MVC.String.rsplit(this.source, /\n/);
+	 	 var source_split = jQuery.String.rsplit(this.source, /\n/);
 	 	 for(var i=0; i<source_split.length; i++) {
 		 	 var item = source_split[i];
 			 this.scanline(item, regex, block);
@@ -245,14 +247,14 @@ MVC.View.Scanner.prototype = {
   },
   scanline: function(line, regex, block) {
 	 this.lines++;
-	 var line_split = MVC.String.rsplit(line, regex);
+	 var line_split = jQuery.String.rsplit(line, regex);
  	 for(var i=0; i<line_split.length; i++) {
 	   var token = line_split[i];
        if (token != null) {
 		   	try{
 	         	block(token, this);
 		 	}catch(e){
-				throw {type: 'MVC.View.Scanner', line: this.lines};
+				throw {type: '$.View.Scanner', line: this.lines};
 			}
        }
 	 }
@@ -260,7 +262,7 @@ MVC.View.Scanner.prototype = {
 };
 
 
-MVC.View.Buffer = function(pre_cmd, post_cmd) {
+$.View.Buffer = function(pre_cmd, post_cmd) {
 	this.line = new Array();
 	this.script = "";
 	this.pre_cmd = pre_cmd;
@@ -270,7 +272,7 @@ MVC.View.Buffer = function(pre_cmd, post_cmd) {
 		this.push(pre_cmd[i]);
 	}
 };
-MVC.View.Buffer.prototype = {
+$.View.Buffer.prototype = {
 	
   push: function(cmd) {
 	this.line.push(cmd);
@@ -297,7 +299,7 @@ MVC.View.Buffer.prototype = {
 };
 
 
-MVC.View.Compiler = function(source, left) {
+$.View.Compiler = function(source, left) {
     this.pre_cmd = ['var ___ViewO = [];'];
 	this.post_cmd = new Array();
 	this.source = ' ';	
@@ -327,16 +329,16 @@ MVC.View.Compiler = function(source, left) {
 			throw left+' is not a supported deliminator';
 			break;
 	}
-	this.scanner = new MVC.View.Scanner(this.source, left, right);
+	this.scanner = new $.View.Scanner(this.source, left, right);
 	this.out = '';
 };
-MVC.View.Compiler.prototype = {
+$.View.Compiler.prototype = {
   compile: function(options) {
   	options = options || {};
 	this.out = '';
 	var put_cmd = "___ViewO.push(";
 	var insert_cmd = put_cmd;
-	var buff = new MVC.View.Buffer(this.pre_cmd, this.post_cmd);		
+	var buff = new $.View.Buffer(this.pre_cmd, this.post_cmd);		
 	var content = '';
 	var clean = function(content)
 	{
@@ -380,7 +382,7 @@ MVC.View.Compiler.prototype = {
 						case scanner.left_delimiter:
 							if (content[content.length - 1] == '\n')
 							{
-								content = MVC.String.chop(content);
+								content = jQuery.String.chop(content);
 								buff.push(content);
 								buff.cr();
 							}
@@ -389,7 +391,7 @@ MVC.View.Compiler.prototype = {
 							}
 							break;
 						case scanner.left_equal:
-							buff.push(insert_cmd + "(MVC.View.Scanner.to_text(" + content + ")))");
+							buff.push(insert_cmd + "($.View.Scanner.to_text(" + content + ")))");
 							break;
 					}
 					scanner.stag = null;
@@ -459,45 +461,45 @@ MVC.View.Compiler.prototype = {
 	</tbody></table>
  * 
  */
-MVC.View.config = function(options){
-	MVC.View.cache = options.cache != null ? options.cache : MVC.View.cache;
-	MVC.View.type = options.type != null ? options.type : MVC.View.type;
-	MVC.View.ext = options.ext != null ? options.ext : MVC.View.ext;
+$.View.config = function(options){
+	$.View.cache = options.cache != null ? options.cache : $.View.cache;
+	$.View.type = options.type != null ? options.type : $.View.type;
+	$.View.ext = options.ext != null ? options.ext : $.View.ext;
 	
 	var templates_directory = {}; //nice and private container
-	MVC.View.templates_directory = templates_directory;
-	MVC.View.get = function(path, cache){
+	$.View.templates_directory = templates_directory;
+	$.View.get = function(path, cache){
 		if(cache == false) return null;
 		if(templates_directory[path]) return templates_directory[path];
   		return null;
 	};
 	
-	MVC.View.update = function(path, template) { 
+	$.View.update = function(path, template) { 
 		if(path == null) return;
 		templates_directory[path] = template ;
 	};
 	
-	MVC.View.INVALID_PATH =  -1;
+	$.View.INVALID_PATH =  -1;
 };
-MVC.View.config( {cache: include.get_env() == 'production', type: '<', ext: '.ejs' } );
+$.View.config( {cache: include.get_env() == 'production', type: '<', ext: '.ejs' } );
 
-MVC.View.PreCompiledFunction = function(original_path, path, f){
+$.View.PreCompiledFunction = function(original_path, path, f){
     
-	new MVC.View({name: path, precompiled: f});
+	new $.View({name: path, precompiled: f});
 };
 
 /**
  * @constructor
- * By adding functions to MVC.View.Helpers.prototype, those functions will be available in the 
+ * By adding functions to $.View.Helpers.prototype, those functions will be available in the 
  * views.
  * @init Creates a view helper.  This function is called internally.  You should never call it.
  * @param {Object} data The data passed to the view.  Helpers have access to it through this.data
  */
-MVC.View.Helpers = function(data){
+$.View.Helpers = function(data){
 	this.data = data;
 };
 /* @prototype*/
-MVC.View.Helpers.prototype = {
+$.View.Helpers.prototype = {
     /**
      * Renders a new view.  If data is passed in, uses that to render the view.
      * @param {Object} options standard options passed to a new view.
@@ -506,7 +508,7 @@ MVC.View.Helpers.prototype = {
      */
 	partial: function(options, data){
 		if(!data) data = this.data;
-		return new MVC.View(options).render(data);
+		return new $.View(options).render(data);
 	},
     /**
      * For a given value, tries to create a human representation.
@@ -525,13 +527,13 @@ MVC.View.Helpers.prototype = {
 include.view = function(path){
 	if(include.get_env() == 'development'){
         //should convert path
-		new MVC.View({view: new MVC.File("../"+path).join_current()});
+		new $.View({view: new jQuery.File("../"+path).join_current()});
 	}else if(include.get_env() == 'compress'){
 		//var oldp = include.get_path();
-        //include.set_path(MVC.root.path);
-        include({path: "../"+path, process: MVC.View.process_include, ignore: true});
+        //include.set_path(jQuery.root.path);
+        include({path: "../"+path, process: $.View.process_include, ignore: true});
         //include.set_path(oldp);
-        new MVC.View({view: new MVC.File("../"+path).join_current()});
+        new $.View({view: new jQuery.File("../"+path).join_current()});
 	}else{
 		//production, do nothing!, it will be loaded by process
 	}
@@ -548,25 +550,25 @@ include.
  */
 views = function(){
 	for(var i=0; i< arguments.length; i++){
-		include.view(arguments[i]+MVC.View.ext);
+		include.view(arguments[i]+$.View.ext);
 	}
 };
 
-MVC.View.process_include = function(script){
-    var view = new MVC.View({text: script.text});
-	return 'MVC.View.PreCompiledFunction("'+script.original_path+
+$.View.process_include = function(script){
+    var view = new $.View({text: script.text});
+	return '$.View.PreCompiledFunction("'+script.original_path+
 				'", "'+script.path+'",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+view.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
 };
 
-if(!MVC._no_conflict){
-	View = MVC.View;
+if(!jQuery._no_conflict){
+	View = $.View;
 }
 
 
 /**
- * @add MVC.Native.String Static
+ * @add jQuery.Native.String Static
  */
-MVC.Native.extend('String', {
+jQuery.Native.extend('String', {
     /**
      * Can split a string nicely cross browser.
      * @plugin view
@@ -606,14 +608,14 @@ MVC.Native.extend('String', {
     }
 });
 
-(function($){
-	var funcs = ["prependTo","appendTo","insertBefore","insertAfter","replaceWith","text","html"]
+
+    var funcs = ["prependTo","appendTo","insertBefore","insertAfter","replaceWith","text","html"]
 	var convert = function(func_name) {
 		var old = jQuery.fn[func_name];
 
 		jQuery.fn[func_name] = function(content) {
 			var useViewTemplate = !(typeof content == "undefined" || typeof content == "string" || content.nodeType || content.jquery);
-			return old.call(this, useViewTemplate ? new MVC.View(content).render(content.data, content.helpers) : content);
+			return old.call(this, useViewTemplate ? new jQuery.View(content).render(content.data, content.helpers) : content);
 		}
 	}
 
