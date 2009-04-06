@@ -24,7 +24,7 @@ MVC.SyntheticEvent.prototype =
     send : function(element){
 		this.firefox_autocomplete_off(element);
 		
-		if(MVC.Browser.Opera && MVC.Array.include(['focus','blur'],this.type)) return this.createEvents(element);
+		if(jQuery.browser.opera && MVC.Array.include(['focus','blur'],this.type)) return this.createEvents(element);
 		
 		if(this.type == 'focus') return element.focus();
 		if(this.type == 'blur') return element.blur();
@@ -34,7 +34,7 @@ MVC.SyntheticEvent.prototype =
 		return this.create_event(element)
 	},
 	firefox_autocomplete_off : function(element) {
-		if(MVC.Browser.Gecko && element.nodeName.toLowerCase() == 'input' && element.getAttribute('autocomplete') != 'off')
+		if(jQuery.browser.mozilla && element.nodeName.toLowerCase() == 'input' && element.getAttribute('autocomplete') != 'off')
 			element.setAttribute('autocomplete','off');
 	},
 	create_event: function(element){
@@ -133,7 +133,7 @@ MVC.SyntheticEvent.prototype =
 			}
 		}
 		var fire_event = this.simulateEvent(element);
-		if(fire_event && this.type == 'keypress' && !MVC.Browser.Gecko && 
+		if(fire_event && this.type == 'keypress' && !jQuery.browser.mozilla && 
             (element.nodeName.toLowerCase() == 'input' || element.nodeName.toLowerCase() == 'textarea')) {
                 if(character) element.value += character;
                 else if(this.options.keyCode && this.options.keyCode == 8) element.value = element.value.substring(0,element.value.length-1);
@@ -153,7 +153,7 @@ MVC.SyntheticEvent.prototype =
   		this.event.charCode = (character? character.charCodeAt(0) : 0);
   		this.event.keyCode = this.options.keyCode || (character? character.charCodeAt(0) : 0);
 		var fire_event = this.simulateEvent(element);
-		if(fire_event && this.type == 'keypress' && !MVC.Browser.Gecko && 
+		if(fire_event && this.type == 'keypress' && !jQuery.browser.mozilla && 
             (element.nodeName.toLowerCase() == 'input' || element.nodeName.toLowerCase() == 'textarea')) {
                 if(character) element.value += character;
                 else if(this.options.keyCode && this.options.keyCode == 8) element.value = element.value.substring(0,element.value.length-1);
@@ -197,7 +197,7 @@ MVC.SyntheticEvent.prototype =
 		}, this.options);
 		
 		MVC.Object.extend(this.event, defaults);
-		if(!MVC.Browser.Gecko && 
+		if(!jQuery.browser.mozilla && 
 			(element.nodeName.toLowerCase() == 'input' || 
 			(element.type && element.type.toLowerCase() == 'checkbox'))) 
 			element.checked = (element.checked ? false : true);

@@ -111,6 +111,7 @@ jQuery.Inflector = {
         return word.replace(regex, replace_string);
       }
     }
+	return word;
   }
 };
 /**

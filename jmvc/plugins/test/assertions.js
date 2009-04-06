@@ -141,6 +141,6 @@ done_dragging : function(){
 		}
 	},
 	_blur_back: function(){
-		MVC.Browser.Gecko ? window.blur() : MVC.Console.window.focus();
+		jQuery.browser.mozilla ? window.blur() : MVC.Console.window.focus();
 	}
 });

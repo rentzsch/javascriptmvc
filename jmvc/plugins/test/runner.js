@@ -26,7 +26,7 @@ MVC.Test.Runner = function(object, iterator_name,params){
 				object._callback();
 				object._callback = null;
 			}else{
-				//if(MVC.Browser.Gecko) window.blur();
+				//if(jQuery.browser.mozilla) window.blur();
 				//else MVC.Console.window.focus();
 			}
 		}

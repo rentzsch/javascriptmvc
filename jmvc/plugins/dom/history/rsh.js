@@ -559,7 +559,7 @@ window.historyStorage = {
 			? 'width: 800px;height:80px;border:1px solid black;'
 			: historyStorage.hideStyles
 		);
-		if(MVC.History.isSafari || MVC.Browser.Rhino){
+		if(MVC.History.isSafari || jQuery.browser.rhino){
 			var form = document.createElement('form');
 			form.id = formID;
 			form.setAttribute('style',formStyles);

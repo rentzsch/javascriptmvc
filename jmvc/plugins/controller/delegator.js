@@ -38,7 +38,7 @@ MVC.Delegator = function(selector, event, f, element){
         //check if custom
 
         
-        if(event == 'contextmenu' && MVC.Browser.Opera) this.context_for_opera();
+        if(event == 'contextmenu' && jQuery.browser.opera) this.context_for_opera();
         else if(event == 'submit' && MVC.Browser.IE) this.submit_for_ie();
     	else if(event == 'change' && MVC.Browser.IE) this.change_for_ie();
     	else if(event == 'change' && MVC.Browser.WebKit) this.change_for_webkit();
@@ -363,7 +363,7 @@ MVC.Object.extend(MVC.Delegator.prototype,
 	},
     destroy : function(){
         //remove from events
-        if(this._event == 'contextmenu' && MVC.Browser.Opera){
+        if(this._event == 'contextmenu' && jQuery.browser.opera){
             return this._remove_from_delegator("click");
         }
         if(this._event == 'submit' && MVC.Browser.IE) {
