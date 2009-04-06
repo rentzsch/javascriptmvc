@@ -152,3 +152,265 @@ jQuery.fn.controller = function(){
             instance_data[ controllerNames[i] ]
     }
 };
+
+
+
+
+
+/*
+ * MVC.Controller.Action is and abstract base class.
+ * Controller Action classes are used to match controller prototype functions. 
+ * Inheriting classes must provide a static matches function.
+ * 
+ * When a new controller is created, it iterates through its prototype functions and tests
+ * each action if it matches.  If there is a match, the controller creates a new action.
+ * 
+ * The action is responsible to callback the function when appropriate.  It typically uses
+ * dispatch_closure to call functions appropriately.  
+ */
+MVC.Class.extend("MVC.Controller.Action",
+/* @Static */
+{
+    matches: function(action_name){
+        if(!this.match) return null;
+        return this.match.exec(action_name);
+    },
+    /**
+     * If the class has provided a matches function, adds this class to the list of 
+     * controller actions.
+     */
+    init: function(){
+        if(this.matches) MVC.Controller.actions.push(this);
+    }
+},
+/* @Prototype */
+{
+    /**
+     * Called with prototype functions that match this action.
+     * @param {String} action_name
+     * @param {Function} f
+     * @param {MVC.Controller} controller
+     */
+    init: function(action_name, callback, className, element, controller){
+        this.action = action_name;
+        this.callback = callback;
+        this.underscoreName = className;
+        this.element = element;
+        this.controller = controller;
+        
+    },
+    /**
+     * Disables an action.
+     */
+    destroy: function(){
+        
+    },
+    /*
+     * Splits the action name into its css and event parts.
+     */
+    css_and_event: function(){
+        this.parts = this.action.match(this.Class.match);
+        this.css = this.parts[1] || "";
+        this.event_type = this.parts[2];
+    },
+    selector : function(){
+        if(this.underscoreName.toLowerCase() == 'main') 
+            return this.css;
+        else{
+            if(MVC.String.is_singular(this.underscoreName)){
+                
+                if(this.element == document.documentElement)
+                    return '#'+this.underscoreName+(this.css ? ' '+this.css : '' );
+                else
+                    return this.css;
+            }else{
+                if(this.css == "#" || this.css.substring(0,2) == "# "){
+        			var newer_action_name = this.css.substring(2,this.css.length)
+                    if(this.element == document.documentElement){
+                        return '#'+this.underscoreName + (newer_action_name ?  ' '+newer_action_name : '') ;
+                    }else{
+                        return (newer_action_name ?  ' '+newer_action_name : '') ;
+                    }
+        		}else{
+    			    return '.'+MVC.String.singularize(this.underscoreName)+(this.css? ' '+this.css : '' );
+        		}
+            }
+        }
+    },
+    delegates : function(){
+        return jQuery.data(this.element, "delegates") || jQuery.data(this.element, "delegates",{});
+    }
+});
+/**
+ * Subscribes to an OpenAjax.hub event.
+ * <h3>Example</h3>
+@code_start javascript
+TasksController = MVC.Controller.extend('tasks',
+{
+  "task.create subscribe" : function(params){
+     var published_data = params.data; //published data always in params.data
+  }
+});
+@code_end
+ */
+MVC.Controller.Action.extend("MVC.Controller.Action.Subscribe",
+/* @Static*/
+{
+    
+    match: new RegExp("(.*?)\\s?(subscribe)$")
+},
+/* @Prototype*/
+{
+    /**
+     * @param {Object} action
+     * @param {Object} f
+     * @param {Object} controller
+     */
+    init: function(action_name, callback, className, element, controller){
+        this._super(action_name, callback, className, element, controller);
+        this.message();
+        this.subscription = OpenAjax.hub.subscribe(this.message_name, MVC.Function.bind(this.subscribe, this) );
+    },
+    /**
+     * Gets the message name from the action name.
+     */
+    message: function(){
+        this.parts = this.action.match(this.Class.match);
+        this.message_name = this.parts[1];
+    },
+    subscribe : function(event_name, data){
+        var params = data || {};
+        params.event_name = event_name
+        this.callback(params)
+    },
+    destroy : function(){
+        OpenAjax.hub.unsubscribe(this.subscription)
+        this._super();
+    }
+});
+/*
+ * Default event delegation based actions
+ */
+MVC.Controller.Action.extend("MVC.Controller.Action.Event",
+/* @Static*/
+{
+    /**
+     * Matches change, click, contextmenu, dblclick, keydown, keyup, keypress, mousedown, mousemove, mouseout, mouseover, mouseup, reset, resize, scroll, select, submit, dblclick, focus, blur, load, unload
+     * @param {Object} action_name
+     */
+    match: new RegExp("^(?:(.*?)\\s)?(change|click|contextmenu|dblclick|keydown|keyup|keypress|mousedown|mousemove|mouseout|mouseover|mouseup|reset|resize|scroll|select|submit|dblclick|focus|blur|load|unload)$")
+},
+/* @Prototype*/
+{    
+    init: function(action_name, callback, className, element, controller){
+        this._super(action_name, callback, className, element, controller);
+        this.css_and_event();
+        
+        var selector = this.selector();
+        if(selector != null){
+            this.delegator = new MVC.Delegator(selector, this.event_type, this.get_callback(), element );
+        }
+    },
+    get_callback : function(){
+        var controller = this.controller;
+        var cb = this.callback;
+        var jquery_element = this.jquery_element;
+        return function(event){
+            cb.call(null, jquery_element(this, controller), event);
+        }
+       },
+
+	jquery_element: function(element, controller) {
+		var jq = jQuery(element);
+		jq.controller = controller;
+		return jq;
+    },
+    
+    /*
+     * Deals with main controller specific delegation (blur and focus)
+     */
+    main_controller: function(){
+	    if(!this.css && MVC.Array.include(['blur','focus'],this.event_type)){
+            //todo
+            var self = this;
+            jQuery.event.add( window , this.event_type , 
+                function(event){
+                    self.callback($(window), event  )
+                }
+            );
+            
+            return;
+        }
+        return this.css;
+    },
+    /*
+     * Handles a plural controller name
+     * @return {String} the css with the controller name included
+     */
+    plural_selector : function(){
+		if(this.css == "#" || this.css.substring(0,2) == "# "){
+			var newer_action_name = this.css.substring(2,this.css.length)
+            if(this.element == document.documentElement){
+                return '#'+this.underscoreName + (newer_action_name ?  ' '+newer_action_name : '') ;
+            }else{
+                return (newer_action_name ?  ' '+newer_action_name : '') ;
+            }
+		}else{
+            //if(this.element == document.documentElement){
+			    return '.'+MVC.String.singularize(this.underscoreName)+(this.css? ' '+this.css : '' );
+            //}else{
+            //    return this.css;
+            //}
+		}
+	},
+    /*
+     * Handles a singular controller name
+     * @return {String} the css with the controller name included
+     */
+    singular_selector : function(){
+        if(this.element == document.documentElement)
+            return '#'+this.underscoreName+(this.css? ' '+this.css : '' );
+        else
+            return this.css;
+    },
+    /*
+     * Gets the full css selector for this action
+     * @return {String/null} returns a string css if Delegator should be used, null if otherwise.
+     */
+    selector : function(){
+        if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type)){
+            var self = this;
+            jQuery.event.add( window , this.event_type , 
+                function(event){
+                    self.callback($(window), event  )
+                }
+            );
+            return;
+        }
+        //if(!this.underscoreName){
+        //    this.css_selector = this.css
+        //}else 
+        if(this.underscoreName.toLowerCase() == 'main') 
+            this.css_selector = this.main_controller();
+        else
+            this.css_selector = MVC.String.is_singular(this.underscoreName) ? 
+                this.singular_selector() : this.plural_selector();
+        return this.css_selector;
+    },
+    destroy : function(){
+        if(this.delegator) this.delegator.destroy();
+        this._super();
+    }
+});
+
+
+
+jQuery.fn.controllerParent = function(){
+    return this.parent("."+this.controller.singularName)
+}
+jQuery.fn.instance = function(){
+    var el = this[0];
+    var model, modelName = this.controller.modelName; 
+    if(! (model=MVC.Model.models[this.controller.modelName])  ) throw "No model for "+ this.controller.fullName+ "!";
+    return Model._find_by_element(el, modelName, model)
+}
