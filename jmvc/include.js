@@ -788,7 +788,7 @@ var insert = function(src){
 
 var call_end = function(src){
     return MVC.Browser.Gecko ? '<script type="text/javascript">include.end()</script>' : 
-    '<script type="text/javascript" src="'+MVC.include_path+'?'+MVC.random+'"></script>'
+    '<script type="text/javascript" src="'+MVC.mvc_root+'/end.js"></script>';
 }
 
 var head = function(){
