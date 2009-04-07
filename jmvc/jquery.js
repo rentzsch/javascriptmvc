@@ -2440,7 +2440,8 @@ jQuery.event = {
 
 	// Bind an event to an element
 	// Original by Dean Edwards
-	add: function(elem, types, handler, data) {
+	// Added Capture
+	add: function(elem, types, handler, data, capture) {
 		if ( elem.nodeType == 3 || elem.nodeType == 8 )
 			return;
 
@@ -2503,7 +2504,7 @@ jQuery.event = {
 				if ( !jQuery.event.special[type] || jQuery.event.special[type].setup.call(elem, data, namespaces) === false ) {
 					// Bind the global event handler to the element
 					if (elem.addEventListener)
-						elem.addEventListener(type, handle, false);
+						elem.addEventListener(type, handle, capture || false);
 					else if (elem.attachEvent)
 						elem.attachEvent("on" + type, handle);
 				}
@@ -4388,51 +4389,13 @@ jQuery.each([ "Height", "Width" ], function(i, name){
  */
 jQuery.MVC = {};
 var MVC = jQuery.MVC;
-MVC.Object =  { 
-        /**
-         * Extends the attributes of destination with source and returns the result.
-         * @param {Object} d
-         * @param {Object} s
-         */
-        extend: function(d, s) { for (var p in s) d[p] = s[p]; return d;} 
-    }
-MVC.Object.extend(MVC,{                                   
-	Test: {},        
-	_no_conflict: false,    
-    /**
-     * Call to set no conflict mode.
-     */                                    
-	no_conflict: function(){ MVC._no_conflict = true  },
-	/**
-	 * Used to ignore Rhino
-	 * @param {Object} f
-	 */
-    runner: function(f){
-		if(!MVC.Browser.Rhino) f();
-	},
-	Ajax: {},
-    IO: {},
-    _env : "development",
-    env : function(arg){
-        MVC._env = arg || MVC._env;
-        return MVC._env;
-    },
-    /**
-     * Has booleans for different browsers.  Browser include:
-     * MVC.Browser. IE, Opera, WebKit, Gecko, MobileSafari, Rhino
-     */
-	Browser: {
-	    IE:     !!(window.attachEvent && !window.opera),
-	    Opera:  !!window.opera,
-	    WebKit: navigator.userAgent.indexOf('AppleWebKit/') > -1,
-	    Gecko:  navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.indexOf('KHTML') == -1,
-	    MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/),
-        Rhino : !!window._rhino
-	},
+
+jQuery.extend(MVC,{                                   
+    env : "development",
     /**
      * Where the jmvc folder is.
      */
-	mvc_root: null,
+	mvcRoot: null,
     /**
      * The path to include in the script tag that loads include and the application.  String.
      */
@@ -4447,24 +4410,6 @@ MVC.Object.extend(MVC,{
      */
     page_dir : null,
     /**
-     * Default functions on a JavaScript Object {}.
-     * @param {Object} id
-     */
-	Object:  { 
-        /**
-         * Extends the attributes of destination with source and returns the result.
-         * @param {Object} d
-         * @param {Object} s
-         */
-        extend: function(d, s) { for (var p in s) d[p] = s[p]; return d;} 
-    },
-    /**
-     * @function $E
-     * Helper function for getting an element by ID.
-     * @param {Object} id
-     */
-	$E: function(id){ return typeof id == 'string' ? document.getElementById(id): id },
-    /**
      * The application name loaded by the script tag.
      * @param {Object} length
      */
@@ -4473,7 +4418,7 @@ MVC.Object.extend(MVC,{
      * Returns a random string.
      * @param {Object} length
      */
-    get_random: function(length){
+    getRandom: function(length){
     	var chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
     	var randomstring = '';
     	for (var i=0; i<length; i++) {
@@ -4490,13 +4435,9 @@ MVC.Object.extend(MVC,{
 /**
  * A static random number.
  */
-MVC.random = MVC.get_random(6);
+MVC.random = MVC.getRandom(6);
 
 
-
-
-
-MVC.Ajax.factory = function(){ return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();};
 
 
 /**
@@ -4644,8 +4585,8 @@ for(var i=0; i<scripts.length; i++) {
 	var src = scripts[i].src;
 	if(src.match(/jquery\.js/i)){  //if script has include.js
 		MVC.include_path = src;
-		MVC.mvc_root = new File( new File(src).join_from( MVC.page_dir ) ).dir();
-		var loc = MVC.mvc_root.match(/\.\.$/) ?  MVC.mvc_root+'/..' : MVC.mvc_root.replace(/jmvc$/,'');
+		MVC.mvcRoot = new File( new File(src).join_from( MVC.page_dir ) ).dir();
+		var loc = MVC.mvcRoot.match(/\.\.$/) ?  MVC.mvcRoot+'/..' : MVC.mvcRoot.replace(/jmvc$/,'');
 		if(loc.match(/.+\/$/)) loc = loc.replace(/\/$/, '');
 		MVC.root = new File(loc);
 		if(src.indexOf('?') != -1) MVC.script_options = src.split('?')[1].split(',');
@@ -4794,14 +4735,14 @@ jQuery.include = function(){
 		return;
 	}
     //do first insert after include
-	if(first && !MVC.Browser.Opera){
+	if(first && !jQuery.browser.opera){
 		first = false;
         insert();
 	}
 };
 var include = jQuery.include;
 
-MVC.Object.extend(include,
+jQuery.extend(include,
 /* @Static */
 {
 	//Adds defaults to an included parameter
@@ -4810,7 +4751,7 @@ MVC.Object.extend(include,
           inc = {path: inc.indexOf('.js') == -1  ? inc+'.js' : inc};            //add .js to it, if not there
     	if(typeof inc != 'function'){
             inc.original_path = inc.path;
-            inc = MVC.Object.extend( {}, inc);       //extend with default options
+            inc = jQuery.extend( {}, inc);       //extend with default options
             //if(force) inc.compress = false
         }
     	return inc;
@@ -4821,12 +4762,12 @@ MVC.Object.extend(include,
 	 */
     init: function(o){
         //good place to set other params
-        MVC.Object.extend(MVC.Options, o || {});
+        jQuery.extend(MVC.Options, o || {});
 
 		MVC.Options.production = MVC.Options.production+(MVC.Options.production.indexOf('.js') == -1 ? '.js' : '' );
 
 		if(MVC.Options.env == 'test')  include.plugins('test');
-		if(MVC.Options.env == 'production' && ! MVC.Browser.Opera && MVC.Options.load_production)
+		if(MVC.Options.env == 'production' && ! jQuery.browser.opera && MVC.Options.load_production)
 			return document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>');
 	},
     /**
@@ -4971,7 +4912,7 @@ MVC.Object.extend(include,
 	},
 	opera: function(){
 		include.opera_called = true;
-		if(MVC.Browser.Opera){
+		if(jQuery.browser.opera){
 			MVC.Options.env == 'production' ? 
                 document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>') : 
                 include.end();
@@ -5056,22 +4997,6 @@ MVC.Object.extend(include,
         return true;
     },
     /**
-     * Synchronously requests a file.
-     * @param {Object} path
-     */
-    request: function(path, content_type){
-       var contentType = content_type || "application/x-www-form-urlencoded; charset="+MVC.Options.encoding
-       var request = MVC.Ajax.factory();
-       request.open("GET", path, false);
-       request.setRequestHeader('Content-type', contentType)
-       if(request.overrideMimeType) request.overrideMimeType(contentType);
-
-       try{request.send(null);}
-       catch(e){return null;}
-       if ( request.status == 500 || request.status == 404 || request.status == 2 ||(request.status == 0 && request.responseText == '') ) return null;
-       return request.responseText;
-    },
-    /**
      * Inserts a script tag in head with the encoding.
      * @param {Object} src
      * @param {Object} encode
@@ -5123,7 +5048,7 @@ var insert = function(src){
             load(new MVC.File( src ).clean());
         }
         load( new MVC.File( MVC.include_path ).clean()  )
-    }else if(MVC.Browser.Opera||MVC.Browser.Webkit){
+    }else if(jQuery.browser.opera||jQuery.browser.safari){
 		if(src) {
 			var script = script_tag();
 			script.src=src+'?'+MVC.random;
@@ -5141,7 +5066,7 @@ var insert = function(src){
 };
 
 var call_end = function(src){
-    return MVC.Browser.Gecko ? '<script type="text/javascript">jQuery.include.end()</script>' : 
+    return jQuery.browser.mozilla ? '<script type="text/javascript">jQuery.include.end()</script>' : 
     '<script type="text/javascript" src="'+MVC.include_path+'?'+MVC.random+'"></script>'
 }
 
@@ -5165,7 +5090,7 @@ if(MVC.script_options){
 	first = false;
     MVC.apps_root =  MVC.root.join('apps')
 	MVC.app_name = MVC.script_options[0];
-    if(MVC.Browser.Rhino)
+    if(jQuery.browser.rhino)
         MVC.script_options[1] = MVCOptions.env
     var hash_match = window.location.hash.match(/&jmvc\[env\]=(\w+)/)
     if(hash_match){
@@ -5201,10 +5126,10 @@ if(MVC.script_options){
 	    	}
 		}
     }
-	if(!MVC.Browser.Opera) insert();
+	if(!jQuery.browser.opera) insert();
     include.opera();//for opera
 }
-if(MVC.Browser.Opera) 
+if(jQuery.browser.opera) 
     setTimeout(function(){ if(!include.opera_called && MVC.Options.load_production){ alert("You forgot include.opera().")}}, 10000);
     
 
