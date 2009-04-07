@@ -96,7 +96,7 @@ jQuery.Controller.Action.extend("jQuery.Controller.Action.Move",
  */
 jQuery.Class.extend("jQuery.Move",{
     init : function(){
-        this.actName = this.className.toLowerCase();
+        this.lowerName = this.className.toLowerCase();
     },
     current : null
 },
@@ -120,8 +120,8 @@ jQuery.Class.extend("jQuery.Move",{
         
         
 		//Call the Controller's drag start if they have one.
-        if(this[this.Class.actName+"start"])
-            this[this.Class.actName+"start"](this.element, event, this  );
+        if(this.callbacks[this.Class.lowerName+"start"])
+            this.callbacks[this.Class.lowerName+"start"](this.element, event, this  );
         
 		//Check what they have set and respond accordingly
         if(this._cancelled == true) return;
@@ -176,8 +176,8 @@ jQuery.Class.extend("jQuery.Move",{
 		this.Class.responder.show(pointer, this, event);  
     },
     move : function(event){
-        if(this[this.Class.actName+"move"])
-            this[this.Class.actName+"move"](this.element, event, this  );
+        if(this.callbacks[this.Class.lowerName+"move"])
+            this.callbacks[this.Class.lowerName+"move"](this.element, event, this  );
     },
 	/**
 	 * Called on drag up
@@ -187,8 +187,8 @@ jQuery.Class.extend("jQuery.Move",{
 
 		this.Class.responder.end(event, this);
         
-        if(this[this.Class.actName+"end"])
-            this[this.Class.actName+"end"](this.element, event, this  );
+        if(this.callbacks[this.Class.lowerName+"end"])
+            this.callbacks[this.Class.lowerName+"end"](this.element, event, this  );
         
     },
 	/**

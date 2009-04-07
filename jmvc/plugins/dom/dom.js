@@ -1,12 +1,12 @@
 
 jQuery.fn.offsetv = function() {
   var offset = this.offset();
-  return new MVC.Vector(offset.left, offset.top);
+  return new jQuery.Vector(offset.left, offset.top);
 };
 
 jQuery.fn.dimensionsv = function(){
     var w = this.outerWidth(), h = this.outerHeight();
-    return new MVC.Vector(w, h);
+    return new jQuery.Vector(w, h);
 }
 jQuery.fn.centerv = function(){
     return this.offsetv().plus( this.dimensionsv().app(function(u){return u /2;})  )
@@ -102,5 +102,5 @@ jQuery._within_box = function(x, y, left, top, width, height ){
 }
 
 jQuery.Event.prototype.pointer = function(){
-    return new MVC.Vector(this.pageX, this.pageY);
+    return new jQuery.Vector(this.pageX, this.pageY);
 }

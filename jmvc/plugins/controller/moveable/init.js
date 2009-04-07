@@ -1,1 +1,1 @@
-jQuery.include('moveable')
+jQuery.include('moveable','respondable')

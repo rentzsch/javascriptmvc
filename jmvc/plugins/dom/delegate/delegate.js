@@ -302,7 +302,7 @@ jQuery.extend(jQuery.Delegator.prototype,
 			var node = parents[n], match = selector_order[matching], matched = true;
 			for(var attr in match){
 				if(!match.hasOwnProperty(attr) || attr == 'element') continue;
-				if(match[attr] && attr == 'className'){
+				if(match[attr] && attr == 'className' && node.className){
 					if(! jQuery.Array.include(node.className.split(' '),match[attr])) matched = false;
 				}else if(match[attr] && node[attr] != match[attr]){
 					matched = false;
