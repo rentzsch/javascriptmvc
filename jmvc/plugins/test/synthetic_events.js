@@ -24,7 +24,7 @@ MVC.SyntheticEvent.prototype =
     send : function(element){
 		this.firefox_autocomplete_off(element);
 		
-		if(jQuery.browser.opera && MVC.Array.include(['focus','blur'],this.type)) return this.createEvents(element);
+		if(jQuery.browser.opera && jQuery.Array.include(['focus','blur'],this.type)) return this.createEvents(element);
 		
 		if(this.type == 'focus') return element.focus();
 		if(this.type == 'blur') return element.blur();
@@ -47,19 +47,19 @@ MVC.SyntheticEvent.prototype =
 		return this.event;
 	},
 	createEvent : function(element) {
-		if(MVC.Array.include(['keypress','keyup','keydown'], this.type))
+		if(jQuery.Array.include(['keypress','keyup','keydown'], this.type))
 			this.createKeypress(element, this.options.character);
 		else if(this.type == 'submit')
 			this.createEvents(element);
-		else if(MVC.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
+		else if(jQuery.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
 			this.createMouse(element);
 	},
 	createEventObject : function(element) {
-		if(MVC.Array.include(['keypress','keyup','keydown'],this.type))
+		if(jQuery.Array.include(['keypress','keyup','keydown'],this.type))
 			this.createKeypressObject(element, this.options.character);
 		else if(this.type == 'submit')
 			this.createSubmitObject(element);
-		else if(MVC.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
+		else if(jQuery.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
 			this.createMouseObject(element);
 	},
 	simulateEvent : function(element) {
@@ -161,7 +161,7 @@ MVC.SyntheticEvent.prototype =
 	},
 	createMouse : function(element){
 		this.event = document.createEvent('MouseEvents');
-		var center = MVC.Test.center(element);
+		var center = jQuery.Test.center(element);
 		var defaults = jQuery.extend({
 			bubbles : true,cancelable : true,
 			view : window,
@@ -183,7 +183,7 @@ MVC.SyntheticEvent.prototype =
 	},
 	createMouseObject : function(element){
 		this.event = document.createEventObject();
-		var center = MVC.Test.center(element);
+		var center = jQuery.Test.center(element);
 		var defaults =jQuery.extend({
 			bubbles : true,
 			cancelable : true,
@@ -209,7 +209,7 @@ MVC.SyntheticEvent.prototype =
 		var addxy = function(part, options){
 			if(!options[part].x || !options[part].y ){
 				if(typeof options[part] == 'string') options[part] = document.getElementById(options[part])
-				var center = MVC.Test.center(options[part]);
+				var center = jQuery.Test.center(options[part]);
 				options[part].x = center.left;
 				options[part].y = center.top;
 			}
@@ -217,7 +217,7 @@ MVC.SyntheticEvent.prototype =
 		addxy('from', this.options);
 		addxy('to', this.options);
 		if(this.options.duration){
-			return new MVC.Test.Drag(target, this.options)
+			return new jQuery.Test.Drag(target, this.options)
 		}
 		var x = this.options.from.x;
 		var y = this.options.from.y;
@@ -239,11 +239,11 @@ MVC.SyntheticEvent.prototype =
 	// syntax 2: this.Write(input_params.element, {text: 'Brian', callback: this.next_callback()});
 	write : function(element) {
 		element.focus();
-		return new MVC.Test.Write(element, this.options)
+		return new jQuery.Test.Write(element, this.options)
 	}
 };
 
-MVC.Test.Write = function(element, options){
+jQuery.Test.Write = function(element, options){
 	this.delay = 100;
 	if(typeof options == 'string') {
 		this.text = options;
@@ -264,7 +264,7 @@ MVC.Test.Write = function(element, options){
 		setTimeout(this.next_callback(), this.delay);
 	}
 };
-MVC.Test.Write.prototype = {
+jQuery.Test.Write.prototype = {
 	next: function(){
 		if( this.text_index >= this.text.length){
 			if(this.callback) 	
@@ -289,7 +289,7 @@ MVC.Test.Write.prototype = {
 		};
 	}
 };
-MVC.Test.Drag = function(target , options){
+jQuery.Test.Drag = function(target , options){
 	this.callback = options.callback;
 	this.start_x = options.from.x;
 	this.end_x = options.to.x;
@@ -315,7 +315,7 @@ MVC.Test.Drag = function(target , options){
 	document.body.appendChild(this.pointer);
 	setTimeout(this.next_callback(), 20);
 };
-MVC.Test.Drag.prototype = {
+jQuery.Test.Drag.prototype = {
 	next: function(){
 		var now = new Date();
 		var difference = now - this.start;
@@ -349,7 +349,7 @@ MVC.Test.Drag.prototype = {
 //  Prototype JavaScript framework, version 1.6.0.1
 //  (c) 2005-2007 Sam Stephenson
 
-MVC.Test.get_dimensions = function(element){
+jQuery.Test.get_dimensions = function(element){
 
     var display = element.style.display;
     if (display != 'none' && display != null) // Safari bug
@@ -372,8 +372,8 @@ MVC.Test.get_dimensions = function(element){
     return {width: originalWidth, height: originalHeight};
 }
 
-MVC.Test.center= function(element) {
-    var d = MVC.Test.get_dimensions(element)
+jQuery.Test.center= function(element) {
+    var d = jQuery.Test.get_dimensions(element)
 	var valueT = d.height / 2, valueL =d.width / 2;
 	do {
       valueT += element.offsetTop  || 0;

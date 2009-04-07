@@ -1,4 +1,4 @@
-new MVC.Test.Unit('timer',{
+new jQuery.Test.Unit('timer',{
    test_timer: function() {
       var timer = new MVC.Timer({
           time: 1000,

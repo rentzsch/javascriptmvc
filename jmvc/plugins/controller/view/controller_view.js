@@ -2,7 +2,7 @@
  * @add MVC.Controller Prototype
  */
 
-MVC.Controller.prototype.
+jQuery.Controller.prototype.
 /**
  * Renders a View template with the controller instance. If action or partial 
  * are not supplied in the options, 

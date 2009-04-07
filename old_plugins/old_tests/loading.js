@@ -9,10 +9,10 @@ JMVCTest = {
 		teardown: function() {
 		},
 	    test_startup: function() { with(this) {
-			assert(JMVC.Test.environment_run, 'The environment file was not loaded')
-			assert(JMVC.Test.initializer_run, 'The initializer function was not called') 
-			assert(JMVC.Test.action_run, 'The first action wasnt run')
-			assertEqual("Hello World", JMVC.Test.rendered   )
+			assert(JjQuery.Test.environment_run, 'The environment file was not loaded')
+			assert(JjQuery.Test.initializer_run, 'The initializer function was not called') 
+			assert(JjQuery.Test.action_run, 'The first action wasnt run')
+			assertEqual("Hello World", JjQuery.Test.rendered   )
 			
 	    }}
 		/*,

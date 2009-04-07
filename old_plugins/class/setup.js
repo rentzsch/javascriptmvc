@@ -2,9 +2,9 @@
 (function(){
   var initializing = false, fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
   // The base Class implementation (does nothing)
-  MVC.Class = function(){};
+  jQuery.Class = function(){};
   // Create a new Class that inherits from this class
-  MVC.Class.extend = function(prop) {
+  jQuery.Class.extend = function(prop) {
     var _super = this.prototype;
     // Instantiate a base class (but only create the instance,
     // don't run the init constructor)
@@ -51,5 +51,5 @@
 })();
 
 if(!MVC._no_conflict && typeof Class == 'undefined'){
-	Class = MVC.Class;
+	Class = jQuery.Class;
 }

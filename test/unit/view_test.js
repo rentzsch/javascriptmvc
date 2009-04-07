@@ -1,4 +1,4 @@
-MVC.Test.Unit.extend("Tests.View",{
+jQuery.Test.Unit.extend("Tests.View",{
 	test_simple : function(){
 		$('#testarea').html({view: 'views/simple'})
         this.assertEqual('<h1>HelloWorld</h1>', $('#testarea').html()

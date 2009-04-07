@@ -1,5 +1,5 @@
 
-MVC.Test.extend("MVC.Test.Unit",
+jQuery.Test.extend("jQuery.Test.Unit",
 {
     tests: [],
     /**
@@ -12,9 +12,9 @@ MVC.Test.extend("MVC.Test.Unit",
      * such as assert or assertEqual as your functions will override these functions.
      */
     init : function(){
-        if(jQuery.String.include(this.fullName,"MVC.Test"  )) return;
+        if(jQuery.String.include(this.fullName,"jQuery.Test"  )) return;
         
-        MVC.Test.Unit.tests.push(this);
+        jQuery.Test.Unit.tests.push(this);
         this._super();
     }  
 },
@@ -24,4 +24,4 @@ MVC.Test.extend("MVC.Test.Unit",
 });
 
 
-MVC.Test.Unit.tests = [];
+jQuery.Test.Unit.tests = [];

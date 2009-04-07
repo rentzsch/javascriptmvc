@@ -1,4 +1,4 @@
-MVC.Class.extend("Animal",
+jQuery.Class.extend("Animal",
 {
     count: 0,
     test : function(){
@@ -42,12 +42,12 @@ new Animal();
 ajax = new Ajax(1000);
 
 
-MVC.Test.Unit.extend("Tests.Class",{
+jQuery.Test.Unit.extend("Tests.Class",{
     init : function(){ //setup code
-        MVC.Console.log("init")
+        $.Console.log("init")
     },
     destroy : function(){ //teardown code
-        MVC.Console.log("destroy")
+        $.Console.log("destroy")
     },
     test_count: function() {
        this.assertEqual(2, Animal.count);

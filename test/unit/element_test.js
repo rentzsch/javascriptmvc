@@ -1,4 +1,4 @@
-new MVC.Test.Unit('element_test',{
+new jQuery.Test.Unit('element_test',{
 	setup: function(){
           MVC.$E('testarea').innerHTML = "<div id='insertion_test' style='width: 100px; height:100px;'></div>"
     },
@@ -69,7 +69,7 @@ new MVC.Test.Unit('element_test',{
         MVC.$E('insertion_test').toggle();
         this.assert_equal("none", MVC.$E('insertion_test').get_style('display')  );
         MVC.$E('insertion_test').toggle();
-        this.assert(  MVC.String.include(MVC.$E('insertion_test').get_style('display'), "block")   );
+        this.assert(  jQuery.String.include(MVC.$E('insertion_test').get_style('display'), "block")   );
         
     },
     test_get_style: function(){

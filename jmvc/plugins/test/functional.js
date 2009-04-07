@@ -5,13 +5,13 @@
 /**
  * Functional tests are used to mimic user events.
  */
-MVC.Test.Functional = MVC.Test.extend(
+jQuery.Test.Functional = jQuery.Test.extend(
 /* @Prototype*/
 {
 	/**
 	 * Creates a new functional test case. A test case is a collection of test functions and helpers.
 @code_start
-new MVC.Test.Functional('TestCaseName',{
+new jQuery.Test.Functional('TestCaseName',{
   test_some_clicks : function(){
     this.Click('#button')
   }
@@ -22,7 +22,7 @@ new MVC.Test.Functional('TestCaseName',{
 	 */
     init: function(name , tests ){
 		this._super(  name, tests, 'functional');
-		MVC.Test.Functional.tests.push(this)
+		jQuery.Test.Functional.tests.push(this)
 	},
 	helpers : function(){
 		var helpers = this._super();
@@ -47,7 +47,7 @@ new MVC.Test.Functional('TestCaseName',{
 			var element = typeof selector == 'string' ? MVC.Query(selector)[number] : selector; //if not a selector assume element
 			
 			if((event_type == 'focus' || event_type == 'write' || event_type == 'click') && !this._do_blur_back){
-				jQuery.browser.mozilla ? MVC.Console.window.blur() : window.focus();
+				jQuery.browser.mozilla ? $.Console.window.blur() : window.focus();
 				this._do_blur_back =true;
 			}
 			
@@ -55,14 +55,14 @@ new MVC.Test.Functional('TestCaseName',{
 			var event = new MVC.SyntheticEvent(event_type, options).send(element);
 			return {event: event, element: element, options: options};
 		}
-		for(var e = 0; e < MVC.Test.Functional.events.length; e++){
-			var event_name = MVC.Test.Functional.events[e];
+		for(var e = 0; e < jQuery.Test.Functional.events.length; e++){
+			var event_name = jQuery.Test.Functional.events[e];
 			helpers[jQuery.String.capitalize(event_name)] = helpers.Action.curry(event_name)
 		}
 		return helpers;
 	}
 });
-MVC.Test.Functional.events = [
+jQuery.Test.Functional.events = [
 /* @function Blur
  * Calls Action using 'blur' as the first parameter.
  * @param {String/HTMLElement} selector_or_element
@@ -370,10 +370,10 @@ this.Write(input_params.element, {text: 'Brian', callback: this.next_callback()}
  */
 'write'
 ];
-MVC.Test.Functional.tests = [];
+jQuery.Test.Functional.tests = [];
 
 
-MVC.Test.Runner(MVC.Test.Functional, "tests", {
+jQuery.Test.Runner(jQuery.Test.Functional, "tests", {
 	start : function(){
 		this.passes = 0;
 	},
@@ -381,7 +381,7 @@ MVC.Test.Runner(MVC.Test.Functional, "tests", {
 		if(this.tests[number].failures == 0 ) this.passes++;
 	},
 	done: function(){
-		MVC.Console.window.document.getElementById('functional_result').innerHTML = 
+		$.Console.window.document.getElementById('functional_result').innerHTML = 
 			'('+this.passes+'/'+this.tests.length+')' + (this.passes == this.tests.length ? ' Wow!' : '')
 	}
 })

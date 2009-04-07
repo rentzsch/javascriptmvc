@@ -10,7 +10,7 @@ MVC.Controller('todos',{
 		params.element.innerHTML = 
 			'<input type="text" class="text" value="'+params.element.innerHTML+'"/>';
 		// weird Firefox bug
-		if(MVC.Browser.Gecko) params.element.firstChild.setAttribute('autocomplete','off');
+		if(jQuery.browser.mozilla) params.element.firstChild.setAttribute('autocomplete','off');
 		params.element.firstChild.focus();
 		params.element.className='working';
 	},

@@ -8,13 +8,13 @@ MVC.Object.is_number = function(value){
  * @param {Object} actions - a hash of functions that get added to the controller's prototype
  */
 MVC.Controller = function(model, actions){
-	var className= model, newmodel = null, singular = MVC.String.is_singular(model);
-	model = MVC.String.classize(model)+'Controller';
+	var className= model, newmodel = null, singular = jQuery.String.is_singular(model);
+	model = jQuery.String.classize(model)+'Controller';
 	newmodel = eval(model + " = function() { this.Class = "+model+";this.initialize.apply(this, arguments);};");
 	newmodel.prototype = new MVC.Controller.functions();
 	newmodel.prototype.klass_name = model;
 	newmodel.className = newmodel.prototype.className =	className;
-	MVC.Object.extend(newmodel.prototype, actions );
+	jQuery.extend(newmodel.prototype, actions );
 	var registered_actions = {}, controller_actions = {};
 	//add register action to model, used by actions to add themselves
     newmodel.add_register_action = function(action,observe_on, event_type, capture){
@@ -40,7 +40,7 @@ MVC.Controller = function(model, actions){
  * MVC.Controller prototype functions
  */
 MVC.Controller.functions = function(){};
-MVC.Object.extend(MVC.Controller.functions.prototype, {
+jQuery.extend(MVC.Controller.functions.prototype, {
 	initialize : function(){},
 	continue_to :function(action){
 		if(!action) action = this.action.name+'ing';
@@ -55,7 +55,7 @@ MVC.Object.extend(MVC.Controller.functions.prototype, {
 /**
  * MVC.Controller class functions
  */
-MVC.Object.extend(MVC.Controller , {
+jQuery.extend(MVC.Controller , {
 	klasses: [],
 	add_kill_event: function(event){
 		if(!event.kill){
@@ -74,7 +74,7 @@ MVC.Object.extend(MVC.Controller , {
 	},
 	dispatch: function(controller, action_name, params){
 		var c_name = controller;
-		if(typeof controller == 'string'){controller = window[ MVC.String.classize(controller)+'Controller'];}
+		if(typeof controller == 'string'){controller = window[ jQuery.String.classize(controller)+'Controller'];}
 		if(!controller) throw 'No controller named '+c_name+' was found for MVC.Controller.dispatch.';
 		if(!action_name) action_name = 'index';
 		
@@ -204,7 +204,7 @@ MVC.Controller.Params.prototype = {
 	},
 	class_element : function(){
 		var start = this.element, controller = this.controller;
-		var className = MVC.String.is_singular(controller.className) ? controller.className : MVC.String.singularize(controller.className);
+		var className = jQuery.String.is_singular(controller.className) ? controller.className : jQuery.String.singularize(controller.className);
 		while(start && start.className.indexOf(className) == -1 ){
 			start = start.parentNode;
 			if(start == document) return null;
@@ -228,20 +228,20 @@ MVC.Controller.Action = function(action_name, func ,controller){
     }
     
     
-    if(! MVC.Array.include(MVC.Controller.Action.actions, this.event_type)){
+    if(! jQuery.Array.include(MVC.Controller.Action.actions, this.event_type)){
 		this.event_type = null;
 		return;
 	}
 	
 	if(this.className() == 'main') return this.main_controller();
-	this.singular = MVC.String.is_singular(this.className());
+	this.singular = jQuery.String.is_singular(this.className());
 	if(this.singular)
 		this.selector = this.last_space == -1 ? '#'+this.className() : '#'+this.className()+' '+this.before_space;
 	else
 		this.set_plural_selector();
-	if(this.event_type == 'submit' && MVC.Browser.IE) return this.submit_for_ie();
-	if(this.event_type == 'change' && MVC.Browser.IE) return this.change_for_ie();
-	if(this.event_type == 'change' && MVC.Browser.WebKit) return this.change_for_webkit();
+	if(this.event_type == 'submit' && jQuery.browser.msie) return this.submit_for_ie();
+	if(this.event_type == 'change' && jQuery.browser.msie) return this.change_for_ie();
+	if(this.event_type == 'change' && jQuery.browser.safari) return this.change_for_webkit();
 	this.controller.add_register_action(this,document.documentElement, this.registered_event(), this.capture());
 };
 
@@ -262,7 +262,7 @@ MVC.Controller.is_special = function(action, controller){
 
 MVC.Controller.Action.prototype = {
 	registered_event : function(){
-		if(MVC.Browser.IE){
+		if(jQuery.browser.msie){
 			if(this.event_type == 'focus')
 				return 'activate';
 			else if(this.event_type == 'blur')
@@ -276,7 +276,7 @@ MVC.Controller.Action.prototype = {
 			newlast_space = newer_action_name.lastIndexOf(' ');
 			this.selector = newlast_space == -1 ? '#'+this.className() : '#'+this.className()+' '+newer_action_name.substring(0,newlast_space);
 		}else{
-			var singular = MVC.String.singularize(this.className());
+			var singular = jQuery.String.singularize(this.className());
 			this.selector = this.last_space == -1 ? '.'+singular : '.'+singular+' '+this.before_space;
 		}
 			
@@ -287,14 +287,14 @@ MVC.Controller.Action.prototype = {
 		this.event_type = this.last_space == -1 ? this.name :this.name.substring(this.last_space+1);
 	},
 	main_controller : function(){
-		if(MVC.Array.include(['load','unload','resize','scroll'],this.event_type))
+		if(jQuery.Array.include(['load','unload','resize','scroll'],this.event_type))
 			return MVC.Event.observe(window, this.event_type, MVC.Controller.event_closure(this.className(), this.event_type, window) );
 		
 		//if(this.name == 'click')
 		//	return MVC.Event.observe(document.documentElement, this.event_type, MVC.Controller.event_closure(this.className(), this.event_type, window) );
 		
 		this.selector = this.before_space;
-		if(this.event_type == 'submit' && MVC.Browser.IE)
+		if(this.event_type == 'submit' && jQuery.browser.msie)
 			return this.submit_for_ie();
 			
 		this.controller.add_register_action(this,document.documentElement, this.registered_event(), this.capture());
@@ -345,7 +345,7 @@ MVC.Controller.Action.prototype = {
 		return this.controller.className;
 	},
 	capture : function(){
-		return MVC.Array.include(['focus','blur'],this.event_type);
+		return jQuery.Array.include(['focus','blur'],this.event_type);
 	},
 	selector_order : function(){
 		if(this.order) return this.order;
@@ -382,7 +382,7 @@ MVC.Controller.Action.prototype = {
 			for(var attr in match){
 				if(!match.hasOwnProperty(attr) || attr == 'element') continue;
 				if(match[attr] && attr == 'className'){
-					if(! MVC.Array.include(node.className.split(' '),match[attr])) matched = false;
+					if(! jQuery.Array.include(node.className.split(' '),match[attr])) matched = false;
 				}else if(match[attr] && node[attr] != match[attr]){
 					matched = false;
 				}

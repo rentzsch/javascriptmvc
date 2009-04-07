@@ -39,7 +39,7 @@ ControllerGeneratorController = AbstractGeneratorController.extend('controller_g
 			return;
 		}
         this.class_name = params.element.controller_name.value;
-        this.name = MVC.String.classize(this.class_name)+'Controller';
+        this.name = jQuery.String.classize(this.class_name)+'Controller';
 		this.application_name = MVC.current_application;
 		params.generating_file = 'controller';
 		params.generated_file_path = MVC.Path.join("controllers",this.class_name+"_controller.js");
@@ -71,7 +71,7 @@ UnitTestGeneratorController = AbstractGeneratorController.extend('unit_test_gene
 ModelGeneratorController = AbstractGeneratorController.extend('model_generator',{
     submit: function(params){
         this.class_name = params.element.model_name.value;
-        this.name = MVC.String.classize(this.class_name);
+        this.name = jQuery.String.classize(this.class_name);
 		this.type = params.element.model_type.value;
 		params.generating_file = 'model';
 		params.generated_file_path = MVC.Path.join("models",this.class_name+".js");

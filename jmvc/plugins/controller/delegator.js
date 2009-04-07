@@ -28,7 +28,7 @@ jQuery.fn.kill = function(selector, event, callback) {
   });
 };
 
-MVC.Delegator = function(selector, event, f, element){
+jQuery.Delegator = function(selector, event, f, element){
         this._event = event;
         this._selector = selector
         this._func = f;
@@ -39,9 +39,9 @@ MVC.Delegator = function(selector, event, f, element){
 
         
         if(event == 'contextmenu' && jQuery.browser.opera) this.context_for_opera();
-        else if(event == 'submit' && MVC.Browser.IE) this.submit_for_ie();
-    	else if(event == 'change' && MVC.Browser.IE) this.change_for_ie();
-    	else if(event == 'change' && MVC.Browser.WebKit) this.change_for_webkit();
+        else if(event == 'submit' && jQuery.browser.msie) this.submit_for_ie();
+    	else if(event == 'change' && jQuery.browser.msie) this.change_for_ie();
+    	else if(event == 'change' && jQuery.browser.safari) this.change_for_webkit();
     	else this.add_to_delegator();
         var delegates = jQuery.data(this.element, "delegates") || jQuery.data(this.element, "delegates",{})
         if(!delegates[event]){
@@ -97,7 +97,7 @@ jQuery.extend(MVC.Delegator.prototype,
      * @return {String} the adjusted event name.
      */
     event: function(){
-    	if(MVC.Browser.IE){
+    	if(jQuery.browser.msie){
             if(this._event == 'focus')
     			return 'activate';
     		else if(this._event == 'blur')
@@ -110,7 +110,7 @@ jQuery.extend(MVC.Delegator.prototype,
      * @return {Boolean} true for focus / blur, false if otherwise
      */
     capture: function(){
-        return MVC.Array.include(['focus','blur'],this._event);
+        return jQuery.Array.include(['focus','blur'],this._event);
     },
     /**
      * If there are no special cases, this is called to add to the delegator.
@@ -302,7 +302,7 @@ jQuery.extend(MVC.Delegator.prototype,
 			for(var attr in match){
 				if(!match.hasOwnProperty(attr) || attr == 'element') continue;
 				if(match[attr] && attr == 'className'){
-					if(! MVC.Array.include(node.className.split(' '),match[attr])) matched = false;
+					if(! jQuery.Array.include(node.className.split(' '),match[attr])) matched = false;
 				}else if(match[attr] && node[attr] != match[attr]){
 					matched = false;
 				}
@@ -366,16 +366,16 @@ jQuery.extend(MVC.Delegator.prototype,
         if(this._event == 'contextmenu' && jQuery.browser.opera){
             return this._remove_from_delegator("click");
         }
-        if(this._event == 'submit' && MVC.Browser.IE) {
+        if(this._event == 'submit' && jQuery.browser.msie) {
             this._remove_from_delegator("keypress");
             return this._remove_from_delegator("click");
         }
-    	if(this._event == 'change' && MVC.Browser.IE){
+    	if(this._event == 'change' && jQuery.browser.msie){
             this._remove_from_delegator("keyup");
             this._remove_from_delegator("beforeactivate");
             return this._remove_from_delegator("click");
         } 
-    	//if(this._event == 'change' && MVC.Browser.WebKit){
+    	//if(this._event == 'change' && jQuery.browser.safari){
         //    return this._remove_from_delegator();
         //}
         this._remove_from_delegator()

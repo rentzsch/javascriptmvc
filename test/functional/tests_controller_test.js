@@ -1,4 +1,4 @@
-new MVC.Test.Controller('tests',{
+new jQuery.Test.Controller('tests',{
 	test_click: function(){
 		this.TestClick();
 		this.assert_equal('success', $GET('click').className )

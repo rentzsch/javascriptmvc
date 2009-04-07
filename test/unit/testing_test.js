@@ -1,5 +1,5 @@
 
-MVC.Test.Unit.extend("Tests.Testing",{
+jQuery.Test.Unit.extend("Tests.Testing",{
        test_asserts : function(){
            this.assert(true);
 		   this.assert({});
@@ -62,7 +62,7 @@ MVC.Test.Unit.extend("Tests.Testing",{
 	   },
 	   test_console : function(){
 	   		for(var i = 0; i < 50 ; i++){
-				MVC.Console.log(i)
+				$.Console.log(i)
 			}
 			
 	   }

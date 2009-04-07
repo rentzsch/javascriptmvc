@@ -1,4 +1,4 @@
-new MVC.Test.Unit('model',{
+new jQuery.Test.Unit('model',{
    test_find_all_no_params: function() {
       var instances = Todo.find('all');
       this.assert_equal(2, instances.length);

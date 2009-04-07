@@ -6,7 +6,7 @@
  * @param {Function} iterator_name - "Tests"
  * @param {Object} params
  */
-MVC.Test.Runner = function(object, iterator_name,params){
+jQuery.Test.Runner = function(object, iterator_name,params){
 	var iterator_num;
 	object.run = function(callback){
 		object._callback = callback;
@@ -27,7 +27,7 @@ MVC.Test.Runner = function(object, iterator_name,params){
 				object._callback = null;
 			}else{
 				//if(jQuery.browser.mozilla) window.blur();
-				//else MVC.Console.window.focus();
+				//else $.Console.window.focus();
 			}
 		}
 	}

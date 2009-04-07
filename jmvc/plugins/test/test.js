@@ -3,12 +3,12 @@
  * Test.Unit, Test.Functional, and Test.Controller. 
  * Typically Test is not used directly but its functions are available in inheriting classes.
  */
-jQuery.Class.extend("MVC.Test",
+jQuery.Class.extend("jQuery.Test",
 {
     init : function(){
         
         this.clear();
-        if(jQuery.String.include(this.fullName,"MVC.Test"  )) return;
+        if(jQuery.String.include(this.fullName,"jQuery.Test"  )) return;
         this.testNames = []
         
 		for(var test_name in this.prototype) {
@@ -94,7 +94,7 @@ jQuery.Class.extend("MVC.Test",
     /**
      * Creates a new test case. A test case is a collection of test functions and helpers.
      * 
-     * @code_start new MVC.Test('TestCaseName',{
+     * @code_start new jQuery.Test('TestCaseName',{
   test_some_asserts : function(){
     var value = this.my_helper('hello world')
     this.assert(value)      //passes
@@ -126,7 +126,7 @@ jQuery.Class.extend("MVC.Test",
 	/**
      * Asserts the expression exists in the same way that if(expression) does. If the expression doesn't exist reports the error.
 @code_start
-new MVC.Test.Unit('TestCase Name',{
+new jQuery.Test.Unit('TestCase Name',{
   test_some_asserts : function(){
     this.assert(true)      //passes
     this.assert({})        //passes
@@ -145,7 +145,7 @@ new MVC.Test.Unit('TestCase Name',{
      * @param {optional:String} message An optional message. A default is provided if the message isn't present.
      */
 	assert: function(expression, message) {
-		var message = message || 'assert: got "' + MVC.Test.inspect(expression) + '"';
+		var message = message || 'assert: got "' + jQuery.Test.inspect(expression) + '"';
 		try { expression ? this.pass() : 
 			this.fail(message); }
 		catch(e) { this.error(e); }
@@ -153,7 +153,7 @@ new MVC.Test.Unit('TestCase Name',{
     /**
      * Uses the double equals (==) to determine if two values are equal. This means that type coercion may occur. For example 5 == '5'.
 @code_start
-new MVC.Test.Unit('TestCase Name',{
+new jQuery.Test.Unit('TestCase Name',{
   test_some_asserts : function(){
     this.assert_equal(7,7)      //passes
 	this.assert_equal(7,'7')    //passes
@@ -171,8 +171,8 @@ new MVC.Test.Unit('TestCase Name',{
   	assertEqual: function(expected, actual, message) {
 		var message = message || "assertEqual";
 		try { (expected == actual) ? this.pass() :
-			this.fail(message + ': expected "' + MVC.Test.inspect(expected) + 
-			'", actual "' + MVC.Test.inspect(actual) + '"'); }
+			this.fail(message + ': expected "' + jQuery.Test.inspect(expected) + 
+			'", actual "' + jQuery.Test.inspect(actual) + '"'); }
 		catch(e) { this.error(e); }
   	},
     /**
@@ -186,7 +186,7 @@ new MVC.Test.Unit('TestCase Name',{
 	assertNull: function(obj, message) {
 	    var message = message || 'assertNull'
 	    try { (obj==null) ? this.pass() : 
-	      this.fail(message + ': got "' + MVC.Test.inspect(obj) + '"'); }
+	      this.fail(message + ': got "' + jQuery.Test.inspect(obj) + '"'); }
 	    catch(e) { this.error(e); }
 	},
     /**
@@ -198,7 +198,7 @@ new MVC.Test.Unit('TestCase Name',{
      * @param {optional:String} message An optional message. A default is provided if the message isn't present.
      */
 	assertNot: function(expression,message) {
-	   var message = arguments[1] || 'assert: got "' + MVC.Test.inspect(expression) + '"';
+	   var message = arguments[1] || 'assert: got "' + jQuery.Test.inspect(expression) + '"';
 		try {! expression ? this.pass() : 
 			this.fail(message); }
 		catch(e) { this.error(e); }
@@ -224,15 +224,15 @@ new MVC.Test.Unit('TestCase Name',{
 	assertEach: function(expected, actual, message) {
 	    var message = message || "assert_each";
 	    try { 
-			var e = MVC.Array.from(expected);
-			var a = MVC.Array.from(actual);
+			var e = jQuery.Array.from(expected);
+			var a = jQuery.Array.from(actual);
 			if(e.length != a.length){
-				return this.fail(message + ': expected ' + MVC.Test.inspect(expected)+', actual ' + MVC.Test.inspect(actual));
+				return this.fail(message + ': expected ' + jQuery.Test.inspect(expected)+', actual ' + jQuery.Test.inspect(actual));
 				
 			}else{
 				for(var i =0; i< e.length; i++){
 					if(e[i] != a[i]){
-						return this.fail(message + ': expected '+MVC.Test.inspect(expected)+', actual ' + MVC.Test.inspect(actual));
+						return this.fail(message + ': expected '+jQuery.Test.inspect(expected)+', actual ' + jQuery.Test.inspect(actual));
 					}
 				}
 			}
@@ -268,19 +268,19 @@ new MVC.Test.Unit('TestCase Name',{
      */
 	error: function(error) {
 	    this.errors++;
-	    this.messages.push(error.name + ": "+ error.message + "(" + MVC.Test.inspect(error) +")");
+	    this.messages.push(error.name + ": "+ error.message + "(" + jQuery.Test.inspect(error) +")");
 	},
     destroy : function(){
         
     },
     callback: function(){
-        var args = MVC.Array.from(arguments);
+        var args = jQuery.Array.from(arguments);
         var fname = args.shift();
 		this._delays++;
 		return this._call_next_callback(fname, args);
 	},
     timeout : function(fname, delay){
-          var args = MVC.Array.from(arguments);
+          var args = jQuery.Array.from(arguments);
           var fname = args.shift();
           var delay = args.shift();
           this._delays++;
@@ -292,7 +292,7 @@ new MVC.Test.Unit('TestCase Name',{
 		return function(){
 			curried = curried || []
             inst._last_called = fname;
-			var args = curried.concat( MVC.Array.from(arguments) );
+			var args = curried.concat( jQuery.Array.from(arguments) );
 			try{
 				func.apply(inst, args);
 			}catch(e){ inst.error(e); }
@@ -324,10 +324,10 @@ new MVC.Test.Unit('TestCase Name',{
 
 
 
-if(MVC.Console && MVC.Console.window) MVC.Console.window.get_tests = function(){return MVC.Tests; } 
+if(jQuery.Console && jQuery.Console.window) jQuery.Console.window.get_tests = function(){return jQuery.Tests; } 
 
 //This function returns what something looks like
-MVC.Test.inspect =  function(object) {
+jQuery.Test.inspect =  function(object) {
 	try {
 		if (object === undefined) return 'undefined';
 		if (object === null) return 'null';
@@ -340,20 +340,20 @@ MVC.Test.inspect =  function(object) {
 		throw e;
 	}
 };
-MVC.Test.loaded_files = {};
+jQuery.Test.loaded_files = {};
 
-include.unit_tests = function(){
+jQuery.include.unit_tests = function(){
 	for(var i=0; i< arguments.length; i++){
-        MVC.Console.log('Trying to load: test/unit/'+arguments[i]+'_test.js');
+        $.Console.log('Trying to load: test/unit/'+arguments[i]+'_test.js');
     }
 		
-	include.app(function(i){ return '../../test/unit/'+i+'_test'}).apply(null, arguments);
+	jQuery.include.app(function(i){ return '../../test/unit/'+i+'_test'}).apply(null, arguments);
 }
-include.functional_tests = function(){
+jQuery.include.functional_tests = function(){
 	for(var i=0; i< arguments.length; i++){
-        MVC.Console.log('Trying to load: test/functional/'+arguments[i]+'_test.js');
+        $.Console.log('Trying to load: test/functional/'+arguments[i]+'_test.js');
     }
-	include.app(function(i){ return '../../test/functional/'+i+'_test'}).apply(null, arguments);
+	jQuery.include.app(function(i){ return '../../test/functional/'+i+'_test'}).apply(null, arguments);
 }
 
 

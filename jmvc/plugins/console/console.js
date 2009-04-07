@@ -1,29 +1,29 @@
-if(include.get_env() != 'test' && typeof console != 'undefined'){
-	MVC.Console.log = function(message){
+if($.include.get_env() != 'test' && typeof console != 'undefined'){
+	$.Console.log = function(message){
 			console.log(message)
 	};
 }else{
 	
-	MVC.Console = {};
-	MVC.Console.window = window.open(MVC.mvcRoot+'/plugins/debug/console.html', 'test', "width=600,height=400,resizable=yes,scrollbars=yes");
-	MVC.Console.log = function(message, html){
-		var el = MVC.Console.window.document.createElement(html ? 'p' : 'pre' );
-		if(! MVC.Browser.IE || html){
+	$.Console = {};
+	$.Console.window = window.open($.MVC.mvcRoot+'/plugins/console/console.html', 'test', "width=600,height=400,resizable=yes,scrollbars=yes");
+	$.Console.log = function(message, html){
+		var el = $.Console.window.document.createElement(html ? 'p' : 'pre' );
+		if(! jQuery.browser.msie || html){
 			el.innerHTML = html ? message : message.toString().replace(/</g,'&lt;');
 		}else{
 			var lines = message.toString().split('\n')
 			for(var l = 0 ; l < lines.length; l++){
-				var txt = MVC.Console.window.document.createTextNode(lines[l] ? lines[l] : ' ')
+				var txt = $.Console.window.document.createTextNode(lines[l] ? lines[l] : ' ')
 				el.appendChild(txt);
-				if(l != lines.length - 1) el.appendChild( MVC.Console.window.document.createElement('br')  )
+				if(l != lines.length - 1) el.appendChild( $.Console.window.document.createElement('br')  )
 			}
 		}
-		var place = MVC.Console.window.document.getElementById('console_log')
+		var place = $.Console.window.document.getElementById('console_log')
 		place.appendChild(el);
 		
-		if(MVC.Console.window.window_resise){
-			MVC.Console.window.window_resise();
-			MVC.Console.window.console_scroll();
+		if($.Console.window.window_resise){
+			$.Console.window.window_resise();
+			$.Console.window.console_scroll();
 		}
 		
 		if(typeof console != 'undefined'){

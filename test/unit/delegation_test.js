@@ -1,4 +1,4 @@
-MVC.Test.Unit.extend("Test.Delegate",{
+jQuery.Test.Unit.extend("Test.Delegate",{
    init: function(){
           $('#testarea').html({view: 'views/delegation'});
    },
@@ -22,7 +22,7 @@ MVC.Test.Unit.extend("Test.Delegate",{
               self.assertEqual("first", this.id)
               self.assert(event.target, $('#first')[0]);
        }
-       var delegate = new MVC.Delegator('#first','click',fn);
+       var delegate = new $.Delegator('#first','click',fn);
        $("#first").synthetic('click')
        $().kill('#first','click', fn );
    },

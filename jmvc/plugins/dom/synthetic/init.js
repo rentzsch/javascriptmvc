@@ -27,7 +27,7 @@
         send : function(element){
     		this.firefox_autocomplete_off(element);
     		
-    		if(jQuery.browser.opera && MVC.Array.include(['focus','blur'],this.type)) return this.createEvents(element);
+    		if(jQuery.browser.opera && jQuery.Array.include(['focus','blur'],this.type)) return this.createEvents(element);
     		
     		if(this.type == 'focus') return element.focus();
     		if(this.type == 'blur') return element.blur();
@@ -58,11 +58,11 @@
          * @param {Object} element
          */
     	createEvent : function(element) {
-    		if(MVC.Array.include(['keypress','keyup','keydown'], this.type))
+    		if(jQuery.Array.include(['keypress','keyup','keydown'], this.type))
     			this.createKeypress(element, this.options.character);
     		else if(this.type == 'submit')
     			this.createEvents(element);
-    		else if(MVC.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
+    		else if(jQuery.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
     			this.createMouse(element);
     	},
         /**
@@ -71,11 +71,11 @@
          */
     	createEventObject : function(element) {
     		this.event = document.createEventObject();
-            if(MVC.Array.include(['keypress','keyup','keydown'],this.type))
+            if(jQuery.Array.include(['keypress','keyup','keydown'],this.type))
     			this.createKeypressObject(element, this.options.character);
     		else if(this.type == 'submit')
     			this.createSubmitObject(element);
-    		else if(MVC.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
+    		else if(jQuery.Array.include(['click','dblclick','mouseover','mouseout','mousemove','mousedown','mouseup','contextmenu'],this.type))
     			this.createMouseObject(element);
     	},
     	simulateEvent : function(element) {

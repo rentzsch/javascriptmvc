@@ -147,8 +147,8 @@ JMVC.Column.prototype = {
 /**
  * @class
  */
-JMVC.StringTextColumn = function(){}
-JMVC.StringTextColumn = Class.create(JMVC.Column, {
+JjQuery.StringTextColumn = function(){}
+JjQuery.StringTextColumn = Class.create(JMVC.Column, {
 	to_sql: function(value) {
 		if(JMVC.database_adapter == 'msaccess') {
 			return "'"+value.replace(/'/g, "\'\'").replace(/"/g, "\\\"")+"'";
@@ -161,14 +161,14 @@ JMVC.StringTextColumn = Class.create(JMVC.Column, {
 /**
  * @class
  */
-JMVC.StringColumn = function(){}
-JMVC.StringColumn = Class.create(JMVC.StringTextColumn)
+JjQuery.StringColumn = function(){}
+JjQuery.StringColumn = Class.create(JjQuery.StringTextColumn)
 
 /**
  * @class
  */
 JMVC.TextColumn = function(){}
-JMVC.TextColumn = Class.create(JMVC.StringTextColumn)
+JMVC.TextColumn = Class.create(JjQuery.StringTextColumn)
 
 /**
  * @class
@@ -237,8 +237,8 @@ JMVC.BooleanColumn = Class.create(JMVC.Column,{
  * @class
  * <p>JMVC.ActiveRecord is based on the active record design pattern where a database table is wrapped into a
  * class.  An object instance is tied to a single row in the table.
- * JMVC.ActiveRecord objects don‘t specify their attributes directly, 
- * but rather infer them from the table definition with which they‘re linked. 
+ * JMVC.ActiveRecord objects donï¿½t specify their attributes directly, 
+ * but rather infer them from the table definition with which theyï¿½re linked. 
  * Adding, removing, and changing attributes and their type is done directly in the DatabaseBuilder. 
  * Any change is instantly reflected in the JMVC.ActiveRecord objects. </p>
  * 

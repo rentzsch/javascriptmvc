@@ -4928,7 +4928,7 @@ jQuery.extend(include,
     engine : function(engine_name){
         var current_path = include.get_path();
 		include.set_path("");
-		include('engines/'+ engine_name+'/apps/'+engine_name+".js");
+		include('engines/'+ engine_name+'/apps/'+engine_name+"/init");
 		include.set_path(current_path);
     },
     /**
@@ -5105,7 +5105,7 @@ if(MVC.script_options){
     }
         
 	
-    include('apps/'+MVC.app_name);
+    include('apps/'+MVC.app_name+"/init");
 	
     if(MVC.script_options[1] == 'test'){
         // have to include these plugins again (they were included in test already), in case prototype or jquery is included
@@ -5121,7 +5121,7 @@ if(MVC.script_options){
 				load_test();
 	    	}else{
 	    		setTimeout(function(){
-	                MVC.Console.log("There is no application test file at:\n    \"apps/"+MVC.app_name+"/test.js\"\nUse it to include your test files.\n\nTest includes:\n    include.unit_tests('product')\n    include.functional_tests('widget')")
+	                $.Console.log("There is no application test file at:\n    \"apps/"+MVC.app_name+"/test.js\"\nUse it to include your test files.\n\nTest includes:\n    include.unit_tests('product')\n    include.functional_tests('widget')")
 	            },1000)
 	    	}
 		}

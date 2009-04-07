@@ -8,12 +8,12 @@ this.assert_null(this.obj, "Expected to be null");
 this.assert(x_value > 200);
 @code_end
  */
-MVC.Test.Assertions =  jQuery.Class.extend(
+jQuery.Test.Assertions =  jQuery.Class.extend(
 /* @Prototype*/
 {
 	/**
 	 * Creates a new Assertion with the given test for the test that matches test_name.
-	 * @param {MVC.Test} test An instance of a MVC.Test class.
+	 * @param {jQuery.Test} test An instance of a jQuery.Test class.
 	 * @param {Function} test_name A function name.
 	 */
     init: function( test, test_name){
@@ -73,7 +73,7 @@ MVC.Test.Assertions =  jQuery.Class.extend(
 		var  func = this._test.tests[fname];
 		return function(){
 			assert._last_called = fname;
-			var args = MVC.Array.from(arguments);
+			var args = jQuery.Array.from(arguments);
 			if(params) args.unshift(params)
 			try{
 				func.apply(assert, args);
@@ -141,6 +141,6 @@ done_dragging : function(){
 		}
 	},
 	_blur_back: function(){
-		jQuery.browser.mozilla ? window.blur() : MVC.Console.window.focus();
+		jQuery.browser.mozilla ? window.blur() : $.Console.window.focus();
 	}
 });

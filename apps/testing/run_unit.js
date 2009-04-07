@@ -7,7 +7,7 @@ MVCOptions = {
         OpenAjax.hub.subscribe("jmvc.test.test.complete", this.update_test);
         OpenAjax.hub.subscribe("jmvc.test.unit.complete", this.unit_results);
         OpenAjax.hub.subscribe("jmvc.test.test.start", this.start_test);
-        MVC.Test.Unit.run_all();
+        jQuery.Test.Unit.run_all();
     },
     start_test : function(called, test){
         print(test.fullName.toUpperCase()+" TEST ------------------------");

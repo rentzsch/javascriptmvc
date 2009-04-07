@@ -1,4 +1,4 @@
-new MVC.Test.Unit('file',{
+new jQuery.Test.Unit('file',{
    setup: function(){
        this.local_absolute = new MVC.File('/this/was/great');
 	   this.relative_1 = new MVC.File('so/was/this');

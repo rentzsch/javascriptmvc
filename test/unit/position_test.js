@@ -1,4 +1,4 @@
-new MVC.Test.Unit('position',{
+new jQuery.Test.Unit('position',{
    test_positioin: function() {
       MVC.$E('testarea').innerHTML = "<div id='first'>first</div><div id='second'>second</div>";
       this.assert_equal(4, MVC.Position.compare(MVC.$E('first'), MVC.$E('second')))

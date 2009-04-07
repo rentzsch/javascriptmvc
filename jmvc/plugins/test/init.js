@@ -1,18 +1,18 @@
 // we don't include the plugin file because thats done after the app file (in case jquery is loaded)
 
 
-include.plugins("jquery","dom",'lang/class','lang/openajax','dom/synthetic')
+$.include.plugins("jquery","dom",'lang','lang/class','lang/openajax','dom/synthetic')
 
 if(!window._rhino){
-    include.plugins('console')
+    $.include.plugins('console')
 }else{
-    MVC.Console = {log: function(txt){
+    $.Console = {log: function(txt){
         print(txt);
     }}
 }
 
 
-include(
+$.include(
     'test',
     'runner',
     'assertions',

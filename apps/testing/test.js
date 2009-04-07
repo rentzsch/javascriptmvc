@@ -1,4 +1,4 @@
-include.unit_tests(
+$.include.unit_tests(
     'class',
     'testing' ,
     'view',
@@ -20,4 +20,4 @@ include.unit_tests(
     
 );
 
-include.functional_tests();
+$.include.functional_tests();

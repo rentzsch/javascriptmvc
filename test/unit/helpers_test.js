@@ -1,8 +1,8 @@
-new MVC.Test.Unit('helpers',{
+new jQuery.Test.Unit('helpers',{
 	test_object_extend : function(){
 	   var a = {one: 'two', two: 'three'}
 	   var b = {three: 'four'};
-	   MVC.Object.extend(b,a)
+	   jQuery.extend(b,a)
 	   this.assert_equal('two', b.one)
 	   this.assert_equal('three', b.two)
 	   this.assert_equal('four', b.three)
@@ -23,37 +23,37 @@ new MVC.Test.Unit('helpers',{
        this.assert_equal('world',d2.object.hello )
 	},
 	test_string_capitalize : function(){
-		this.assert_equal('Yes', MVC.String.capitalize('yes'));
-		this.assert_equal('Y', MVC.String.capitalize('Y'));
-		this.assert_equal('Yes', MVC.String.capitalize('YES'))
+		this.assert_equal('Yes', jQuery.String.capitalize('yes'));
+		this.assert_equal('Y', jQuery.String.capitalize('Y'));
+		this.assert_equal('Yes', jQuery.String.capitalize('YES'))
 	},
 	test_string_include : function(){
-		this.assert_not(MVC.String.include('Yes','bear') )
-		this.assert( MVC.String.include('Justin','in') )
-		this.assert( MVC.String.include('Justin','Just') )
-		this.assert( MVC.String.include('Justin','Justin') )
-		this.assert_not( MVC.String.include('Justin','nJ') )
+		this.assert_not(jQuery.String.include('Yes','bear') )
+		this.assert( jQuery.String.include('Justin','in') )
+		this.assert( jQuery.String.include('Justin','Just') )
+		this.assert( jQuery.String.include('Justin','Justin') )
+		this.assert_not( jQuery.String.include('Justin','nJ') )
 	},
 	test_string_ends_with : function(){
-		this.assert( MVC.String.ends_with('Justin','in')   );
-		this.assert_not( MVC.String.ends_with('Justin','is awesome')   );
+		this.assert( jQuery.String.ends_with('Justin','in')   );
+		this.assert_not( jQuery.String.ends_with('Justin','is awesome')   );
 	},
 	test_string_camelize : function(){
-		this.assert_equal('oneTwo', MVC.String.camelize('one_two'))
+		this.assert_equal('oneTwo', jQuery.String.camelize('one_two'))
 	},
 	test_string_classize : function(){
-		this.assert_equal('OneTwo', MVC.String.classize('one_two'))
+		this.assert_equal('OneTwo', jQuery.String.classize('one_two'))
 	},
 	test_string_strip : function(){
-		this.assert_equal('word', MVC.String.strip(' word  '))
+		this.assert_equal('word', jQuery.String.strip(' word  '))
 	},
 	test_array_include : function(){
-		this.assert(MVC.Array.include([1,2,3], 2) );
-		this.assert_not(MVC.Array.include([1,2,3], 4) )
+		this.assert(jQuery.Array.include([1,2,3], 2) );
+		this.assert_not(jQuery.Array.include([1,2,3], 4) )
 	},
 	test_array_from : function(){
 		var f = function( ){
-			var arr = MVC.Array.from(arguments);
+			var arr = jQuery.Array.from(arguments);
 			this.assert(arr.join)
 			this.assert_equal(arr[0], 1)
 			this.assert_equal(arr[1], 2)
@@ -71,7 +71,7 @@ new MVC.Test.Unit('helpers',{
 	}
 });
 
-new MVC.Test.Unit('conflict_helpers',{
+new jQuery.Test.Unit('conflict_helpers',{
 	test_string_capitalize : function(){
 		if(MVC._no_conflict) {
 			this.messages.push("Skipping because no_conflict mode is on.");
@@ -173,7 +173,7 @@ MVC.Path.get_data = function(path) {
 		var pair = parts[i].split('=');
 		if(pair.length != 2) continue;
 		var key = decodeURIComponent(pair[0]), value = decodeURIComponent(pair[1]);
-		var key_components = MVC.String.rsplit(key,/\[[^\]]*\]/);
+		var key_components = jQuery.String.rsplit(key,/\[[^\]]*\]/);
 		
 		if( key_components.length > 1 ) {
 			var last = key_components.length - 1;

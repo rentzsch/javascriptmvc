@@ -90,14 +90,14 @@ $.View = function( options ){
 	if(options.view || options.absolute_url || options.view_url){
         this.name = this.name ? this.name : options.view || options.absolute_url || "views/"+options.view_url;
         var url = options.absolute_url || 
-                  (options.view ? jQuery.root.join( options.view+ (options.view.match(this.extMatch) ? '' : this.ext ) ) : 
-                   jQuery.root.join("views/"+options.view_url+ (options.view_url.match(this.extMatch) ? '' : this.ext ))
+                  (options.view ? jQuery.MVC.root.join( options.view+ (options.view.match(this.extMatch) ? '' : this.ext ) ) : 
+                   jQuery.MVC.root.join("views/"+options.view_url+ (options.view_url.match(this.extMatch) ? '' : this.ext ))
                    );
         //options.view = options.absolute_url || options.view || options.;
 		var template = $.View.get(this.name, this.cache);
 		if (template) return template;
 	    if (template == $.View.INVALID_PATH) return null;
-        this.text = include.request(url+(this.cache || window._rhino ? '' : '?'+Math.random() ));
+        this.text = $.ajax({ url: url+(this.cache || window._rhino ? '' : '?'+Math.random() ),async: false}).responseText;
 		
 		if(this.text == null){
 			if(window._rhino) print("Exception: "+'There is no template at '+url);
@@ -138,7 +138,7 @@ $.View.prototype = {
     render : function(object, extra_helpers){
 		object = object || {};
 		var v = new $.View.Helpers(object);
-        jQuery.Object.extend(v, extra_helpers || {} );
+        jQuery.extend(v, extra_helpers || {} );
 		return this.template.process.call(object, object,v);
 	},
 	out : function(){
@@ -481,7 +481,7 @@ $.View.config = function(options){
 	
 	$.View.INVALID_PATH =  -1;
 };
-$.View.config( {cache: include.get_env() == 'production', type: '<', ext: '.ejs' } );
+$.View.config( {cache: jQuery.include.get_env() == 'production', type: '<', ext: '.ejs' } );
 
 $.View.PreCompiledFunction = function(original_path, path, f){
     
@@ -524,14 +524,14 @@ $.View.Helpers.prototype = {
 	}
 };
 
-include.view = function(path){
-	if(include.get_env() == 'development'){
+$.include.view = function(path){
+	if($.include.get_env() == 'development'){
         //should convert path
 		new $.View({view: new jQuery.File("../"+path).join_current()});
-	}else if(include.get_env() == 'compress'){
+	}else if($.include.get_env() == 'compress'){
 		//var oldp = include.get_path();
         //include.set_path(jQuery.root.path);
-        include({path: "../"+path, process: $.View.process_include, ignore: true});
+        $.include({path: "../"+path, process: $.View.process_include, ignore: true});
         //include.set_path(oldp);
         new $.View({view: new jQuery.File("../"+path).join_current()});
 	}else{
@@ -542,7 +542,7 @@ include.view = function(path){
  * @add include Static
  */
 
-include.
+$.include.
 /**
  * @plugin view
  * Includes views into the production file.  This is highly encouraged as the files are preprocessed
@@ -550,7 +550,7 @@ include.
  */
 views = function(){
 	for(var i=0; i< arguments.length; i++){
-		include.view(arguments[i]+$.View.ext);
+		$.include.view(arguments[i]+$.View.ext);
 	}
 };
 
@@ -560,9 +560,7 @@ $.View.process_include = function(script){
 				'", "'+script.path+'",function(_CONTEXT,_VIEW) { try { with(_VIEW) { with (_CONTEXT) {'+view.out()+" return ___ViewO.join('');}}}catch(e){e.lineNumber=null;throw e;}})";
 };
 
-if(!jQuery._no_conflict){
-	View = $.View;
-}
+
 
 
 /**

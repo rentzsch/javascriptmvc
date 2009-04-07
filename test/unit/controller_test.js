@@ -1,4 +1,4 @@
-new MVC.Test.Unit('controller',{
+new jQuery.Test.Unit('controller',{
     setup: function(){
           MVC.$E('testarea').innerHTML = new MVC.View({url: 'views/render/controller'}).render( )
    },

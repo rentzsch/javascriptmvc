@@ -3,7 +3,7 @@
  * Creates helpers from your controller actions.  For example, if your todos controller has an action
  * named click, a TodosClick helper wil be created.
  */
-MVC.Test.Controller = MVC.Test.Functional.extend({
+jQuery.Test.Controller = jQuery.Test.Functional.extend({
 	init: function(name , tests ){
 		var part = jQuery.String.classize(name);
 		var controller_name = part+'Controller';

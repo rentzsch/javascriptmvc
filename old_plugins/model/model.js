@@ -12,11 +12,11 @@ MVC.Model = function(cname, options, class_f, inst_f){
 	
 	inst_f= inst_f || {};
 	inst_f.className = cname;
-	window[MVC.String.classize(cname)] = MVC.Model.InstanceFunctions.extend(inst_f);
-	var clss = window[MVC.String.classize(cname)];
+	window[jQuery.String.classize(cname)] = MVC.Model.InstanceFunctions.extend(inst_f);
+	var clss = window[jQuery.String.classize(cname)];
 	clss.prototype.Class = clss;
 	
-	MVC.Object.extend(clss, MVC.Model.ClassFunctions);
+	jQuery.extend(clss, MVC.Model.ClassFunctions);
 	
 	fnTest = /xyz/.test(function(){xyz;}) ? /\b_super\b/ : /.*/;
 	for (var name in class_f) {
@@ -45,13 +45,13 @@ MVC.Model.ClassFunctions = {
 
 	    if (!options) options = {};
 
-	    options              = MVC.Object.extend({
+	    options              = jQuery.extend({
 	      format:   "xml",
-	      singular: MVC.String.underscore(model),
+	      singular: jQuery.String.underscore(model),
 	      name:     model
 	    }, options);
 	    options.format       = options.format.toLowerCase();
-	    options.plural       = MVC.String.pluralize(options.singular,options.plural);
+	    options.plural       = jQuery.String.pluralize(options.singular,options.plural);
 	    options.singular_xml = options.singular.replace(/_/g, "-");
 	    options.plural_xml   = options.plural.replace(/_/g, "-");
 	    options.remote       = false;
@@ -68,7 +68,7 @@ MVC.Model.ClassFunctions = {
     options.prefix = options.prefix.replace(/\b\/+$/,"");
     
     // Establish custom URLs
-    options.urls = MVC.Object.extend(this._default_urls(options), options.urls);
+    options.urls = jQuery.extend(this._default_urls(options), options.urls);
 
     // Assign options to model
 
@@ -149,7 +149,7 @@ MVC.Model.ClassFunctions = {
       if (!base || base._properties.length == 0) return null;
 
       // even if the ID didn't come back, we obviously knew the ID to search with, so set it
-      if (!MVC.Array.include(base._properties,"id")) base._setAttribute("id", parseInt(id));
+      if (!jQuery.Array.include(base._properties,"id")) base._setAttribute("id", parseInt(id));
 
       return base;
     },this);
@@ -390,7 +390,7 @@ MVC.Model.ClassFunctions = {
         if (relation[singular] && typeof(relation[singular]) == "object" && i == 1) {
           var value = [];
           var plural = attr;
-          var name = MVC.String.classize(singular);
+          var name = jQuery.String.classize(singular);
           
           // force array
           if (!(elements[plural][singular].length > 0))
@@ -410,7 +410,7 @@ MVC.Model.ClassFunctions = {
         // has_one or belongs_to
         else {
           singular = attr;
-          var name = MVC.String.classize(capitalize);
+          var name = jQuery.String.classize(capitalize);
           
           // if the association hasn't been modeled, do a default modeling here
           // hosted object's prefix and format are inherited, singular is set from the XML
@@ -473,7 +473,7 @@ MVC.Model.ClassFunctions = {
 
 
 
-MVC.Model.InstanceFunctions =  MVC.Class.extend({
+MVC.Model.InstanceFunctions =  jQuery.Class.extend({
   init : function(attributes) {
     // Initialize no attributes, no associations
     this._properties = [];
@@ -735,13 +735,13 @@ MVC.Model.InstanceFunctions =  MVC.Class.extend({
       
   _setProperty : function(property, value) {  
     this[property] = value;
-    if (!(MVC.Array.include(this._properties,property)))
+    if (!(jQuery.Array.include(this._properties,property)))
       this._properties.push(property);  
   },
   
   _setAssociation : function(association, value) {
     this[association] = value;
-    if (!(MVC.Array.include(this._associations,association)))
+    if (!(jQuery.Array.include(this._associations,association)))
       this._associations.push(association);
   },
   
@@ -773,7 +773,7 @@ MVC.Model.InstanceFunctions =  MVC.Class.extend({
 });
 
 
-MVC.String.underscore = function(string) {
+jQuery.String.underscore = function(string) {
     return string.replace(/::/g, '/').replace(/([A-Z]+)([A-Z][a-z])/g,'#{1}_#{2}').replace(/([a-z\d])([A-Z])/g,'#{1}_#{2}').replace(/-/g,'_').toLowerCase();
 };
 

@@ -1,4 +1,4 @@
-new MVC.Test.Unit('engine',{
+new jQuery.Test.Unit('engine',{
    test_application_loaded: function() {
       this.assert(TESTING_APP_LOADED);
    },
