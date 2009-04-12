@@ -56,8 +56,8 @@ MVC.Controller.Action.Drag = MVC.Controller.Action.Event.extend(
         }
     
         MVC.Draggable.current = null;
-        MVC.Event.observe(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
-        MVC.Event.observe(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
+        MVC.Event.stop_observing(document, 'mousemove', MVC.Controller.Action.Drag.mousemove)
+        MVC.Event.stop_observing(document, 'mouseup', MVC.Controller.Action.Drag.mouseup);
     }
 },
 /* @prototype */
