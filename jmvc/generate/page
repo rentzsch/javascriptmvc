@@ -30,7 +30,7 @@ if (loc_folders[i] == "..") {
 
 loc_folders.pop();
 loc_folders.push("jmvc");
-loc_folders.push("include.js");
+loc_folders.push("jquery.js");
 
 var data = {
 	path_to_jmvc: loc_folders.join("/"),

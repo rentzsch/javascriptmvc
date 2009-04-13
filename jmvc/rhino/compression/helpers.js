@@ -50,10 +50,10 @@ MVCOptions.collect = function(total){
 		var includer = total[s];
         
         if(typeof includer == 'function'){
-            collection += "include.next_function();\n"
+            collection += "jQuery.include.next_function();\n"
         }else{
             txt = includer.process ? includer.process(includer) : includer.text
-		    collection += "include.set_path('"+includer.start+"')"+";\n"+txt + ";\n";
+		    collection += "jQuery.include.set_path('"+includer.start+"')"+";\n"+txt + ";\n";
         }
         
         
@@ -68,16 +68,16 @@ MVCOptions.collect_and_compress = function(total){
 	for(var s=0; s < total.length; s++){
 		script = total[s];
         if(typeof script == 'function'){
-            collection += "include.next_function();\n"
+            collection += "jQuery.include.next_function();\n"
         }else{
             txt = script.process ? script.process(total[s]) : script.text;
     		compressed = script.compress == false ? txt : MVCOptions.compress(txt, script.path);
-            collection += "include.set_path('"+script.start+"')"+";\n"+compressed + ";\n";
+            collection += "jQuery.include.set_path('"+script.start+"')"+";\n"+compressed + ";\n";
             
             
         }
 	}
-	collection += "include.end_of_production();";
+	collection += "jQuery.include.end_of_production();";
     return collection;
 }
 

@@ -1,14 +1,11 @@
-include.resources();
-include.engines();
-include.plugins(
-    'controller','controller/scaffold',
-    'view','view/helpers',
-    'io/ajax',
-    'model/json_rest','model/xml_rest'
+$.include.resources();
+$.include.engines();
+$.include.plugins(
+    'controller','view'
     );
 
-include(function(){ //runs after prior includes are loaded
-  include.models();
-  include.controllers();
-  include.views();
+$.include(function(){ //runs after prior includes are loaded
+  $.include.models();
+  $.include.controllers();
+  $.include.views();
 });

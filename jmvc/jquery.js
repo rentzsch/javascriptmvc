@@ -4902,7 +4902,7 @@ jQuery.extend(include,
                 var parts = latest.path.split("/")
                 if(parts.length > 4) parts = parts.slice(parts.length - 4);
                 print("   "+parts.join("/"));
-                latest.text = include.request(MVC.root.join(latest.path));
+                latest.text = $.ajax({ url: MVC.root.join(latest.path) ,async: false}).responseText
             }
     		latest.ignore ? insert() : insert(latest.path);
         }
