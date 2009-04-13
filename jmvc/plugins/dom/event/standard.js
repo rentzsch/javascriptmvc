@@ -48,7 +48,7 @@ MVC.Event.observe(MVC.$E('signinForm'), 'submit', checkForm);
             var event = {
                 _event: e, 
                 type: e.type, 
-                target: (e.toElement && e.toElement != e.srcElement ? e.toElement :e.srcElement) || document,  
+                target: eventType == 'mouseover' ? e.toElement : (eventType == 'mouseout' ? e.fromElement : (e.srcElement || document ) ),  
                 currentTarget: element, 
                 relatedTarget: eventType == 'mouseover' ?e.fromElement : e.toElement, //mouseout gets toElement
                 eventPhase: (e.srcElement==element)?2:3,
