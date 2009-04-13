@@ -97,10 +97,10 @@ $.View = function( options ){
 		var template = $.View.get(this.name, this.cache);
 		if (template) return template;
 	    if (template == $.View.INVALID_PATH) return null;
-        this.text = $.ajax({ url: url+(this.cache || window._rhino ? '' : '?'+Math.random() ),async: false}).responseText;
+        this.text = $.ajax({ url: url+(this.cache || jQuery.browser.rhino ? '' : '?'+Math.random() ),async: false}).responseText;
 		
 		if(this.text == null){
-			if(window._rhino) print("Exception: "+'There is no template at '+url);
+			if(jQuery.browser.rhino) print("Exception: "+'There is no template at '+url);
             throw( {type: 'JMVC', message: 'There is no template at '+url}  );
 		}
 		//this.name = url;

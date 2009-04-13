@@ -1,39 +1,23 @@
-load('jmvc/rhino/compression/env.js');
-
-if(typeof MVC == 'undefined')
-    MVC ={ Included: {} };
-else
-    MVC.Included = {};
-
-var window = this;
-var self = window;
-
-include = function(){}
-include.get_env = function(){
-	return 'development'
+//load('jmvc/generate/loader.js')
+discribe_el = function(el){
+    if(!el) return undefined;
+    if(el.id) return "#"+el.id;
+    if(el.className) return "."+el.className
+    return el.nodeName;
 }
 
-window._rhino = __env__.platform == 'Rhino ';
+
+load('jmvc/rhino/compression/env.js');
+__env__.scriptTypes["text/javascript"] = true;
+
+load_stuff = function(){
+    $.include.plugins('view')
+}
+
 window.location = 'jmvc/generate/empty.html';
 
-MVC.Object = { 
-	extend: function(d, s) { for (var p in s) d[p] = s[p]; return d;} 
-}
 
-load('jmvc/plugins/jquery/setup.js');
-load('jmvc/plugins/lang/setup.js');
-load('jmvc/plugins/lang/inflector/inflector.js')
-load('jmvc/plugins/view/view.js');
 
-MVC.Ajax = {factory: function(){ return window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();}}
-include.request = function(path){
-   var request = MVC.Ajax.factory();
-   request.open("GET", path, false);
-   try{request.send(null);}
-   catch(e){return null;}
-   if ( request.status == 404 || request.status == 2 ||(request.status == 0 && request.responseText == '') ) return null;
-   return request.responseText;
-};
 
 MVCOptions = {};
 load('jmvc/rhino/compression/helpers.js');
@@ -54,21 +38,21 @@ var print_generating_message = function(path) {
 render_to = function(file, ejs, data) {
     print_generating_message(file);
     
-    try {
-		MVCOptions.save(file, new View({ absolute_url : ejs }).render(data));
-	} catch(e) {
-		print("  ERROR! Unable to render to " + file + ". Make sure the folder exists!");
-	}
+    //try {
+		MVCOptions.save(file, new $.View({ absolute_url : ejs }).render(data));
+	//} catch(e) {
+	//	print("  ERROR! Unable to render to " + file + ". Make sure the folder exists!");
+	//}
 };
 
 render_text_to = function(file, text) {
 	print_generating_message(file);
 	
-	try {
+	///try {
 		MVCOptions.save(file, text);
-	} catch(e) {
-		print("  ERROR! Unable to render to " + file + ". Make sure the folder exists!");
-	}
+	//} catch(e) {
+	//	print("  ERROR! Unable to render to " + file + ". Make sure the folder exists!");
+	//}
 };
 
 create_folder = function(path) {
@@ -84,3 +68,6 @@ create_folder = function(path) {
 print_post_generation_message = function() {
 	print("\n" + generation_message_state.indent + "Make sure to add new files to your application and test file!\n");
 };
+
+
+

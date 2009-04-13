@@ -12,7 +12,7 @@
 (function(){
 
 
-	if(typeof include != 'undefined') return jquery.include.end();
+	if(typeof jQuery != 'undefined') return jQuery.include.end();
 
 
 
@@ -4382,7 +4382,10 @@ jQuery.each([ "Height", "Width" ], function(i, name){
 });
 
 // ====================== INCLUDE =================================
+//add rhino
 
+
+jQuery.browser.rhino = navigator.userAgent.match(/Rhino/) && true;
 /**
  * @class MVC
  * Default values in MVC namespace.
@@ -4813,7 +4816,7 @@ jQuery.extend(include,
         
         //if we have already performed loads, insert new includes in head
         if(first_wave_done) 
-            return include.insert_head(newInclude.path);
+            return include.insert_head( $.MVC.root.join(newInclude.path) ); //load relative to jmvc_root
         
         
         //get the normalized path, and absolute path, and new start path for the file
@@ -4901,7 +4904,6 @@ jQuery.extend(include,
                 print("   "+parts.join("/"));
                 latest.text = include.request(MVC.root.join(latest.path));
             }
-
     		latest.ignore ? insert() : insert(latest.path);
         }
 	},
@@ -5043,12 +5045,7 @@ var insert = function(src){
 		if(!src_file.is_local_absolute() && !src_file.is_domain_absolute())
 	        src = MVC.root.join(src);
 	}
-    if(! document.write){
-        if(src){
-            load(new MVC.File( src ).clean());
-        }
-        load( new MVC.File( MVC.include_path ).clean()  )
-    }else if(jQuery.browser.opera||jQuery.browser.safari){
+    if(jQuery.browser.opera||jQuery.browser.safari){
 		if(src) {
 			var script = script_tag();
 			script.src=src+'?'+MVC.random;
@@ -5066,7 +5063,7 @@ var insert = function(src){
 };
 
 var call_end = function(src){
-    return jQuery.browser.mozilla ? '<script type="text/javascript">jQuery.include.end()</script>' : 
+    return jQuery.browser.mozilla || jQuery.browser.rhino ? '<script type="text/javascript">jQuery.include.end()</script>' : 
     '<script type="text/javascript" src="'+MVC.include_path+'?'+MVC.random+'"></script>'
 }
 

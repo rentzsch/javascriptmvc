@@ -3,7 +3,7 @@
 
 $.include.plugins("jquery","dom",'lang','lang/class','lang/openajax','dom/synthetic')
 
-if(!window._rhino){
+if(!jQuery.browser.rhino){
     $.include.plugins('console')
 }else{
     $.Console = {log: function(txt){

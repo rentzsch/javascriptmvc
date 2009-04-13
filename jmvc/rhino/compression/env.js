@@ -222,24 +222,28 @@ var __env__ = {};
                 types = script.type?script.type.split(";"):[];
                 for(i=0;i<types.length;i++){
                     if($env.scriptTypes[types[i]]){
-						if(script.src){
+                        //if supported
+                        
+                        var docWrites = [];
+			document.write = function(text){
+				docWrites.push(text);
+			}
+                        
+                        
+                        //if source load
+			if(script.src){
                             $env.log("loading allowed external script :" + script.src);
                             base = "" + window.location;
-                            
-							var docWrites = [];
-							document.write = function(text){
-								docWrites.push(text);
-							}
+			    load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
 							
-							load($env.location(script.src.match(/([^\?#]*)/)[1], base ));
-							if(p){
-								var start = p.m_xml.slice(0,p.m_iP);
-								var end = p.m_xml.slice(p.m_iP);
-								p.m_xml = start+docWrites.join('')+end;
-							}
                         }else{
                             $env.loadInlineScript(script);
                         }
+                        //
+                        if(p){
+				p.insert(docWrites.join(''))
+			}
+                        
                     }else{
                         if(!script.src && script.type == "text/javascript"){
                             $env.loadInlineScript(script);
@@ -2664,7 +2668,6 @@ XMLP.prototype.getName = function() {
 
 
 XMLP.prototype.next = function() {
-
     return this._checkStructure(this._parse());
 
 } 
@@ -3084,8 +3087,15 @@ XMLP.prototype._setErr = function(iErr) {
     return XMLP._ERROR;
 
 }  
-
-
+XMLP.prototype.parsed = function(){
+	return this.m_xml.slice(0,this.m_iP);
+}
+XMLP.prototype.remaining = function(){
+	return this.m_xml.slice(this.m_iP);
+}
+XMLP.prototype.insert = function(text){
+	return this.m_xml = this.parsed()+text+this.remaining();
+}
 /**
 * function:   SAXDriver
 * Author:   Scott Severtson
@@ -3695,7 +3705,7 @@ __extend__(DOMImplementation.prototype,{
  */
 function __parseLoop__(impl, doc, p) {
     var iEvt, iNode, iAttr, strName;
-    iNodeParent = doc;
+    var iNodeParent = doc;
     
     var el_close_count = 0;
     
@@ -3802,12 +3812,11 @@ function __parseLoop__(impl, doc, p) {
     }
 
     else if(iEvt == XMLP._ELM_E) {                  // End-Element Event
-      
 	  var oldParent = iNodeParent;
 	  iNodeParent = iNodeParent.parentNode;         // ascend one level of the DOM Tree
 	  //handle script tag
 	  if(oldParent.nodeName.toLowerCase() == 'script'){
-			$policy.loadScript(oldParent, p);
+            $policy.loadScript(oldParent, p);
 	  }
 	  
     }
@@ -3969,6 +3978,7 @@ function __parseLoop__(impl, doc, p) {
         throw(new DOMException(DOMException.SYNTAX_ERR));
     }
     else if(iEvt == XMLP._NONE) {                   // no more events
+
       if (iNodeParent == doc) {                     // confirm that we have recursed back up to root
         break;
       }
@@ -5081,22 +5091,22 @@ __extend__(HTMLElement.prototype, {
 		set innerHTML(html){
 		    $debug("htmlElement.innerHTML("+html+")");
 		    //Should be replaced with HTMLPARSER usage
-		    var doc = new DOMParser().
-			  parseFromString('<div>'+html+'</div>');
-            var parent = doc.documentElement;//__ownerDocument__(this).importNode(doc.documentElement, true);
+		    var doc = new DOMParser().parseFromString('<div>'+html+'</div>');
+		    var parent = doc.documentElement;//__ownerDocument__(this).importNode(doc.documentElement, true);
             
-			//$log("\n\nIMPORTED HTML:\n\n"+parent.xml);
+			//remove old insides
 			while(this.firstChild != null){
 			    //$log('innerHTML - removing child '+ this.firstChild.xml);
 			    this.removeChild( this.firstChild );
 			}
 			var importedNode;
+			//transfer everything
 			while(parent.firstChild != null){
 			    //$log('innerHTML - appending child '+ parent.firstChild.xml);
 		        //$log('innerHTML - importing node');
-	            importedNode = this.importNode( parent.removeChild( parent.firstChild ), true);
+			   importedNode = this.importNode( parent.removeChild( parent.firstChild ), true);
 			    this.appendChild( importedNode );   
-		    }
+		        }
 		    //Mark for garbage collection
 		    doc = null;
 		},
@@ -7309,7 +7319,7 @@ var $location = $env.location('./');
 
 $w.__defineSetter__("location", function(url){
   //$w.onunload();
-	$location = $env.location(url);
+	$location = String($env.location(url) );
 	setHistory($location);
 	$w.document.load($location);
 });

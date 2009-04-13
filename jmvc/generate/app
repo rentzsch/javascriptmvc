@@ -13,7 +13,7 @@ var data = {
 var app_root = "apps/" + data.class_name;
 
 create_folder(app_root);
-render_to(app_root + ".js", "../rhino/command/templates/application.ejs", data);
+render_to(app_root + "/init.js", "../rhino/command/templates/application.ejs", data);
 render_to(app_root + "/compress.js", "../rhino/command/templates/compress_script.ejs", data);
 render_to(app_root + "/index.html", "../rhino/command/templates/compress_page.ejs", data);
 render_to(app_root + "/run_unit.js", "../rhino/command/templates/unit_script.ejs", data);

@@ -3,7 +3,7 @@ MVC = {
 	Test: {},
 	File: function(path){ this.path = path; },
 	runner: function(f){
-		if(!window.in_command_window && !window._rhino)
+		if(!window.in_command_window && !jQuery.browser.rhino)
 			f();
 	},
 	mvc_root: null,
