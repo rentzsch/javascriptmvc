@@ -4988,10 +4988,9 @@ jQuery.extend(include,
      * @return {Boolean}
      */
     check_exists: function(path){		
-    	var xhr=MVC.Ajax.factory();
+    	var xhr;
     	try{ 
-    		xhr.open("HEAD", path, false);
-    		xhr.send(null); 
+    		xhr = $.ajax({type: 'HEAD', url: path, asynch: false}); 
     	} catch(e) { return false; }
     	if ( xhr.status > 505 || xhr.status == 404 || xhr.status == 2 || 
     		xhr.status == 3 ||(xhr.status == 0 && xhr.responseText == '') ) 
@@ -5105,23 +5104,14 @@ if(MVC.script_options){
     include('apps/'+MVC.app_name+"/init");
 	
     if(MVC.script_options[1] == 'test'){
-        // have to include these plugins again (they were included in test already), in case prototype or jquery is included
-        include.plugins('lang')
+
 		var load_test = function(){
 			include('apps/'+MVC.app_name+'/test');
 		}
 		// check exists doesn't block other scripts from loading in FF3, so this causes problems
-		if (navigator.userAgent.match(/Firefox\/3/)) { // FF 3
-			load_test();
-		} else {
-			if(include.check_exists(MVC.apps_root+'/'+MVC.app_name+'/test.js')){
-				load_test();
-	    	}else{
-	    		setTimeout(function(){
-	                $.Console.log("There is no application test file at:\n    \"apps/"+MVC.app_name+"/test.js\"\nUse it to include your test files.\n\nTest includes:\n    include.unit_tests('product')\n    include.functional_tests('widget')")
-	            },1000)
-	    	}
-		}
+		
+		load_test();
+		
     }
 	if(!jQuery.browser.opera) insert();
     include.opera();//for opera
