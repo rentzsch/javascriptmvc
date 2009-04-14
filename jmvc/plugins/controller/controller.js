@@ -47,29 +47,19 @@ jQuery.Controller = jQuery.Class.extend(
         if(!this.modelName)
             this.modelName = jQuery.String.is_singular(this.underscoreName) ? this.underscoreName : jQuery.String.singularize(this.underscoreName)
 
-        //load tests
-        if(jQuery.include.get_env() == 'test'){
-            var path = jQuery.root.join('test/functional/'+this.underscoreName+'_controller_test.js');
-    		var exists = include.check_exists(path);
-    		if (exists) {
-				jQuery.Console.log('Loading: "test/functional/' + this.underscoreName + '_controller_test.js"');
-                include('../test/functional/'+this.underscoreName+'_controller_test.js');
-			}
-			else {
-				jQuery.Console.log('Test Controller not found at "test/functional/' + this.underscoreName + '_controller_test.js"');
-			}
-        }
-        this._path =  jQuery.include.get_path().match(/(.*?)controllers/)[1]+"controllers";
+        //load tests (will implement later)
+
+        //this._path =  jQuery.include.get_path().match(/(.*?)controllers/)[1]+"controllers";
         var controller = this;
         jQuery.fn[jQuery.String.underscore(this.fullName)] = function(){
             var instances = [];
             var args = jQuery.makeArray(arguments);
             for(var i =0; i < this.length; i++){
                 args.unshift(this[i]);
-                var inst = jQuery.data(this[i], self.fullName);
-                instances.push( isNaN(inst) ? 
+                var inst = jQuery.data(this[i], controller.fullName);
+                instances.push( inst ? 
                                 inst :
-                                controller.createInstance.apply(controller, args)
+                                controller.newInstance.apply(controller, args)
                 )
                 args.shift();
             }
