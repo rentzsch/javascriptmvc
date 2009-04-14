@@ -193,12 +193,13 @@
         klass[name];
 	};
     
-    Class.createInstance = function(){
+    Class.newInstance = function(){
         initializing = true;
         var inst = new Class();
         initializing = false;
         if ( inst.init )
             inst.init.apply(inst, arguments);
+        return inst;
     }
     
     
