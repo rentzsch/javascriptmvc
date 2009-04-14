@@ -4,7 +4,9 @@ $.include.unit_tests(
     'view',
     'delegation',	
 	'inflector',
-    'controller_view'/*,
+    'controller'/*,
+    
+    'controller_view',
     'controller',
     'file',
     'engine',

@@ -1,4 +1,4 @@
-RenderController = MVC.Controller.extend('render',{
+RenderController = $.Controller.extend('render',{
 	"render_to subscribe" : function(params){
 		this.data = 'HelloWorld'
 		this.render({to: 'render_here'});
