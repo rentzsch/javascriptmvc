@@ -61,7 +61,8 @@ jQuery.Test.Unit.extend("Tests.Class",{
        this.assertEqual(true, ajax.eyes);
        this.assertEqual(1000, ajax.hairs);
     },
-    test_something : function(){
-        
+    test_newInstance : function(){
+        var d = Ajax.newInstance(6);
+        this.assertEqual(6, d.hairs);
     }
 });

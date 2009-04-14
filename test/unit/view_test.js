@@ -1,7 +1,7 @@
 jQuery.Test.Unit.extend("Tests.View",{
 	test_simple : function(){
 		$('#testarea').html({view: 'views/simple'})
-        this.assertEqual('<h1>HelloWorld</h1>', $('#testarea').html()
+        this.assertEqual('<h1>helloworld</h1>', $('#testarea').html().toLowerCase()
          /*new MVC.View({url: 'views/simple'}).render( )*/  
          );
 	}/*,
