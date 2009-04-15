@@ -4387,7 +4387,6 @@ jQuery.browser.rhino = navigator.userAgent.match(/Rhino/) && true;
 //add documentWrite to know if we get it right away
 document.write("<script type='text/javascript'>if(jQuery.support.documentWriteSync == null) jQuery.support.documentWriteSync = true</script>")
 if(jQuery.support.documentWriteSync == null) jQuery.support.documentWriteSync = false;
-alert(jQuery.support.documentWriteSync);
 
 /**
  * @class MVC
@@ -4633,8 +4632,7 @@ MVC.Options = {
 
 
 // variables used while including
-var first = true ,                                 //If we haven't included a file yet
-	first_wave_done = false,                       //If all files have been included 
+var first_wave_done = false,                       //If all files have been included 
 	included_paths = [],                           //a list of all included paths
 	cwd = '',                                      //where we are currently including
 	includes=[],                                   //    
@@ -4739,11 +4737,6 @@ jQuery.include = function(){
             include.add( include.add_defaults(arguments[i]) );
         }
 		return;
-	}
-    //do first insert after include
-	if(first && !jQuery.browser.opera){
-		first = false;
-        insert();
 	}
 };
 var include = jQuery.include;
@@ -4915,15 +4908,14 @@ jQuery.extend(include,
 	compress: function(){
         MVCOptions.compress_callback(total)
 	},
-	opera: function(){
-		include.opera_called = true;
-		if(jQuery.browser.opera){
+	start: function(){
+		include.start_called = true;
 			MVC.Options.env == 'production' ? 
                 document.write('<script type="text/javascript" src="'+include.get_production_name()+'"></script>') : 
                 include.end();
-		}
+
 	},
-	opera_called : false,
+	start_called : false,
     plugin: function(plugin_name) {
 		var current_path = include.get_path();
 		include.set_path("");
@@ -5116,11 +5108,11 @@ if(MVC.script_options){
 		load_test();
 		
     }
-	if(!jQuery.browser.opera) insert();
-    include.opera();//for opera
+	//if(!jQuery.browser.opera) insert();
+    include.start();//for opera
 }
-if(jQuery.browser.opera) 
-    setTimeout(function(){ if(!include.opera_called && MVC.Options.load_production){ alert("You forgot include.opera().")}}, 10000);
+//if(jQuery.browser.opera) 
+//    setTimeout(function(){ if(!include.start_called && MVC.Options.load_production){ alert("You forgot include.opera().")}}, 10000);
     
 
 
