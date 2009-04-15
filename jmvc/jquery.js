@@ -4383,9 +4383,12 @@ jQuery.each([ "Height", "Width" ], function(i, name){
 
 // ====================== INCLUDE =================================
 //add rhino
-
-
 jQuery.browser.rhino = navigator.userAgent.match(/Rhino/) && true;
+//add documentWrite to know if we get it right away
+document.write("<script type='text/javascript'>if(jQuery.support.documentWriteSync == null) jQuery.support.documentWriteSync = true</script>")
+if(jQuery.support.documentWriteSync == null) jQuery.support.documentWriteSync = false;
+alert(jQuery.support.documentWriteSync);
+
 /**
  * @class MVC
  * Default values in MVC namespace.
