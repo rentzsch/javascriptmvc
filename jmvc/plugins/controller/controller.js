@@ -262,7 +262,7 @@ jQuery.Controller.Action.extend("jQuery.Controller.Action.Subscribe",
     init: function(action_name, callback, className, element, controller){
         this._super(action_name, callback, className, element, controller);
         this.message();
-        this.subscription = OpenAjax.hub.subscribe(this.message_name, jQuery.Function.bind(this.subscribe, this) );
+        this.subscription = OpenAjax.hub.subscribe(this.message_name, callback );
     },
     /**
      * Gets the message name from the action name.
@@ -270,11 +270,6 @@ jQuery.Controller.Action.extend("jQuery.Controller.Action.Subscribe",
     message: function(){
         this.parts = this.action.match(this.Class.match);
         this.message_name = this.parts[1];
-    },
-    subscribe : function(event_name, data){
-        var params = data || {};
-        params.event_name = event_name
-        this.callback(params)
     },
     destroy : function(){
         OpenAjax.hub.unsubscribe(this.subscription)
