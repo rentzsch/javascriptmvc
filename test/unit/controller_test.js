@@ -89,6 +89,11 @@ $.Test.Unit.extend('Tests.Controller',{
        this.assertEqual("testing_area", inst.clickElement[0].id  );
        this.assertEqual("click", inst.clickEvent.type  );
        inst.destroy();
+   },
+   test_className : function(){
+       var inst = $('#testing_area').testing_controller()[0];
+       this.assert( $('#testing_area').hasClass("testing_controller") );
+       inst.destroy();
    }
    /*,
    test_click_on_id: function() {

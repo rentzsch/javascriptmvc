@@ -40,6 +40,7 @@ jQuery.Controller = jQuery.Class.extend(
         if(!this.className) return;
         this.underscoreName = jQuery.String.underscore(this.className.replace(/controller/i,""))
         this.singularName =  jQuery.String.singularize(this.underscoreName);
+        
         //Don't need these b/c history will uses openAjax
 		//if(!jQuery.Controller.controllers[this.underscoreName]) jQuery.Controller.controllers[this.underscoreName] = [];
         //jQuery.Controller.controllers[this.underscoreName].unshift(this);
@@ -77,7 +78,7 @@ jQuery.Controller = jQuery.Class.extend(
      */
     init: function(element){
         //needs to go through prototype, and attach events to this instance
-
+        jQuery.className.add(element, jQuery.String.underscore(this.Class.fullName.replace('.','_') ) );
         this._actions = [];
         for(var action_name in this){
     		var val = this[action_name];
@@ -144,7 +145,6 @@ jQuery.fn.controller = function(){
             instance_data[ controllerNames[i] ]
     }
 };
-
 
 
 

@@ -31,7 +31,7 @@ jQuery.Class.extend("jQuery.Test",
     run_all : function(number, completedTest){
         number = number || 0;
         if(number < this.tests.length)
-            this.tests[number].run( MVC.Function.bind(this.run_all, this, number+1)  )
+            this.tests[number].run( jQuery.Function.bind(this.run_all, this, number+1)  )
         else
             OpenAjax.hub.publish(this.fullName.toLowerCase()+".complete", this)
     },
