@@ -611,9 +611,16 @@ jQuery.Native.extend('String', {
 	var convert = function(func_name) {
 		var old = jQuery.fn[func_name];
 
-		jQuery.fn[func_name] = function(content) {
-			var useViewTemplate = !(typeof content == "undefined" || typeof content == "string" || content.nodeType || content.jquery);
-			return old.call(this, useViewTemplate ? new jQuery.View(content).render(content.data, content.helpers) : content);
+		jQuery.fn[func_name] = function() {
+			var args = arguments;
+			
+			if (args.length == 1) {
+				var content = arguments[0];
+				var useViewTemplate = !(typeof content == "undefined" || typeof content == "string" || content.nodeType || content.jquery);
+				args = [ useViewTemplate ? new jQuery.View(content).render(content.data, content.helpers) : content ];
+			}
+			
+			return old.apply(this, args);
 		}
 	}
 
