@@ -61,9 +61,9 @@ jQuery.Test.Unit.extend("Tests.Testing",{
            } )
 	   },
 	   test_console : function(){
-	   		for(var i = 0; i < 50 ; i++){
+	   		/*for(var i = 0; i < 50 ; i++){
 				$.Console.log(i)
-			}
+			}*/
 			
 	   }
 });

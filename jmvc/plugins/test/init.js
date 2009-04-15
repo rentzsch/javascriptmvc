@@ -1,5 +1,5 @@
 // we don't include the plugin file because thats done after the app file (in case jquery is loaded)
-
+console.log('test init')
 
 $.include.plugins("jquery","dom",'lang','lang/class','lang/openajax','dom/synthetic')
 

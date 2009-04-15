@@ -87,7 +87,7 @@ jQuery.Controller = jQuery.Class.extend(
                     var act = jQuery.Controller.actions[a];
                     if(act.matches(action_name)){
                         var callback = this.dispatch_closure(action_name);
-                        this._actions.push(new act(action_name, callback, this.Class.underscoreName,element ));
+                        this._actions.push(new act(action_name, callback, this.Class.underscoreName,element, this ));
                     }
                 }
             }
@@ -250,7 +250,7 @@ jQuery.Controller.Action.extend("jQuery.Controller.Action.Subscribe",
 /* @Static*/
 {
     
-    match: new RegExp("(.*?)\\s?(subscribe)$")
+    match: new RegExp("(opener|parent|window)?(~)?(.*?)\\s?(subscribe)$")
 },
 /* @Prototype*/
 {
@@ -262,14 +262,15 @@ jQuery.Controller.Action.extend("jQuery.Controller.Action.Subscribe",
     init: function(action_name, callback, className, element, controller){
         this._super(action_name, callback, className, element, controller);
         this.message();
-        this.subscription = OpenAjax.hub.subscribe(this.message_name, callback );
+        this.subscription = this.who.OpenAjax.hub.subscribe(this.message_name, callback );
     },
     /**
      * Gets the message name from the action name.
      */
     message: function(){
-        this.parts = this.action.match(this.Class.match);
-        this.message_name = this.parts[1];
+        var parts = this.action.match(this.Class.match);
+        this.message_name = parts[3];
+		this.who = parts[1] ? window[parts[1]] : window;
     },
     destroy : function(){
         OpenAjax.hub.unsubscribe(this.subscription)
@@ -391,8 +392,8 @@ jQuery.Controller.Action.extend("jQuery.Controller.Action.Event",
 
 
 
-jQuery.fn.controllerParent = function(){
-    return this.parent("."+this.controller.singularName)
+jQuery.fn.controllerElement = function(){
+    return this.parents("."+this.controller.Class.singularName)
 }
 jQuery.fn.instance = function(){
     var el = this[0];

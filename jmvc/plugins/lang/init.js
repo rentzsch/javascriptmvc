@@ -1,3 +1,4 @@
+console.log("lang init")
 // Several of the methods in this plugin use code adapated from Prototype
 //  Prototype JavaScript framework, version 1.6.0.1
 //  (c) 2005-2007 Sam Stephenson

@@ -1,4 +1,4 @@
-
+console.log('app init')
 
 $.include.engines('testing');
 $.include.plugins('io/ajax/fixtures','controller','view',

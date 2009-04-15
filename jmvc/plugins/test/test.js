@@ -11,6 +11,7 @@ jQuery.Class.extend("jQuery.Test",
         if(jQuery.String.include(this.fullName,"jQuery.Test"  )) return;
         this.testNames = []
         
+		this.underscoredName = jQuery.String.underscore(this.fullName.replace('.','_' ));
 		for(var test_name in this.prototype) {
 			if(! this.prototype.hasOwnProperty(test_name) ) continue;
 			if(test_name.indexOf('test') == 0) {
