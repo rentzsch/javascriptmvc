@@ -18,6 +18,10 @@ $.Controller.extend("TestingController",{
     },
     ".render click" : function(){
         this.classNameClicked = true;
+    },
+    "message.publish subscribe" : function(first, second, third){
+        this.sub1 = first;
+        this.sub2 = second;
     }
 });
 
@@ -93,6 +97,14 @@ $.Test.Unit.extend('Tests.Controller',{
    test_className : function(){
        var inst = $('#testing_area').testing_controller()[0];
        this.assert( $('#testing_area').hasClass("testing_controller") );
+       inst.destroy();
+   },
+   test_open_ajax : function(){
+       var inst = $('#testing_area').testing_controller()[0];
+       OpenAjax.hub.publish("message.publish", 5);
+       
+       this.assertEqual("message.publish", inst.sub1);
+       this.assertEqual(5, inst.sub2);
        inst.destroy();
    }
    /*,

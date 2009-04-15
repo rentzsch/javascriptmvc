@@ -1,10 +1,19 @@
 jQuery.Test.Unit.extend("Tests.View",{
-	test_simple : function(){
-		$('#testarea').html({view: 'views/simple'})
-        this.assertEqual('<h1>helloworld</h1>', $('#testarea').html().toLowerCase()
-         /*new MVC.View({url: 'views/simple'}).render( )*/  
-         );
-	}/*,
+	test_html : function(){
+		$('#testarea').html({view: 'views/simple'});
+        this.assertEqual('<h1>helloworld</h1>', $('#testarea').html().toLowerCase() );
+        $('#testarea').html("");
+
+	},
+    test_append : function(){
+		$('#testarea').html("");
+        $('#testarea').append({view: 'views/simple'});
+        this.assertEqual('<h1>helloworld</h1>', $('#testarea').html().toLowerCase() );
+        $('#testarea').html("");
+
+	}
+    
+    /*,
 	test_render : function(){
 		this.assert_equal("<h1>yes</h1>\n\n<p>1</p>\n\n<p>2</p>\n\n<p>3</p>\n", new MVC.View({url: 'views/no_helpers'}).render( {data: {title: 'yes', info: [1,2,3]}}) );
 	},

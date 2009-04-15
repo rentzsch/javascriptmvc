@@ -607,7 +607,7 @@ jQuery.Native.extend('String', {
 });
 
 
-    var funcs = ["prependTo","appendTo","insertBefore","insertAfter","replaceWith","text","html"]
+    var funcs = ["prepend","append","after","before","replace","text","html"]
 	var convert = function(func_name) {
 		var old = jQuery.fn[func_name];
 
