@@ -1,7 +1,6 @@
 /*$.include.engines('testing');*/
-$.include.plugins('io/ajax/fixtures','controller','view',
-    'dom/element','dom/position','dom/synthetic',
-    'model','lang/timer','view/translation');
+jQuery.include.plugins('controller','view','dom/synthetic'
+    );
 
 
 

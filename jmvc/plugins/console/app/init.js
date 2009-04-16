@@ -71,7 +71,6 @@ jQuery.Controller.extend("TestsController",{
 		this.find("#"+test.underscoredName+" .test_results").html( '('+test.passes+'/'+test.testNames.length+ ')' )
 	},
 	"opener~jquery.test.unit.complete subscribe": function(called, superTest){
-	    console.log(superTest)
 		if(!called.match( this.element.id)) return;
 		//get ones with failures
 	    var fails = 0;
@@ -143,13 +142,13 @@ window.onresize = window_resise =function(){
 	var f = document.getElementById('functional')
 	f.style.height = ''+(getDimensions().height - 57)+'px';
 	if(opener.jQuery.browser.msie){
-		var up = document.getElementById('unit_play').offsetWidth;
+		/*var up = document.getElementById('unit_play').offsetWidth;
 		var fp = document.getElementById('functional_play').offsetWidth;
 		if(up){
 			document.getElementById('unit_container').style.width = ''+(up+20)+'px'
 		}else if(fp){
 			document.getElementById('functional_container').style.width = ''+(fp+20)+'px'
-		}
+		}*/
 		
 	}
 	
@@ -157,7 +156,7 @@ window.onresize = window_resise =function(){
 
 console_scroll = function(){
 	if(console_scrolled <= -10){
-		if(opener.jQuery.jQuery.browser.safari ){
+		if(opener.jQuery.browser.safari ){
 			setTimeout(function(){
 				var cl = document.getElementById('console_log');
 				var newHeight = cl.clientHeight;

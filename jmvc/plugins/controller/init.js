@@ -1,4 +1,3 @@
-logger("=============CONTROLLER:INIT")
 jQuery.include.plugins('lang','lang/class','lang/openajax','lang/inflector','dom/delegate');
 jQuery.include('controller');
 if(jQuery.View) jQuery.include.plugins('controller/view');

@@ -4383,8 +4383,6 @@ jQuery.browser.rhino = navigator.userAgent.match(/Rhino/) && true;
 //add documentWrite to know if we get it right away
 document.write("<script type='text/javascript'>if(jQuery.support.documentWriteSync == null) jQuery.support.documentWriteSync = true</script>")
 if(jQuery.support.documentWriteSync == null) jQuery.support.documentWriteSync = false;
-logger("docWriteSync "+jQuery.support.documentWriteSync);
-logger("scriptEval " +jQuery.support.scriptEval)
 /**
  * @class MVC
  * Default values in MVC namespace.
@@ -4794,7 +4792,6 @@ jQuery.extend(include,
     // Adds an include to the pending list of includes.
 	add: function(newInclude){
         //If include is a function, adjust the function to first set the path right before including
-        logger("ADD "+newInclude.path)
         if(typeof newInclude == 'function'){
             var path = include.get_path();
             var adjusted = function(){
@@ -4877,7 +4874,6 @@ jQuery.extend(include,
             }
 			return;
 		};
-        logger("END "+latest.path+" remaining "+includes.length)
         //add to the total list of things that have been included, and clear current includes
 		total.push( latest);
 		current_includes = [];
@@ -5032,7 +5028,6 @@ var script_tag = function(){
 var insert = function(src){
     // source we need to know how to get to jmvc, then load 
     // relative to path to jmvc
-    logger("INSERT "+src)
     if(src){
         var src_file = new MVC.File(src);
 		if(!src_file.is_local_absolute() && !src_file.is_domain_absolute())
@@ -5056,8 +5051,8 @@ var insert = function(src){
 };
 
 var call_end = function(src){
-    return !jQuery.browser.msie ? '<script type="text/javascript">logger("..calling end");jQuery.include.end();logger("..after end")</script>' : 
-    '<script type="text/javascript" src="'+MVC.mvc_root+'/end.js"></script>'
+    return !jQuery.browser.msie ? '<script type="text/javascript">jQuery.include.end();</script>' : 
+    '<script type="text/javascript" src="'+MVC.mvcRoot+'/end.js"></script>'
 }
 
 var head = function(){
