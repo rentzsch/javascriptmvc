@@ -5006,15 +5006,15 @@ jQuery.extend(include,
 /**
  * @function controllers
  */
-include.controllers = include.app(function(i){return '../controllers/'+i+'_controller'});
+include.controllers = include.app(function(i){return '../../controllers/'+i+'_controller'});
 /**
  * @function models
  */
-include.models = include.app(function(i){return '../models/'+i});
+include.models = include.app(function(i){return '../../models/'+i});
 /**
  * @function resources
  */
-include.resources = include.app(function(i){return '../resources/'+i});
+include.resources = include.app(function(i){return '../../resources/'+i});
 
 
 
