@@ -10,7 +10,7 @@ opener.jQuery.Console.log = function(){
 
 
 opener.jQuery.Console.logHtml = function(html){
-	$("#console_log").after(  html )
+	$("#console_log").append(  html )
 }
 	
 		
@@ -25,7 +25,6 @@ jQuery.Controller.extend("TestsController",{
 		opener.jQuery.Test.Unit.run_all()
 	},
 	".test_run click" : function(el){
-		console.log("c2")
 		this.tests[el.controllerElement()[0].id].run()
 	},
 	".step a click" : function(el){
@@ -34,21 +33,20 @@ jQuery.Controller.extend("TestsController",{
 		test.run_test(el.parents(".step").attr('stepName'));
 		
 	},
-	"opener~jmvc.test.created subscribe" : function(called, test){
+	"opener~jquery.test.created subscribe" : function(called, test){
 		if(test.type != this.element.id) return;
 		this.tests[test.underscoredName] = test;
 		this.find(".tests_container").append({view: "jmvc/plugins/console/app/test", data: test});
 		window_resise();
 	},
-	"opener~jmvc.test.running subscribe" : function(called, assertions){
-	    console.log("running",assertions )
+	"opener~jquery.test.running subscribe" : function(called, assertions){
 		if(assertions._test.type != this.element.id) return;
 		
 		var test = assertions._test;
 		this.find('#step_'+test.name+'_'+assertions._test_name).removeClass().
 			find('.result').html("Running...");
 	},
-	"opener~jmvc.test.case.complete subscribe": function(called, testInstance){
+	"opener~jquery.test.case.complete subscribe": function(called, testInstance){
 
 		if(testInstance.Class.type != this.element.id) return;
 	    var test_name = testInstance._testName
@@ -68,11 +66,11 @@ jQuery.Controller.extend("TestsController",{
 				clean_messages(testInstance.messages).join("<br/>") )
 		}
 	},
-	"opener~jmvc.test.test.complete subscribe": function(called, test){
+	"opener~jquery.test.test.complete subscribe": function(called, test){
 		if(test.type != this.element.id) return;
 		this.find("#"+test.underscoredName+" .test_results").html( '('+test.passes+'/'+test.testNames.length+ ')' )
 	},
-	"opener~jmvc.test.unit.complete subscribe": function(called, superTest){
+	"opener~jquery.test.unit.complete subscribe": function(called, superTest){
 	    console.log(superTest)
 		if(!called.match( this.element.id)) return;
 		//get ones with failures

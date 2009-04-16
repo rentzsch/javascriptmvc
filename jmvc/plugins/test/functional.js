@@ -373,15 +373,3 @@ this.Write(input_params.element, {text: 'Brian', callback: this.next_callback()}
 jQuery.Test.Functional.tests = [];
 
 
-jQuery.Test.Runner(jQuery.Test.Functional, "tests", {
-	start : function(){
-		this.passes = 0;
-	},
-	after : function(number ){
-		if(this.tests[number].failures == 0 ) this.passes++;
-	},
-	done: function(){
-		$.Console.window.document.getElementById('functional_result').innerHTML = 
-			'('+this.passes+'/'+this.tests.length+')' + (this.passes == this.tests.length ? ' Wow!' : '')
-	}
-})

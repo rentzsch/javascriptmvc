@@ -114,7 +114,6 @@ jQuery.Class.extend('jQuery.Respond',
 	 */
 	activate: function(responder, mover, event) { //this is where we should call over
 		this.last_active = responder;
-		console.log(responder[this.className+'over'])
         if(responder[this.lowerName+'over']) responder[this.lowerName+'over']( responder.element, event, responder, mover);
 	},
     move : function(responder, mover, event){
@@ -133,7 +132,7 @@ jQuery.Class.extend('jQuery.Respond',
 		if(!this._responders.length) return;
 		
 		var respondable, affected = [];
-		console.log(this._responders.length)
+
 		for(var d =0 ; d < this._responders.length; d++ ){
 		    if(this.isAffected(point, element, this._responders[d])) 
 				affected.push(this._responders[d]);   
@@ -189,7 +188,6 @@ jQuery.Class.extend('jQuery.Respond',
 	* Called after dragging has stopped.
 	*/
 	clear : function(){
-		console.log('clear')
 	  this._responders = [];
 	}
 },

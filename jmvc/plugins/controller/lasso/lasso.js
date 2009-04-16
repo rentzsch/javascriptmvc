@@ -140,7 +140,6 @@ MVC.Lasso.prototype =
      * @param {Object} event
      */
 	position_lasso : function(event){
-		console.log("position")
         
         var current = event.pointer();
 		//find the top left event

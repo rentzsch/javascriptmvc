@@ -28,7 +28,7 @@ jQuery.Test.Assertions =  jQuery.Class.extend(
 		this._test_name = test_name;
 		this._last_called = test_name;
 		
-        OpenAjax.hub.publish("jmvc.test.running", this);
+        OpenAjax.hub.publish("jquery.test.running", this);
         
 		if(this.setup) 
 			this._setup();
@@ -134,7 +134,7 @@ done_dragging : function(){
 			if(this._do_blur_back)
 				this._blur_back();
 			
-            OpenAjax.hub.publish("jmvc.test.assertions.update", this);
+            OpenAjax.hub.publish("jquery.test.assertions.update", this);
             
 			this.failures == 0 && this.errors == 0?  this._test.pass(): this._test.fail();
 			this._test.run_next();

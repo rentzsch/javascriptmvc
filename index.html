@@ -12,6 +12,11 @@
                 border: solid 1px gray;
             }
         </style>
+        <script type='text/javascript'>
+            logger =  function(text){
+                $('#log').append(text+"<br/>");
+            }
+        </script>
 	</head>
 	<body>
 	    <h1>JavaScriptMVC Testing</h1>
@@ -21,6 +26,6 @@
         <div id='testarea'></div>
         <div id="log"></div>
         
-		<script type='text/javascript' src='jmvc/jquery.js?testing,test'></script>
+		<script type='text/javascript' src='jmvc/jquery.js?testing,development'></script>
 	</body>
 </html>

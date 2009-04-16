@@ -18,13 +18,13 @@ jQuery.Class.extend("jQuery.Test",
                 this.testNames.push(test_name)
             }
 		}
-        OpenAjax.hub.publish("jmvc.test.created", this)
+        OpenAjax.hub.publish("jquery.test.created", this)
     },
     run : function(callback){
         this.clear();
         this.working_test = 0;
         this.callback = callback;
-        OpenAjax.hub.publish("jmvc.test.test.start", this);
+        OpenAjax.hub.publish("jquery.test.test.start", this);
         //get list of tests
         
         this.run_next();
@@ -46,7 +46,7 @@ jQuery.Class.extend("jQuery.Test",
 			this.working_test++;
 			this.run_test(this.testNames[this.working_test-1]);
 		}else if(this.working_test != null){
-			OpenAjax.hub.publish("jmvc.test.test.complete", this);
+			OpenAjax.hub.publish("jquery.test.test.complete", this);
 
 			this.working_test = null;
 			if(this.callback){
@@ -306,7 +306,7 @@ new jQuery.Test.Unit('TestCase Name',{
 			this.destroy()
 			if(this._do_blur_back) this._blur_back();
 			
-            OpenAjax.hub.publish("jmvc.test.case.complete", this);
+            OpenAjax.hub.publish("jquery.test.case.complete", this);
             
 			this.failures == 0 && this.errors == 0?  this.Class.pass(): this.Class.fail();
 			this.Class.run_next();

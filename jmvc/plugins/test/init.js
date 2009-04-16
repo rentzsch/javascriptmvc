@@ -1,18 +1,17 @@
 // we don't include the plugin file because thats done after the app file (in case jquery is loaded)
-console.log('test init')
 
-$.include.plugins("jquery","dom",'lang','lang/class','lang/openajax','dom/synthetic')
+jQuery.include.plugins("jquery","dom",'lang','lang/class','lang/openajax','dom/synthetic')
 
 if(!jQuery.browser.rhino){
-    $.include.plugins('console')
+    jQuery.include.plugins('console')
 }else{
-    $.Console = {log: function(txt){
+    jQuery.Console = {log: function(txt){
         print(txt);
     }}
 }
 
 
-$.include(
+jQuery.include(
     'test',
     'runner',
     'assertions',

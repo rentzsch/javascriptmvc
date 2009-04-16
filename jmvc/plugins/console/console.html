@@ -7,7 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="console.css"/>
 
 	</head>
-	<body scroll='no'>
+	<body>
 	<a id="reload" href="#" onclick="opener.location.reload()">Reload</a>
 		<h1>JavaScriptMVC Console</h1>
 		<div id='types'>
@@ -67,6 +67,12 @@
 		<div id='console' class='test_type'>
 			 <div id='console_log' onscroll='console_log_scrolled()'></div>
 		</div>
+        <script type='text/javascript'>
+            logger =  function(text){
+                $('#console_log').append(text+"<br/>");
+            }
+        </script>
+        
 		<script src='../../jquery.js' type='text/javascript'></script>
 		<script type='text/javascript'>
 			$.include.plugins('controller','console/app','view');
