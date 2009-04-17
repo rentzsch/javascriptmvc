@@ -50,8 +50,9 @@ MVC.Object.extend(MVC.String, {
         };
         
         var escapedString = string.replace(/[\x00-\x1f\\]/g, function(match) {
-          var character = specialChar[match[0]];
-          return character ? character : '\\u00' + MVC.Number.to_padded_string(match[0].charCodeAt(), 2, 16);
+		  var first_match = match.slice(0);
+          var character = specialChar[first_match];
+          return character ? character : '\\u00' + MVC.Number.to_padded_string(first_match.charCodeAt(), 2, 16);
         });
         return '"' + escapedString.replace(/"/g, '\\"') + '"';
     }
