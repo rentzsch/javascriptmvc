@@ -84,10 +84,10 @@ to_query_string = function(object,name){
 	return MVC.Native.Object.to_query_string.worker(object,name).join('&');
 };
 MVC.Native.Object.to_query_string.worker = function(obj,name){
-	var parts2 = [];
+	var parts2 = [], value;
 	for(var thing in obj){
-		if(obj.hasOwnProperty(thing)) {
-			var value = obj[thing];
+		if(obj.hasOwnProperty(thing) && (( value = obj[thing]) != null )) {
+
             if(value && value.constructor === Date){
                 
                 value =  value.getUTCFullYear()+'-'+
