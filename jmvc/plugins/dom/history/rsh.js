@@ -738,6 +738,8 @@ historyChange = function(newLocation, historyData) {
 		controller_part = 'main';
 		action_part = folders;
 	}
+	params._controller_name = controller_part;
+	params._action_name     = action_part;
 	var controller = MVC.Controller.get_controller_with_name_and_action(controller_part, action_part )
 	if(!controller){
 		if(MVC.History.throwErrors)
