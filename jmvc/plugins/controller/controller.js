@@ -425,8 +425,16 @@ MVC.Controller.Action.Event = MVC.Controller.Action.extend(
             this.bound_event = MVC.Function.bind(function(event){
                 this.callback({event: event, element: window})
             }, this)
-			
-			MVC.Event.observe(window, this.event_type, MVC.Function.bind(this.bound_event) );
+			var event_type = this.event_type;
+			if(MVC.Browser.IE){
+				if(this.event_type == 'focus')
+					event_type = 'focusin';
+				if(this.event_type == 'blur')
+					event_type = 'focusout';
+				MVC.Event.observe(document.documentElement, event_type, MVC.Function.bind(this.bound_event) );
+			}
+			else
+				MVC.Event.observe(window, event_type, MVC.Function.bind(this.bound_event) );
             this.css_selector = "";
             return;
         }
