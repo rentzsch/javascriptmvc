@@ -128,7 +128,7 @@ MVC.Object.extend(MVC.Element, {
              MVC.Dom.data(element,"offset") ||  MVC.Dom.data(element,"offset", MVC.Element.offset(element)) :
              MVC.Element.offset(element);
     if(element == document.documentElement) return true;
-	var res = this._within_box(x, y, 
+	var res = MVC.Element._within_box(x, y, 
 		                    offset[0],offset[1],
 		                    element.offsetWidth,  element.offsetHeight )
 	
