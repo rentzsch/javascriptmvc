@@ -27,14 +27,15 @@ jQuery.Class.extend("jQuery.Test",
         OpenAjax.hub.publish("jquery.test.test.start", this);
         //get list of tests
         
-        this.run_next();
+        return this.run_next();
     },
     run_all : function(number, completedTest){
         number = number || 0;
         if(number < this.tests.length)
             this.tests[number].run( jQuery.Function.bind(this.run_all, this, number+1)  )
         else
-            OpenAjax.hub.publish(this.fullName.toLowerCase()+".complete", this)
+            OpenAjax.hub.publish(this.fullName.toLowerCase()+".complete", this);
+		return this;
     },
     clear : function(){
         this.working_test = null;

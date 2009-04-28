@@ -1,6 +1,5 @@
 // we don't include the plugin file because thats done after the app file (in case jquery is loaded)
 
-jQuery.include.plugins('dom','lang','lang/class','lang/openajax','dom/synthetic')
 
 if(!jQuery.browser.rhino){
     jQuery.include.plugins('console')
@@ -9,6 +8,10 @@ if(!jQuery.browser.rhino){
         print(txt);
     }}
 }
+
+jQuery.include.plugins('dom','lang','lang/class','lang/openajax','dom/synthetic')
+
+
 
 
 jQuery.include(

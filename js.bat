@@ -4,7 +4,7 @@
 @echo off
 SETLOCAL ENABLEDELAYEDEXPANSION
 if "%1"=="" (
-	java -jar jmvc\rhino\js.jar
+	java -cp jmvc\rhino\selenium-java-client-driver.jar;jmvc\rhino\js.jar org.mozilla.javascript.tools.shell.Main
 	GOTO END
 )
 if "%1"=="-h" GOTO PRINT_HELP
@@ -12,7 +12,7 @@ if "%1"=="-?" GOTO PRINT_HELP
 if "%1"=="--help" GOTO PRINT_HELP
 
 if "%1"=="-d" (
-	java -classpath jmvc/rhino/js.jar org.mozilla.javascript.tools.debugger.Main
+	java -classpath jmvc\rhino\selenium-java-client-driver.jar;jmvc/rhino/js.jar org.mozilla.javascript.tools.debugger.Main
 	GOTO END
 )
 
@@ -24,25 +24,22 @@ for %%a in (%2 %3 %4 %5 %6 %7) do (
 	if not "%%a"=="" SET ARGS=!ARGS!'%%a',
 )
 SET ARGS=%ARGS%]
-java -jar jmvc\rhino\js.jar -e _args=%ARGS% -e load('%FILENAME%')
+java -cp jmvc\rhino\selenium-java-client-driver.jar;jmvc\rhino\js.jar org.mozilla.javascript.tools.shell.Main -e _args=%ARGS% -e load('%FILENAME%')
+
 GOTO END
 
 :PRINT_HELP
-echo.
 echo Load a command line Rhino JavaScript environment or run JavaScript script files in Rhino.
 echo Available commands:
-echo.
 echo js				Opens a command line JavaScript environment
-echo js -d				Opens the Rhino debugger
+echo js	-d			Opens the Rhino debugger
 echo js [FILE]			Runs FILE in the Rhino environment
-echo.
+
 echo JavaScriptMVC script usage:
-echo.
-echo js jmvc/generate/app [NAME]		Creates a new JavaScriptMVC application
+echo js jmvc/generate/app [NAME]	Creates a new JavaScriptMVC application
 echo js jmvc/generate/page [APP] [PAGE]	Generates a page for the application
 echo js jmvc/generate/controller [NAME]	Generates a Controller file
 echo js jmvc/generate/model [TYPE] [NAME]	Generates a Model file
-echo js jmvc/generate/engine [NAME]		Generates a set of Engine files
-echo js apps/[NAME]/compress.js		Compress your application and generate documentation
-echo.
+echo js apps/[NAME]/compress.js	Compress your application and generate documentation
+
 :END

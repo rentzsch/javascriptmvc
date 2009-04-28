@@ -121,7 +121,7 @@ jQuery.Native.extend('String',
      */
 	strip : jQuery.String.strip,
     underscore : function(s){
-        return s.replace(/::/, '/').replace(/([A-Z]+)([A-Z][a-z])/,'$1_$2').replace(/([a-z\d])([A-Z])/,'$1_$2').replace(/-/,'_').toLowerCase()
+        return s.replace(/::/, '/').replace(/([A-Z]+)([A-Z][a-z])/g,'$1_$2').replace(/([a-z\d])([A-Z])/g,'$1_$2').replace(/-/g,'_').toLowerCase()
     }
 });
 

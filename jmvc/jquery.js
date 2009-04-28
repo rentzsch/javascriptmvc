@@ -769,7 +769,7 @@ jQuery.extend({
 				});
 			}
 
-			if ( elem.offsetWidth !== 0 )
+			if ( elem.offsetWidth !== 0 || elem.nodeName.toLowerCase() == 'script') //JMVC Modified
 				getWH();
 			else
 				jQuery.swap( elem, props, getWH );
@@ -4377,6 +4377,99 @@ jQuery.each([ "Height", "Width" ], function(i, name){
 
 });
 
+
+
+var _listener = {
+	// create a dispatcher function
+	getDispatcher: function(){
+		return function(){
+			var ap=Array.prototype, c=arguments.callee, ls=c._listeners, t=c.target;
+			// return value comes from original target function
+			var r = t && t.apply(this, arguments);
+			// make local copy of listener array so it is immutable during processing
+			var lls;
+											lls = [].concat(ls);
+							
+			// invoke listeners after target function
+			for(var i in lls){
+				if(!(i in ap)){
+					lls[i].apply(this, arguments);
+				}
+			}
+			// return value comes from original target function
+			return r;
+		}
+	},
+	// add a listener to an object
+	add: function(/*Object*/ source, /*String*/ method, /*Function*/ listener){
+		source = source || window;
+		var f = source[method];
+		if(!f||!f._listeners){
+			var d = _listener.getDispatcher();
+			d.target = f;
+			d._listeners = []; 
+			f = source[method] = d;
+		}
+
+		return f._listeners.push(listener) ; /*Handle*/
+	},
+	remove: function(/*Object*/ source, /*String*/ method, /*Handle*/ handle){
+		var f = (source||window)[method];
+		if(f && f._listeners && handle--){
+			delete f._listeners[handle];
+		}
+	}
+};
+jQuery.connect = function(/*Object|null*/ obj, 
+						/*String*/ event, 
+						/*Object|null*/ context, 
+						/*String|Function*/ method,
+						/*Boolean*/ dontFix){
+
+	// normalize arguments
+	var a=arguments, args=[], i=0;
+	// if a[0] is a String, obj was ommited
+	args.push((typeof a[0] == "string") ? null : a[i++], a[i++]);
+	// if the arg-after-next is a String or Function, context was NOT omitted
+	var a1 = a[i+1];
+	args.push((typeof a1 == "string") || (typeof a1 == "function") ? a[i++] : null, a[i++]);
+	// absorb any additional arguments
+	for(var l=a.length; i<l; i++){	args.push(a[i]); }
+	// do the actual work
+	return _connect.apply(this, args); /*Handle*/
+}
+
+// used by non-browser hostenvs. always overriden by event.js
+var _connect = function(obj, event, context, method){
+	var l=_listener, h=l.add(obj, event, hitch(context, method)); 
+	return [obj, event, h, l]; // Handle
+}
+
+jQuery.disconnect = function(/*Handle*/ handle){
+
+	if(handle && handle[0] !== undefined){
+	 _disconnect.apply(this, handle);
+		// let's not keep this reference
+		delete handle[0];
+	}
+}
+
+var _disconnect = function(obj, event, handle, listener){
+	listener.remove(obj, event, handle);
+}
+var hitch = function(scope, method ){
+	if(!method){
+		method = scope;
+		scope = null;
+	}
+	if(typeof method == "string"){
+		scope = scope || window;
+		if(!scope[method]){ throw(['jQuery.hitch: scope["', method, '"] is null (scope="', scope, '")'].join('')); }
+		return function(){ return scope[method].apply(scope, arguments || []); }; // Function
+	}
+	return !scope ? method : function(){ return method.apply(scope, arguments || []); }; // Function
+}
+
 // ====================== INCLUDE =================================
 //add rhino
 jQuery.browser.rhino = navigator.userAgent.match(/Rhino/) && true;
@@ -4844,16 +4937,7 @@ jQuery.extend(include,
             include.insert_head(MVC.root.join(arguments[i]));
         }
     },
-    /**
-     * Used to close a document that has been openned.  This is useful for writing to popup windows.
-     */
-    close_time : function(){
-        setTimeout(function(){ document.close(); },10)
-    },
-    close : function(){
-        if(include.get_env()=='production') include.close_time();
-        else    include._close= true;
-    },
+	done : function(){},
     // Called after every file is loaded.  Gets the next file and includes it.
 	end: function(src){
         // add includes that were just added to the end of the list
@@ -4866,12 +4950,10 @@ jQuery.extend(include,
         // if there are no more
 		if(!latest) {
 			first_wave_done = true;
-			if(include.get_env()=='compress') setTimeout( include.compress, 10 );
+			include.done();
+
             if(typeof MVCOptions != 'undefined' && MVCOptions.done_loading) MVCOptions.done_loading();
             
-            if(include._close){ 
-                this.close_time();
-            }
 			return;
 		};
         //add to the total list of things that have been included, and clear current includes
@@ -5094,12 +5176,13 @@ if(MVC.script_options){
 	
     if(MVC.script_options[1] == 'test'){
 
-		var load_test = function(){
-			include('apps/'+MVC.app_name+'/test');
-		}
+		//var load_test = function(){
+			include('apps/'+MVC.app_name+'/test');  //load at the end?
+			
+		//}
 		// check exists doesn't block other scripts from loading in FF3, so this causes problems
 		
-		load_test();
+		//load_test();
 		
     }
 	//if(!jQuery.browser.opera) insert();

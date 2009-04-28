@@ -40,7 +40,7 @@ jQuery.Controller = jQuery.Class.extend(
         if(!this.className) return;
         this.underscoreName = jQuery.String.underscore(this.className.replace(/controller/i,""))
         this.singularName =  jQuery.String.singularize(this.underscoreName);
-        
+        this.underscoreControllerName = jQuery.String.underscore(this.fullName.replace('.','_'));
         //Don't need these b/c history will uses openAjax
 		//if(!jQuery.Controller.controllers[this.underscoreName]) jQuery.Controller.controllers[this.underscoreName] = [];
         //jQuery.Controller.controllers[this.underscoreName].unshift(this);
@@ -78,7 +78,7 @@ jQuery.Controller = jQuery.Class.extend(
      */
     init: function(element){
         //needs to go through prototype, and attach events to this instance
-        jQuery.className.add(element, jQuery.String.underscore(this.Class.fullName.replace('.','_') ) );
+        jQuery.className.add(element,  this.Class.underscoreControllerName );
         this._actions = [];
         for(var action_name in this){
     		var val = this[action_name];
@@ -93,8 +93,8 @@ jQuery.Controller = jQuery.Class.extend(
             }
 	    }
         this.action_name = "init";
-        this.element = element;
-        jQuery.data(this.element, this.Class.fullName, this);
+        this.element = jQuery(element);
+        jQuery.data(element, this.Class.fullName, this);
     },
 
     /**
@@ -108,7 +108,7 @@ jQuery.Controller = jQuery.Class.extend(
 		delete this._actions;
 		this._destroyed = true;
 		//clear element
-        jQuery.removeData(this.element, this.Class.fullName);
+        this.element.removeData( this.Class.fullName);
 		this.element = null;
     },
     /**
@@ -129,7 +129,7 @@ jQuery.Controller = jQuery.Class.extend(
      * @param {Object} selector
      */
     find: function(selector){
-        return $(this.element).find(selector);
+        return this.element.find(selector);
     }
 });
 
