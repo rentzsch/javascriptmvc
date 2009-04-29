@@ -106,7 +106,9 @@ MVC.Model = MVC.Class.extend(
      * @return {Model} will return instances of the model if syncronous
      */
 	init: function(){
-		if(!this.className) return;
+		this.attributes= {};
+        this.default_attributes= {};
+        if(!this.className) return;
         MVC.Model.models[this.className] = this;
         this.store = new this.store_type(this);
 	},
@@ -207,8 +209,7 @@ MVC.Model = MVC.Class.extend(
         if(! this.default_attributes[property])
             this.default_attributes[property] = null;
     },
-    attributes: {},
-    default_attributes: {},
+
     /**
      * Used for converting callbacks to to seperate failure and succcess
      * @param {Object} callbacks
