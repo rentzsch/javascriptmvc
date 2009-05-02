@@ -3,9 +3,16 @@
 # if arguments do exist, it loads the script in the first argument and passes the other arguments to the script
 # ie: ./js jmvc/script/controller Todo
 
+JAVA="java"
+
+if [ -z "$JAVA_HOME" -a -d "/System" ]
+then
+  JAVA="/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/bin/java"
+fi
+
 if [ $# -eq 0 ]
 then
-  java -jar jmvc/rhino/js.jar
+  $JAVA -jar jmvc/rhino/js.jar
   exit 127
 fi
 
@@ -29,7 +36,7 @@ fi
 
 if [ $1 = "-d" ]
 then
-	java -classpath jmvc/rhino/js.jar org.mozilla.javascript.tools.debugger.Main
+	$JAVA -classpath jmvc/rhino/js.jar org.mozilla.javascript.tools.debugger.Main
 	exit 127
 fi
 
@@ -42,4 +49,4 @@ do
   fi
 done
 ARGS=$ARGS]
-java -jar jmvc/rhino/js.jar -e _args=$ARGS -e 'load('"'"$1"'"')'
+$JAVA -jar jmvc/rhino/js.jar -e _args=$ARGS -e 'load('"'"$1"'"')'
